@@ -56,7 +56,7 @@ public class PrimesMain {
 		// InfrastructureManager(initialSpecs, isElastic, infraProvider,
 		// properties);
 		InfrastructureManager infraManager = new InfrastructureManager(null, isElastic, infraProvider, properties);
-		infraManager.start(blockWhileInitializing);
+		infraManager.start(blockWhileInitializing, true);
 
 		Job primeJob = new PrimeJob();
 		primeJob.addTask(getPrimeTask(1000, 2000, null));

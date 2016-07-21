@@ -89,10 +89,13 @@ public class InfrastructureManager {
 
 	// --------- PUBLIC METHODS --------- //
 
-	public void start(boolean blockWhileInitializing) throws Exception {
+	public void start(boolean blockWhileInitializing, boolean removePrevious) throws Exception {
 		LOGGER.info("Starting Infrastructure Manager");
-
-		removePreviousResources();
+		
+		if (removePrevious) {
+			removePreviousResources();
+		}
+		
 		this.createInitialOrders();
 		// Start order service to monitor and resolve orders.
 		triggerOrderTimer();
@@ -132,7 +135,7 @@ public class InfrastructureManager {
 
 	}
 
-	private void removePreviousResources() {
+	public void removePreviousResources() {
 		LOGGER.info("Removing previous resources");
 
 		LOGGER.info("Getting list of existing resources IDs");

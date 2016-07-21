@@ -179,7 +179,7 @@ public class TestInfrastructureManager {
 		infrastructureManager = new InfrastructureManager(specifications, false, infrastructureProviderMock,
 				properties);
 		infrastructureManager.setDataStore(dsMock);
-		infrastructureManager.start(true);
+		infrastructureManager.start(true, true);
 		infrastructureManager.cancelOrderTimer();
 		infrastructureManager.cancelResourceTimer();
 		assertEquals(specifications.size(), infrastructureManager.getIdleResources().size());
@@ -200,7 +200,7 @@ public class TestInfrastructureManager {
 
 		doReturn(previousResources).when(dsMock).getRequesId();
 
-		infrastructureManager.start(true);
+		infrastructureManager.start(true, true);
 		infrastructureManager.cancelOrderTimer();
 		infrastructureManager.cancelResourceTimer();
 		
