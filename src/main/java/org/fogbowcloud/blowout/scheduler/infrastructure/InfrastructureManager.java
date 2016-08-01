@@ -383,7 +383,7 @@ public class InfrastructureManager {
 				} else {
 					LOGGER.debug("Removing order " + order.getRequestId());
 					orders.remove(order);
-					LOGGER.debug("Moving resource " + resource.getId() + " to idle");
+					LOGGER.debug("Moving resource " + newResource.getId() + " to idle");
 					moveResourceToIdle(newResource);
 				}
 
