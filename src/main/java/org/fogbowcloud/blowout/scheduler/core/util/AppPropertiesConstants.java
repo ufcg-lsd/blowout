@@ -28,6 +28,11 @@ public class AppPropertiesConstants {
 	public static final String INFRA_FOGBOW_TOKEN_UPDATE_PLUGIN = "infra_fogbow_token_update_plugin";
 	public static final String TOKEN_UPDATE_TIME = "token_update.time";
 	public static final String TOKEN_UPDATE_TIME_UNIT = "token_update.time.unit";
+	public static final String NAF_IDENTITY_PRIVATE_KEY = "naf_identity_private_key";
+	public static final String NAF_IDENTITY_PUBLIC_KEY = "naf_identity_private_key";
+	public static final String NAF_IDENTITY_TOKEN_USERNAME = "naf_identity_token_username";
+	public static final String NAF_IDENTITY_TOKEN_PASSWORD = "naf_identity_token_password";
+	public static final String NAF_IDENTITY_TOKEN_GENERATOR_URL = "naf_token_generator_endpoint";
 
 	public static final String EXECUTION_MONITOR_PERIOD = "execution_monitor_period";
 
