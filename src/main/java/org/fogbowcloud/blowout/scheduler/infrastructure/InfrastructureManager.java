@@ -331,6 +331,9 @@ public class InfrastructureManager {
 
 		Resource resource = null;
 
+		LOGGER.debug("Number of idle resources is " + String.valueOf(idleResources.size()));
+		LOGGER.debug("Number of allocated resources is " + String.valueOf(allocatedResources.size()));
+		
 		// First verify if any idle resource can be resolve this order.
 		if (idleResources != null && !idleResources.isEmpty() && order.getResourceNotifier() != null) {
 			for (Resource idleResource : idleResources.keySet()) {
@@ -343,11 +346,13 @@ public class InfrastructureManager {
 		}
 
 		boolean resolvedWithIdle = false;
+		LOGGER.debug("Resource is " + resource);
 
 		if (resource != null) {
-
 			try {
 				String oldRequest = order.getRequestId();
+				
+				LOGGER.debug("oldRequest " + oldRequest);
 				resolvedWithIdle = relateResourceToOrder(resource, order, true);
 				if(resolvedWithIdle){
 					LOGGER.debug("Disposing old order request " + oldRequest);
