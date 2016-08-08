@@ -11,11 +11,13 @@ import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.infrastructure.ResourceNotifier;
 import org.fogbowcloud.blowout.scheduler.core.model.Job;
+import org.fogbowcloud.blowout.scheduler.core.model.Job.TaskState;
 import org.fogbowcloud.blowout.scheduler.core.model.Resource;
 import org.fogbowcloud.blowout.scheduler.core.model.Specification;
 import org.fogbowcloud.blowout.scheduler.core.model.Task;
 import org.fogbowcloud.blowout.scheduler.core.model.TaskImpl;
-import org.fogbowcloud.blowout.scheduler.core.model.Job.TaskState;
+import org.fogbowcloud.blowout.scheduler.core.model.TaskProcess;
+import org.fogbowcloud.blowout.scheduler.core.model.TaskProcessImpl;
 import org.fogbowcloud.blowout.scheduler.infrastructure.InfrastructureManager;
 
 public class Scheduler implements Runnable, ResourceNotifier {
@@ -24,12 +26,16 @@ public class Scheduler implements Runnable, ResourceNotifier {
 	private ArrayList<Job> jobList = new ArrayList<Job>();
 	private InfrastructureManager infraManager;
 	private Map<String, Resource> runningTasks = new HashMap<String, Resource>();
-	private ExecutorService taskExecutor =  Executors.newCachedThreadPool();
+	private ExecutorService taskExecutor = Executors.newCachedThreadPool();
+
+	private List<TaskProcess> processQueue = new ArrayList<TaskProcess>();
+
+	private Map<TaskProcess, Task> allProcesses = new HashMap<TaskProcess, Task>();
 
 	private static final Logger LOGGER = Logger.getLogger(Scheduler.class);
 
 	public Scheduler(InfrastructureManager infraManager, Job... jobs) {
-		for(Job aJob : jobs) {
+		for (Job aJob : jobs) {
 			jobList.add(aJob);
 		}
 		this.infraManager = infraManager;
@@ -44,97 +50,106 @@ public class Scheduler implements Runnable, ResourceNotifier {
 	@Override
 	public void run() {
 		LOGGER.info("Running scheduler...");
-		Map<Specification, Integer> specDemand = new HashMap<Specification, Integer>();		
+		Map<Specification, Integer> specDemand = new HashMap<Specification, Integer>();
 
-		List<Task> readyTasks = new ArrayList<Task>();
-		for (Job job : jobList){
-			readyTasks.addAll(job.getByState(TaskState.READY));
+		for (Job job : jobList) {
+			generateProcessForJob(job);
 		}
-		LOGGER.debug("There are " + readyTasks.size() + " ready tasks.");
+		LOGGER.debug("There are " + this.processQueue.size() + " ready tasks.");
 		LOGGER.debug("Scheduler running tasks is " + runningTasks.size());
 
-		for (Task task : readyTasks) {
-			Specification taskSpec = task.getSpecification();
+		for (TaskProcess taskProcess : this.processQueue) {
+			Specification taskSpec = taskProcess.getSpecification();
 			if (!specDemand.containsKey(taskSpec)) {
 				specDemand.put(taskSpec, 0);
 			}
-			int currentDemand = specDemand.get(taskSpec); 
+			int currentDemand = specDemand.get(taskSpec);
 			specDemand.put(taskSpec, ++currentDemand);
 		}
 
 		LOGGER.debug("Current job demand is " + specDemand);
-		for (Specification spec : specDemand.keySet()) {			
+		for (Specification spec : specDemand.keySet()) {
 			infraManager.orderResource(spec, this, specDemand.get(spec));
+		}
+	}
+
+	protected void generateProcessForJob(Job job) {
+		if (!job.isCreated()) {
+			for (Task task : job.getTasks().values()) {
+				TaskProcess tp = createTaskProcess(task);
+				this.processQueue.add(tp);
+				this.allProcesses.put(tp, task);
+			}
+			job.setCreated();
 		}
 	}
 
 	@Override
 	public void resourceReady(final Resource resource) {
-		LOGGER.debug("Receiving resource ready [ID:"+resource.getId()+"]");
-		for (Job job : jobList) {
-			for (final Task task : job.getByState(TaskState.READY)) {
-				if(resource.match(task.getSpecification())){
+		LOGGER.debug("Receiving resource ready [ID:" + resource.getId() + "]");
+		for (final TaskProcess taskProcess : this.processQueue) {
+			if (resource.match(taskProcess.getSpecification())) {
 
-					LOGGER.debug("Relating resource [ID:"+resource.getId()+"] with task [ID:"+task.getId()+"]");
-					job.run(task);
-					runningTasks.put(task.getId(), resource);
-					task.startedRunning();
-					task.putMetadata(TaskImpl.METADATA_RESOURCE_ID, resource.getId());
-					taskExecutor.submit(new Runnable() {
-						@Override
-						public void run() {
-							try {
-								resource.executeTask(task);
-							} catch (Throwable e) {
-								LOGGER.error("Error while executing task.", e);
-							}
+				LOGGER.debug("Relating resource [ID:" + resource.getId() + "] with task [ID:" + taskProcess.getTaskId()
+						+ "]");
+				runningTasks.put(taskProcess.getTaskId(), resource);
+				processQueue.remove(taskProcess);
+				taskExecutor.submit(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							taskProcess.executeTask(resource);
+						} catch (Throwable e) {
+							LOGGER.error("Error while executing task.", e);
 						}
-					});
-					return;
-				}
+					}
+				});
+				return;
 			}
 		}
 
 		infraManager.releaseResource(resource);
 	}
 
-	public void taskFailed(Task task) {
+	public void taskProcessFailed(TaskProcess taskProcess) {
 		LOGGER.debug("============================================================");
-		LOGGER.debug("==  Task " + task.getId() + " failed and will be cloned.  ==");
+		LOGGER.debug("==  Task " + taskProcess.getTaskId() + " failed and will be cloned.  ==");
 		LOGGER.debug("============================================================");
-		Job job = getJobOfFailedTask(task);
+		Job job = getJobOfFailedTask(taskProcess);
 		if (job != null) {
-			job.recoverTask(task);
+			Task task = allProcesses.get(taskProcess);
+			TaskProcess tp = createTaskProcess(task);
+			allProcesses.put(tp, task);
+			processQueue.add(tp);
 		} else {
 			LOGGER.error("Task was from a non-existing or removed Job");
 		}
-		infraManager.releaseResource(runningTasks.get(task.getId()));
-		runningTasks.remove(task.getId());
+		infraManager.releaseResource(runningTasks.get(taskProcess.getTaskId()));
+		runningTasks.remove(taskProcess.getTaskId());
 
 	}
 
-	private Job getJobOfFailedTask(Task task) {
-		for(Job job : jobList) {
-			if (job.getByState(TaskState.FAILED).contains(task)){
-				LOGGER.debug("Failed task " + task.getId() + " is from job " + job.getId());
-				return job; 
+	protected TaskProcess createTaskProcess(Task task) {
+		TaskProcess tp = new TaskProcessImpl(task.getId(), task.getAllCommands(), task.getSpecification(),
+				this.infraManager.getLocalInterpreter());
+		return tp;
+	}
+
+	private Job getJobOfFailedTask(TaskProcess taskProcess) {
+		for (Job job : jobList) {
+			if (job.getTasks().containsKey(taskProcess.getTaskId())) {
+				LOGGER.debug("Failed task " + taskProcess.getTaskId() + " is from job " + job.getId());
+				return job;
 			}
 		}
 		return null;
 	}
 
-	public void taskCompleted(Task task) {
-		LOGGER.info("Task " + task.getId() + " was completed.");
-		infraManager.releaseResource(runningTasks.get(task.getId()));
-		runningTasks.remove(task.getId());
-	}
-
-	public Resource getAssociateResource(
-			Task task) {
+	public Resource getAssociateResource(Task task) {
 		return runningTasks.get(task.getId());
 	}
 
-	protected Map<String, Resource> getRunningTasks(){
+	protected Map<String, Resource> getRunningTasks() {
 		return runningTasks;
 	}
 
@@ -167,7 +182,6 @@ public class Scheduler implements Runnable, ResourceNotifier {
 		return this.jobList;
 	}
 
-
 	public Job getJobById(String jobId) {
 		if (jobId == null) {
 			return null;
@@ -184,9 +198,44 @@ public class Scheduler implements Runnable, ResourceNotifier {
 		Job toBeRemoved = getJobById(jobId);
 
 		this.jobList.remove(toBeRemoved);
-		for (Task task : toBeRemoved.getByState(TaskState.RUNNING)) {
-			this.taskFailed(task);
+		for (Task task : toBeRemoved.getTasks().values()) {
+			removeProcessesFromTask(task);
 		}
 		return toBeRemoved;
+	}
+
+	private void removeProcessesFromTask(Task task) {
+		List<TaskProcess> toRemove = new ArrayList<TaskProcess>();
+		
+		for (TaskProcess tp : getAllProcs()) {
+			if (tp.getTaskId().equals(task.getId())) {
+				taskProcessFailed(tp);
+				toRemove.add(tp);
+			}
+		}
+		for (TaskProcess procDeleted : toRemove) {
+		this.allProcesses.remove(procDeleted);
+		}
+		
+	}
+
+	public List<TaskProcess> getAllProcs() {
+		List<TaskProcess> procList = new ArrayList<TaskProcess>();
+		procList.addAll(this.allProcesses.keySet());
+		return procList;
+		
+	}
+	
+	
+
+	public void taskFailed(TaskProcess tp) {
+		taskProcessFailed(tp);
+	}
+
+	public void taskCompleted(TaskProcess tp) {
+		LOGGER.info("Task " + tp.getTaskId() + " was completed.");
+		infraManager.releaseResource(runningTasks.get(tp.getTaskId()));
+		runningTasks.remove(tp.getTaskId());
+
 	}
 }

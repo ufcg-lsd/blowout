@@ -146,21 +146,21 @@ public class PrimesMain {
 		String mkdirCommand = "ssh " + SSH_SCP_PRECOMMAND + " -p $" + Resource.ENV_SSH_PORT + " -i $"
 				+ Resource.ENV_PRIVATE_KEY_FILE + " $" + Resource.ENV_SSH_USER + "@" + "$" + Resource.ENV_HOST
 				+ " rm -rfv " + folder;
-		return new Command(mkdirCommand, Command.Type.PROLOGUE);
+		return new Command(mkdirCommand, Command.Type.LOCAL);
 	}
 
 	private static Command mkdirRemoteFolder(String folder) {
 		String mkdirCommand = "ssh " + SSH_SCP_PRECOMMAND + " -p $" + Resource.ENV_SSH_PORT + " -i $"
 				+ Resource.ENV_PRIVATE_KEY_FILE + " $" + Resource.ENV_SSH_USER + "@" + "$" + Resource.ENV_HOST
 				+ " mkdir " + folder;
-		return new Command(mkdirCommand, Command.Type.PROLOGUE);
+		return new Command(mkdirCommand, Command.Type.LOCAL);
 	}
 
 	private static Command stageInCommand(String localFile, String remoteFile) {
 		String scpCommand = "scp " + SSH_SCP_PRECOMMAND + " -P $" + Resource.ENV_SSH_PORT + " -i $"
 				+ Resource.ENV_PRIVATE_KEY_FILE + " " + localFile + " $" + Resource.ENV_SSH_USER + "@" + "$"
 				+ Resource.ENV_HOST + ":" + remoteFile;
-		return new Command(scpCommand, Command.Type.PROLOGUE);
+		return new Command(scpCommand, Command.Type.LOCAL);
 	}
 
 	private static Command stageOutCommand(String remoteFile, String localFile) {
@@ -174,23 +174,17 @@ public class PrimesMain {
 	static class PrimeJob extends Job {
 
 		@Override
-		public void run(Task task) {
-			tasksReady.remove(task);
-			tasksRunning.add(task);
-
-		}
-
-		@Override
 		public void finish(Task task) {
-			tasksRunning.remove(task);
-			tasksCompleted.add(task);
+			// TODO Auto-generated method stub
+			
 		}
 
 		@Override
 		public void fail(Task task) {
-			tasksRunning.remove(task);
-			tasksFailed.add(task);
+			// TODO Auto-generated method stub
+			
 		}
+
 
 	}
 

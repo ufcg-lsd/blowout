@@ -7,7 +7,7 @@ public class Command implements Serializable{
 	private static final long serialVersionUID = 5281647552435522413L;
 
 	public enum Type {
-		PROLOGUE, REMOTE, EPILOGUE
+		LOCAL, REMOTE, EPILOGUE
 	}
 
 	public enum State {

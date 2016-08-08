@@ -104,6 +104,7 @@ public class InfrastructureManager {
 
 		LOGGER.info("Block while waiting initial resources? " + blockWhileInitializing);
 		if (blockWhileInitializing && initialSpec != null) {
+			System.out.println("Idles: "+ idleResources.size() + " needed: "  +initialSpec.size());
 			while (idleResources.size() != initialSpec.size()) {
 				Thread.sleep(2000);
 			}
@@ -258,6 +259,7 @@ public class InfrastructureManager {
 
 			for (Specification spec : initialSpec) {
 				// Must initial spec be Persistent ?
+				System.out.println("created");
 				spec.addRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUEST_TYPE,
 						OrderType.PERSISTENT.getValue());				
 				orderResource(spec, null, 1);
@@ -705,6 +707,11 @@ public class InfrastructureManager {
 				}
 			}
 		}
+	}
+
+	public String getLocalInterpreter() {
+	
+		return this.properties.get("local_command_interpreter").toString();
 	}
 	
 

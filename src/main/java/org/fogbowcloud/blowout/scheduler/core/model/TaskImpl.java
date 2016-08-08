@@ -200,4 +200,11 @@ public class TaskImpl implements Task {
 		return true;
 	}
 
+
+	@Override
+	public int getNumberOfCommands() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 }
