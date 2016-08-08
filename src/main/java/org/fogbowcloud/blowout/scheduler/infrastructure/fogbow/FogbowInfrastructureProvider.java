@@ -94,6 +94,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 	protected void handleTokenUpdate(ScheduledExecutorService handleTokenUpdateExecutor) {
 		LOGGER.debug("Turning on handle token update.");
 		
+		//TODO: set it to use a default time unit instead of asking for it in the configuration
 		handleTokenUpdateExecutor.scheduleWithFixedDelay(new Runnable() {
 			@Override
 			public void run() {
