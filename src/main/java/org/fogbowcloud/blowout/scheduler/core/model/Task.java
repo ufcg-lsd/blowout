@@ -43,4 +43,6 @@ public interface Task extends Serializable{
 	public int getRetries();
 
 	public void setRetries(int retries);
+	
+	public int getNumberOfCommands();
 }

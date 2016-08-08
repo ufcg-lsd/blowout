@@ -7,7 +7,8 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.scheduler.core.model.Job;
 import org.fogbowcloud.blowout.scheduler.core.model.Resource;
 import org.fogbowcloud.blowout.scheduler.core.model.Task;
-import org.fogbowcloud.blowout.scheduler.core.model.Job.TaskState;
+import org.fogbowcloud.blowout.scheduler.core.model.TaskProcess;
+import org.fogbowcloud.blowout.scheduler.core.model.TaskProcessImpl;
 import org.fogbowcloud.blowout.scheduler.infrastructure.exceptions.InfrastructureException;
 
 public class ExecutionMonitor implements Runnable {
@@ -24,9 +25,9 @@ public class ExecutionMonitor implements Runnable {
 	public ExecutionMonitor(Scheduler scheduler, ExecutorService service, Job... job) {
 		this.job = job;
 		this.scheduler = scheduler;
-		if(service == null){
+		if (service == null) {
 			this.service = Executors.newFixedThreadPool(3);
-		}else{
+		} else {
 			this.service = service;
 		}
 	}
@@ -34,72 +35,34 @@ public class ExecutionMonitor implements Runnable {
 	@Override
 	public void run() {
 		LOGGER.debug("Submitting monitoring tasks");
-		for (Job aJob : job){
-			LOGGER.debug("Tasks for job: "+ aJob.toString() );
-			for (Task task : aJob.getByState(TaskState.RUNNING)) {
-				service.submit(new TaskExecutionChecker(task, this.scheduler, aJob));
-			}
+		for (TaskProcess tp : scheduler.getAllProcs()) {
+			service.submit(new TaskExecutionChecker(tp, this.scheduler));
 		}
 	}
+}
 
-	class TaskExecutionChecker implements Runnable {
+class TaskExecutionChecker implements Runnable {
 
-		protected Task task; 
-		protected Scheduler scheduler;
-		protected Job job;
+	protected TaskProcess tp;
+	protected Scheduler scheduler;
+	protected Job job;
 
-		public TaskExecutionChecker(Task task, Scheduler scheduler, Job job){
-			this.task = task;
-			this.scheduler = scheduler;
-			this.job = job;
+	public TaskExecutionChecker(TaskProcess tp, Scheduler scheduler) {
+		this.tp = tp;
+		this.scheduler = scheduler;
+	}
+
+	@Override
+	public void run() {
+
+		if (tp.getStatus().equals(TaskProcessImpl.State.FAILED)) {
+			scheduler.taskFailed(tp);
+			return;
 		}
 
-		@Override
-		public void run() {
-			LOGGER.info("Monitoring task " + task.getId() + ", failed=" + task.isFailed()
-			+ ", completed=" + task.isFinished());
-
-			if (task.checkTimeOuted()){
-				job.fail(task);
-				scheduler.taskFailed(task);
-				LOGGER.error("Task "+ task.getId() + " timed out");
-				return;
-			}
-
-			if (task.isFailed()) {
-				LOGGER.info("Failing task " + task.getId());
-				job.fail(task);
-				scheduler.taskFailed(task);
-				return;
-			}
-
-			if (task.isFinished()){
-				LOGGER.info("Completing task " + task.getId());
-				job.finish(task);
-				scheduler.taskCompleted(task);
-				return;
-			}
-
-			try {
-				if (!checkResourceConnectivity(task)){
-					if (!task.mayRetry()) {
-						job.fail(task);
-						scheduler.taskFailed(task);
-					} else {
-						task.setRetries(task.getRetries() + 1);
-					}
-				} else {
-					task.setRetries(0);
-				}
-			} catch (InfrastructureException e) {
-				LOGGER.error("Error while checking connectivity.", e);
-			}
-		}
-
-		private boolean checkResourceConnectivity(Task task) throws InfrastructureException{
-			Resource resource = scheduler.getAssociateResource(task);
-			return resource.checkConnectivity();
+		if (tp.getStatus().equals(TaskProcessImpl.State.FINNISHED)) {
+			scheduler.taskCompleted(tp);
+			return;
 		}
 	}
-	
 }

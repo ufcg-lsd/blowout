@@ -1,13 +1,12 @@
 package org.fogbowcloud.blowout.scheduler.core.model;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Scanner;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.blowout.scheduler.core.ExecutionCommandHelper;
 import org.fogbowcloud.blowout.scheduler.core.TaskExecutionResult;
 import org.fogbowcloud.blowout.scheduler.core.util.DateUtils;
 import org.fogbowcloud.blowout.scheduler.infrastructure.fogbow.FogbowRequirementsHelper;
@@ -39,20 +38,14 @@ public class Resource {
 
 	private String id;
 	private Map<String, String> metadata = new HashMap<String, String>();
-	private Task task;
-	private TaskExecutionResult taskExecutionResult;
-	private ExecutionCommandHelper executionCommandHelper;
-	private DateUtils dateUtils = new DateUtils();
 	private int timesReused = 0;
 
 	// private SshClientWrapper sshClientWrapper;
 
 	private static final Logger LOGGER = Logger.getLogger(Resource.class);
-	private static final long REMOTE_COMMAND_CHECKER_PERIOD = 5000;
 
 	public Resource(String id, Properties properties) {
 		this.id = id;
-		executionCommandHelper = new ExecutionCommandHelper(properties);
 	}
 
 	/**
@@ -96,7 +89,34 @@ public class Resource {
 		String host = this.getMetadataValue(METADATA_SSH_HOST);
 		String port = this.getMetadataValue(METADATA_SSH_PORT);
 
-		return executionCommandHelper.checkConnectivity(host, port);
+		Runtime run = null;
+		Process p = null;
+		Scanner scanner = null;
+
+		try {
+			run = Runtime.getRuntime();
+			p = run.exec(new String[] { "/bin/bash", "-c",
+					"echo quit | telnet " + host + " " + port + " 2>/dev/null | grep Connected" });
+			p.waitFor();
+			scanner = new Scanner(p.getInputStream());
+			if (scanner.hasNext()) {
+				String result = scanner.nextLine();
+				if (result != null && !result.isEmpty()) {
+					return true;
+				}
+			}
+		} catch (Exception e) {
+			return false;
+		} finally {
+			run = null;
+			if (p != null) {
+				p.destroy();
+			}
+			if (scanner != null) {
+				scanner.close();
+			}
+		}
+		return false;
 	}
 
 	public void putMetadata(String attributeName, String value) {
@@ -117,131 +137,6 @@ public class Resource {
 		return metadata;
 	}
 
-	public void executeTask(Task task) {
-		LOGGER.debug("Executing task " + task.getId() + " on resource " + getId());
-		long initTime = dateUtils.currentTimeMillis();
-		try {
-			this.task = task;
-			this.taskExecutionResult = new TaskExecutionResult();
-
-			if (!executePrologue() || !executeRemote() || !executeEpilogue()) {
-				finish(TaskExecutionResult.NOK);
-				return;
-			}
-			finish(TaskExecutionResult.OK);
-		} finally {
-			long endTime = dateUtils.currentTimeMillis();
-			LOGGER.debug("Task " + task.getId() + " end with " + taskExecutionResult.getExitValue() + " result in "
-					+ DateUtils.formatElapsedTime(endTime-initTime) + " ms");
-
-		}
-	}
-
-	protected void finish(int exitValue) {
-		LOGGER.debug("Finishing task " + task.getId() + " with exit value = " + exitValue);
-		task.finish();
-		if (TaskExecutionResult.OK != exitValue) {
-			task.fail();
-		}
-		taskExecutionResult.finish(exitValue);
-	}
-
-	protected boolean executePrologue() {
-		List<Command> commands = task.getCommandsByType(Command.Type.PROLOGUE);
-		return executePrologueCommands(commands) == TaskExecutionResult.OK;
-	}
-
-	protected int executePrologueCommands(List<Command> prologueCommands) {
-		LOGGER.debug("Executing prologue commands on " + getId());
-		long initTime = dateUtils.currentTimeMillis();
-		int executionResult = TaskExecutionResult.OK;
-		if (prologueCommands != null && !prologueCommands.isEmpty()) {
-			executionResult = executionCommandHelper.execLocalCommands(prologueCommands, getAdditionalEnvVariables());
-		}
-		long endTime = dateUtils.currentTimeMillis();
-		LOGGER.debug("Prologue commands finished on " + getId() + " with result " + executionResult + " in "
-				+ DateUtils.formatElapsedTime(endTime - initTime) + " ms");
-		return executionResult;
-	}
-
-	protected Map<String, String> getAdditionalEnvVariables() {
-		Map<String, String> additionalEnvVar = new HashMap<String, String>();
-		additionalEnvVar.put(ENV_HOST, getMetadataValue(METADATA_SSH_HOST));
-		LOGGER.debug("Env_host:" + getMetadataValue(METADATA_SSH_HOST));
-		additionalEnvVar.put(ENV_SSH_PORT, getMetadataValue(METADATA_SSH_PORT));
-		if (task.getSpecification().getUsername() != null && !task.getSpecification().getUsername().isEmpty()) {
-			additionalEnvVar.put(ENV_SSH_USER, task.getSpecification().getUsername());
-			LOGGER.debug("Env_ssh_user:" + task.getSpecification().getUsername());
-		} else {
-			additionalEnvVar.put(ENV_SSH_USER, getMetadataValue(ENV_SSH_USER));
-			LOGGER.debug("Env_ssh_user:" + getMetadataValue(ENV_SSH_USER));
-		}
-		additionalEnvVar.put(ENV_PRIVATE_KEY_FILE, task.getSpecification().getPrivateKeyFilePath());
-		LOGGER.debug("Env_private_key_file:" + task.getSpecification().getPrivateKeyFilePath());
-		// TODO getEnvVariables from task
-
-		return additionalEnvVar;
-	}
-
-	protected boolean executeRemote() {
-		List<Command> commands = task.getCommandsByType(Command.Type.REMOTE);
-		return executeRemoteCommands(commands) == TaskExecutionResult.OK;
-	}
-
-	protected int executeRemoteCommands(List<Command> remoteCommands) {
-		LOGGER.debug("Executing remote commands on " + getId());
-		long initTime = dateUtils.currentTimeMillis();
-		String host = getMetadataValue(METADATA_SSH_HOST);
-		int sshPort = Integer.parseInt(getMetadataValue(METADATA_SSH_PORT));
-
-		int executionResult = TaskExecutionResult.OK;
-		if (remoteCommands != null && !remoteCommands.isEmpty()) {
-			executionResult = executionCommandHelper.execRemoteCommands(host, sshPort,
-					task.getSpecification().getUsername(), task.getSpecification().getPrivateKeyFilePath(),
-					remoteCommands);
-			if (executionResult != TaskExecutionResult.OK) {
-				return executionResult;
-			}
-		}
-
-		Integer exitValue = null;
-		while ((exitValue = executionCommandHelper.getRemoteCommandExitValue(host, sshPort,
-				task.getSpecification().getUsername(), task.getSpecification().getPrivateKeyFilePath(),
-				task.getMetadata(TaskImpl.METADATA_REMOTE_COMMAND_EXIT_PATH))) == null) {
-			try {
-				Thread.sleep(REMOTE_COMMAND_CHECKER_PERIOD);
-			} catch (InterruptedException e) {
-				// TODO it must not happen here
-			}
-		}
-		for (Command command : remoteCommands) {
-			command.setState(exitValue == TaskExecutionResult.OK ? Command.State.FINISHED : Command.State.FAILED);
-		}
-
-		long endTime = dateUtils.currentTimeMillis();
-		LOGGER.debug("Remote commands finished on " + getId() + " with result " + exitValue + " in "
-				+ DateUtils.formatElapsedTime(endTime - initTime) + " ms");
-		return exitValue;
-	}
-
-	protected boolean executeEpilogue() {
-		List<Command> commands = task.getCommandsByType(Command.Type.EPILOGUE);
-		return executeEpilogueCommands(commands) == TaskExecutionResult.OK;
-	}
-
-	protected int executeEpilogueCommands(List<Command> epilogueCommands) {
-		LOGGER.debug("Executing epilogue commands on " + getId());
-		long initTime = dateUtils.currentTimeMillis();
-		int executionResult = TaskExecutionResult.OK;
-		if (epilogueCommands != null && !epilogueCommands.isEmpty()) {
-			executionResult = executionCommandHelper.execLocalCommands(epilogueCommands, getAdditionalEnvVariables());
-		}
-		long endTime = dateUtils.currentTimeMillis();
-		LOGGER.debug("Epilogue commands finished on " + getId() + " with result " + executionResult + " in "
-				+ DateUtils.formatElapsedTime(endTime - initTime) + " ms");
-		return executionResult;
-	}
-
 	public void copyInformations(Resource resource) {
 		this.metadata.clear();
 		this.metadata.putAll(resource.getAllMetadata());
@@ -253,27 +148,11 @@ public class Resource {
 		return id;
 	}
 
-	protected ExecutionCommandHelper getExecutionCommandHelper() {
-		return this.executionCommandHelper;
-	}
-
-	protected void setExecutionCommandHelper(ExecutionCommandHelper executionCommandHelper) {
-		this.executionCommandHelper = executionCommandHelper;
-	}
-
-	protected TaskExecutionResult getTaskExecutionResult() {
-		return this.taskExecutionResult;
-	}
-
-	protected void setTaskExecutionResult(TaskExecutionResult taskExecutionResult) {
-		this.taskExecutionResult = taskExecutionResult;
-	}
-	
-	public void incReuse(){
+	public void incReuse() {
 		timesReused++;
 	}
-	
-	public int getReusedTimes(){
+
+	public int getReusedTimes() {
 		return this.timesReused;
 	}
 
