@@ -79,6 +79,7 @@ public class Scheduler implements Runnable, ResourceNotifier {
 				TaskProcess tp = createTaskProcess(task);
 				this.processQueue.add(tp);
 				this.allProcesses.put(tp, task);
+				task.addProcess(tp.getProcessId());
 			}
 			job.setCreated();
 		}
@@ -119,6 +120,7 @@ public class Scheduler implements Runnable, ResourceNotifier {
 		if (job != null) {
 			Task task = allProcesses.get(taskProcess);
 			TaskProcess tp = createTaskProcess(task);
+			task.addProcess(tp.getProcessId());
 			allProcesses.put(tp, task);
 			processQueue.add(tp);
 		} else {
@@ -206,7 +208,7 @@ public class Scheduler implements Runnable, ResourceNotifier {
 
 	private void removeProcessesFromTask(Task task) {
 		List<TaskProcess> toRemove = new ArrayList<TaskProcess>();
-		
+
 		for (TaskProcess tp : getAllProcs()) {
 			if (tp.getTaskId().equals(task.getId())) {
 				taskProcessFailed(tp);
@@ -214,19 +216,17 @@ public class Scheduler implements Runnable, ResourceNotifier {
 			}
 		}
 		for (TaskProcess procDeleted : toRemove) {
-		this.allProcesses.remove(procDeleted);
+			this.allProcesses.remove(procDeleted);
 		}
-		
+
 	}
 
 	public List<TaskProcess> getAllProcs() {
 		List<TaskProcess> procList = new ArrayList<TaskProcess>();
 		procList.addAll(this.allProcesses.keySet());
 		return procList;
-		
+
 	}
-	
-	
 
 	public void taskFailed(TaskProcess tp) {
 		taskProcessFailed(tp);

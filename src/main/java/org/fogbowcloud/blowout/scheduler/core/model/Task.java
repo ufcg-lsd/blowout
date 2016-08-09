@@ -45,4 +45,6 @@ public interface Task extends Serializable{
 	public void setRetries(int retries);
 	
 	public int getNumberOfCommands();
+
+	void addProcess(String procId);
 }
