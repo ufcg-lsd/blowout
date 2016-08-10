@@ -76,10 +76,12 @@ public class Scheduler implements Runnable, ResourceNotifier {
 	protected void generateProcessForJob(Job job) {
 		if (!job.isCreated()) {
 			for (Task task : job.getTasks().values()) {
+				if (!task.isFinished()) {
 				TaskProcess tp = createTaskProcess(task);
 				this.processQueue.add(tp);
 				this.allProcesses.put(tp, task);
 				task.addProcess(tp.getProcessId());
+				}
 			}
 			job.setCreated();
 		}
