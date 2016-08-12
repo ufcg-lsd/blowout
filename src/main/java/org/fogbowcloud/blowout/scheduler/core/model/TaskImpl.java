@@ -202,7 +202,7 @@ public class TaskImpl implements Task {
 	}
 
 	@Override
-	public void addProcess(String procId) {
+	public void addProcessId(String procId) {
 		this.processes.add(procId);
 	}
 	
@@ -210,6 +210,13 @@ public class TaskImpl implements Task {
 	public int getNumberOfCommands() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+
+	@Override
+	public List<String> getProcessId() {
+		
+		return this.processes;
 	}
 
 }

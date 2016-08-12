@@ -77,10 +77,10 @@ public class Scheduler implements Runnable, ResourceNotifier {
 		if (!job.isCreated()) {
 			for (Task task : job.getTasks().values()) {
 				if (!task.isFinished()) {
-				TaskProcess tp = createTaskProcess(task);
-				this.processQueue.add(tp);
-				this.allProcesses.put(tp, task);
-				task.addProcess(tp.getProcessId());
+					TaskProcess tp = createTaskProcess(task);
+					this.processQueue.add(tp);
+					this.allProcesses.put(tp, task);
+					task.addProcessId(tp.getProcessId());
 				}
 			}
 			job.setCreated();
@@ -94,7 +94,7 @@ public class Scheduler implements Runnable, ResourceNotifier {
 			if (resource.match(taskProcess.getSpecification())) {
 
 				LOGGER.debug("Relating resource [ID:" + resource.getId() + "] with task [ID:" + taskProcess.getTaskId()
-						+ "]");
+				+ "]");
 				runningTasks.put(taskProcess.getTaskId(), resource);
 				processQueue.remove(taskProcess);
 				taskExecutor.submit(new Runnable() {
@@ -122,7 +122,7 @@ public class Scheduler implements Runnable, ResourceNotifier {
 		if (job != null) {
 			Task task = allProcesses.get(taskProcess);
 			TaskProcess tp = createTaskProcess(task);
-			task.addProcess(tp.getProcessId());
+			task.addProcessId(tp.getProcessId());
 			allProcesses.put(tp, task);
 			processQueue.add(tp);
 		} else {
@@ -238,6 +238,35 @@ public class Scheduler implements Runnable, ResourceNotifier {
 		LOGGER.info("Task " + tp.getTaskId() + " was completed.");
 		infraManager.releaseResource(runningTasks.get(tp.getTaskId()));
 		runningTasks.remove(tp.getTaskId());
+	}
 
+	public TaskState inferTaskState(Task task) {
+		List<TaskProcess> tpList = getProcessFromTask(task);
+		for (TaskProcess tp : tpList) {
+			if (tp.getStatus().equals(TaskProcessImpl.State.READY)) {
+				return TaskState.READY;
+			}
+			if (tp.getStatus().equals(TaskProcessImpl.State.RUNNING)) {
+				return TaskState.RUNNING;
+			}
+			if (tp.getStatus().equals(TaskProcessImpl.State.FINNISHED)) {
+				return TaskState.COMPLETED;
+			}
+
+		}
+		return TaskState.FAILED;
+	}
+
+	private List<TaskProcess> getProcessFromTask(Task task) {
+		List<TaskProcess> tpList = new ArrayList<TaskProcess>();
+		for (String tpId : task.getProcessId()) {
+			for (TaskProcess tp : getAllProcs()) {
+				if (tp.getProcessId().equals(tpId)) {
+					tpList.add(tp);
+					break;
+				}
+			}
+		}
+		return tpList;
 	}
 }

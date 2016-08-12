@@ -46,5 +46,7 @@ public interface Task extends Serializable{
 	
 	public int getNumberOfCommands();
 
-	void addProcess(String procId);
+	void addProcessId(String procId);
+	
+	List<String> getProcessId();
 }
