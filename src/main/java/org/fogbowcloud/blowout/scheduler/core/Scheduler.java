@@ -257,7 +257,7 @@ public class Scheduler implements Runnable, ResourceNotifier {
 		return TaskState.FAILED;
 	}
 
-	private List<TaskProcess> getProcessFromTask(Task task) {
+	protected List<TaskProcess> getProcessFromTask(Task task) {
 		List<TaskProcess> tpList = new ArrayList<TaskProcess>();
 		for (String tpId : task.getProcessId()) {
 			for (TaskProcess tp : getAllProcs()) {
