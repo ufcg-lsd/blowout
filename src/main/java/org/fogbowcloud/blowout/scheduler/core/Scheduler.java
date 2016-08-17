@@ -239,8 +239,9 @@ public class Scheduler implements Runnable, ResourceNotifier {
 	}
 
 	public List<TaskProcess> getRunningProcs() {
-		
-		return this.runningProcesses;
+		List<TaskProcess> procList = new ArrayList<TaskProcess>();
+		procList.addAll(this.runningProcesses);
+		return procList;
 		
 	}
 	

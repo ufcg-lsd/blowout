@@ -48,7 +48,7 @@ public class TestExecutionMonitor {
 		TaskProcess tp = mock(TaskProcess.class);
 		List<TaskProcess> processes = new ArrayList<TaskProcess>();
 		processes.add(tp);
-		doReturn(processes).when(scheduler).getAllProcs();
+		doReturn(processes).when(scheduler).getRunningProcs();
 		doReturn(TaskProcessImpl.State.FINNISHED).when(tp).getStatus();
 		doNothing().when(scheduler).taskCompleted(tp);
 		executionMonitor.run();
@@ -62,7 +62,7 @@ public class TestExecutionMonitor {
 		TaskProcess tp = mock(TaskProcess.class);
 		List<TaskProcess> processes = new ArrayList<TaskProcess>();
 		processes.add(tp);
-		doReturn(processes).when(scheduler).getAllProcs();
+		doReturn(processes).when(scheduler).getRunningProcs();
 		doReturn(TaskProcessImpl.State.FAILED).when(tp).getStatus();
 		doNothing().when(scheduler).taskCompleted(tp);
 		doNothing().when(job).finish(task);
@@ -78,7 +78,7 @@ public class TestExecutionMonitor {
 		doReturn(TaskProcessImpl.State.RUNNING).when(tp).getStatus();
 		List<TaskProcess> processes = new ArrayList<TaskProcess>();
 		processes.add(tp);
-		doReturn(processes).when(scheduler).getAllProcs();
+		doReturn(processes).when(scheduler).getRunningProcs();
 		executionMonitor.run();
 		verify(tp, times(2)).getStatus();
 		verify(scheduler, never()).taskCompleted(tp);
