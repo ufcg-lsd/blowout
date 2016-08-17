@@ -27,6 +27,7 @@ public class Scheduler implements Runnable, ResourceNotifier {
 	private InfrastructureManager infraManager;
 	private Map<String, Resource> runningTasks = new HashMap<String, Resource>();
 	private ExecutorService taskExecutor = Executors.newCachedThreadPool();
+	private List<TaskProcess> runningProcesses = new ArrayList<TaskProcess>();
 
 	private List<TaskProcess> processQueue = new ArrayList<TaskProcess>();
 
@@ -36,6 +37,7 @@ public class Scheduler implements Runnable, ResourceNotifier {
 
 	public Scheduler(InfrastructureManager infraManager, Job... jobs) {
 		for (Job aJob : jobs) {
+			aJob.restart();
 			jobList.add(aJob);
 		}
 		this.infraManager = infraManager;
@@ -62,9 +64,13 @@ public class Scheduler implements Runnable, ResourceNotifier {
 			Specification taskSpec = taskProcess.getSpecification();
 			if (!specDemand.containsKey(taskSpec)) {
 				specDemand.put(taskSpec, 0);
-			}
+			} 
+			
+			if (specDemand.get(taskSpec) < this.processQueue.size()) {
 			int currentDemand = specDemand.get(taskSpec);
 			specDemand.put(taskSpec, ++currentDemand);
+			LOGGER.debug("Current Demmand is: " +currentDemand);
+			}
 		}
 
 		LOGGER.debug("Current job demand is " + specDemand);
@@ -97,6 +103,7 @@ public class Scheduler implements Runnable, ResourceNotifier {
 				+ "]");
 				runningTasks.put(taskProcess.getTaskId(), resource);
 				processQueue.remove(taskProcess);
+				runningProcesses.add(taskProcess);
 				taskExecutor.submit(new Runnable() {
 					@Override
 					public void run() {
@@ -130,6 +137,7 @@ public class Scheduler implements Runnable, ResourceNotifier {
 		}
 		infraManager.releaseResource(runningTasks.get(taskProcess.getTaskId()));
 		runningTasks.remove(taskProcess.getTaskId());
+		runningProcesses.remove(taskProcess);
 
 	}
 
@@ -230,6 +238,12 @@ public class Scheduler implements Runnable, ResourceNotifier {
 
 	}
 
+	public List<TaskProcess> getRunningProcs() {
+		
+		return this.runningProcesses;
+		
+	}
+	
 	public void taskFailed(TaskProcess tp) {
 		taskProcessFailed(tp);
 	}
@@ -238,6 +252,7 @@ public class Scheduler implements Runnable, ResourceNotifier {
 		LOGGER.info("Task " + tp.getTaskId() + " was completed.");
 		infraManager.releaseResource(runningTasks.get(tp.getTaskId()));
 		runningTasks.remove(tp.getTaskId());
+		runningProcesses.remove(tp);
 	}
 
 	public TaskState inferTaskState(Task task) {

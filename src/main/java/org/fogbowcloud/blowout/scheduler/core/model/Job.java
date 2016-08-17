@@ -66,4 +66,9 @@ public abstract class Job implements Serializable {
 	public void setCreated() {
 		this.isCreated = true;
 	}
+
+	public void restart() {
+		this.isCreated = false;
+		
+	}
 }
