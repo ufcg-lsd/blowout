@@ -35,7 +35,7 @@ public class ExecutionMonitor implements Runnable {
 	@Override
 	public void run() {
 		LOGGER.debug("Submitting monitoring tasks");
-		for (TaskProcess tp : scheduler.getAllProcs()) {
+		for (TaskProcess tp : scheduler.getRunningProcs()) {
 			service.submit(new TaskExecutionChecker(tp, this.scheduler));
 		}
 	}

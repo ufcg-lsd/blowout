@@ -91,11 +91,11 @@ public class InfrastructureManager {
 
 	public void start(boolean blockWhileInitializing, boolean removePrevious) throws Exception {
 		LOGGER.info("Starting Infrastructure Manager");
-		
+
 		if (removePrevious) {
 			removePreviousResources();
 		}
-		
+
 		this.createInitialOrders();
 		// Start order service to monitor and resolve orders.
 		triggerOrderTimer();
@@ -140,11 +140,13 @@ public class InfrastructureManager {
 
 		LOGGER.info("Getting list of existing resources IDs");
 		List<String> recoveredRequests = ds.getRequesId();
-		for (String requestId : recoveredRequests) {
-			try {
-				infraProvider.deleteResource(requestId);
-			} catch (Exception e) {
-				LOGGER.error("Error while trying to delete Resource with request id [" + requestId + "]", e);
+		if (recoveredRequests != null) {
+			for (String requestId : recoveredRequests) {
+				try {
+					infraProvider.deleteResource(requestId);
+				} catch (Exception e) {
+					LOGGER.error("Error while trying to delete Resource with request id [" + requestId + "]", e);
+				}
 			}
 		}
 		LOGGER.info("Previous resources removal finished");
@@ -337,7 +339,7 @@ public class InfrastructureManager {
 
 		LOGGER.debug("Number of idle resources is " + String.valueOf(idleResources.size()));
 		LOGGER.debug("Number of allocated resources is " + String.valueOf(allocatedResources.size()));
-		
+
 		// First verify if any idle resource can be resolve this order.
 		if (idleResources != null && !idleResources.isEmpty() && order.getResourceNotifier() != null) {
 			for (Resource idleResource : idleResources.keySet()) {
@@ -355,7 +357,7 @@ public class InfrastructureManager {
 		if (resource != null) {
 			try {
 				String oldRequest = order.getRequestId();
-				
+
 				LOGGER.debug("oldRequest " + oldRequest);
 				resolvedWithIdle = relateResourceToOrder(resource, order, true);
 				if (resolvedWithIdle) {
@@ -712,7 +714,7 @@ public class InfrastructureManager {
 
 	public String getLocalInterpreter() {
 
-		return this.properties.get("local_command_interpreter").toString();
+		return this.properties.getProperty("local_command_interpreter").toString();
 	}
 
 }
