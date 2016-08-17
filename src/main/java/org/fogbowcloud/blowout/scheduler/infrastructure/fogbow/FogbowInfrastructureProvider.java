@@ -20,7 +20,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.apache.log4j.Logger;
-import org.fogbowcloud.blowout.infrastructure.plugin.TokenUpdatePluginInterface;
+import org.fogbowcloud.blowout.infrastructure.plugin.AbstractTokenUpdatePlugin;
 import org.fogbowcloud.blowout.scheduler.core.http.HttpWrapper;
 import org.fogbowcloud.blowout.scheduler.core.model.Resource;
 import org.fogbowcloud.blowout.scheduler.core.model.Specification;
@@ -66,14 +66,14 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 	private Map<String, Specification> pendingRequestsMap = new HashMap<String, Specification>();
 	private String resourceComputeId;
 	private ScheduledExecutorService handleTokenUpdateExecutor;
-	private TokenUpdatePluginInterface tokenUpdatePlugin;
+	private AbstractTokenUpdatePlugin tokenUpdatePlugin;
 	
 	public FogbowInfrastructureProvider(Properties properties, ScheduledExecutorService handleTokeUpdateExecutor) throws Exception{
 		this(properties, handleTokeUpdateExecutor, createTokenUpdatePlugin(properties));
 	}
 	
 	protected FogbowInfrastructureProvider(Properties properties, ScheduledExecutorService handleTokeUpdateExecutor, 
-			TokenUpdatePluginInterface tokenUpdatePlugin) throws Exception{
+			AbstractTokenUpdatePlugin tokenUpdatePlugin) throws Exception{
 		httpWrapper = new HttpWrapper();
 		this.properties = properties;
 		this.resourceComputeId = null;
@@ -463,19 +463,19 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		return atts;
 	}
 	
-	private static TokenUpdatePluginInterface createTokenUpdatePlugin(Properties properties)
+	private static AbstractTokenUpdatePlugin createTokenUpdatePlugin(Properties properties)
 			throws Exception {
 
 		String providerClassName = properties
 				.getProperty(AppPropertiesConstants.INFRA_FOGBOW_TOKEN_UPDATE_PLUGIN);
 
 		Object clazz = Class.forName(providerClassName).getConstructor(Properties.class).newInstance(properties);
-		if (!(clazz instanceof TokenUpdatePluginInterface)) {
+		if (!(clazz instanceof AbstractTokenUpdatePlugin)) {
 			throw new Exception(
 					"Provider Class Name is not a TokenUpdatePluginInterface implementation");
 		}
 
-		return (TokenUpdatePluginInterface) clazz;
+		return (AbstractTokenUpdatePlugin) clazz;
 	}
 
 	private OrderState getRequestState(String requestValue) {

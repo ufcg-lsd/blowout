@@ -14,7 +14,7 @@ import org.fogbowcloud.blowout.scheduler.core.util.AppPropertiesConstants;
 import org.fogbowcloud.manager.core.plugins.identity.voms.VomsIdentityPlugin;
 import org.fogbowcloud.manager.occi.model.Token;
 
-public class VomsTokenUpdatePlugin implements TokenUpdatePluginInterface{
+public class VomsTokenUpdatePlugin extends AbstractTokenUpdatePlugin{
 
 	private static final String FOGBOW_VOMS_CERTIFICATE_PASSWORD = "fogbow.voms.certificate.password";
 	private static final String FOGBOW_VOMS_SERVER = "fogbow.voms.server";
@@ -28,7 +28,7 @@ public class VomsTokenUpdatePlugin implements TokenUpdatePluginInterface{
 	private Properties properties;
 	
 	public VomsTokenUpdatePlugin(Properties properties){
-		
+		super(properties);
 		this.vomsServer = properties.getProperty(FOGBOW_VOMS_SERVER);
 		this.password = properties.getProperty(FOGBOW_VOMS_CERTIFICATE_PASSWORD) ;
 		this.properties = properties;
@@ -75,30 +75,5 @@ public class VomsTokenUpdatePlugin implements TokenUpdatePluginInterface{
 
 		return new Token(certificate, DEFAULT_USER, date, new HashMap<String, String>());
 	}
-
-	@Override
-	public int getUpdateTime() {
-		try{
-			return Integer.parseInt(properties.getProperty(AppPropertiesConstants.TOKEN_UPDATE_TIME));
-		}catch(Exception e){
-			return DEFAULT_UPDATE_TIME;
-		}
-	}
-
-	@Override
-	public TimeUnit getUpdateTimeUnits() {
-		
-		String timeUnit = properties.getProperty(AppPropertiesConstants.TOKEN_UPDATE_TIME_UNIT);
-		
-		if(UpdateTimeUnitsEnum.HOUR.getValue().equalsIgnoreCase(timeUnit)){
-			return TimeUnit.HOURS;
-		}else if(UpdateTimeUnitsEnum.MINUTES.getValue().equalsIgnoreCase(timeUnit)){
-			return TimeUnit.MINUTES;
-		}else if(UpdateTimeUnitsEnum.SECONDS.getValue().equalsIgnoreCase(timeUnit)){
-			return TimeUnit.SECONDS;
-		}else if(UpdateTimeUnitsEnum.MILLISECONDS.getValue().equalsIgnoreCase(timeUnit)){
-			return TimeUnit.MILLISECONDS;
-		}
-		return DEFAULT_UPDATE_TIME_UNIT;
-	}
 }
+

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -13,12 +14,11 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
-import org.eclipse.jetty.http.HttpStatus;
 import org.fogbowcloud.blowout.scheduler.core.util.AppPropertiesConstants;
 import org.fogbowcloud.manager.core.plugins.identity.naf.NAFIdentityPlugin;
 import org.fogbowcloud.manager.occi.model.Token;
 
-public class NAFTokenUpdatePlugin implements TokenUpdatePluginInterface {
+public class NAFTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
 	private static final int DEFAULT_UPDATE_TIME = 6;
 	private static final TimeUnit DEFAULT_UPDATE_TIME_UNIT = TimeUnit.HOURS;
 	private static final String USERNAME_PARAMETER = "username";
@@ -28,6 +28,7 @@ public class NAFTokenUpdatePlugin implements TokenUpdatePluginInterface {
 	private Properties properties;
 	
 	public NAFTokenUpdatePlugin(Properties properties) {
+		super(properties);
 		this.properties = properties;
 	}
 
@@ -64,7 +65,7 @@ public class NAFTokenUpdatePlugin implements TokenUpdatePluginInterface {
 			httpPost.setEntity(formEntity);
 			
 			CloseableHttpResponse response = httpClient.execute(httpPost);
-			if (response.getStatusLine().getStatusCode() == HttpStatus.OK_200) {
+			if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
 				return IOUtils.toString(response.getEntity().getContent());
 			}
 		} catch (Exception e) {
@@ -73,30 +74,6 @@ public class NAFTokenUpdatePlugin implements TokenUpdatePluginInterface {
 		return null;
 	}
 	
-	@Override
-	public int getUpdateTime() {
-		try{
-			return Integer.parseInt(properties.getProperty(AppPropertiesConstants.TOKEN_UPDATE_TIME));
-		}catch(Exception e){
-			return DEFAULT_UPDATE_TIME;
-		}
-	}
-
-	@Override
-	public TimeUnit getUpdateTimeUnits() {
-		String timeUnit = properties.getProperty(AppPropertiesConstants.TOKEN_UPDATE_TIME_UNIT);
-		
-		if(UpdateTimeUnitsEnum.HOUR.getValue().equalsIgnoreCase(timeUnit)){
-			return TimeUnit.HOURS;
-		}else if(UpdateTimeUnitsEnum.MINUTES.getValue().equalsIgnoreCase(timeUnit)){
-			return TimeUnit.MINUTES;
-		}else if(UpdateTimeUnitsEnum.SECONDS.getValue().equalsIgnoreCase(timeUnit)){
-			return TimeUnit.SECONDS;
-		}else if(UpdateTimeUnitsEnum.MILLISECONDS.getValue().equalsIgnoreCase(timeUnit)){
-			return TimeUnit.MILLISECONDS;
-		}
-		return DEFAULT_UPDATE_TIME_UNIT;
-	}
 	
 	private int getTokenUpdateTimeInHours() {
 		

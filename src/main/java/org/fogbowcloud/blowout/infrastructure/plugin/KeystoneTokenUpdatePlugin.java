@@ -14,7 +14,7 @@ import org.fogbowcloud.blowout.scheduler.core.util.AppPropertiesConstants;
 import org.fogbowcloud.manager.core.plugins.identity.openstack.KeystoneIdentityPlugin;
 import org.fogbowcloud.manager.occi.model.Token;
 
-public class KeystoneTokenUpdatePlugin implements TokenUpdatePluginInterface{
+public class KeystoneTokenUpdatePlugin extends AbstractTokenUpdatePlugin{
 
 	private static final Logger LOGGER = Logger.getLogger(KeystoneTokenUpdatePlugin.class);
 	private static final String DEFAULT_USER = "user";
@@ -33,6 +33,9 @@ public class KeystoneTokenUpdatePlugin implements TokenUpdatePluginInterface{
 	private Properties properties;
 	
 	public KeystoneTokenUpdatePlugin(Properties properties){
+		
+		super(properties);
+		
 		this.properties = properties;
 		
 		this.username=properties.getProperty(FOGBOW_KEYSTONE_USERNAME);   
@@ -92,29 +95,4 @@ public class KeystoneTokenUpdatePlugin implements TokenUpdatePluginInterface{
 		return new Token(certificate, DEFAULT_USER, date, new HashMap<String, String>());
 	}
 
-	@Override
-	public int getUpdateTime() {
-		try{
-			return Integer.parseInt(properties.getProperty(AppPropertiesConstants.TOKEN_UPDATE_TIME));
-		}catch(Exception e){
-			return DEFAULT_UPDATE_TIME;
-		}
-	}
-
-	@Override
-	public TimeUnit getUpdateTimeUnits() {
-		
-		String timeUnit = properties.getProperty(AppPropertiesConstants.TOKEN_UPDATE_TIME_UNIT);
-		
-		if(UpdateTimeUnitsEnum.HOUR.getValue().equalsIgnoreCase(timeUnit)){
-			return TimeUnit.HOURS;
-		}else if(UpdateTimeUnitsEnum.MINUTES.getValue().equalsIgnoreCase(timeUnit)){
-			return TimeUnit.MINUTES;
-		}else if(UpdateTimeUnitsEnum.SECONDS.getValue().equalsIgnoreCase(timeUnit)){
-			return TimeUnit.SECONDS;
-		}else if(UpdateTimeUnitsEnum.MILLISECONDS.getValue().equalsIgnoreCase(timeUnit)){
-			return TimeUnit.MILLISECONDS;
-		}
-		return DEFAULT_UPDATE_TIME_UNIT;
-	}
 }

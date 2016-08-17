@@ -19,13 +19,12 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-import org.fogbowcloud.blowout.infrastructure.plugin.TokenUpdatePluginInterface;
+import org.fogbowcloud.blowout.infrastructure.plugin.AbstractTokenUpdatePlugin;
 import org.fogbowcloud.blowout.scheduler.core.http.HttpWrapper;
 import org.fogbowcloud.blowout.scheduler.core.model.Resource;
 import org.fogbowcloud.blowout.scheduler.core.model.Specification;
 import org.fogbowcloud.blowout.scheduler.core.util.AppPropertiesConstants;
 import org.fogbowcloud.blowout.scheduler.infrastructure.exceptions.InfrastructureException;
-import org.fogbowcloud.blowout.scheduler.infrastructure.fogbow.FogbowInfrastructureProvider;
 import org.fogbowcloud.manager.occi.model.Token;
 import org.fogbowcloud.manager.occi.order.OrderConstants;
 import org.fogbowcloud.manager.occi.order.OrderState;
@@ -56,14 +55,14 @@ public class TestFogbowInfrastructureProvider {
 	private HttpWrapper httpWrapperMock;
 	private Properties properties;
 	private ScheduledCurrentThreadExecutorService exec;
-	private TokenUpdatePluginInterface tokenUpdatePluginMock;
+	private AbstractTokenUpdatePlugin tokenUpdatePluginMock;
 
 	@Before
 	public void setUp() throws Exception {
 
 		//Initiating properties file.
 		this.generateDefaulProperties();
-		tokenUpdatePluginMock = mock(TokenUpdatePluginInterface.class);
+		tokenUpdatePluginMock = mock(AbstractTokenUpdatePlugin.class);
 
 		Token token = mock(Token.class);
 		doReturn(token).when(tokenUpdatePluginMock).generateToken();
