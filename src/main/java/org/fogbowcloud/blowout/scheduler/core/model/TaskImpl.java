@@ -30,6 +30,7 @@ public class TaskImpl implements Task {
 	private String id;
 	private Specification spec;
 	private List<Command> commands = new ArrayList<Command>();
+	List<String> processes = new ArrayList<String>();
 	private Map<String, String> metadata = new HashMap<String, String>();
 	private boolean isFailed = false;
 	private int retries = 0;
@@ -198,6 +199,24 @@ public class TaskImpl implements Task {
 		} else if (!spec.equals(other.spec))
 			return false;
 		return true;
+	}
+
+	@Override
+	public void addProcessId(String procId) {
+		this.processes.add(procId);
+	}
+	
+	@Override
+	public int getNumberOfCommands() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+
+	@Override
+	public List<String> getProcessId() {
+		
+		return this.processes;
 	}
 
 }

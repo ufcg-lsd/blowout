@@ -7,21 +7,24 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.fogbowcloud.blowout.scheduler.core.Scheduler;
+import org.fogbowcloud.blowout.scheduler.core.model.Command;
 import org.fogbowcloud.blowout.scheduler.core.model.Job;
+import org.fogbowcloud.blowout.scheduler.core.model.Job.TaskState;
 import org.fogbowcloud.blowout.scheduler.core.model.Resource;
 import org.fogbowcloud.blowout.scheduler.core.model.Specification;
 import org.fogbowcloud.blowout.scheduler.core.model.Task;
 import org.fogbowcloud.blowout.scheduler.core.model.TaskImpl;
-import org.fogbowcloud.blowout.scheduler.core.model.Job.TaskState;
+import org.fogbowcloud.blowout.scheduler.core.model.TaskProcess;
+import org.fogbowcloud.blowout.scheduler.core.model.TaskProcessImpl;
 import org.fogbowcloud.blowout.scheduler.infrastructure.InfrastructureManager;
 import org.junit.After;
 import org.junit.Before;
@@ -58,7 +61,7 @@ public class TestScheduler {
 		infraManagerMock = mock(InfrastructureManager.class);
 		scheduler = spy(new Scheduler(infraManagerMock, executorService, jobMock, jobMock2));
 
-	}    
+	}
 
 	@After
 	public void setDown() throws Exception {
@@ -71,36 +74,39 @@ public class TestScheduler {
 	}
 
 	@Test
-	public void runTest(){
+	public void runTest() {
 
 		int qty = 5;
 
-		Specification spec = new Specification("image", "username",
-				"publicKey", "privateKeyFilePath", "userDataFile", "userDataType");
-		List<Task> tasks = this.generateMockTasks(qty,spec);
-		List<Task> tasks2 = this.generateMockTasks(qty, spec);		
-		doReturn(tasks).when(jobMock).getByState(TaskState.READY);
-		doReturn(tasks2).when(jobMock2).getByState(TaskState.READY);
+		Specification spec = new Specification("image", "username", "publicKey", "privateKeyFilePath", "userDataFile",
+				"userDataType");
+		Map<String, Task> tasks = this.generateMockTasks(qty, spec);
+		Map<String, Task> tasks2 = this.generateMockTasks(qty, spec);
+		doReturn(tasks).when(jobMock).getTasks();
+		doReturn(tasks2).when(jobMock2).getTasks();
 		scheduler.run();
 		verify(infraManagerMock).orderResource(Mockito.eq(spec), Mockito.eq(scheduler), Mockito.anyInt());
 	}
 
 	@Test
-	public void resourceReadyWithMatchTask(){
+	public void resourceReadyWithMatchTask() {
 
 		int qty = 3;
 
 		Resource resourceMock = mock(Resource.class);
 
-		Specification specA = new Specification("image", "username",
-				"publicKey", "privateKeyFilePath", "userDataFile", "userDataType");
-		Specification specB = new Specification("image", "username",
-				"publicKey", "privateKeyFilePath", "userDataFile", "userDataType");
-		List<Task> tasks = this.generateMockTasks(qty,specA);
+		Specification specA = new Specification("image", "username", "publicKey", "privateKeyFilePath", "userDataFile",
+				"userDataType");
+		Specification specB = new Specification("image", "username", "publicKey", "privateKeyFilePath", "userDataFile",
+				"userDataType");
+		Map<String, Task> tasks = this.generateMockTasks(qty, specA);
 
-		Task tMatch = tasks.get(1);
+		Task tMatch = tasks.get(tasks.keySet().iterator().next());
 
-		doReturn(tasks).when(jobMock).getByState(TaskState.READY);
+		doReturn(tasks).when(jobMock).getTasks();
+		doReturn(false).when(jobMock).isCreated();
+		scheduler.run();
+		doReturn(true).when(jobMock).isCreated();
 		doReturn(specB).when(tMatch).getSpecification();
 		doReturn("resource01").when(resourceMock).getId();
 		doReturn(true).when(resourceMock).match(specB);
@@ -112,21 +118,25 @@ public class TestScheduler {
 	}
 
 	@Test
-	public void resourceReadyWithoutMatchTask(){
+	public void resourceReadyWithoutMatchTask() {
 
 		int qty = 3;
 
 		Resource resourceMock = mock(Resource.class);
 
-		Specification specA = new Specification("image", "username",
-				"publicKey", "privateKeyFilePath", "userDataFile", "userDataType");
-		Specification specB = new Specification("image", "username",
-				"publicKey", "privateKeyFilePath", "userDataFile", "userDataType");
-		List<Task> tasks = this.generateMockTasks(qty,specA);
+		Specification specA = new Specification("image", "username", "publicKey", "privateKeyFilePath", "userDataFile",
+				"userDataType");
+		Specification specB = new Specification("image", "username", "publicKey", "privateKeyFilePath", "userDataFile",
+				"userDataType");
+		Map<String, Task> tasks = this.generateMockTasks(qty, specA);
 
-		doReturn(tasks).when(jobMock).getByState(TaskState.READY);
+		doReturn(tasks).when(jobMock).getTasks();
 		doReturn("resource01").when(resourceMock).getId();
 		doReturn(false).when(resourceMock).match(specB);
+
+		doReturn(false).when(jobMock).isCreated();
+		scheduler.run();
+		doReturn(true).when(jobMock).isCreated();
 
 		scheduler.resourceReady(resourceMock);
 
@@ -139,54 +149,59 @@ public class TestScheduler {
 	@Test
 	public void taskFailed() {
 
-		Task t = mock(Task.class);
-		doReturn(String.valueOf("task1")).when(t).getId();
+		Task task = mock(Task.class);
 
-		Task tClone = mock(Task.class);
-		doReturn(String.valueOf("task1_c")).when(t).getId();
+		TaskProcess tp = mock(TaskProcess.class);
+		doReturn(String.valueOf("task1")).when(tp).getTaskId();
 
-		doReturn(tClone).when(t).clone();
+		TaskProcess tClone = mock(TaskProcess.class);
+		doReturn(String.valueOf("task1")).when(tClone).getTaskId();
+
+		doReturn(tClone).when(scheduler).createTaskProcess(task);
 
 		Resource resourceMock = mock(Resource.class);
-		scheduler.getRunningTasks().put(t.getId(), resourceMock);
+		scheduler.getRunningTasks().put(tp.getTaskId(), resourceMock);
 
-		List<Task> tasksOfJob1 = new ArrayList<Task>();
-		tasksOfJob1.add(t);
+		Map<String, Task> tasksOfJob1 = new HashMap<String, Task>();
+		tasksOfJob1.put(task.getId(), task);
 
-		doReturn(tasksOfJob1).when(jobMock).getByState(TaskState.FAILED);
-		scheduler.taskFailed(t);
+		doReturn(tasksOfJob1).when(jobMock).getTasks();
+		scheduler.taskProcessFailed(tp);
 
-		verify(jobMock, times(1)).recoverTask(t);
 		verify(infraManagerMock, times(1)).releaseResource(resourceMock);
 
-		assertNull(scheduler.getRunningTasks().get(t.getId()));
+		assertNull(scheduler.getRunningTasks().get(tp.getTaskId()));
 	}
 
 	@Test
 	public void taskCompleted() {
 
 		Task t = mock(Task.class);
+		TaskProcess tp = mock(TaskProcess.class);
 		doReturn(String.valueOf("task1")).when(t).getId();
+		doReturn(String.valueOf("task1")).when(tp).getTaskId();
 
 		Resource resourceMock = mock(Resource.class);
 		scheduler.getRunningTasks().put(t.getId(), resourceMock);
 
-		scheduler.taskCompleted(t);
+		scheduler.taskCompleted(tp);
 
 		verify(infraManagerMock, times(1)).releaseResource(resourceMock);
 
 		assertNull(scheduler.getRunningTasks().get(t.getId()));
 	}
 
-	private List<Task> generateMockTasks(int qty, Specification spec){
+	private Map<String, Task> generateMockTasks(int qty, Specification spec) {
 
-		List<Task> tasks = new ArrayList<Task>();
-		for(int count = 1; count <= qty; count++ ){
+		Map<String, Task> tasks = new HashMap<String, Task>();
+		for (int count = 1; count <= qty; count++) {
+			List<Command> commands = new ArrayList<Command>();
 			Task t = mock(Task.class);
-			doReturn("Task_0"+String.valueOf(count)).when(t).getId();
+			doReturn("Task_0" + String.valueOf(count)).when(t).getId();
 			doReturn(spec).when(t).getSpecification();
 			doNothing().when(t).startedRunning();
-			tasks.add(t);
+			doReturn(commands).when(t).getAllCommands();
+			tasks.put(t.getId(), t);
 		}
 
 		return tasks;
@@ -194,41 +209,63 @@ public class TestScheduler {
 	}
 
 	@Test
-	public void testAddJob(){
+	public void testAddJob() {
 
 		int qty = 5;
 
-		Specification spec = new Specification("image", "username", "publicKey", "privateKeyFilePath", "userDataFile", "userDataType");
-		List<Task> tasks = this.generateMockTasks(qty,spec);
-		List<Task> tasks2 = this.generateMockTasks(qty, spec);		
-		doReturn(tasks).when(jobMock).getByState(TaskState.READY);
-		doReturn(tasks2).when(jobMock2).getByState(TaskState.READY);
+		Specification spec = new Specification("image", "username", "publicKey", "privateKeyFilePath", "userDataFile",
+				"userDataType");
+		Map<String, Task> tasks = this.generateMockTasks(qty, spec);
+		Map<String, Task> tasks2 = this.generateMockTasks(qty, spec);
+		doReturn(tasks).when(jobMock).getTasks();
+		doReturn(tasks2).when(jobMock2).getTasks();
+		doNothing().when(jobMock).setCreated();
+		doNothing().when(jobMock2).setCreated();
+		doNothing().when(jobMock3).setCreated();
+		doReturn(false).when(jobMock).isCreated();
+		doReturn(false).when(jobMock2).isCreated();
 		scheduler.run();
+		doReturn(true).when(jobMock).isCreated();
+		doReturn(true).when(jobMock2).isCreated();
 		verify(infraManagerMock).orderResource(Mockito.eq(spec), Mockito.eq(scheduler), Mockito.anyInt());
-		doReturn(new ArrayList<Task>()).when(jobMock3).getByState(TaskState.READY);
+		doReturn(new HashMap<String, Task>()).when(jobMock3).getTasks();
+		doReturn(false).when(jobMock3).isCreated();
 		scheduler.addJob(jobMock3);
+		doReturn(true).when(jobMock).isCreated();
 		scheduler.run();
-		verify(jobMock3).getByState(TaskState.READY);
+		verify(jobMock3).getTasks();
+		verify(jobMock3).setCreated();
 	}
+
 	@Test
-	public void testRemoveJob(){
+	public void testRemoveJob() {
 
 		int qty = 5;
 
-		Specification spec = new Specification("image", "username", "publicKey", "privateKeyFilePath", "userDataFile", "userDataType");
-		List<Task> tasks = this.generateMockTasks(qty,spec);
-		List<Task> tasks2 = this.generateMockTasks(qty, spec);		
-		doReturn(tasks).when(jobMock).getByState(TaskState.READY);
-		doReturn(tasks2).when(jobMock2).getByState(TaskState.READY);
+		Specification spec = new Specification("image", "username", "publicKey", "privateKeyFilePath", "userDataFile",
+				"userDataType");
+		Map<String, Task> tasks = this.generateMockTasks(qty, spec);
+		Map<String, Task> tasks2 = this.generateMockTasks(qty, spec);
+		doReturn(tasks).when(jobMock).getTasks();
+		doReturn(tasks2).when(jobMock2).getTasks();
 		doReturn(JOB_ID1).when(jobMock).getId();
 		doReturn(JOB_ID2).when(jobMock2).getId();
 		doReturn(JOB_ID3).when(jobMock3).getId();
+		doNothing().when(jobMock).setCreated();
+		doNothing().when(jobMock2).setCreated();
+		doNothing().when(jobMock3).setCreated();
+		doReturn(false).when(jobMock).isCreated();
+		doReturn(false).when(jobMock2).isCreated();
 		scheduler.run();
+		doReturn(true).when(jobMock).isCreated();
+		doReturn(true).when(jobMock2).isCreated();
 		verify(infraManagerMock).orderResource(Mockito.eq(spec), Mockito.eq(scheduler), Mockito.anyInt());
-		doReturn(new ArrayList<Task>()).when(jobMock3).getByState(TaskState.READY);
+		doReturn(new HashMap<String, Task>()).when(jobMock3).getTasks();
 		scheduler.addJob(jobMock3);
+		doReturn(false).when(jobMock3).isCreated();
 		scheduler.run();
-		verify(jobMock3).getByState(TaskState.READY);
+		doReturn(true).when(jobMock3).isCreated();
+		verify(jobMock3).getTasks();
 		scheduler.removeJob(JOB_ID1);
 		assertEquals(2, scheduler.getJobs().size());
 		assertTrue(scheduler.getJobs().contains(jobMock2));
@@ -238,46 +275,120 @@ public class TestScheduler {
 	}
 
 	@Test
-	public void testFailTaskWithMultipleJobs(){
+	public void testFailTaskWithMultipleJobs() {
 
-		//setup
+		// setup
 		int qty = 5;
 
-		Specification spec = new Specification("image", "username", "publicKey", "privateKeyFilePath", "userDataFile", "userDataType");
+		Specification spec = new Specification("image", "username", "publicKey", "privateKeyFilePath", "userDataFile",
+				"userDataType");
 
-		//We have three jobs. job 1 and 2 are added in the setUp method
-		List<Task> tasksOfJob1 =  this.generateMockTasks(qty, spec);
-		List<Task> tasksOfJob2 =  this.generateMockTasks(qty, spec);
-		List<Task> tasksOfJob3 =  new ArrayList<Task>();
+		// We have three jobs. job 1 and 2 are added in the setUp method
+		Map<String, Task> tasksOfJob1 = this.generateMockTasks(qty, spec);
+		Map<String, Task> tasksOfJob2 = this.generateMockTasks(qty, spec);
+		Map<String, Task> tasksOfJob3 = new HashMap<String, Task>();
 
-		//jobs 1 and 2 have 5 failed tasks each
-		doReturn(tasksOfJob1).when(jobMock).getByState(TaskState.FAILED);
-		doReturn(tasksOfJob2).when(jobMock2).getByState(TaskState.FAILED);
+		// jobs 1 and 2 have 5 failed tasks each
+		doReturn(tasksOfJob1).when(jobMock).getTasks();
+		doReturn(tasksOfJob2).when(jobMock2).getTasks();
 
-		//job 3 has no ready tasks
-		doReturn(new ArrayList<Task>()).when(jobMock3).getByState(TaskState.READY);
+		// job 3 has no ready tasks
+		doReturn(new HashMap<String, Task>()).when(jobMock3).getTasks();
 
-		//add the job 3. it is going to have one failed task
+		// add the job 3. it is going to have one failed task
 		scheduler.addJob(jobMock3);
+		doReturn(false).when(jobMock3).isCreated();
 
 		Task task = new TaskImpl("fakeTaskId", spec);
-		tasksOfJob3.add(task);		
-		doReturn(tasksOfJob3).when(jobMock3).getByState(TaskState.FAILED);
-
-		doNothing().when(jobMock3).recoverTask(task);
+		tasksOfJob3.put("fakeTaskId", task);
+		TaskProcess tp = mock(TaskProcess.class);
+		doReturn("fakeTaskId").when(tp).getTaskId();
+		doReturn(tp).when(scheduler).createTaskProcess(task);
+		doReturn(tasksOfJob3).when(jobMock3).getTasks();
 
 		Resource resourceMock = mock(Resource.class);
 		scheduler.getRunningTasks().put(task.getId(), resourceMock);
 
-		//test
-		scheduler.taskFailed(task);
+		scheduler.run();
+		doReturn(true).when(jobMock3).isCreated();
+		// test
+		scheduler.taskProcessFailed(tp);
 
-		//verify - We have to notify job3 to recover from task failure, and only job3
-		verify(jobMock, never()).recoverTask(task);
-		verify(jobMock2, never()).recoverTask(task);
-		verify(jobMock3, times(1)).recoverTask(task);
+		// verify - We have to notify job3 to recover from task failure, and
+		// only job3
 		verify(infraManagerMock, times(1)).releaseResource(resourceMock);
 
+	}
 
+	@Test
+	public void testInferTaskState() {
+		TaskProcess fakeTp1 = mock(TaskProcess.class);
+		TaskProcess fakeTp2 = mock(TaskProcess.class);
+		TaskProcess fakeTp3 = mock(TaskProcess.class);
+
+		doReturn(TaskProcessImpl.State.FAILED).when(fakeTp1).getStatus();
+		doReturn(TaskProcessImpl.State.FAILED).when(fakeTp2).getStatus();
+		doReturn(TaskProcessImpl.State.READY).when(fakeTp3).getStatus();
+
+		List<TaskProcess> tpList = new ArrayList<TaskProcess>();
+		tpList.add(fakeTp1);
+		tpList.add(fakeTp2);
+		tpList.add(fakeTp3);
+
+		TaskImpl fakeTask = mock(TaskImpl.class);
+		
+		doReturn(tpList).when(scheduler).getProcessFromTask(fakeTask);
+		
+		TaskState state = scheduler.inferTaskState(fakeTask);
+		
+		assertEquals(TaskState.READY, state);
+	}
+	
+	@Test
+	public void testInferTaskState2() {
+		TaskProcess fakeTp1 = mock(TaskProcess.class);
+		TaskProcess fakeTp2 = mock(TaskProcess.class);
+		TaskProcess fakeTp3 = mock(TaskProcess.class);
+
+		doReturn(TaskProcessImpl.State.FAILED).when(fakeTp1).getStatus();
+		doReturn(TaskProcessImpl.State.READY).when(fakeTp2).getStatus();
+		doReturn(TaskProcessImpl.State.FAILED).when(fakeTp3).getStatus();
+
+		List<TaskProcess> tpList = new ArrayList<TaskProcess>();
+		tpList.add(fakeTp1);
+		tpList.add(fakeTp2);
+		tpList.add(fakeTp3);
+
+		TaskImpl fakeTask = mock(TaskImpl.class);
+		
+		doReturn(tpList).when(scheduler).getProcessFromTask(fakeTask);
+		
+		TaskState state = scheduler.inferTaskState(fakeTask);
+		
+		assertEquals(TaskState.READY, state);
+	}
+	
+	@Test
+	public void testInferTaskState3() {
+		TaskProcess fakeTp1 = mock(TaskProcess.class);
+		TaskProcess fakeTp2 = mock(TaskProcess.class);
+		TaskProcess fakeTp3 = mock(TaskProcess.class);
+
+		doReturn(TaskProcessImpl.State.FAILED).when(fakeTp1).getStatus();
+		doReturn(TaskProcessImpl.State.FINNISHED).when(fakeTp2).getStatus();
+		doReturn(TaskProcessImpl.State.READY).when(fakeTp3).getStatus();
+
+		List<TaskProcess> tpList = new ArrayList<TaskProcess>();
+		tpList.add(fakeTp1);
+		tpList.add(fakeTp2);
+		tpList.add(fakeTp3);
+
+		TaskImpl fakeTask = mock(TaskImpl.class);
+		
+		doReturn(tpList).when(scheduler).getProcessFromTask(fakeTask);
+		
+		TaskState state = scheduler.inferTaskState(fakeTask);
+		
+		assertEquals(TaskState.COMPLETED, state);
 	}
 }

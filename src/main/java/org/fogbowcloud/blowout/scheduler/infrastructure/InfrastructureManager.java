@@ -28,8 +28,8 @@ import org.fogbowcloud.blowout.scheduler.infrastructure.fogbow.FogbowRequirement
 import org.fogbowcloud.manager.occi.order.OrderType;
 
 public class InfrastructureManager {
-	
-	//TODO: see if number of VMs in each site will be stored in a map
+
+	// TODO: see if number of VMs in each site will be stored in a map
 
 	private static final Logger LOGGER = Logger.getLogger(InfrastructureManager.class);
 
@@ -71,7 +71,7 @@ public class InfrastructureManager {
 
 		String resourceReuseTimesStr = this.properties.getProperty(AppPropertiesConstants.INFRA_RESOURCE_REUSE_TIMES);
 
-		if (resourceReuseTimesStr != null && !resourceReuseTimesStr.isEmpty()){
+		if (resourceReuseTimesStr != null && !resourceReuseTimesStr.isEmpty()) {
 			this.maxResourceReuses = Integer.parseInt(resourceReuseTimesStr);
 		}
 
@@ -91,11 +91,11 @@ public class InfrastructureManager {
 
 	public void start(boolean blockWhileInitializing, boolean removePrevious) throws Exception {
 		LOGGER.info("Starting Infrastructure Manager");
-		
+
 		if (removePrevious) {
 			removePreviousResources();
 		}
-		
+
 		this.createInitialOrders();
 		// Start order service to monitor and resolve orders.
 		triggerOrderTimer();
@@ -120,7 +120,7 @@ public class InfrastructureManager {
 		for (Order o : getOrdersByState(OrderState.ORDERED)) {
 			infraProvider.deleteResource(o.getRequestId());
 		}
-			
+
 		if (deleteResource) {
 			for (Resource r : getAllResources()) {
 				infraProvider.deleteResource(r.getId());
@@ -140,11 +140,13 @@ public class InfrastructureManager {
 
 		LOGGER.info("Getting list of existing resources IDs");
 		List<String> recoveredRequests = ds.getRequesId();
-		for (String requestId : recoveredRequests) {
-			try {
-				infraProvider.deleteResource(requestId);
-			} catch (Exception e) {
-				LOGGER.error("Error while trying to delete Resource with request id [" + requestId + "]", e);
+		if (recoveredRequests != null) {
+			for (String requestId : recoveredRequests) {
+				try {
+					infraProvider.deleteResource(requestId);
+				} catch (Exception e) {
+					LOGGER.error("Error while trying to delete Resource with request id [" + requestId + "]", e);
+				}
 			}
 		}
 		LOGGER.info("Previous resources removal finished");
@@ -153,8 +155,10 @@ public class InfrastructureManager {
 	public void orderResource(Specification specification, ResourceNotifier resourceNotifier, int resourceNumber) {
 		LOGGER.debug("Ordering resource with spec " + specification.toString());
 
-		List<Order> existingOrdersMatches = this.getOrdersByStateAndSchedulerAndSpec(resourceNotifier, specification, OrderState.OPEN);
-		existingOrdersMatches.addAll(this.getOrdersByStateAndSchedulerAndSpec(resourceNotifier, specification, OrderState.ORDERED));
+		List<Order> existingOrdersMatches = this.getOrdersByStateAndSchedulerAndSpec(resourceNotifier, specification,
+				OrderState.OPEN);
+		existingOrdersMatches
+				.addAll(this.getOrdersByStateAndSchedulerAndSpec(resourceNotifier, specification, OrderState.ORDERED));
 
 		int qtyOpenOrOrdered = existingOrdersMatches.size();
 		// int qtyIdle = existingIdlesMatches.size();
@@ -186,10 +190,10 @@ public class InfrastructureManager {
 			 */
 			return;
 		} else {
-			for (int count = 0; count < qtyToRequest; count++) {				
+			for (int count = 0; count < qtyToRequest; count++) {
 				Order order = new Order(resourceNotifier, specification);
 				LOGGER.info("Adding to orders list");
-				orders.add(order);				
+				orders.add(order);
 				resolveOpenOrder(order);
 				LOGGER.debug("Order request " + order.getRequestId() + " solved");
 			}
@@ -206,7 +210,7 @@ public class InfrastructureManager {
 			orders.remove(orderToRemove);
 			allocatedResources.remove(resource);
 		}
-		if (resource.getReusedTimes() <= getMaxResourceReuses()){
+		if (resource.getReusedTimes() <= getMaxResourceReuses()) {
 			if (isResourceAlive(resource)) {
 				// Anticipating resource to Scheduler if it is needed
 				for (Order order : this.getOrdersByState(OrderState.OPEN, OrderState.ORDERED)) {
@@ -222,8 +226,10 @@ public class InfrastructureManager {
 								order.getResourceNotifier().resourceReady(resource);
 								return;
 							} catch (Exception e) {
-								LOGGER.error("Error while trying to relate Idle Resource to Ordered request [RequestID: "
-										+ order.getRequestId() + "]", e);
+								LOGGER.error(
+										"Error while trying to relate Idle Resource to Ordered request [RequestID: "
+												+ order.getRequestId() + "]",
+										e);
 							}
 						}
 					}
@@ -253,13 +259,13 @@ public class InfrastructureManager {
 	// --------- PRIVATE OR PROTECTED METHODS --------- //
 
 	private void createInitialOrders() {
-		if(initialSpec!=null){
+		if (initialSpec != null) {
 			LOGGER.info("Creating orders to initial specs \n" + initialSpec);
 
 			for (Specification spec : initialSpec) {
 				// Must initial spec be Persistent ?
 				spec.addRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUEST_TYPE,
-						OrderType.PERSISTENT.getValue());				
+						OrderType.PERSISTENT.getValue());
 				orderResource(spec, null, 1);
 			}
 		}
@@ -314,7 +320,7 @@ public class InfrastructureManager {
 				order.setState(OrderState.ORDERED);
 				updateInfrastuctureState();
 				LOGGER.debug("Order [" + order.getRequestId() + "] update to Ordered with request [" + requestId + "]");
-				
+
 			} catch (RequestResourceException e) {
 				LOGGER.error("Error while resolving Order", e);
 				order.setState(OrderState.OPEN);
@@ -333,12 +339,12 @@ public class InfrastructureManager {
 
 		LOGGER.debug("Number of idle resources is " + String.valueOf(idleResources.size()));
 		LOGGER.debug("Number of allocated resources is " + String.valueOf(allocatedResources.size()));
-		
+
 		// First verify if any idle resource can be resolve this order.
 		if (idleResources != null && !idleResources.isEmpty() && order.getResourceNotifier() != null) {
 			for (Resource idleResource : idleResources.keySet()) {
 				if (idleResource.match(order.getSpecification())) {
-					LOGGER.debug("Order spec" + order.getSpecification() + "match with resource " + idleResource);					
+					LOGGER.debug("Order spec" + order.getSpecification() + "match with resource " + idleResource);
 					resource = idleResource;
 					break;
 				}
@@ -351,10 +357,10 @@ public class InfrastructureManager {
 		if (resource != null) {
 			try {
 				String oldRequest = order.getRequestId();
-				
+
 				LOGGER.debug("oldRequest " + oldRequest);
 				resolvedWithIdle = relateResourceToOrder(resource, order, true);
-				if(resolvedWithIdle){
+				if (resolvedWithIdle) {
 					LOGGER.debug("Disposing old order request " + oldRequest);
 					this.disposeRequest(oldRequest);
 				}
@@ -363,14 +369,15 @@ public class InfrastructureManager {
 						+ order.getRequestId() + "]");
 			}
 		}
-		
-		if (!resolvedWithIdle){
+
+		if (!resolvedWithIdle) {
 			LOGGER.debug("Could not resolve order" + order.getRequestId() + " with idle resource");
-			
+
 			/*
-			 * Attempt to get resource from this order, even when a idle resource
-			 * was founded. If a new resource is returned and don't exists any task
-			 * to execute, this resource is move to idle by scheduler.
+			 * Attempt to get resource from this order, even when a idle
+			 * resource was founded. If a new resource is returned and don't
+			 * exists any task to execute, this resource is move to idle by
+			 * scheduler.
 			 */
 			Resource newResource = infraProvider.getResource(order.getRequestId());
 			if (newResource != null) {
@@ -378,7 +385,7 @@ public class InfrastructureManager {
 
 				// if order is not related to initial spec
 				if (order.getResourceNotifier() != null) {
-					
+
 					this.relateResourceToOrder(newResource, order, false);
 				} else {
 					LOGGER.debug("Removing order " + order.getRequestId());
@@ -400,7 +407,7 @@ public class InfrastructureManager {
 		allocatedResources.put(resource, order);
 
 		String requestType = resource.getMetadataValue(Resource.METADATA_REQUEST_TYPE);
-		LOGGER.debug("Order request "  + order.getRequestId() + " type is " + requestType);
+		LOGGER.debug("Order request " + order.getRequestId() + " type is " + requestType);
 		boolean resourceOK = true;
 
 		if (!isResourceAlive(resource)) {
@@ -416,7 +423,8 @@ public class InfrastructureManager {
 			}
 		}
 		if (resourceOK) {
-			LOGGER.debug("Resource " + resource.getId() + " related Order with Specifications " + order.getSpecification().toString());
+			LOGGER.debug("Resource " + resource.getId() + " related Order with Specifications "
+					+ order.getSpecification().toString());
 			order.setRequestId(resource.getId());
 			order.setState(OrderState.FULFILLED);
 			updateInfrastuctureState();
@@ -440,7 +448,7 @@ public class InfrastructureManager {
 
 		LOGGER.debug("Moving resource " + resource.getId() + " to idle");
 		Long expirationDate = noExpirationDate;
-		
+
 		if (OrderType.ONE_TIME.getValue().equals(resource.getMetadataValue(Resource.METADATA_REQUEST_TYPE))) {
 			int idleLifeTime = Integer
 					.parseInt(properties.getProperty(AppPropertiesConstants.INFRA_RESOURCE_IDLE_LIFETIME));
@@ -536,8 +544,7 @@ public class InfrastructureManager {
 		return filtredOrders;
 	}
 
-	protected List<Order> getOrdersByStateAndSchedulerAndSpec(
-			ResourceNotifier resourceNotifier, Specification spec,
+	protected List<Order> getOrdersByStateAndSchedulerAndSpec(ResourceNotifier resourceNotifier, Specification spec,
 			OrderState... states) {
 
 		List<Order> filtredOrders = new ArrayList<Order>();
@@ -545,8 +552,7 @@ public class InfrastructureManager {
 
 		for (Order o : orders) {
 			if (filters.contains(o.getState())
-					&& (resourceNotifier == null || resourceNotifier.equals(o
-							.getResourceNotifier()))
+					&& (resourceNotifier == null || resourceNotifier.equals(o.getResourceNotifier()))
 					&& (spec == null || spec.equals(o.getSpecification()))) {
 				filtredOrders.add(o);
 			}
@@ -614,15 +620,14 @@ public class InfrastructureManager {
 	protected DataStore getDataStore() {
 		return this.ds;
 	}
-	
-	
-	public int getMaxResourceReuses(){
+
+	public int getMaxResourceReuses() {
 		return this.maxResourceReuses;
 	}
-	
+
 	public String getResourceComputeId(Resource resource) {
 		resourceComputeId = infraProvider.getResourceComputeId();
-		
+
 		return resourceComputeId;
 	}
 
@@ -706,6 +711,10 @@ public class InfrastructureManager {
 			}
 		}
 	}
-	
+
+	public String getLocalInterpreter() {
+
+		return this.properties.getProperty("local_command_interpreter").toString();
+	}
 
 }

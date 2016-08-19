@@ -50,7 +50,7 @@ public class KeystoneTokenUpdatePlugin extends AbstractTokenUpdatePlugin{
 	public Token generateToken() {
 
 		try {
-			return createToken();
+			return createToken(this.properties);
 		} catch (Throwable e) {
 			LOGGER.error("Error while setting token.", e);
 			try {
@@ -69,7 +69,11 @@ public class KeystoneTokenUpdatePlugin extends AbstractTokenUpdatePlugin{
 	}
 	
 	protected Token createToken() {
-		KeystoneIdentityPlugin keystoneIdentityPlugin = new KeystoneIdentityPlugin(new Properties());
+		return createToken(new Properties());
+	}
+	
+	protected Token createToken(Properties properties) {
+		KeystoneIdentityPlugin keystoneIdentityPlugin = new KeystoneIdentityPlugin(properties);
 
 		HashMap<String, String> credentials = new HashMap<String, String>();
 		

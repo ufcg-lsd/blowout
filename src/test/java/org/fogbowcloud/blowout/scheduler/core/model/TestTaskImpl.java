@@ -99,7 +99,7 @@ public class TestTaskImpl {
 	public void testGetCommandsByType(){
 		List<Command> commands = new ArrayList<Command>();
 		Command remoteCommand = new Command("fakeremotecomand", Command.Type.REMOTE);
-		Command prologueCommand = new Command("fakeprologueCommand", Command.Type.PROLOGUE);
+		Command prologueCommand = new Command("fakeprologueCommand", Command.Type.LOCAL);
 		Command epilogueCommand = new Command("fakeepilogueCommand", Command.Type.EPILOGUE);
 		Command epilogueCommand2 = new Command("fakeepilogueCommand2", Command.Type.EPILOGUE);
 		commands.add(remoteCommand);
