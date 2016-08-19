@@ -347,7 +347,7 @@ public class InfrastructureManager {
 
 		boolean resolvedWithIdle = false;
 		LOGGER.debug("Resource is " + resource);
-
+		//if we found a idle
 		if (resource != null) {
 			try {
 				String oldRequest = order.getRequestId();
