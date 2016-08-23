@@ -503,4 +503,9 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		this.managerUrl = managerUrl;
 	}
 
+	@Override
+	public Token getToken() {
+		return this.token;
+	}
+	
 }

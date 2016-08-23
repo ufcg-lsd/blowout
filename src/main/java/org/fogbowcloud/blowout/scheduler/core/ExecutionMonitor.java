@@ -6,10 +6,10 @@ import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.scheduler.core.model.Job;
 import org.fogbowcloud.blowout.scheduler.core.model.TaskProcess;
+import org.fogbowcloud.blowout.scheduler.core.model.TaskProcessImpl;
 
 public class ExecutionMonitor implements Runnable {
 
-	private Job[] job;
 	private Scheduler scheduler;
 	private static final Logger LOGGER = Logger.getLogger(ExecutionMonitor.class);
 	private ExecutorService service;
@@ -19,7 +19,6 @@ public class ExecutionMonitor implements Runnable {
 	}
 
 	public ExecutionMonitor(Scheduler scheduler, ExecutorService service, Job... job) {
-		this.job = job;
 		this.scheduler = scheduler;
 		if (service == null) {
 			this.service = Executors.newFixedThreadPool(3);
@@ -27,7 +26,7 @@ public class ExecutionMonitor implements Runnable {
 			this.service = service;
 		}
 	}
-	
+
 	public ExecutorService getService() {
 		return service;
 	}

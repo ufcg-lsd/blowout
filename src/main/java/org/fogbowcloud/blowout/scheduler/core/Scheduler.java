@@ -15,7 +15,6 @@ import org.fogbowcloud.blowout.scheduler.core.model.Job.TaskState;
 import org.fogbowcloud.blowout.scheduler.core.model.Resource;
 import org.fogbowcloud.blowout.scheduler.core.model.Specification;
 import org.fogbowcloud.blowout.scheduler.core.model.Task;
-import org.fogbowcloud.blowout.scheduler.core.model.TaskImpl;
 import org.fogbowcloud.blowout.scheduler.core.model.TaskProcess;
 import org.fogbowcloud.blowout.scheduler.core.model.TaskProcessImpl;
 import org.fogbowcloud.blowout.scheduler.infrastructure.InfrastructureManager;
@@ -42,6 +41,7 @@ public class Scheduler implements Runnable, ResourceNotifier {
 		}
 		this.infraManager = infraManager;
 		this.id = UUID.randomUUID().toString();
+
 	}
 
 	protected Scheduler(InfrastructureManager infraManager, ExecutorService taskExecutor, Job... jobs) {
@@ -144,7 +144,7 @@ public class Scheduler implements Runnable, ResourceNotifier {
 
 	protected TaskProcess createTaskProcess(Task task, String UUID) {
 		TaskProcess tp = new TaskProcessImpl(task.getId(), task.getAllCommands(), task.getSpecification(),
-				this.infraManager.getLocalInterpreter(), UUID);
+				this.infraManager.getLocalInterpreter(),  this.infraManager.getToken().getUser());
 		return tp;
 	}
 
@@ -243,9 +243,9 @@ public class Scheduler implements Runnable, ResourceNotifier {
 		List<TaskProcess> procList = new ArrayList<TaskProcess>();
 		procList.addAll(this.runningProcesses);
 		return procList;
-		
+
 	}
-	
+
 	public void taskFailed(TaskProcess tp) {
 		taskProcessFailed(tp);
 	}
@@ -287,7 +287,7 @@ public class Scheduler implements Runnable, ResourceNotifier {
 		}
 		return tpList;
 	}
-	
+
 	public Task getTaskFromTaskProcess(TaskProcess tp) {
 		return this.allProcesses.get(tp);
 	}

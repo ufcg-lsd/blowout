@@ -33,6 +33,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
 
+import org.fogbowcloud.manager.occi.model.Token;
+
 public class TestScheduler {
 
 	private static final String JOB_ID3 = "jodId3";
@@ -62,6 +64,9 @@ public class TestScheduler {
 		doReturn("uuid").when(jobMock2).getUUID();
 		doReturn("uuid").when(jobMock3).getUUID();
 		infraManagerMock = mock(InfrastructureManager.class);
+		Token token = mock(Token.class);
+		doReturn(token).when(infraManagerMock).getToken();
+		doReturn("User").when(token).getUser();
 		scheduler = spy(new Scheduler(infraManagerMock, executorService, jobMock, jobMock2));
 
 	}

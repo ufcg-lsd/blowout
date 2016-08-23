@@ -11,7 +11,7 @@ public abstract class Job implements Serializable {
 
 	private static final long serialVersionUID = -6111900503095749695L;
 
-	private Map<String, Task> taskList = new HashMap<String, Task>();
+	protected Map<String, Task> taskList = new HashMap<String, Task>();
 	
 	public enum TaskState{
 		READY,RUNNING,COMPLETED,FAILED
