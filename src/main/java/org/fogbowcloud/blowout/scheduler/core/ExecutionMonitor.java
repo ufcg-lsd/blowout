@@ -36,33 +36,8 @@ public class ExecutionMonitor implements Runnable {
 	public void run() {
 		LOGGER.debug("Submitting monitoring tasks");
 		for (TaskProcess tp : scheduler.getRunningProcs()) {
-			service.submit(new TaskExecutionChecker(tp, this.scheduler));
+			service.submit(new CommonTaskExecutionChecker(tp, this.scheduler));
 		}
 	}
 }
 
-class TaskExecutionChecker implements Runnable {
-
-	protected TaskProcess tp;
-	protected Scheduler scheduler;
-	protected Job job;
-
-	public TaskExecutionChecker(TaskProcess tp, Scheduler scheduler) {
-		this.tp = tp;
-		this.scheduler = scheduler;
-	}
-
-	@Override
-	public void run() {
-
-		if (tp.getStatus().equals(TaskProcessImpl.State.FAILED)) {
-			scheduler.taskFailed(tp);
-			return;
-		}
-
-		if (tp.getStatus().equals(TaskProcessImpl.State.FINNISHED)) {
-			scheduler.taskCompleted(tp);
-			return;
-		}
-	}
-}
