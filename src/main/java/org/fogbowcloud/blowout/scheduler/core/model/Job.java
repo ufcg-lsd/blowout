@@ -32,7 +32,7 @@ public abstract class Job implements Serializable {
 		LOGGER.debug("Adding task " + task.getId());
 		taskReadyLock.writeLock().lock();
 		try {
-			taskList.put(task.getId(), task);
+			getTaskList().put(task.getId(), task);
 		} finally {
 			taskReadyLock.writeLock().unlock();
 		}
@@ -48,7 +48,7 @@ public abstract class Job implements Serializable {
 	}
 
 	public Map<String, Task> getTasks(){
-		return this.taskList;
+		return this.getTaskList();
 	}
 	
 	public abstract void finish(Task task);
@@ -70,5 +70,13 @@ public abstract class Job implements Serializable {
 	public void restart() {
 		this.isCreated = false;
 		
+	}
+
+	public Map<String, Task> getTaskList() {
+		return taskList;
+	}
+
+	public void setTaskList(Map<String, Task> taskList) {
+		this.taskList = taskList;
 	}
 }
