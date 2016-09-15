@@ -10,14 +10,11 @@ import org.apache.log4j.Logger;
 
 public abstract class Job implements Serializable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -6111900503095749695L;
 
 	private Map<String, Task> taskList = new HashMap<String, Task>();
 	
-	public static enum TaskState{
+	public enum TaskState{
 		READY,RUNNING,COMPLETED,FAILED
 	}
 	
@@ -35,15 +32,6 @@ public abstract class Job implements Serializable {
 			getTaskList().put(task.getId(), task);
 		} finally {
 			taskReadyLock.writeLock().unlock();
-		}
-	}
-	
-	public void addFakeTask(Task task) {
-		LOGGER.debug("Adding fake completed task " + task.getId());
-		taskCompletedLock.writeLock().lock();
-		try {
-		} finally {
-			taskCompletedLock.writeLock().unlock();
 		}
 	}
 
