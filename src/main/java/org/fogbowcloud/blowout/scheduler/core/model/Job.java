@@ -24,7 +24,8 @@ public abstract class Job implements Serializable {
 	protected ReentrantReadWriteLock taskCompletedLock = new ReentrantReadWriteLock();
 
 	private boolean isCreated = false;
-	
+
+	//TODO: not sure that we need to guarantee thread safety at the job level
 	public void addTask(Task task) {
 		LOGGER.debug("Adding task " + task.getId());
 		taskReadyLock.writeLock().lock();
@@ -42,11 +43,14 @@ public abstract class Job implements Serializable {
 	public abstract void finish(Task task);
 
 	public abstract void fail(Task task);
-	
+
+	//FIXME: it seems not ok. maybe we should have an Job interface and add this method to it
 	public String getId(){
 		return null;
 	}
 
+	//TODO: it seems this *created* and restart methods help the Scheduler class to its job. I'm not sure
+	//if we should keep them.
 	public boolean isCreated() {
 		return this.isCreated;
 	}
@@ -60,10 +64,12 @@ public abstract class Job implements Serializable {
 		
 	}
 
+
 	public Map<String, Task> getTaskList() {
 		return taskList;
 	}
 
+	//FIXME: why do we need this method? (serialization?)
 	public void setTaskList(Map<String, Task> taskList) {
 		this.taskList = taskList;
 	}
