@@ -2,7 +2,6 @@ package org.fogbowcloud.blowout.scheduler.core.model;
 
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -22,6 +21,8 @@ public abstract class Job implements Serializable {
 	
 	protected ReentrantReadWriteLock taskReadyLock = new ReentrantReadWriteLock();
 	protected ReentrantReadWriteLock taskCompletedLock = new ReentrantReadWriteLock();
+	
+	private String UUID = "";
 
 	private boolean isCreated = false;
 
@@ -72,5 +73,13 @@ public abstract class Job implements Serializable {
 	//FIXME: why do we need this method? (serialization?)
 	public void setTaskList(Map<String, Task> taskList) {
 		this.taskList = taskList;
+	}
+	
+	public void setUUID(String UUID) {
+		this.UUID = UUID;
+	}
+	
+	public String getUUID() {
+		return this.UUID;
 	}
 }

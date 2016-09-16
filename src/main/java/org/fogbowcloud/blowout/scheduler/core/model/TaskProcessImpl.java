@@ -46,7 +46,9 @@ public class TaskProcessImpl implements TaskProcess {
 	
 	private String processId;
 
-	public TaskProcessImpl(String taskId, List<Command> commandList, Specification spec, String interpreter) {
+	private String UserId;
+	
+	public TaskProcessImpl(String taskId, List<Command> commandList, Specification spec, String interpreter, String UserID) {
 		//FIXME: check parameters?
 		this.processId = UUID.randomUUID().toString();
 		this.taskId = taskId;
@@ -55,6 +57,7 @@ public class TaskProcessImpl implements TaskProcess {
 		this.commandList = commandList;
 		//extract string to constants
 		localCommandInterpreter = interpreter;
+		this.UserId = UserID;
 		
 	}
 
@@ -172,7 +175,7 @@ public class TaskProcessImpl implements TaskProcess {
 
 	private Process startLocalProcess(String command, Map<String, String> additionalEnvVariables)
 			throws IOException {
-		ProcessBuilder builder = new ProcessBuilder(localCommandInterpreter, "-c",
+		ProcessBuilder builder = new ProcessBuilder(localCommandInterpreter, this.UserId, "9999", "-c",
 				command);
 		if (additionalEnvVariables == null || additionalEnvVariables.isEmpty()) {
 			return builder.start();	
