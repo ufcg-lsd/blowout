@@ -4,6 +4,6 @@ import org.fogbowcloud.blowout.scheduler.core.model.Resource;
 
 public interface ResourceNotifier {
 	
-	public void resourceReady(final Resource resource);
+	void resourceReady(final Resource resource);
 
 }
