@@ -83,7 +83,7 @@ public class Scheduler implements Runnable, ResourceNotifier {
 		if (!job.isCreated()) {
 			for (Task task : job.getTasks().values()) {
 				if (!task.isFinished()) {
-					TaskProcess tp = createTaskProcess(task);
+					TaskProcess tp = createTaskProcess(task, job.getUUID());
 					this.processQueue.add(tp);
 					this.allProcesses.put(tp, task);
 					task.addProcessId(tp.getProcessId());
@@ -128,7 +128,7 @@ public class Scheduler implements Runnable, ResourceNotifier {
 		Job job = getJobOfFailedTask(taskProcess);
 		if (job != null) {
 			Task task = allProcesses.get(taskProcess);
-			TaskProcess tp = createTaskProcess(task);
+			TaskProcess tp = createTaskProcess(task, job.getUUID());
 			task.addProcessId(tp.getProcessId());
 			allProcesses.put(tp, task);
 			processQueue.add(tp);
@@ -143,9 +143,9 @@ public class Scheduler implements Runnable, ResourceNotifier {
 
 	}
 
-	protected TaskProcess createTaskProcess(Task task) {
+	protected TaskProcess createTaskProcess(Task task, String UUID) {
 		TaskProcess tp = new TaskProcessImpl(task.getId(), task.getAllCommands(), task.getSpecification(),
-				this.infraManager.getLocalInterpreter());
+				this.infraManager.getLocalInterpreter(), UUID);
 		return tp;
 	}
 
