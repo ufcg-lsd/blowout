@@ -57,6 +57,7 @@ public class Scheduler implements Runnable, ResourceNotifier {
 		for (Job job : jobList) {
 			generateProcessForJob(job);
 		}
+		//FIXME: avoid duplicated log lines (when they are related)
 		LOGGER.debug("There are " + this.processQueue.size() + " ready tasks.");
 		LOGGER.debug("Scheduler running tasks is " + runningTasks.size());
 
@@ -122,9 +123,7 @@ public class Scheduler implements Runnable, ResourceNotifier {
 	}
 
 	public void taskProcessFailed(TaskProcess taskProcess) {
-		LOGGER.debug("============================================================");
-		LOGGER.debug("==  Task " + taskProcess.getTaskId() + " failed and will be cloned.  ==");
-		LOGGER.debug("============================================================");
+		LOGGER.debug("Task " + taskProcess.getTaskId() + " failed and will be cloned");
 		Job job = getJobOfFailedTask(taskProcess);
 		if (job != null) {
 			Task task = allProcesses.get(taskProcess);
