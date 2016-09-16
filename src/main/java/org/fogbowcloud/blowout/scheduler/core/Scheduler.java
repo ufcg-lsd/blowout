@@ -135,8 +135,10 @@ public class Scheduler implements Runnable, ResourceNotifier {
 		} else {
 			LOGGER.error("Task was from a non-existing or removed Job");
 		}
-		infraManager.releaseResource(runningTasks.get(taskProcess.getTaskId()));
-		runningTasks.remove(taskProcess.getTaskId());
+		if (runningTasks.containsKey(taskProcess.getTaskId())) {
+			infraManager.releaseResource(runningTasks.get(taskProcess.getTaskId()));
+			runningTasks.remove(taskProcess.getTaskId());
+		}
 		runningProcesses.remove(taskProcess);
 
 	}
