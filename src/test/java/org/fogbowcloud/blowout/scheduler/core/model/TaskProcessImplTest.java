@@ -35,7 +35,7 @@ public class TaskProcessImplTest {
 		commandList.add(new Command(FAKE_COMMAND, Command.Type.LOCAL));
 		Resource resource = mock(Resource.class);
 
-		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, "execution"));
+		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, "execution", null));
 
 		doReturn(0).when(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
 		//
@@ -53,7 +53,7 @@ public class TaskProcessImplTest {
 		commandList.add(new Command(FAKE_COMMAND, Command.Type.LOCAL));
 		Resource resource = mock(Resource.class);
 
-		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, "execution"));
+		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, "execution", null));
 
 		doReturn(1).when(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
 
@@ -73,7 +73,7 @@ public class TaskProcessImplTest {
 		commandList.add(new Command(FAKE_COMMAND3, Command.Type.LOCAL));
 		Resource resource = mock(Resource.class);
 
-		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, "execution"));
+		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, "execution", null));
 
 		doReturn(0).when(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
 		doReturn(0).when(tp).executeCommandString(FAKE_COMMAND2, Command.Type.LOCAL, resource);
@@ -97,7 +97,7 @@ public class TaskProcessImplTest {
 		commandList.add(new Command(FAKE_COMMAND3, Command.Type.LOCAL));
 		Resource resource = mock(Resource.class);
 
-		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, "execution"));
+		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, "execution", null));
 
 		doReturn(0).when(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
 		doReturn(1).when(tp).executeCommandString(FAKE_COMMAND2, Command.Type.LOCAL, resource);
@@ -120,7 +120,7 @@ public class TaskProcessImplTest {
 		commandList.add(new Command(FAKE_COMMAND3, Command.Type.LOCAL));
 		Resource resource = mock(Resource.class);
 
-		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, "execution"));
+		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, "execution", null));
 
 		doReturn(1).when(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
 
