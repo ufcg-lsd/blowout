@@ -2,7 +2,6 @@ package org.fogbowcloud.blowout.scheduler.core.model;
 
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -10,14 +9,11 @@ import org.apache.log4j.Logger;
 
 public abstract class Job implements Serializable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -6111900503095749695L;
 
 	private Map<String, Task> taskList = new HashMap<String, Task>();
 	
-	public static enum TaskState{
+	public enum TaskState{
 		READY,RUNNING,COMPLETED,FAILED
 	}
 	
@@ -25,40 +21,37 @@ public abstract class Job implements Serializable {
 	
 	protected ReentrantReadWriteLock taskReadyLock = new ReentrantReadWriteLock();
 	protected ReentrantReadWriteLock taskCompletedLock = new ReentrantReadWriteLock();
+	
+	private String UUID = "";
 
 	private boolean isCreated = false;
-	
+
+	//TODO: not sure that we need to guarantee thread safety at the job level
 	public void addTask(Task task) {
 		LOGGER.debug("Adding task " + task.getId());
 		taskReadyLock.writeLock().lock();
 		try {
-			taskList.put(task.getId(), task);
+			getTaskList().put(task.getId(), task);
 		} finally {
 			taskReadyLock.writeLock().unlock();
 		}
 	}
-	
-	public void addFakeTask(Task task) {
-		LOGGER.debug("Adding fake completed task " + task.getId());
-		taskCompletedLock.writeLock().lock();
-		try {
-		} finally {
-			taskCompletedLock.writeLock().unlock();
-		}
-	}
 
 	public Map<String, Task> getTasks(){
-		return this.taskList;
+		return this.getTaskList();
 	}
 	
 	public abstract void finish(Task task);
 
 	public abstract void fail(Task task);
-	
+
+	//FIXME: it seems not ok. maybe we should have an Job interface and add this method to it
 	public String getId(){
 		return null;
 	}
 
+	//TODO: it seems this *created* and restart methods help the Scheduler class to its job. I'm not sure
+	//if we should keep them.
 	public boolean isCreated() {
 		return this.isCreated;
 	}
@@ -70,5 +63,23 @@ public abstract class Job implements Serializable {
 	public void restart() {
 		this.isCreated = false;
 		
+	}
+
+
+	public Map<String, Task> getTaskList() {
+		return taskList;
+	}
+
+	//FIXME: why do we need this method? (serialization?)
+	public void setTaskList(Map<String, Task> taskList) {
+		this.taskList = taskList;
+	}
+	
+	public void setUUID(String UUID) {
+		this.UUID = UUID;
+	}
+	
+	public String getUUID() {
+		return this.UUID;
 	}
 }

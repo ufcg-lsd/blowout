@@ -10,6 +10,8 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.scheduler.core.Scheduler;
 
 public class TaskProcessImpl implements TaskProcess {
+
+	//FIXME: it should not be here (since is referenced in a upper hieararchy level
 	public enum State {
 		READY, RUNNING, FINNISHED, FAILED
 	}
@@ -44,8 +46,10 @@ public class TaskProcessImpl implements TaskProcess {
 	
 	private String processId;
 
-	public TaskProcessImpl(String taskId, List<Command> commandList, Specification spec, String interpreter) {
-		//check parameters?
+	private String UserId;
+	
+	public TaskProcessImpl(String taskId, List<Command> commandList, Specification spec, String interpreter, String UserID) {
+		//FIXME: check parameters?
 		this.processId = UUID.randomUUID().toString();
 		this.taskId = taskId;
 		this.status = State.READY;
@@ -53,6 +57,7 @@ public class TaskProcessImpl implements TaskProcess {
 		this.commandList = commandList;
 		//extract string to constants
 		localCommandInterpreter = interpreter;
+		this.UserId = UserID;
 		
 	}
 
@@ -92,6 +97,7 @@ public class TaskProcessImpl implements TaskProcess {
 	public void executeTask(Resource resource) {
 		this.setStatus(State.RUNNING);
 		for (Command command : this.getCommands()) {
+			//FIXME: avoid multiple related log line when possible
 			LOGGER.debug("Command " + command.getCommand());
 			LOGGER.debug("Command Type " + command.getType());
 			String commandString = getExecutableCommandString(command);
@@ -129,9 +135,11 @@ public class TaskProcessImpl implements TaskProcess {
 				int returnValue = localProc.waitFor();
 				return returnValue;
 			} catch (IOException e) {
+				//FIXME
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (InterruptedException e) {
+				//FIXME
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -142,8 +150,10 @@ public class TaskProcessImpl implements TaskProcess {
 				return returnValue;
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
+				//FIXME
 				e.printStackTrace();
 			} catch (InterruptedException e) {
+				//FIXME
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -152,6 +162,7 @@ public class TaskProcessImpl implements TaskProcess {
 	}
 
 	private Process startRemoteProcess(String commandString, Map<String, String> additionalVariables) throws IOException {
+		//FIXME: extract strings or commands to a variable
 		ProcessBuilder builder = new ProcessBuilder(localCommandInterpreter, "-c",
 				"ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i " + additionalVariables.get(ENV_PRIVATE_KEY_FILE) + " "
 						+ additionalVariables.get(ENV_SSH_USER) + "@" + additionalVariables.get(ENV_HOST) + " -p " + additionalVariables.get(ENV_SSH_PORT) + " " + parseEnvironVariable(commandString, additionalVariables));
@@ -164,7 +175,7 @@ public class TaskProcessImpl implements TaskProcess {
 
 	private Process startLocalProcess(String command, Map<String, String> additionalEnvVariables)
 			throws IOException {
-		ProcessBuilder builder = new ProcessBuilder(localCommandInterpreter, "-c",
+		ProcessBuilder builder = new ProcessBuilder(localCommandInterpreter, this.UserId, "9999", "-c",
 				command);
 		if (additionalEnvVariables == null || additionalEnvVariables.isEmpty()) {
 			return builder.start();	
@@ -185,6 +196,9 @@ public class TaskProcessImpl implements TaskProcess {
 	}
 	
 	protected Map<String, String> getAdditionalEnvVariables(Resource resource) {
+
+		//FIXME extract constants
+
 		Map<String, String> additionalEnvVar = new HashMap<String, String>();
 		additionalEnvVar.put(ENV_HOST, resource.getMetadataValue(METADATA_SSH_HOST));
 		LOGGER.debug("Env_host:" + resource.getMetadataValue(METADATA_SSH_HOST));
