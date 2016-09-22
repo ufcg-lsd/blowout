@@ -1,8 +1,6 @@
 package org.fogbowcloud.blowout.scheduler.core.util;
 
-
 public class AppPropertiesConstants {
-
 
 	// __________ INFRASTRUCTURE CONSTANTS __________ //
 	public static final String INFRA_IS_STATIC = "infra_is_elastic";
@@ -18,7 +16,8 @@ public class AppPropertiesConstants {
 	public static final String INFRA_SCHEDULER_SPECS_FILE_PATH = "infra_scheduler_specs_file_path";
 	public static final String INFRA_FETCHER_SPECS_FILE_PATH = "infra_fetcher_specs_file_path";
 	public static final String INFRA_SPECS_BLOCK_CREATING = "infra_specs_block_creating";
-	
+	public static final String SCHEDULER_PERIOD = "scheduler_period";
+
 	public static final String INFRA_INITIAL_SPECS_BLOCK_CREATING = "infra_initial_specs_block_creating";
 
 	// __________ FOGBOW INFRASTRUCTURE CONSTANTS __________ //
@@ -38,26 +37,25 @@ public class AppPropertiesConstants {
 
 	public static final String REST_SERVER_PORT = "rest_server_port";
 
-
-	//___________ DB CONSTANTS ______________//
-
+	// ___________ DB CONSTANTS ______________//
 
 	public static final String DB_MAP_NAME = "jobMap";
 
 	public static final String DB_MAP_USERS = "users";
-	
+
 	public static final String DB_FILE_NAME = "legacyJobs.db";
-	
+
 	public static final String DB_FILE_USERS = "usersmap.db";
-	
-	
-	//___________ APPLICATION HEADERS  ____//
-	
+
+	public static final String DB_REST_SERVER_PORT = "db_rest_server_port";
+
+	// ___________ APPLICATION HEADERS ____//
+
 	public static final String X_AUTH_NONCE = "X-auth-nonce";
 	public static final String X_AUTH_USER = "X-auth-username";
 	public static final String X_AUTH_HASH = "X-auth-hash";
-	
-	//___________ SWIFT PROPERTIES ___________//
+
+	// ___________ SWIFT PROPERTIES ___________//
 	public static final String SWIFT_CONTAINER_NAME = "swift_container_name";
 	public static final String SWIFT_PSEUD_FOLDER_PREFIX = "swift_pseud_folder_prefix";
 	public static final String SWIFT_USERNAME = "swift_username";
