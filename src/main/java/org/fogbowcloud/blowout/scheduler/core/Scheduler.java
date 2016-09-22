@@ -57,6 +57,7 @@ public class Scheduler implements Runnable, ResourceNotifier {
 		for (Job job : jobList) {
 			generateProcessForJob(job);
 		}
+		//FIXME: avoid duplicated log lines (when they are related)
 		LOGGER.debug("There are " + this.processQueue.size() + " ready tasks.");
 		LOGGER.debug("Scheduler running tasks is " + runningTasks.size());
 
@@ -64,12 +65,12 @@ public class Scheduler implements Runnable, ResourceNotifier {
 			Specification taskSpec = taskProcess.getSpecification();
 			if (!specDemand.containsKey(taskSpec)) {
 				specDemand.put(taskSpec, 0);
-			} 
-			
+			}
+
 			if (specDemand.get(taskSpec) < this.processQueue.size()) {
-			int currentDemand = specDemand.get(taskSpec);
-			specDemand.put(taskSpec, ++currentDemand);
-			LOGGER.debug("Current Demmand is: " +currentDemand);
+				int currentDemand = specDemand.get(taskSpec);
+				specDemand.put(taskSpec, ++currentDemand);
+				LOGGER.debug("Current Demand is: " + currentDemand);
 			}
 		}
 
@@ -122,9 +123,7 @@ public class Scheduler implements Runnable, ResourceNotifier {
 	}
 
 	public void taskProcessFailed(TaskProcess taskProcess) {
-		LOGGER.debug("============================================================");
-		LOGGER.debug("==  Task " + taskProcess.getTaskId() + " failed and will be cloned.  ==");
-		LOGGER.debug("============================================================");
+		LOGGER.debug("Task " + taskProcess.getTaskId() + " failed and will be cloned");
 		Job job = getJobOfFailedTask(taskProcess);
 		if (job != null) {
 			Task task = allProcesses.get(taskProcess);
@@ -135,8 +134,10 @@ public class Scheduler implements Runnable, ResourceNotifier {
 		} else {
 			LOGGER.error("Task was from a non-existing or removed Job");
 		}
-		infraManager.releaseResource(runningTasks.get(taskProcess.getTaskId()));
-		runningTasks.remove(taskProcess.getTaskId());
+		if (runningTasks.containsKey(taskProcess.getTaskId())) {
+			infraManager.releaseResource(runningTasks.get(taskProcess.getTaskId()));
+			runningTasks.remove(taskProcess.getTaskId());
+		}
 		runningProcesses.remove(taskProcess);
 
 	}
@@ -256,6 +257,7 @@ public class Scheduler implements Runnable, ResourceNotifier {
 		runningProcesses.remove(tp);
 	}
 
+	//FIXME: not a good name, infer is kind of a reserved word in CS
 	public TaskState inferTaskState(Task task) {
 		List<TaskProcess> tpList = getProcessFromTask(task);
 		for (TaskProcess tp : tpList) {
