@@ -285,4 +285,8 @@ public class Scheduler implements Runnable, ResourceNotifier {
 		}
 		return tpList;
 	}
+	
+	public Task getTaskFromTaskProcess(TaskProcess tp) {
+		return this.allProcesses.get(tp);
+	}
 }
