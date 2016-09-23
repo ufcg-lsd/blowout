@@ -9,11 +9,11 @@ public class CommonTaskExecutionChecker extends TaskExecutionChecker {
 	}
 
 	@Override
-	public void Failure(TaskProcess tp) {
+	public void failure(TaskProcess tp) {
 	}
 
 	@Override
-	public void Completion(TaskProcess tp) {
+	public void completion(TaskProcess tp) {
 	}
 
 }

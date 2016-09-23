@@ -20,19 +20,19 @@ public abstract class TaskExecutionChecker implements Runnable {
 
 		if (tp.getStatus().equals(TaskProcessImpl.State.FAILED)) {
 			scheduler.taskFailed(tp);
-			Failure(tp);
+			failure(tp);
 			return;
 		}
 
 		if (tp.getStatus().equals(TaskProcessImpl.State.FINNISHED)) {
 			scheduler.taskCompleted(tp);
-			Completion(tp);
+			completion(tp);
 			return;
 		}
 	}
 	
-	public abstract void Failure(TaskProcess tp);
+	public abstract void failure(TaskProcess tp);
 	
-	public abstract void Completion(TaskProcess tp);
+	public abstract void completion(TaskProcess tp);
 }
 
