@@ -5,11 +5,8 @@ import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.scheduler.core.model.Job;
-import org.fogbowcloud.blowout.scheduler.core.model.Resource;
-import org.fogbowcloud.blowout.scheduler.core.model.Task;
 import org.fogbowcloud.blowout.scheduler.core.model.TaskProcess;
 import org.fogbowcloud.blowout.scheduler.core.model.TaskProcessImpl;
-import org.fogbowcloud.blowout.scheduler.infrastructure.exceptions.InfrastructureException;
 
 public class ExecutionMonitor implements Runnable {
 

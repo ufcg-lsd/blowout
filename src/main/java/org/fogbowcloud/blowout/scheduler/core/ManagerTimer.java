@@ -11,7 +11,7 @@ public class ManagerTimer {
 	private ScheduledExecutorService executor;
 	private ScheduledFuture<?> future;
 	private static final Logger LOGGER = Logger.getLogger(ManagerTimer.class);
-	
+
 	public ManagerTimer(ScheduledExecutorService executor) {
 		this.executor = executor;
 	}
@@ -23,7 +23,9 @@ public class ManagerTimer {
 				try {
 					task.run();
 				} catch (Throwable e) {
-					LOGGER.error("Failed while executing timer task: "+e.getMessage(), e);
+					LOGGER.error(
+							"Failed while executing timer task: "
+									+ e.getMessage(), e);
 				}
 			}
 		}, delay, period, TimeUnit.MILLISECONDS);

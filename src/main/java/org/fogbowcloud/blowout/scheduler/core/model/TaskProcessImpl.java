@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.blowout.scheduler.core.Scheduler;
 
 public class TaskProcessImpl implements TaskProcess {
 	public enum State {
