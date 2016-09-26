@@ -3,6 +3,7 @@ package org.fogbowcloud.blowout.scheduler.infrastructure;
 import org.fogbowcloud.blowout.scheduler.core.model.Resource;
 import org.fogbowcloud.blowout.scheduler.core.model.Specification;
 import org.fogbowcloud.blowout.scheduler.infrastructure.exceptions.RequestResourceException;
+import org.fogbowcloud.manager.occi.model.Token;
 
 public interface InfrastructureProvider {
 
@@ -20,4 +21,6 @@ public interface InfrastructureProvider {
 	public String getResourceComputeId();
 	
 	public void deleteResource(String resourceId) throws Exception;
+
+	public Token getToken();
 }

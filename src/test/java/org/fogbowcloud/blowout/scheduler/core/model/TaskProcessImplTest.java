@@ -35,7 +35,7 @@ public class TaskProcessImplTest {
 		commandList.add(new Command(FAKE_COMMAND, Command.Type.LOCAL));
 		Resource resource = mock(Resource.class);
 
-		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, "execution"));
+		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, "execution", "User"));
 
 		doReturn(0).when(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
 		//
@@ -53,7 +53,7 @@ public class TaskProcessImplTest {
 		commandList.add(new Command(FAKE_COMMAND, Command.Type.LOCAL));
 		Resource resource = mock(Resource.class);
 
-		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, "execution"));
+		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, "execution", "User"));
 
 		doReturn(1).when(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
 
@@ -73,7 +73,7 @@ public class TaskProcessImplTest {
 		commandList.add(new Command(FAKE_COMMAND3, Command.Type.LOCAL));
 		Resource resource = mock(Resource.class);
 
-		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, "execution"));
+		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, "execution", "User"));
 
 		doReturn(0).when(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
 		doReturn(0).when(tp).executeCommandString(FAKE_COMMAND2, Command.Type.LOCAL, resource);
@@ -97,7 +97,7 @@ public class TaskProcessImplTest {
 		commandList.add(new Command(FAKE_COMMAND3, Command.Type.LOCAL));
 		Resource resource = mock(Resource.class);
 
-		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, "execution"));
+		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, "execution", "User"));
 
 		doReturn(0).when(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
 		doReturn(1).when(tp).executeCommandString(FAKE_COMMAND2, Command.Type.LOCAL, resource);
@@ -120,7 +120,7 @@ public class TaskProcessImplTest {
 		commandList.add(new Command(FAKE_COMMAND3, Command.Type.LOCAL));
 		Resource resource = mock(Resource.class);
 
-		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, "execution"));
+		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, "execution", "User"));
 
 		doReturn(1).when(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
 
@@ -134,7 +134,7 @@ public class TaskProcessImplTest {
 
 //	@Test
 //	public void testExecuteTask(){
-//		
+//
 //		List<Command> commandsPrologue = new ArrayList<Command>();
 //		List<Command> commandsRemote = new ArrayList<Command>();
 //		List<Command> commandsEpilogue = new ArrayList<Command>();
@@ -148,19 +148,19 @@ public class TaskProcessImplTest {
 //		String port = "1091";
 //		String userDataFile = "scripts/lvl-user-data.sh";
 //		String userDataType = "text/x-shellscript";
-//		
+//
 //		Task task = prepareMockCommandsToExecute(commandsPrologue, commandsRemote, commandsEpilogue, envVariables,
 //				image, userName, publicKey, privateKey, host, port, userDataFile, userDataType);
-//		
+//
 //		doReturn(TaskExecutionResult.OK).when(executionCommandHelperMock).execLocalCommands(Mockito.eq(commandsPrologue),
 //				Mockito.eq(envVariables));
 //		doReturn(TaskExecutionResult.OK).when(executionCommandHelperMock).execRemoteCommands(Mockito.eq(host),
 //				Mockito.eq(Integer.parseInt(port)), Mockito.eq(userName), Mockito.eq(privateKey), Mockito.eq(commandsRemote));
 //		doReturn(TaskExecutionResult.OK).when(executionCommandHelperMock).execLocalCommands(Mockito.eq(commandsEpilogue),
 //				Mockito.eq(envVariables));
-//		
+//
 //		resource.executeTask(task);
-//		
+//
 //		verify(executionCommandHelperMock, times(1)).execLocalCommands(Mockito.eq(commandsPrologue), Mockito.eq(envVariables));
 //		verify(executionCommandHelperMock, times(1)).execRemoteCommands(Mockito.eq(host),
 //				Mockito.eq(Integer.parseInt(port)), Mockito.eq(userName), Mockito.eq(privateKey), Mockito.eq(commandsRemote));
@@ -176,10 +176,10 @@ public class TaskProcessImplTest {
 //		envVariables.clear();
 //		envVariables = null;
 //	}
-	
-	
-//	
-//	
+
+
+//
+//
 //	@Test
 //	public void testExecuteTaskFail(){
 //
@@ -187,7 +187,7 @@ public class TaskProcessImplTest {
 //		List<Command> commandsRemote = new ArrayList<Command>();
 //		List<Command> commandsEpilogue = new ArrayList<Command>();
 //		Map<String, String> envVariables = new HashMap<String, String>();
-//		
+//
 //		String image = "image";
 //		String userName = "userName";
 //		String publicKey = "publicKey";
@@ -196,24 +196,24 @@ public class TaskProcessImplTest {
 //		String port = "1091";
 //		String userDataFile = "scripts/lvl-user-data.sh";
 //		String userDataType = "text/x-shellscript";
-//		
+//
 //		Task task = prepareMockCommandsToExecute(commandsPrologue, commandsRemote, commandsEpilogue, envVariables,
 //				image, userName, publicKey, privateKey, host, port, userDataFile, userDataType);
-//		
+//
 //		doReturn(TaskExecutionResult.OK).when(executionCommandHelperMock).execLocalCommands(Mockito.eq(commandsPrologue),
 //				Mockito.eq(envVariables));
 //		doReturn(TaskExecutionResult.NOK).when(executionCommandHelperMock).execRemoteCommands(Mockito.eq(host),
 //				Mockito.eq(Integer.parseInt(port)), Mockito.eq(userName), Mockito.eq(privateKey), Mockito.eq(commandsRemote));
 //		doReturn(TaskExecutionResult.OK).when(executionCommandHelperMock).execLocalCommands(Mockito.eq(commandsEpilogue),
 //				Mockito.eq(envVariables));
-//		
+//
 //		resource.executeTask(task);
-//		
+//
 //		verify(executionCommandHelperMock, times(1)).execLocalCommands(Mockito.eq(commandsPrologue), Mockito.eq(envVariables));
 //		verify(executionCommandHelperMock, times(1)).execRemoteCommands(Mockito.eq(host),
 //				Mockito.eq(Integer.parseInt(port)), Mockito.eq(userName), Mockito.eq(privateKey), Mockito.eq(commandsRemote));
 //		assertEquals(TaskExecutionResult.NOK, resource.getTaskExecutionResult().getExitValue());
-//		
+//
 //		commandsPrologue.clear();
 //		commandsPrologue = null;
 //		commandsRemote.clear();
@@ -222,22 +222,22 @@ public class TaskProcessImplTest {
 //		commandsEpilogue = null;
 //		envVariables.clear();
 //		envVariables = null;
-//		
+//
 //	}
-	
+
 
 
 //	private Task prepareMockCommandsToExecute(List<Command> commandsPrologue, List<Command> commandsRemote,
 //			List<Command> commandsEpilogue, Map<String, String> envVariables, String image, String userName,
 //			String publicKey, String privateKey, String host, String port, String userDataFile, String userDataType) {
-//		
+//
 //		Specification spec = new Specification(image, userName, publicKey, privateKey, userDataFile, userDataType);
-//		
+//
 //		resource.putMetadata(Resource.METADATA_IMAGE, "image");
 //		resource.putMetadata(Resource.METADATA_PUBLIC_KEY, "publicKey");
 //		resource.putMetadata(Resource.METADATA_SSH_HOST, host);
 //		resource.putMetadata(Resource.METADATA_SSH_PORT, port);
-//		
+//
 //		Command c1 = new Command("command_01", Command.Type.LOCAL);
 //		Command c2 = new Command("command_02", Command.Type.REMOTE);
 //		Command c3 = new Command("command_03", Command.Type.EPILOGUE);
@@ -245,27 +245,27 @@ public class TaskProcessImplTest {
 //		commandsPrologue.add(c1);
 //		commandsRemote.add(c2);
 //		commandsEpilogue.add(c3);
-//		
+//
 //		envVariables.put(Resource.ENV_HOST, host);
 //		envVariables.put(Resource.ENV_SSH_PORT, port);
 //		envVariables.put(Resource.ENV_SSH_USER, userName);
 //		envVariables.put(Resource.ENV_PRIVATE_KEY_FILE, privateKey);
-//		
+//
 //		Task task = mock(Task.class);
 //		doReturn("Task_01").when(task).getId();
 //		doReturn(spec).when(task).getSpecification();
-//		
+//
 //		doReturn(commandsPrologue).when(task).getCommandsByType(Command.Type.LOCAL);
 //		doReturn(commandsRemote).when(task).getCommandsByType(Command.Type.REMOTE);
 //		doReturn(commandsEpilogue).when(task).getCommandsByType(Command.Type.EPILOGUE);
 //		return task;
 //	}
-//	
+//
 //
 //	private void generateDefaulProperties(){
-//		
+//
 //		properties = new Properties();
-//		
+//
 //		properties.setProperty(AppPropertiesConstants.INFRA_IS_STATIC, "false");
 //		properties.setProperty(AppPropertiesConstants.INFRA_PROVIDER_CLASS_NAME,
 //				"org.fogbowcloud.scheduler.infrastructure.fogbow.FogbowInfrastructureProvider");
@@ -278,6 +278,6 @@ public class TaskProcessImplTest {
 //		properties.setProperty(AppPropertiesConstants.INFRA_FOGBOW_MANAGER_BASE_URL, "100_02_01_01:8098");
 //		properties.setProperty(AppPropertiesConstants.INFRA_FOGBOW_TOKEN_PUBLIC_KEY_FILEPATH,
 //				"src/test/resources/publickey_file");
-//		
+//
 //	}
 }

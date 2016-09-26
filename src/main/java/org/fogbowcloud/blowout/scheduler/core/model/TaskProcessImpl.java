@@ -9,27 +9,31 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 
 public class TaskProcessImpl implements TaskProcess {
+
+	//FIXME: it should not be here (since is referenced in a upper hieararchy level
 	public enum State {
 		READY, RUNNING, FINNISHED, FAILED
 	}
 
 	private static final Logger LOGGER = Logger.getLogger(TaskProcessImpl.class);
-	
+
 	int COMMAND_EXECUTION_OK = 0;
-	
+
 	public static final String ENV_HOST = "HOST";
 	public static final String ENV_SSH_PORT = "SSH_PORT";
 	public static final String ENV_SSH_USER = "SSH_USER";
 	public static final String ENV_PRIVATE_KEY_FILE = "PRIVATE_KEY_FILE";
-	
+
 	public static final String METADATA_SSH_HOST = "metadataSSHHost";
 	public static final String METADATA_SSH_PORT = "metadataSSHPort";
 	public static final String METADATA_SSH_USERNAME_ATT = "metadateSshUsername";
 	public static final String METADATA_EXTRA_PORTS_ATT = "metadateExtraPorts";
 
+	public static final String UserID = "UUID";
+
 	private final String taskId;
 
-	
+
 	//TODO choose between setResource + exec or exec(resource)
 	private Resource resource;
 
@@ -40,28 +44,32 @@ public class TaskProcessImpl implements TaskProcess {
 	private final Specification spec;
 
 	private final String localCommandInterpreter;
-	
+
 	private String processId;
 
-	public TaskProcessImpl(String taskId, List<Command> commandList, Specification spec, String interpreter) {
+	private String UserId;
+
+	public TaskProcessImpl(String taskId, List<Command> commandList, Specification spec, String interpreter, String UserId) {
 		//check parameters?
 		this.processId = UUID.randomUUID().toString();
 		this.taskId = taskId;
 		this.status = State.READY;
 		this.spec = spec;
 		this.commandList = commandList;
+		this.UserId = UserId;
 		//extract string to constants
 		localCommandInterpreter = interpreter;
-		
+		this.UserId = UserID;
+
 	}
 
 	public String getProcessId() {
 		return this.processId;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.fogbowcloud.blowout.scheduler.core.model.TaskProcess#getTaskId()
 	 */
 	@Override
@@ -71,7 +79,7 @@ public class TaskProcessImpl implements TaskProcess {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.fogbowcloud.blowout.scheduler.core.model.TaskProcess#getCommands()
 	 */
@@ -83,7 +91,7 @@ public class TaskProcessImpl implements TaskProcess {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.fogbowcloud.blowout.scheduler.core.model.TaskProcess#executeTask()
 	 */
@@ -91,10 +99,11 @@ public class TaskProcessImpl implements TaskProcess {
 	public void executeTask(Resource resource) {
 		this.setStatus(State.RUNNING);
 		for (Command command : this.getCommands()) {
+			//FIXME: avoid multiple related log line when possible
 			LOGGER.debug("Command " + command.getCommand());
 			LOGGER.debug("Command Type " + command.getType());
 			String commandString = getExecutableCommandString(command);
-			
+
 			int executionResult = executeCommandString(commandString, command.getType(), resource);
 			LOGGER.debug("Command result: " + executionResult);
 			if (executionResult != COMMAND_EXECUTION_OK) {
@@ -128,9 +137,11 @@ public class TaskProcessImpl implements TaskProcess {
 				int returnValue = localProc.waitFor();
 				return returnValue;
 			} catch (IOException e) {
+				//FIXME
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (InterruptedException e) {
+				//FIXME
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -141,8 +152,10 @@ public class TaskProcessImpl implements TaskProcess {
 				return returnValue;
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
+				//FIXME
 				e.printStackTrace();
 			} catch (InterruptedException e) {
+				//FIXME
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -151,6 +164,7 @@ public class TaskProcessImpl implements TaskProcess {
 	}
 
 	private Process startRemoteProcess(String commandString, Map<String, String> additionalVariables) throws IOException {
+		//FIXME: extract strings or commands to a variable
 		ProcessBuilder builder = new ProcessBuilder(localCommandInterpreter, "-c",
 				"ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i " + additionalVariables.get(ENV_PRIVATE_KEY_FILE) + " "
 						+ additionalVariables.get(ENV_SSH_USER) + "@" + additionalVariables.get(ENV_HOST) + " -p " + additionalVariables.get(ENV_SSH_PORT) + " " + parseEnvironVariable(commandString, additionalVariables));
@@ -159,31 +173,34 @@ public class TaskProcessImpl implements TaskProcess {
 		return builder.start();
 
 	}
-	
+
 
 	private Process startLocalProcess(String command, Map<String, String> additionalEnvVariables)
 			throws IOException {
-		ProcessBuilder builder = new ProcessBuilder(localCommandInterpreter, "-c",
+		ProcessBuilder builder = new ProcessBuilder(localCommandInterpreter, this.UserId, "9999", "-c",
 				command);
 		if (additionalEnvVariables == null || additionalEnvVariables.isEmpty()) {
-			return builder.start();	
+			return builder.start();
 		}
-		
+
 		// adding additional environment variables related to resource and/or task
 		for (String envVariable : additionalEnvVariables.keySet()) {
 			builder.environment().put(envVariable, additionalEnvVariables.get(envVariable));
 		}
 		return builder.start();
 	}
-	
+
 	private String parseEnvironVariable(String commandString, Map<String, String> additionalVariables) {
 		for (String envVar : additionalVariables.keySet()) {
 			commandString.replace(envVar, additionalVariables.get(envVar));
 		}
 		return commandString;
 	}
-	
+
 	protected Map<String, String> getAdditionalEnvVariables(Resource resource) {
+
+		//FIXME extract constants
+
 		Map<String, String> additionalEnvVar = new HashMap<String, String>();
 		additionalEnvVar.put(ENV_HOST, resource.getMetadataValue(METADATA_SSH_HOST));
 		LOGGER.debug("Env_host:" + resource.getMetadataValue(METADATA_SSH_HOST));
@@ -197,6 +214,8 @@ public class TaskProcessImpl implements TaskProcess {
 			LOGGER.debug("Env_ssh_user:" + resource.getMetadataValue(ENV_SSH_USER));
 		}
 		additionalEnvVar.put(ENV_PRIVATE_KEY_FILE, spec.getPrivateKeyFilePath());
+
+		additionalEnvVar.put(UserID, this.UserId);
 		LOGGER.debug("Env_private_key_file:" + spec.getPrivateKeyFilePath());
 		// TODO getEnvVariables from task
 
@@ -205,7 +224,7 @@ public class TaskProcessImpl implements TaskProcess {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.fogbowcloud.blowout.scheduler.core.model.TaskProcess#getStatus()
 	 */
 	@Override

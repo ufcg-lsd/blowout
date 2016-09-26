@@ -15,7 +15,6 @@ import org.fogbowcloud.blowout.scheduler.core.model.Job.TaskState;
 import org.fogbowcloud.blowout.scheduler.core.model.Resource;
 import org.fogbowcloud.blowout.scheduler.core.model.Specification;
 import org.fogbowcloud.blowout.scheduler.core.model.Task;
-import org.fogbowcloud.blowout.scheduler.core.model.TaskImpl;
 import org.fogbowcloud.blowout.scheduler.core.model.TaskProcess;
 import org.fogbowcloud.blowout.scheduler.core.model.TaskProcessImpl;
 import org.fogbowcloud.blowout.scheduler.infrastructure.InfrastructureManager;
@@ -42,6 +41,7 @@ public class Scheduler implements Runnable, ResourceNotifier {
 		}
 		this.infraManager = infraManager;
 		this.id = UUID.randomUUID().toString();
+
 	}
 
 	protected Scheduler(InfrastructureManager infraManager, ExecutorService taskExecutor, Job... jobs) {
@@ -57,6 +57,7 @@ public class Scheduler implements Runnable, ResourceNotifier {
 		for (Job job : jobList) {
 			generateProcessForJob(job);
 		}
+		//FIXME: avoid duplicated log lines (when they are related)
 		LOGGER.debug("There are " + this.processQueue.size() + " ready tasks.");
 		LOGGER.debug("Scheduler running tasks is " + runningTasks.size());
 
@@ -64,12 +65,12 @@ public class Scheduler implements Runnable, ResourceNotifier {
 			Specification taskSpec = taskProcess.getSpecification();
 			if (!specDemand.containsKey(taskSpec)) {
 				specDemand.put(taskSpec, 0);
-			} 
-			
+			}
+
 			if (specDemand.get(taskSpec) < this.processQueue.size()) {
-			int currentDemand = specDemand.get(taskSpec);
-			specDemand.put(taskSpec, ++currentDemand);
-			LOGGER.debug("Current Demmand is: " +currentDemand);
+				int currentDemand = specDemand.get(taskSpec);
+				specDemand.put(taskSpec, ++currentDemand);
+				LOGGER.debug("Current Demand is: " + currentDemand);
 			}
 		}
 
@@ -83,7 +84,7 @@ public class Scheduler implements Runnable, ResourceNotifier {
 		if (!job.isCreated()) {
 			for (Task task : job.getTasks().values()) {
 				if (!task.isFinished()) {
-					TaskProcess tp = createTaskProcess(task);
+					TaskProcess tp = createTaskProcess(task, job.getUUID());
 					this.processQueue.add(tp);
 					this.allProcesses.put(tp, task);
 					task.addProcessId(tp.getProcessId());
@@ -122,28 +123,28 @@ public class Scheduler implements Runnable, ResourceNotifier {
 	}
 
 	public void taskProcessFailed(TaskProcess taskProcess) {
-		LOGGER.debug("============================================================");
-		LOGGER.debug("==  Task " + taskProcess.getTaskId() + " failed and will be cloned.  ==");
-		LOGGER.debug("============================================================");
+		LOGGER.debug("Task " + taskProcess.getTaskId() + " failed and will be cloned");
 		Job job = getJobOfFailedTask(taskProcess);
 		if (job != null) {
 			Task task = allProcesses.get(taskProcess);
-			TaskProcess tp = createTaskProcess(task);
+			TaskProcess tp = createTaskProcess(task, job.getUUID());
 			task.addProcessId(tp.getProcessId());
 			allProcesses.put(tp, task);
 			processQueue.add(tp);
 		} else {
 			LOGGER.error("Task was from a non-existing or removed Job");
 		}
-		infraManager.releaseResource(runningTasks.get(taskProcess.getTaskId()));
-		runningTasks.remove(taskProcess.getTaskId());
+		if (runningTasks.containsKey(taskProcess.getTaskId())) {
+			infraManager.releaseResource(runningTasks.get(taskProcess.getTaskId()));
+			runningTasks.remove(taskProcess.getTaskId());
+		}
 		runningProcesses.remove(taskProcess);
 
 	}
 
-	protected TaskProcess createTaskProcess(Task task) {
+	protected TaskProcess createTaskProcess(Task task, String UUID) {
 		TaskProcess tp = new TaskProcessImpl(task.getId(), task.getAllCommands(), task.getSpecification(),
-				this.infraManager.getLocalInterpreter());
+				this.infraManager.getLocalInterpreter(),  this.infraManager.getToken().getUser());
 		return tp;
 	}
 
@@ -242,9 +243,9 @@ public class Scheduler implements Runnable, ResourceNotifier {
 		List<TaskProcess> procList = new ArrayList<TaskProcess>();
 		procList.addAll(this.runningProcesses);
 		return procList;
-		
+
 	}
-	
+
 	public void taskFailed(TaskProcess tp) {
 		taskProcessFailed(tp);
 	}
@@ -256,6 +257,7 @@ public class Scheduler implements Runnable, ResourceNotifier {
 		runningProcesses.remove(tp);
 	}
 
+	//FIXME: not a good name, infer is kind of a reserved word in CS
 	public TaskState inferTaskState(Task task) {
 		List<TaskProcess> tpList = getProcessFromTask(task);
 		for (TaskProcess tp : tpList) {
@@ -284,5 +286,9 @@ public class Scheduler implements Runnable, ResourceNotifier {
 			}
 		}
 		return tpList;
+	}
+
+	public Task getTaskFromTaskProcess(TaskProcess tp) {
+		return this.allProcesses.get(tp);
 	}
 }
