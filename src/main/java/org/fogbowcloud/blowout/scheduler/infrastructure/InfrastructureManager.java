@@ -17,14 +17,15 @@ import org.fogbowcloud.blowout.infrastructure.ResourceNotifier;
 import org.fogbowcloud.blowout.scheduler.core.DataStore;
 import org.fogbowcloud.blowout.scheduler.core.ManagerTimer;
 import org.fogbowcloud.blowout.scheduler.core.model.Order;
+import org.fogbowcloud.blowout.scheduler.core.model.Order.OrderState;
 import org.fogbowcloud.blowout.scheduler.core.model.Resource;
 import org.fogbowcloud.blowout.scheduler.core.model.Specification;
-import org.fogbowcloud.blowout.scheduler.core.model.Order.OrderState;
 import org.fogbowcloud.blowout.scheduler.core.util.AppPropertiesConstants;
 import org.fogbowcloud.blowout.scheduler.core.util.DateUtils;
 import org.fogbowcloud.blowout.scheduler.infrastructure.exceptions.InfrastructureException;
 import org.fogbowcloud.blowout.scheduler.infrastructure.exceptions.RequestResourceException;
 import org.fogbowcloud.blowout.scheduler.infrastructure.fogbow.FogbowRequirementsHelper;
+import org.fogbowcloud.manager.occi.model.Token;
 import org.fogbowcloud.manager.occi.order.OrderType;
 
 public class InfrastructureManager {
@@ -717,4 +718,8 @@ public class InfrastructureManager {
 		return this.properties.getProperty("local_command_interpreter").toString();
 	}
 
+	
+	public Token getToken() {
+		return this.infraProvider.getToken();
+	}
 }

@@ -33,6 +33,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
 
+import org.fogbowcloud.manager.occi.model.Token;
+
 public class TestScheduler {
 
 	private static final String JOB_ID3 = "jodId3";
@@ -58,7 +60,13 @@ public class TestScheduler {
 		jobMock = mock(Job.class);
 		jobMock2 = mock(Job.class);
 		jobMock3 = mock(Job.class);
+		doReturn("uuid").when(jobMock).getUUID();
+		doReturn("uuid").when(jobMock2).getUUID();
+		doReturn("uuid").when(jobMock3).getUUID();
 		infraManagerMock = mock(InfrastructureManager.class);
+		Token token = mock(Token.class);
+		doReturn(token).when(infraManagerMock).getToken();
+		doReturn("User").when(token).getUser();
 		scheduler = spy(new Scheduler(infraManagerMock, executorService, jobMock, jobMock2));
 
 	}
@@ -157,7 +165,7 @@ public class TestScheduler {
 		TaskProcess tClone = mock(TaskProcess.class);
 		doReturn(String.valueOf("task1")).when(tClone).getTaskId();
 
-		doReturn(tClone).when(scheduler).createTaskProcess(task);
+		doReturn(tClone).when(scheduler).createTaskProcess(task, "uuid");
 
 		Resource resourceMock = mock(Resource.class);
 		scheduler.getRunningTasks().put(tp.getTaskId(), resourceMock);
@@ -303,7 +311,7 @@ public class TestScheduler {
 		tasksOfJob3.put("fakeTaskId", task);
 		TaskProcess tp = mock(TaskProcess.class);
 		doReturn("fakeTaskId").when(tp).getTaskId();
-		doReturn(tp).when(scheduler).createTaskProcess(task);
+		doReturn(tp).when(scheduler).createTaskProcess(task, "uuid");
 		doReturn(tasksOfJob3).when(jobMock3).getTasks();
 
 		Resource resourceMock = mock(Resource.class);
