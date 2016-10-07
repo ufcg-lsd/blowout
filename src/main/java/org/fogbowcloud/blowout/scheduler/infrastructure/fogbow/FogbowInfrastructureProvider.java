@@ -48,16 +48,16 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 	private static final String X_OCCI_ATTRIBUTE = "X-OCCI-Attribute";
 	private static final User DEFAULT_USER = new Token.User("9999", "User");
 
-	public static final String REQUEST_ATTRIBUTE_MEMBER_ID = "org.fogbowcloud.request.providing-member";
+	public static final String REQUEST_ATTRIBUTE_MEMBER_ID = "org.fogbowcloud.order.providing-member";
 
-	public static final String INSTANCE_ATTRIBUTE_SSH_PUBLIC_ADDRESS_ATT = "org.fogbowcloud.request.ssh-public-address";
-	public static final String INSTANCE_ATTRIBUTE_SSH_USERNAME_ATT = "org.fogbowcloud.request.ssh-username";
-	public static final String INSTANCE_ATTRIBUTE_EXTRA_PORTS_ATT = "org.fogbowcloud.request.extra-ports";
+	public static final String INSTANCE_ATTRIBUTE_SSH_PUBLIC_ADDRESS_ATT = "org.fogbowcloud.order.ssh-public-address";
+	public static final String INSTANCE_ATTRIBUTE_SSH_USERNAME_ATT = "org.fogbowcloud.order.ssh-username";
+	public static final String INSTANCE_ATTRIBUTE_EXTRA_PORTS_ATT = "org.fogbowcloud.order.extra-ports";
 	public static final String INSTANCE_ATTRIBUTE_MEMORY_SIZE = "occi.compute.memory";
 	public static final String INSTANCE_ATTRIBUTE_VCORE = "occi.compute.cores";
 	// TODO Alter when fogbow are returning this attribute
 	public static final String INSTANCE_ATTRIBUTE_DISKSIZE = "TODO-AlterWhenFogbowReturns"; 
-	public static final String INSTANCE_ATTRIBUTE_REQUEST_TYPE = "org.fogbowcloud.request.type";
+	public static final String INSTANCE_ATTRIBUTE_REQUEST_TYPE = "org.fogbowcloud.order.type";
 
 	// ------------------ ATTRIBUTES -----------------//
 	private HttpWrapper httpWrapper;
@@ -333,7 +333,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		if (specs.getUserDataFile() != null && !specs.getUserDataFile().isEmpty()) {
 			if (specs.getUserDataType() == null 
 					|| specs.getUserDataType().isEmpty()) {
-				System.out.println("Content type of user data file cannot be empty.");
+				LOGGER.error("Content type of user data file cannot be empty.");
 				return null;
 			}
 			try {
@@ -347,7 +347,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 						OrderAttribute.EXTRA_USER_DATA_CONTENT_TYPE_ATT.getValue() 
 						+ "=" + specs.getUserDataType()));
 			} catch (IOException e) {
-				System.out.println("User data file not found.");
+				LOGGER.debug("User data file not found.");
 				return null;
 			}
 		}
