@@ -66,7 +66,7 @@ public class TestScheduler {
 		infraManagerMock = mock(InfrastructureManager.class);
 		Token token = mock(Token.class);
 		doReturn(token).when(infraManagerMock).getToken();
-		doReturn("User").when(token).getUser();
+		doReturn(new Token.User("9999", "User")).when(token).getUser();
 		scheduler = spy(new Scheduler(infraManagerMock, executorService, jobMock, jobMock2));
 
 	}
