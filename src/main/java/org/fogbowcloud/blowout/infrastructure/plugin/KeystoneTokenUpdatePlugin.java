@@ -17,7 +17,7 @@ import org.fogbowcloud.manager.occi.model.Token;
 public class KeystoneTokenUpdatePlugin extends AbstractTokenUpdatePlugin{
 
 	private static final Logger LOGGER = Logger.getLogger(KeystoneTokenUpdatePlugin.class);
-	private static final String DEFAULT_USER = "user";
+	private static final Token.User DEFAULT_USER = new Token.User("9999", "User");
 	private static final int DEFAULT_UPDATE_TIME = 6;
 	private static final TimeUnit DEFAULT_UPDATE_TIME_UNIT = TimeUnit.HOURS;
 	

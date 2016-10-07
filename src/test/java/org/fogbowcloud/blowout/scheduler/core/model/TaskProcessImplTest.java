@@ -1,23 +1,18 @@
 package org.fogbowcloud.blowout.scheduler.core.model;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
-import org.fogbowcloud.blowout.scheduler.core.TaskExecutionResult;
-import org.fogbowcloud.blowout.scheduler.core.util.AppPropertiesConstants;
+import org.fogbowcloud.manager.occi.model.Token;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 public class TaskProcessImplTest {
 
@@ -35,7 +30,7 @@ public class TaskProcessImplTest {
 		commandList.add(new Command(FAKE_COMMAND, Command.Type.LOCAL));
 		Resource resource = mock(Resource.class);
 
-		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, "execution", "User"));
+		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, "execution", new Token.User("9999", "User")));
 
 		doReturn(0).when(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
 		//
@@ -53,7 +48,7 @@ public class TaskProcessImplTest {
 		commandList.add(new Command(FAKE_COMMAND, Command.Type.LOCAL));
 		Resource resource = mock(Resource.class);
 
-		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, "execution", "User"));
+		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, "execution", new Token.User("9999", "User")));
 
 		doReturn(1).when(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
 
@@ -73,7 +68,7 @@ public class TaskProcessImplTest {
 		commandList.add(new Command(FAKE_COMMAND3, Command.Type.LOCAL));
 		Resource resource = mock(Resource.class);
 
-		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, "execution", "User"));
+		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, "execution", new Token.User("9999", "User")));
 
 		doReturn(0).when(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
 		doReturn(0).when(tp).executeCommandString(FAKE_COMMAND2, Command.Type.LOCAL, resource);
@@ -97,7 +92,7 @@ public class TaskProcessImplTest {
 		commandList.add(new Command(FAKE_COMMAND3, Command.Type.LOCAL));
 		Resource resource = mock(Resource.class);
 
-		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, "execution", "User"));
+		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, "execution", new Token.User("9999", "User")));
 
 		doReturn(0).when(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
 		doReturn(1).when(tp).executeCommandString(FAKE_COMMAND2, Command.Type.LOCAL, resource);
@@ -120,7 +115,7 @@ public class TaskProcessImplTest {
 		commandList.add(new Command(FAKE_COMMAND3, Command.Type.LOCAL));
 		Resource resource = mock(Resource.class);
 
-		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, "execution", "User"));
+		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, "execution", new Token.User("9999", "User")));
 
 		doReturn(1).when(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
 

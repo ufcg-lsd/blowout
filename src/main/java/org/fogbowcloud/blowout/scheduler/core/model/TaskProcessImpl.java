@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
+import org.fogbowcloud.manager.occi.model.Token.User;
 
 public class TaskProcessImpl implements TaskProcess {
 
@@ -49,14 +50,14 @@ public class TaskProcessImpl implements TaskProcess {
 
 	private String UserId;
 
-	public TaskProcessImpl(String taskId, List<Command> commandList, Specification spec, String interpreter, String UserId) {
+	public TaskProcessImpl(String taskId, List<Command> commandList, Specification spec, String interpreter, User user) {
 		//check parameters?
 		this.processId = UUID.randomUUID().toString();
 		this.taskId = taskId;
 		this.status = State.READY;
 		this.spec = spec;
 		this.commandList = commandList;
-		this.UserId = UserId;
+		this.UserId = user.getId();
 		//extract string to constants
 		localCommandInterpreter = interpreter;
 		this.UserId = UserID;

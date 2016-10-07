@@ -19,7 +19,7 @@ public class VomsTokenUpdatePlugin extends AbstractTokenUpdatePlugin{
 	private static final String FOGBOW_VOMS_CERTIFICATE_PASSWORD = "fogbow.voms.certificate.password";
 	private static final String FOGBOW_VOMS_SERVER = "fogbow.voms.server";
 	private static final Logger LOGGER = Logger.getLogger(VomsTokenUpdatePlugin.class);
-	private static final String DEFAULT_USER = "user";
+	private static final Token.User DEFAULT_USER = new Token.User("9999", "User");
 	private static final int DEFAULT_UPDATE_TIME = 6;
 	private static final TimeUnit DEFAULT_UPDATE_TIME_UNIT = TimeUnit.HOURS;
 	

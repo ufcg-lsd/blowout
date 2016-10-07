@@ -31,6 +31,7 @@ import org.fogbowcloud.blowout.scheduler.infrastructure.exceptions.Infrastructur
 import org.fogbowcloud.blowout.scheduler.infrastructure.exceptions.RequestResourceException;
 import org.fogbowcloud.manager.core.UserdataUtils;
 import org.fogbowcloud.manager.occi.model.Token;
+import org.fogbowcloud.manager.occi.model.Token.User;
 import org.fogbowcloud.manager.occi.order.OrderAttribute;
 import org.fogbowcloud.manager.occi.order.OrderConstants;
 import org.fogbowcloud.manager.occi.order.OrderState;
@@ -45,7 +46,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 	private static final String NULL_VALUE = "null";
 	private static final String CATEGORY = "Category";
 	private static final String X_OCCI_ATTRIBUTE = "X-OCCI-Attribute";
-	private static final String DEFAULT_USER = "user";
+	private static final User DEFAULT_USER = new Token.User("9999", "User");
 
 	public static final String REQUEST_ATTRIBUTE_MEMBER_ID = "org.fogbowcloud.request.providing-member";
 
