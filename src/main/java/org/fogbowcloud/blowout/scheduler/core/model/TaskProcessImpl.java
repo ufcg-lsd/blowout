@@ -166,8 +166,7 @@ public class TaskProcessImpl implements TaskProcess {
 
 	private Process startRemoteProcess(String commandString, Map<String, String> additionalVariables) throws IOException {
 		//FIXME: extract strings or commands to a variable
-		ProcessBuilder builder = new ProcessBuilder(localCommandInterpreter, "-c",
-				"ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i " + additionalVariables.get(ENV_PRIVATE_KEY_FILE) + " "
+		ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i " + additionalVariables.get(ENV_PRIVATE_KEY_FILE) + " "
 						+ additionalVariables.get(ENV_SSH_USER) + "@" + additionalVariables.get(ENV_HOST) + " -p " + additionalVariables.get(ENV_SSH_PORT) + " " + parseEnvironVariable(commandString, additionalVariables));
 		LOGGER.debug("ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i " + additionalVariables.get(ENV_PRIVATE_KEY_FILE) + " "
 				+ additionalVariables.get(ENV_SSH_USER) + "@" + additionalVariables.get(ENV_HOST) + " -p " + additionalVariables.get(ENV_SSH_PORT) + " " + parseEnvironVariable(commandString, additionalVariables));
@@ -178,8 +177,7 @@ public class TaskProcessImpl implements TaskProcess {
 
 	private Process startLocalProcess(String command, Map<String, String> additionalEnvVariables)
 			throws IOException {
-		ProcessBuilder builder = new ProcessBuilder(localCommandInterpreter, this.UserId, "9999", "-c",
-				command);
+		ProcessBuilder builder = new ProcessBuilder(localCommandInterpreter, this.UserId, "9999", command);
 		if (additionalEnvVariables == null || additionalEnvVariables.isEmpty()) {
 			return builder.start();
 		}
