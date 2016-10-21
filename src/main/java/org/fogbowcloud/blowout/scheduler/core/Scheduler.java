@@ -272,6 +272,12 @@ public class Scheduler implements Runnable, ResourceNotifier {
 			}
 
 		}
+		
+		//If has no TaskProcess for this task, it was never scheduled and thus, not created yet.
+		if(tpList.isEmpty()){
+			return TaskState.NOT_CREATED;
+		}
+		
 		return TaskState.FAILED;
 	}
 

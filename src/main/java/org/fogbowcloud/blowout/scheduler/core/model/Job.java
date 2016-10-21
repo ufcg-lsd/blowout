@@ -14,7 +14,18 @@ public abstract class Job implements Serializable {
 	protected Map<String, Task> taskList = new HashMap<String, Task>();
 	
 	public enum TaskState{
-		READY,RUNNING,COMPLETED,FAILED
+		
+		READY("READY"),RUNNING("RUNNING"),COMPLETED("COMPLETED"),FAILED("FAILED"),NOT_CREATED("NOT CREATED");
+		
+		private String value;
+		
+		private TaskState(String value){
+			this.value = value;
+		}
+		
+		public String getValue(){
+			return this.value;
+		}
 	}
 	
 	public static final Logger LOGGER = Logger.getLogger(Job.class);

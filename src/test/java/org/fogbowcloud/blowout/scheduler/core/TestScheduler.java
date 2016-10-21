@@ -399,4 +399,18 @@ public class TestScheduler {
 		
 		assertEquals(TaskState.COMPLETED, state);
 	}
+	
+	@Test
+	public void testInferTaskState4() {
+
+		List<TaskProcess> tpList = new ArrayList<TaskProcess>();
+
+		TaskImpl fakeTask = mock(TaskImpl.class);
+		
+		doReturn(tpList).when(scheduler).getProcessFromTask(fakeTask);
+		
+		TaskState state = scheduler.inferTaskState(fakeTask);
+		
+		assertEquals(TaskState.NOT_CREATED, state);
+	}
 }
