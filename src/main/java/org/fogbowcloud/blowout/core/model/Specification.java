@@ -14,9 +14,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.google.gson.Gson;
 
 public class Specification implements Serializable{
+	private static final Logger LOGGER = Logger.getLogger(Specification.class);
 
 	/**
 	 * 
@@ -269,5 +274,22 @@ public class Specification implements Serializable{
 		Specification cloneSpec = new Specification(this.image, this.username, this.publicKey, this.privateKeyFilePath, this.userDataFile, this.userDataType);
 		cloneSpec.putAllRequirements(this.getAllRequirements());
 		return cloneSpec;
+	}
+	
+	public JSONObject toJSON() {
+		try {
+			JSONObject specification = new JSONObject();
+			specification.put("image", this.getImage());
+			specification.put("username", this.getUsername());
+			specification.put("publicKey", this.getPublicKey());
+			specification.put("privateKeyFilePath", this.getPrivateKeyFilePath());
+			specification.put("contextScript", this.getContextScript());
+			specification.put("userDataFile", this.getUserDataFile());
+			specification.put("userDataType", this.getUserDataType());
+			return specification;
+		} catch (JSONException e) {
+			LOGGER.debug("Error while trying to create a JSON from Specification", e);
+			return null;
+		}
 	}
 }

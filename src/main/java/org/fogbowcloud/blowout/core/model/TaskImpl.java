@@ -4,10 +4,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.model.Command.Type;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class TaskImpl implements Task {
 
@@ -41,8 +45,7 @@ public class TaskImpl implements Task {
 		this.id = id;
 		this.spec = spec;
 	}
-
-
+	
 	@Override
 	public void putMetadata(String attributeName, String value) {
 		metadata.put(attributeName, value);
@@ -218,7 +221,30 @@ public class TaskImpl implements Task {
 			return false;
 		return true;
 	}
-
-
+	
+	public JSONObject toJSON() {
+		try {
+			JSONObject task = new JSONObject();
+			task.put("isFinished", this.isFinished());
+			task.put("isFailed", this.isFailed());
+			task.put("id", this.getId());
+			task.put("spec", this.getSpecification().toJSON());
+			task.put("retries", this.getRetries());
+			JSONArray commands = new JSONArray();
+			for (Command command : this.getAllCommands()) {
+				commands.put(command.toJSON());
+			}
+			task.put("commands", commands);
+			JSONObject metadata = new JSONObject();
+			for (Entry<String, String> entry : this.getAllMetadata().entrySet()) {
+				metadata.put(entry.getKey(), entry.getValue());
+			}
+			task.put("metadata", metadata);
+			return task;
+		} catch (JSONException e) {
+			LOGGER.debug("Error while trying to create a JSON from task", e);
+			return null;
+		}
+	}
 	
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.fogbowcloud.blowout.core.model.Command.Type;
+import org.json.JSONObject;
 
 public interface Task extends Serializable{
 
@@ -49,4 +50,6 @@ public interface Task extends Serializable{
 	void addProcessId(String procId);
 	
 	List<String> getProcessId();
+	
+	public JSONObject toJSON();
 }

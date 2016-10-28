@@ -2,8 +2,13 @@ package org.fogbowcloud.blowout.core.model;
 
 import java.io.Serializable;
 
-public class Command implements Serializable{
+import org.apache.log4j.Logger;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+public class Command implements Serializable{
+	private static final Logger LOGGER = Logger.getLogger(Command.class);
+	
 	private static final long serialVersionUID = 5281647552435522413L;
 
 	public enum Type {
@@ -34,8 +39,25 @@ public class Command implements Serializable{
 	public void setState(State state) {
 		this.state = state;
 	}
+	
+	public State getState() {
+		return this.state;
+	}
 
 	public Command clone() {
 		return null;
-	};
+	}
+	
+	public JSONObject toJSON() {
+		try {
+			JSONObject command = new JSONObject();
+			command.put("command", this.getCommand());
+			command.put("type", this.getType().toString());
+			command.put("state", this.getState().toString());
+			return command;
+		} catch (JSONException e) {
+			LOGGER.debug("Error while trying to create a JSON from command", e);
+			return null;
+		}
+	}
 }
