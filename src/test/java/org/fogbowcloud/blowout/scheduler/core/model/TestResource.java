@@ -6,14 +6,14 @@ import static org.mockito.Mockito.spy;
 
 import java.util.Properties;
 
-import org.fogbowcloud.blowout.scheduler.infrastructure.fogbow.FogbowRequirementsHelper;
+import org.fogbowcloud.blowout.core.infrastructure.fogbow.FogbowRequirementsHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class TestResource {
 	
-	Resource resource;
+	FogbowResource resource;
 	
 	private Properties properties;
 	
@@ -22,7 +22,7 @@ public class TestResource {
 		
 		
 		
-		resource = spy(new Resource("resource_01",properties));
+		resource = spy(new FogbowResource("resource_01",properties));
 	}    
 
 	@After
@@ -53,12 +53,12 @@ public class TestResource {
 		Specification spec = new Specification(image, userName, publicKey, privateKey, userDataFile, userDataType);
 		spec.addRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
 		
-		resource.putMetadata(Resource.METADATA_IMAGE, image);
-		resource.putMetadata(Resource.METADATA_PUBLIC_KEY, publicKey);
-		resource.putMetadata(Resource.METADATA_VCPU, coreSize);
-		resource.putMetadata(Resource.METADATA_MEN_SIZE, menSize);
-		resource.putMetadata(Resource.METADATA_DISK_SIZE, diskSize);
-		resource.putMetadata(Resource.METADATA_LOCATION, location);
+		resource.putMetadata(FogbowResource.METADATA_IMAGE, image);
+		resource.putMetadata(FogbowResource.METADATA_PUBLIC_KEY, publicKey);
+		resource.putMetadata(FogbowResource.METADATA_VCPU, coreSize);
+		resource.putMetadata(FogbowResource.METADATA_MEN_SIZE, menSize);
+		resource.putMetadata(FogbowResource.METADATA_DISK_SIZE, diskSize);
+		resource.putMetadata(FogbowResource.METADATA_LOCATION, location);
 		
 		assertTrue(resource.match(spec));
 		
@@ -86,12 +86,12 @@ public class TestResource {
 		Specification spec = new Specification(image, userName, publicKey, privateKey, userDataFile, userDataType);
 		spec.addRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
 		
-		resource.putMetadata(Resource.METADATA_IMAGE, image);
-		resource.putMetadata(Resource.METADATA_PUBLIC_KEY, publicKey);
-		resource.putMetadata(Resource.METADATA_VCPU, coreSize);
-		resource.putMetadata(Resource.METADATA_MEN_SIZE, menSize);
-		resource.putMetadata(Resource.METADATA_DISK_SIZE, diskSize);
-		resource.putMetadata(Resource.METADATA_LOCATION, location);
+		resource.putMetadata(FogbowResource.METADATA_IMAGE, image);
+		resource.putMetadata(FogbowResource.METADATA_PUBLIC_KEY, publicKey);
+		resource.putMetadata(FogbowResource.METADATA_VCPU, coreSize);
+		resource.putMetadata(FogbowResource.METADATA_MEN_SIZE, menSize);
+		resource.putMetadata(FogbowResource.METADATA_DISK_SIZE, diskSize);
+		resource.putMetadata(FogbowResource.METADATA_LOCATION, location);
 		
 		assertFalse(resource.match(spec));
 		
@@ -119,12 +119,12 @@ public class TestResource {
 		Specification spec = new Specification(imageB, userName, publicKey, privateKey, userDataFile, userDataType);
 		spec.addRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
 		
-		resource.putMetadata(Resource.METADATA_IMAGE, imageA);
-		resource.putMetadata(Resource.METADATA_PUBLIC_KEY, publicKey);
-		resource.putMetadata(Resource.METADATA_VCPU, coreSize);
-		resource.putMetadata(Resource.METADATA_MEN_SIZE, menSize);
-		resource.putMetadata(Resource.METADATA_DISK_SIZE, diskSize);
-		resource.putMetadata(Resource.METADATA_LOCATION, location);
+		resource.putMetadata(FogbowResource.METADATA_IMAGE, imageA);
+		resource.putMetadata(FogbowResource.METADATA_PUBLIC_KEY, publicKey);
+		resource.putMetadata(FogbowResource.METADATA_VCPU, coreSize);
+		resource.putMetadata(FogbowResource.METADATA_MEN_SIZE, menSize);
+		resource.putMetadata(FogbowResource.METADATA_DISK_SIZE, diskSize);
+		resource.putMetadata(FogbowResource.METADATA_LOCATION, location);
 		
 		assertFalse(resource.match(spec));
 	
@@ -152,12 +152,12 @@ public class TestResource {
 		Specification spec = new Specification(image, userName, publicKeyB, privateKey, userDataFile, userDataType);
 		spec.addRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
 
-		resource.putMetadata(Resource.METADATA_IMAGE, image);
-		resource.putMetadata(Resource.METADATA_PUBLIC_KEY, publicKeyA);
-		resource.putMetadata(Resource.METADATA_VCPU, coreSize);
-		resource.putMetadata(Resource.METADATA_MEN_SIZE, menSize);
-		resource.putMetadata(Resource.METADATA_DISK_SIZE, diskSize);
-		resource.putMetadata(Resource.METADATA_LOCATION, location);
+		resource.putMetadata(FogbowResource.METADATA_IMAGE, image);
+		resource.putMetadata(FogbowResource.METADATA_PUBLIC_KEY, publicKeyA);
+		resource.putMetadata(FogbowResource.METADATA_VCPU, coreSize);
+		resource.putMetadata(FogbowResource.METADATA_MEN_SIZE, menSize);
+		resource.putMetadata(FogbowResource.METADATA_DISK_SIZE, diskSize);
+		resource.putMetadata(FogbowResource.METADATA_LOCATION, location);
 
 		assertFalse(resource.match(spec));
 

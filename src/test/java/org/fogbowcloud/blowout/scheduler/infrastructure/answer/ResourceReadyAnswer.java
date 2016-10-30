@@ -1,6 +1,6 @@
 package org.fogbowcloud.blowout.scheduler.infrastructure.answer;
 
-import org.fogbowcloud.blowout.scheduler.core.model.Resource;
+import org.fogbowcloud.blowout.core.core.model.Resource;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -9,19 +9,19 @@ import org.mockito.stubbing.Answer;
  * @author gustavorag
  *
  */
-public class ResourceReadyAnswer implements Answer<Resource>{
+public class ResourceReadyAnswer implements Answer<FogbowResource>{
 
-	private Resource resourceReady = null;
+	private FogbowResource resourceReady = null;
 	
 	@Override
-	public Resource answer(InvocationOnMock invocation) throws Throwable {
+	public FogbowResource answer(InvocationOnMock invocation) throws Throwable {
 		
-		resourceReady = (Resource) invocation.getArguments()[0];
+		resourceReady = (FogbowResource) invocation.getArguments()[0];
 		
 		return null;
 	}
 
-	public Resource getResourceReady() {
+	public FogbowResource getResourceReady() {
 		return resourceReady;
 	}
 	

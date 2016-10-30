@@ -1,7 +1,7 @@
 package org.fogbowcloud.blowout.scheduler.core.model;
 
-import org.fogbowcloud.blowout.scheduler.core.model.Job;
-import org.fogbowcloud.blowout.scheduler.core.model.Task;
+import org.fogbowcloud.blowout.core.core.model.Job;
+import org.fogbowcloud.blowout.core.core.model.Task;
 
 public class FakeJob extends Job{
 

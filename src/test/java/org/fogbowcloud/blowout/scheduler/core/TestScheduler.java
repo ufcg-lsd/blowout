@@ -16,23 +16,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.fogbowcloud.blowout.scheduler.core.model.Command;
-import org.fogbowcloud.blowout.scheduler.core.model.Job;
-import org.fogbowcloud.blowout.scheduler.core.model.Job.TaskState;
-import org.fogbowcloud.blowout.scheduler.core.model.Resource;
-import org.fogbowcloud.blowout.scheduler.core.model.Specification;
-import org.fogbowcloud.blowout.scheduler.core.model.Task;
-import org.fogbowcloud.blowout.scheduler.core.model.TaskImpl;
-import org.fogbowcloud.blowout.scheduler.core.model.TaskProcess;
-import org.fogbowcloud.blowout.scheduler.core.model.TaskProcessImpl;
-import org.fogbowcloud.blowout.scheduler.infrastructure.InfrastructureManager;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
-
+import org.fogbowcloud.blowout.core.core.model.Command;
+import org.fogbowcloud.blowout.core.core.model.Job;
+import org.fogbowcloud.blowout.core.core.model.Resource;
+import org.fogbowcloud.blowout.core.core.model.Specification;
+import org.fogbowcloud.blowout.core.core.model.Task;
+import org.fogbowcloud.blowout.core.core.model.TaskImpl;
+import org.fogbowcloud.blowout.core.core.model.TaskProcess;
+import org.fogbowcloud.blowout.core.core.model.TaskProcessImpl;
+import org.fogbowcloud.blowout.core.core.model.Job.TaskState;
+import org.fogbowcloud.blowout.core.infrastructure.InfrastructureManager;
 import org.fogbowcloud.manager.occi.model.Token;
 
 public class TestScheduler {
@@ -101,7 +100,7 @@ public class TestScheduler {
 
 		int qty = 3;
 
-		Resource resourceMock = mock(Resource.class);
+		FogbowResource resourceMock = mock(FogbowResource.class);
 
 		Specification specA = new Specification("image", "username", "publicKey", "privateKeyFilePath", "userDataFile",
 				"userDataType");
@@ -130,7 +129,7 @@ public class TestScheduler {
 
 		int qty = 3;
 
-		Resource resourceMock = mock(Resource.class);
+		FogbowResource resourceMock = mock(FogbowResource.class);
 
 		Specification specA = new Specification("image", "username", "publicKey", "privateKeyFilePath", "userDataFile",
 				"userDataType");
@@ -167,7 +166,7 @@ public class TestScheduler {
 
 		doReturn(tClone).when(scheduler).createTaskProcess(task, "uuid");
 
-		Resource resourceMock = mock(Resource.class);
+		FogbowResource resourceMock = mock(FogbowResource.class);
 		scheduler.getRunningTasks().put(tp.getTaskId(), resourceMock);
 
 		Map<String, Task> tasksOfJob1 = new HashMap<String, Task>();
@@ -189,7 +188,7 @@ public class TestScheduler {
 		doReturn(String.valueOf("task1")).when(t).getId();
 		doReturn(String.valueOf("task1")).when(tp).getTaskId();
 
-		Resource resourceMock = mock(Resource.class);
+		FogbowResource resourceMock = mock(FogbowResource.class);
 		scheduler.getRunningTasks().put(t.getId(), resourceMock);
 
 		scheduler.taskCompleted(tp);
@@ -314,7 +313,7 @@ public class TestScheduler {
 		doReturn(tp).when(scheduler).createTaskProcess(task, "uuid");
 		doReturn(tasksOfJob3).when(jobMock3).getTasks();
 
-		Resource resourceMock = mock(Resource.class);
+		FogbowResource resourceMock = mock(FogbowResource.class);
 		scheduler.getRunningTasks().put(task.getId(), resourceMock);
 
 		scheduler.run();

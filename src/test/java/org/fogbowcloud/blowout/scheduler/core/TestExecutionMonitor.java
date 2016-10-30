@@ -11,14 +11,14 @@ import static org.mockito.Mockito.verify;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.fogbowcloud.blowout.scheduler.core.model.Job;
-import org.fogbowcloud.blowout.scheduler.core.model.Resource;
-import org.fogbowcloud.blowout.scheduler.core.model.Task;
-import org.fogbowcloud.blowout.scheduler.core.model.TaskImpl;
-import org.fogbowcloud.blowout.scheduler.core.model.TaskProcess;
-import org.fogbowcloud.blowout.scheduler.core.model.TaskProcessImpl;
-import org.fogbowcloud.blowout.scheduler.infrastructure.InfrastructureManager;
-import org.fogbowcloud.blowout.scheduler.infrastructure.exceptions.InfrastructureException;
+import org.fogbowcloud.blowout.core.core.model.Job;
+import org.fogbowcloud.blowout.core.core.model.Resource;
+import org.fogbowcloud.blowout.core.core.model.Task;
+import org.fogbowcloud.blowout.core.core.model.TaskImpl;
+import org.fogbowcloud.blowout.core.core.model.TaskProcess;
+import org.fogbowcloud.blowout.core.core.model.TaskProcessImpl;
+import org.fogbowcloud.blowout.core.infrastructure.InfrastructureManager;
+import org.fogbowcloud.blowout.core.infrastructure.exceptions.InfrastructureException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,7 +28,7 @@ public class TestExecutionMonitor {
 	public Scheduler scheduler;
 	public Job job;
 	public InfrastructureManager IM;
-	public Resource resource;
+	public FogbowResource resource;
 	public String FAKE_TASK_ID = "FAKE_TASK_ID";
 	private CurrentThreadExecutorService executorService;
 
@@ -36,7 +36,7 @@ public class TestExecutionMonitor {
 	public void setUp() {
 		task = spy(new TaskImpl(FAKE_TASK_ID, null));
 		IM = mock(InfrastructureManager.class);
-		resource = mock(Resource.class);
+		resource = mock(FogbowResource.class);
 		job = mock(Job.class);
 		executorService = new CurrentThreadExecutorService();
 		scheduler = spy(new Scheduler(IM, job));

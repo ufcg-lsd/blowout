@@ -19,12 +19,12 @@ import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-import org.fogbowcloud.blowout.scheduler.core.DataStore;
-import org.fogbowcloud.blowout.scheduler.core.Scheduler;
-import org.fogbowcloud.blowout.scheduler.core.model.Order;
-import org.fogbowcloud.blowout.scheduler.core.model.Resource;
-import org.fogbowcloud.blowout.scheduler.core.model.Specification;
-import org.fogbowcloud.blowout.scheduler.core.model.Order.OrderState;
+import org.fogbowcloud.blowout.core.core.DataStore;
+import org.fogbowcloud.blowout.core.core.Scheduler;
+import org.fogbowcloud.blowout.core.core.model.Order;
+import org.fogbowcloud.blowout.core.core.model.Resource;
+import org.fogbowcloud.blowout.core.core.model.Specification;
+import org.fogbowcloud.blowout.core.core.model.Order.OrderState;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,12 +64,12 @@ public class TestDataStore {
 	public void testAddListOfOrders() throws SQLException, InterruptedException {
 		Scheduler scheduler = mock(Scheduler.class);
 		Specification specification = mock(Specification.class);
-		Order order1 = mock(Order.class);
-		Order order2 = mock(Order.class);
+		Request order1 = mock(Request.class);
+		Request order2 = mock(Request.class);
 		doReturn(FAKE_REQUEST_ID1).when(order1).getRequestId();
 		doReturn(FAKE_REQUEST_ID2).when(order2).getRequestId();
-		List<Order> orders = new ArrayList<Order>();
-		List<Resource> resources = new ArrayList<Resource>();
+		List<Request> orders = new ArrayList<Request>();
+		List<FogbowResource> resources = new ArrayList<FogbowResource>();
 		orders.add(order1);
 		orders.add(order2);
 		db.updateInfrastructureState(orders, resources);
@@ -87,15 +87,15 @@ public class TestDataStore {
 	public void testGetRequestIds() throws SQLException{
 		Scheduler scheduler = mock(Scheduler.class);
 		Specification specification = mock(Specification.class);
-		Order order1 = mock(Order.class);
-		Order order2 = mock(Order.class);
-		Order order3 = mock(Order.class);
+		Request order1 = mock(Request.class);
+		Request order2 = mock(Request.class);
+		Request order3 = mock(Request.class);
 		doReturn(FAKE_REQUEST_ID1).when(order1).getRequestId();
 		doReturn(FAKE_REQUEST_ID2).when(order2).getRequestId();
 		doReturn(FAKE_REQUEST_ID3).when(order3).getRequestId();
-		List<Order> orders = new ArrayList<Order>();
-		List<Order> orders2 = new ArrayList<Order>();
-		List<Resource> resources = new ArrayList<Resource>();
+		List<Request> orders = new ArrayList<Request>();
+		List<Request> orders2 = new ArrayList<Request>();
+		List<FogbowResource> resources = new ArrayList<FogbowResource>();
 		orders.add(order1);
 		orders.add(order2);
 		db.updateInfrastructureState(orders, resources);
@@ -112,15 +112,15 @@ public class TestDataStore {
 	public void testAddListOfOrdersAgain() throws SQLException, InterruptedException {
 		Scheduler scheduler = mock(Scheduler.class);
 		Specification specification = mock(Specification.class);
-		Order order1 = mock(Order.class);
-		Order order2 = mock(Order.class);
-		Order order3 = mock(Order.class);
+		Request order1 = mock(Request.class);
+		Request order2 = mock(Request.class);
+		Request order3 = mock(Request.class);
 		doReturn(FAKE_REQUEST_ID1).when(order1).getRequestId();
 		doReturn(FAKE_REQUEST_ID2).when(order2).getRequestId();
 		doReturn(FAKE_REQUEST_ID3).when(order3).getRequestId();
-		List<Order> orders = new ArrayList<Order>();
-		List<Order> orders2 = new ArrayList<Order>();
-		List<Resource> resources = new ArrayList<Resource>();
+		List<Request> orders = new ArrayList<Request>();
+		List<Request> orders2 = new ArrayList<Request>();
+		List<FogbowResource> resources = new ArrayList<FogbowResource>();
 		orders.add(order1);
 		orders.add(order2);
 		db.updateInfrastructureState(orders, resources);
@@ -148,21 +148,21 @@ public class TestDataStore {
 		Scheduler scheduler = mock(Scheduler.class);
 		Specification specification = mock(Specification.class);
 		
-		Order order1 = mock(Order.class);
-		Order order2 = mock(Order.class);
+		Request order1 = mock(Request.class);
+		Request order2 = mock(Request.class);
 		doReturn(FAKE_REQUEST_ID1).when(order1).getRequestId();
-		doReturn(OrderState.ORDERED).when(order1).getState();
+		doReturn(RequestState.ORDERED).when(order1).getState();
 		doReturn(FAKE_REQUEST_ID2).when(order2).getRequestId();
-		doReturn(OrderState.FULFILLED).when(order2).getState();
-		List<Order> orders = new ArrayList<Order>();
+		doReturn(RequestState.FULFILLED).when(order2).getState();
+		List<Request> orders = new ArrayList<Request>();
 		orders.add(order1);
 		orders.add(order2);
 		
-		Resource resource1 = mock(Resource.class);
+		FogbowResource resource1 = mock(FogbowResource.class);
 		doReturn(FAKE_REQUEST_ID4).when(resource1).getId();
-		Resource resource2 = mock(Resource.class);
+		FogbowResource resource2 = mock(FogbowResource.class);
 		doReturn(FAKE_REQUEST_ID5).when(resource2).getId();
-		List<Resource> resources = new ArrayList<Resource>();
+		List<FogbowResource> resources = new ArrayList<FogbowResource>();
 		resources.add(resource1);
 		resources.add(resource2);
 		

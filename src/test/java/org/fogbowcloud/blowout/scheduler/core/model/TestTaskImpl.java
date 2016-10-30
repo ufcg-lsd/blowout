@@ -10,10 +10,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.fogbowcloud.blowout.scheduler.core.model.Command;
-import org.fogbowcloud.blowout.scheduler.core.model.Specification;
-import org.fogbowcloud.blowout.scheduler.core.model.Task;
-import org.fogbowcloud.blowout.scheduler.core.model.TaskImpl;
+import org.fogbowcloud.blowout.core.core.model.Command;
+import org.fogbowcloud.blowout.core.core.model.Specification;
+import org.fogbowcloud.blowout.core.core.model.Task;
+import org.fogbowcloud.blowout.core.core.model.TaskImpl;
 import org.junit.Before;
 import org.junit.Test;
 

@@ -28,7 +28,7 @@ public class TaskProcessImplTest {
 		Properties properties = new Properties();
 		List<Command> commandList = new ArrayList<Command>();
 		commandList.add(new Command(FAKE_COMMAND, Command.Type.LOCAL));
-		Resource resource = mock(Resource.class);
+		FogbowResource resource = mock(FogbowResource.class);
 
 		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, "execution", new Token.User("9999", "User")));
 
@@ -46,7 +46,7 @@ public class TaskProcessImplTest {
 		Specification spec = mock(Specification.class);
 		List<Command> commandList = new ArrayList<Command>();
 		commandList.add(new Command(FAKE_COMMAND, Command.Type.LOCAL));
-		Resource resource = mock(Resource.class);
+		FogbowResource resource = mock(FogbowResource.class);
 
 		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, "execution", new Token.User("9999", "User")));
 
@@ -66,7 +66,7 @@ public class TaskProcessImplTest {
 		commandList.add(new Command(FAKE_COMMAND, Command.Type.LOCAL));
 		commandList.add(new Command(FAKE_COMMAND2, Command.Type.LOCAL));
 		commandList.add(new Command(FAKE_COMMAND3, Command.Type.LOCAL));
-		Resource resource = mock(Resource.class);
+		FogbowResource resource = mock(FogbowResource.class);
 
 		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, "execution", new Token.User("9999", "User")));
 
@@ -90,7 +90,7 @@ public class TaskProcessImplTest {
 		commandList.add(new Command(FAKE_COMMAND, Command.Type.LOCAL));
 		commandList.add(new Command(FAKE_COMMAND2, Command.Type.LOCAL));
 		commandList.add(new Command(FAKE_COMMAND3, Command.Type.LOCAL));
-		Resource resource = mock(Resource.class);
+		FogbowResource resource = mock(FogbowResource.class);
 
 		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, "execution", new Token.User("9999", "User")));
 
@@ -113,7 +113,7 @@ public class TaskProcessImplTest {
 		commandList.add(new Command(FAKE_COMMAND, Command.Type.LOCAL));
 		commandList.add(new Command(FAKE_COMMAND2, Command.Type.LOCAL));
 		commandList.add(new Command(FAKE_COMMAND3, Command.Type.LOCAL));
-		Resource resource = mock(Resource.class);
+		FogbowResource resource = mock(FogbowResource.class);
 
 		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, "execution", new Token.User("9999", "User")));
 

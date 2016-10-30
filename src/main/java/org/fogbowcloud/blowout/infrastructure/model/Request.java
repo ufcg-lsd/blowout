@@ -3,22 +3,23 @@ package org.fogbowcloud.blowout.infrastructure.model;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.infrastructure.manager.ResourceNotifier;
 
-public class Requisition{
+public class Request{
 
-	public static enum RequisitionState{
+	public static enum RequestState{
 		OPEN,ORDERED,FULFILLED
 	}
 	
 	private ResourceNotifier resourceNotifier;
 	private Specification specification;
-	private RequisitionState state;
-	private String requestId;
+	private RequestState state;
+	private final String requestId;
 	
 	
-	public Requisition(ResourceNotifier resourceNotifier, Specification specification) {
+	public Request(String requestId, ResourceNotifier resourceNotifier, Specification specification) {
+		this.requestId = requestId;
 		this.resourceNotifier = resourceNotifier;
 		this.specification = specification;
-		this.state = RequisitionState.OPEN;
+		this.state = RequestState.OPEN;
 	}
 	
 	public ResourceNotifier getResourceNotifier() {
@@ -29,20 +30,16 @@ public class Requisition{
 		return specification;
 	}
 
-	public RequisitionState getState() {
+	public RequestState getState() {
 		return state;
 	}
 
-	public void setState(RequisitionState state) {
+	public void setState(RequestState state) {
 		this.state = state;
 	}
 
 	public String getRequestId() {
 		return requestId;
-	}
-
-	public void setRequestId(String requestId) {
-		this.requestId = requestId;
 	}
 
 	@Override
@@ -53,7 +50,7 @@ public class Requisition{
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Requisition other = (Requisition) obj;
+		Request other = (Request) obj;
 		if (requestId == null) {
 			if (other.requestId != null)
 				return false;

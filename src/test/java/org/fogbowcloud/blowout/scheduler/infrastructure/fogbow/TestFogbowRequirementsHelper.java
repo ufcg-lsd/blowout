@@ -10,11 +10,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.fogbowcloud.blowout.scheduler.core.model.Resource;
-import org.fogbowcloud.blowout.scheduler.core.model.Specification;
+import org.fogbowcloud.blowout.core.core.model.Resource;
+import org.fogbowcloud.blowout.core.core.model.Specification;
+import org.fogbowcloud.blowout.core.core.util.AppPropertiesConstants;
+import org.fogbowcloud.blowout.core.infrastructure.fogbow.FogbowRequirementsHelper;
 import org.fogbowcloud.blowout.scheduler.core.model.TestResourceHelper;
-import org.fogbowcloud.blowout.scheduler.core.util.AppPropertiesConstants;
-import org.fogbowcloud.blowout.scheduler.infrastructure.fogbow.FogbowRequirementsHelper;
 import org.fogbowcloud.manager.occi.order.OrderType;
 import org.junit.After;
 import org.junit.Before;
@@ -26,7 +26,7 @@ public class TestFogbowRequirementsHelper {
 	private Properties properties;
 	private Map<String, String> requirements;
 	private Specification spec;
-	private Resource suitableResource;
+	private FogbowResource suitableResource;
 
 	@Before
 	public void setUp() throws Exception {
@@ -42,7 +42,7 @@ public class TestFogbowRequirementsHelper {
 
 		requirements = new HashMap<String, String>();
 		spec = new Specification(image, userName, publicKey, privateKey, userData, userDataType);
-		suitableResource = mock(Resource.class);
+		suitableResource = mock(FogbowResource.class);
 		doReturn("resquest_01").when(suitableResource).getId();
 		when(suitableResource.match(Mockito.any(Specification.class))).thenCallRealMethod();
 	}
