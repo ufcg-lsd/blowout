@@ -2,6 +2,7 @@ package org.fogbowcloud.blowout.core.model;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -15,21 +16,14 @@ public abstract class Job implements Serializable {
 	
 	public static final Logger LOGGER = Logger.getLogger(Job.class);
 	
-	protected ReentrantReadWriteLock taskReadyLock = new ReentrantReadWriteLock();
-	protected ReentrantReadWriteLock taskCompletedLock = new ReentrantReadWriteLock();
-	
 	private String UUID = "";
 
 	private boolean isCreated = false;
 
-	//TODO: not sure that we need to guarantee thread safety at the job level
-	public void addTask(Task task) {
-		LOGGER.debug("Adding task " + task.getId());
-		taskReadyLock.writeLock().lock();
-		try {
+	public Job(List<Task> tasks) {
+		for(Task task : tasks){
+			LOGGER.debug("Adding task " + task.getId());
 			getTaskList().put(task.getId(), task);
-		} finally {
-			taskReadyLock.writeLock().unlock();
 		}
 	}
 
@@ -41,10 +35,7 @@ public abstract class Job implements Serializable {
 
 	public abstract void fail(Task task);
 
-	//FIXME: it seems not ok. maybe we should have an Job interface and add this method to it
-	public String getId(){
-		return null;
-	}
+	public abstract String getId();
 
 	//TODO: it seems this *created* and restart methods help the Scheduler class to its job. I'm not sure
 	//if we should keep them.
@@ -61,14 +52,8 @@ public abstract class Job implements Serializable {
 		
 	}
 
-
 	public Map<String, Task> getTaskList() {
 		return taskList;
-	}
-
-	//FIXME: why do we need this method? (serialization?)
-	public void setTaskList(Map<String, Task> taskList) {
-		this.taskList = taskList;
 	}
 	
 	public void setUUID(String UUID) {

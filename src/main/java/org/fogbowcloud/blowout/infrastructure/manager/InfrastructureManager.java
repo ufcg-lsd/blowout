@@ -23,5 +23,4 @@ public interface InfrastructureManager {
 
 	public void release(AbstractResource resource);
 
-	public void releaseAll();
 }

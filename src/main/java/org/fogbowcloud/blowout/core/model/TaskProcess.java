@@ -12,7 +12,7 @@ public interface TaskProcess {
 
 	List<Command> getCommands();
 
-	void executeTask(AbstractResource resource);
+	TaskExecutionResult executeTask(AbstractResource resource);
 
 	TaskState getStatus();
 	

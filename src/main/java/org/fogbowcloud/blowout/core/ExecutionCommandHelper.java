@@ -10,6 +10,7 @@ import java.util.Scanner;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.model.Command;
+import org.fogbowcloud.blowout.core.model.TaskExecutionResult;
 import org.fogbowcloud.blowout.core.util.AppUtil;
 
 public class ExecutionCommandHelper {
@@ -154,27 +155,6 @@ public class ExecutionCommandHelper {
 		}
 		return null;
 	
-//		
-//		return exitStatus;
-//        
-//        try {
-//			sshClientWrapper.connect(address, sshPort, username, privateKeyFilePath);
-//			int exitFileExists = sshClientWrapper.doSshExecution(exitFileExistsCommand);
-//			if (exitFileExists != TaskExecutionResult.OK) {
-//				return null;
-//			}
-//			String exitStatusCommand = "cat " + remoteFileExit + " | grep -w 0";
-//			int exitStatus = sshClientWrapper.doSshExecution(exitStatusCommand);
-//			return exitStatus;
-//		} catch (IOException e) {
-//			LOGGER.error("Error while connecting resource.", e);
-//			return null;
-//		} finally {
-//			try {
-//				sshClientWrapper.disconnect();
-//			} catch (Throwable e) {
-//			}
-//		}
    }
 
 	public boolean checkConnectivity(String host, String port) {

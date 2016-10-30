@@ -3,7 +3,7 @@ package org.fogbowcloud.blowout.infrastructure.model;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.infrastructure.manager.ResourceNotifier;
 
-public class Request{
+public class ResourceRequest{
 
 	public static enum RequestState{
 		OPEN,ORDERED,FULFILLED
@@ -15,7 +15,7 @@ public class Request{
 	private final String requestId;
 	
 	
-	public Request(String requestId, ResourceNotifier resourceNotifier, Specification specification) {
+	public ResourceRequest(String requestId, ResourceNotifier resourceNotifier, Specification specification) {
 		this.requestId = requestId;
 		this.resourceNotifier = resourceNotifier;
 		this.specification = specification;
@@ -50,7 +50,7 @@ public class Request{
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Request other = (Request) obj;
+		ResourceRequest other = (ResourceRequest) obj;
 		if (requestId == null) {
 			if (other.requestId != null)
 				return false;

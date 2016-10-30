@@ -1,4 +1,4 @@
-package org.fogbowcloud.blowout.core;
+package org.fogbowcloud.blowout.infrastructure.manager;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;

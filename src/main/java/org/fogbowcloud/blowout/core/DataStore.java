@@ -11,7 +11,7 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
-import org.fogbowcloud.blowout.infrastructure.model.Request;
+import org.fogbowcloud.blowout.infrastructure.model.ResourceRequest;
 import org.h2.jdbcx.JdbcConnectionPool;
 
 public class DataStore {
@@ -90,7 +90,7 @@ public class DataStore {
 
 	private static final String DELETE_ALL_CONTENT_SQL = "DELETE FROM " + REQUEST_ID_TABLE_NAME;
 
-	public boolean updateInfrastructureState(List<Request> orders, List<FogbowResource> idleResource){
+	public boolean updateInfrastructureState(List<ResourceRequest> orders, List<FogbowResource> idleResource){
 		LOGGER.debug("Updating current list of Orders that were requested to provider");
 		PreparedStatement deleteOldContent = null;
 		PreparedStatement updateRequestList = null;
@@ -105,7 +105,7 @@ public class DataStore {
 				return false;
 			}
 			updateRequestList = prepare(connection, INSERT_MEMBER_USAGE_SQL);
-			for (Request order : orders){
+			for (ResourceRequest order : orders){
 				updateRequestList.setString(1, order.getRequestId());
 				updateRequestList.addBatch();
 			}

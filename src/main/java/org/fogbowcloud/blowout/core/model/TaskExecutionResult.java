@@ -1,4 +1,4 @@
-package org.fogbowcloud.blowout.core;
+package org.fogbowcloud.blowout.core.model;
 
 public class TaskExecutionResult {
 
@@ -7,7 +7,7 @@ public class TaskExecutionResult {
 
 	private boolean taskFinished = false;
 	private int exitValue = -1;
-
+	
 	public int getExitValue() {
 		return exitValue;
 	}

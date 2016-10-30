@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.model.Job;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.model.Task;
+import org.fogbowcloud.blowout.core.model.TaskExecutionResult;
 import org.fogbowcloud.blowout.core.model.TaskProcess;
 import org.fogbowcloud.blowout.core.model.TaskProcessImpl;
 import org.fogbowcloud.blowout.core.model.TaskState;
@@ -25,10 +26,10 @@ public class Scheduler implements Runnable, ResourceNotifier {
 	private final String id;
 	private ArrayList<Job> jobList = new ArrayList<Job>();
 	private InfrastructureManager infraManager;
-	private Map<String, AbstractResource> runningTasks = new HashMap<String, AbstractResource>();
 	private ExecutorService taskExecutor = Executors.newCachedThreadPool();
+	
+	private Map<String, AbstractResource> runningTasks = new HashMap<String, AbstractResource>();
 	private List<TaskProcess> runningProcesses = new ArrayList<TaskProcess>();
-
 	private List<TaskProcess> processQueue = new ArrayList<TaskProcess>();
 
 	private Map<TaskProcess, Task> allProcesses = new HashMap<TaskProcess, Task>();
@@ -110,7 +111,13 @@ public class Scheduler implements Runnable, ResourceNotifier {
 					@Override
 					public void run() {
 						try {
-							taskProcess.executeTask(resource);
+							TaskExecutionResult taskResult = taskProcess.executeTask(resource);
+							switch(taskResult.getExitValue()){
+							case TaskExecutionResult.OK:
+								taskCompleted(taskProcess);
+							case TaskExecutionResult.NOK:
+								taskFailed(taskProcess);
+							}
 						} catch (Throwable e) {
 							LOGGER.error("Error while executing task.", e);
 						}
@@ -121,26 +128,6 @@ public class Scheduler implements Runnable, ResourceNotifier {
 		}
 
 		infraManager.release(resource);
-	}
-
-	public void taskProcessFailed(TaskProcess taskProcess) {
-		LOGGER.debug("Task " + taskProcess.getTaskId() + " failed and will be cloned");
-		Job job = getJobOfFailedTask(taskProcess);
-		if (job != null) {
-			Task task = allProcesses.get(taskProcess);
-			TaskProcess tp = createTaskProcess(task, job.getUUID());
-			task.addProcessId(tp.getProcessId());
-			allProcesses.put(tp, task);
-			processQueue.add(tp);
-		} else {
-			LOGGER.error("Task was from a non-existing or removed Job");
-		}
-		if (runningTasks.containsKey(taskProcess.getTaskId())) {
-			infraManager.release(runningTasks.get(taskProcess.getTaskId()));
-			runningTasks.remove(taskProcess.getTaskId());
-		}
-		runningProcesses.remove(taskProcess);
-
 	}
 
 	protected TaskProcess createTaskProcess(Task task, String UUID) {
@@ -222,7 +209,7 @@ public class Scheduler implements Runnable, ResourceNotifier {
 
 		for (TaskProcess tp : getAllProcs()) {
 			if (tp.getTaskId().equals(task.getId())) {
-				taskProcessFailed(tp);
+				taskFailed(tp);
 				toRemove.add(tp);
 			}
 		}
@@ -246,8 +233,23 @@ public class Scheduler implements Runnable, ResourceNotifier {
 
 	}
 
-	public void taskFailed(TaskProcess tp) {
-		taskProcessFailed(tp);
+	public void taskFailed(TaskProcess taskProcess) {
+		LOGGER.debug("Task " + taskProcess.getTaskId() + " failed and will be cloned");
+		Job job = getJobOfFailedTask(taskProcess);
+		if (job != null) {
+			Task task = allProcesses.get(taskProcess);
+			TaskProcess tp = createTaskProcess(task, job.getUUID());
+			task.addProcessId(tp.getProcessId());
+			allProcesses.put(tp, task);
+			processQueue.add(tp);
+		} else {
+			LOGGER.error("Task was from a non-existing or removed Job");
+		}
+		if (runningTasks.containsKey(taskProcess.getTaskId())) {
+			infraManager.release(runningTasks.get(taskProcess.getTaskId()));
+			runningTasks.remove(taskProcess.getTaskId());
+		}
+		runningProcesses.remove(taskProcess);
 	}
 
 	public void taskCompleted(TaskProcess tp) {

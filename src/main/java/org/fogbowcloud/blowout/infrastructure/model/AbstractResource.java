@@ -35,7 +35,7 @@ public abstract class AbstractResource {
 	private String id;
 	private Map<String, String> metadata = new HashMap<String, String>();
 	private int timesReused = 0;
-	private int connectionTries = 0;
+	private int connectionFailTries = 0;
 	
 	public AbstractResource(String id, Properties properties) {
 		this.id = id;
@@ -58,7 +58,7 @@ public abstract class AbstractResource {
 	public boolean checkConnectivity(){
 		
 		boolean success = this.internalCheckConnectivity();
-		connectionTries = success ? 0 : connectionTries+1;
+		connectionFailTries = success ? 0 : connectionFailTries+1;
 		return success;
 		
 	}
@@ -92,7 +92,7 @@ public abstract class AbstractResource {
 		return id;
 	}
 
-	public void incReuse() {
+	public void incrementReuse() {
 		timesReused++;
 	}
 
@@ -100,8 +100,8 @@ public abstract class AbstractResource {
 		return this.timesReused;
 	}
 	
-	public int getConnectionTries() {
-		return this.connectionTries;
+	public int getConnectionFailTries() {
+		return this.connectionFailTries;
 	}
 
 }
