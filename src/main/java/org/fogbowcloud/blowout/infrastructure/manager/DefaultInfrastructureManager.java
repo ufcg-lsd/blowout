@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
 import org.fogbowcloud.blowout.core.util.DateUtils;
+import org.fogbowcloud.blowout.db.ResourceIdDatastore;
 import org.fogbowcloud.blowout.infrastructure.exception.InfrastructureException;
 import org.fogbowcloud.blowout.infrastructure.exception.RequestResourceException;
 import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
@@ -41,14 +42,15 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 	// Resources control
 	private List<AbstractResource> allocatedResources = new ArrayList<AbstractResource>();
 	private Map<AbstractResource, Long> idleResources = new ConcurrentHashMap<AbstractResource, Long>();
+	//This map holds the Resource ID and the specification used to request this one.
+	private Map<String, Specification> pendingResources = new ConcurrentHashMap<String, Specification>();
 
 	// Requisitions control
 	private List<ResourceRequest> openRequests = new ArrayList<ResourceRequest>();
-	private Map<String, Specification> penddingOrder = new ConcurrentHashMap<String, Specification>();
 
 	private boolean isElastic;
 	private int maxResourceReuses;
-	// private DataStore ds;
+	private ResourceIdDatastore ds;
 	private List<Specification> initialSpec;
 
 	public DefaultInfrastructureManager(List<Specification> initialSpec, boolean isElastic,
@@ -70,9 +72,8 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 					"No resource may be created with isElastic=" + isElastic + " and initialSpec=" + initialSpec + ".");
 		}
 
-		// ds = new DataStore(properties);
+		ds = new ResourceIdDatastore(properties);
 		this.isElastic = isElastic;
-		// this.resourceComputeId = new String();
 	}
 
 	@Override
@@ -80,7 +81,10 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 		LOGGER.info("Starting Infrastructure Manager");
 
 		if (removePrevious) {
-			//TODO get resources from datastore and remove from infra provider
+			for(String resourceId : ds.getResourceIds()){
+				infraProvider.deleteResource(resourceId);
+			}
+			ds.deleteAll();
 		}
 
 		this.createInitialInfrastructure();
@@ -106,14 +110,15 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 		//Stopping the periodic management.
 		executionTimer.cancel();
 
-		for (String orderId : penddingOrder.keySet()) {
-			infraProvider.cancelOrder(orderId);
+		for (String resourceId : pendingResources.keySet()) {
+			infraProvider.deleteResource(resourceId);
 		}
-		penddingOrder.clear();
+		pendingResources.clear();
 
 		if (deleteResource) {
 			for (AbstractResource resource : this.getAllResources()) {
-				infraProvider.deleteResource(resource);
+				infraProvider.deleteResource(resource.getId());
+				ds.deleteResourceId(resource.getId());
 			}
 			allocatedResources.clear();
 			idleResources.clear();
@@ -147,7 +152,8 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 			moveResourceToIdle(resource);
 		} else {
 			try {
-				infraProvider.deleteResource(resource);
+				infraProvider.deleteResource(resource.getId());
+				ds.deleteResourceId(resource.getId());
 			} catch (Exception e) {
 				LOGGER.error("Error when disposing of resource for excessive reuse", e);
 			}
@@ -188,7 +194,7 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 
 			/* Step 3 - Order new resources on Infrastructure Provider accordingly the demand. */
 			orderResourcesByDemand(especificationsDemand);
-
+			
 		}
 
 	}
@@ -223,7 +229,7 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 
 	private void checkPendingOrders(Map<Specification, Integer> especificationsDemand) {
 
-		for (Entry<String, Specification> entry : getEntriesFromMap(penddingOrder)) {
+		for (Entry<String, Specification> entry : getEntriesFromMap(pendingResources)) {
 
 			String orderId = entry.getKey();
 			Specification spec = entry.getValue();
@@ -243,7 +249,7 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 			if (newResource != null) {
 				LOGGER.info("New resource " + newResource.getId() + " is being put into Idle Pool");
 				moveResourceToIdle(newResource);
-				penddingOrder.remove(orderId);
+				pendingResources.remove(orderId);
 				// updateInfrastuctureState();
 			}
 
@@ -252,6 +258,8 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 
 	private void orderResourcesByDemand(Map<Specification, Integer> especificationsDemand) {
 
+		List<String> newsOrdersIds = new ArrayList<String>();
+		
 		for (Entry<Specification, Integer> entry : getEntriesFromMap(especificationsDemand)) {
 
 			Specification spec = entry.getKey();
@@ -261,14 +269,16 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 					String orderId;
 					try {
 						orderId = infraProvider.requestResource(spec);
-						penddingOrder.put(orderId, spec);
+						pendingResources.put(orderId, spec);
+						newsOrdersIds.add(orderId);
 					} catch (RequestResourceException e) {
 						LOGGER.error("Erro while ordering resource for spec: " + spec, e);
 					}
 				}
 			}
-
 		}
+		
+		ds.addResourceIds(newsOrdersIds);
 	}
 
 	protected boolean relateResourceToRequest(AbstractResource resource, ResourceRequest request) {

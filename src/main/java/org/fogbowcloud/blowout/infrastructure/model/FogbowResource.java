@@ -11,7 +11,8 @@ public class FogbowResource extends AbstractResource{
 
 	private static final Logger LOGGER = Logger.getLogger(FogbowResource.class);
 
-	private String orderId;
+	private final String orderId;
+	private String instanceId;
 	
 	public FogbowResource(String id, String orderId, Properties properties) {
 		super(id, properties);
@@ -78,7 +79,16 @@ public class FogbowResource extends AbstractResource{
 		return false;
 	}
 
-	public String getOrderId(){
+	public String getInstanceId() {
+		return instanceId;
+	}
+
+	public void setInstanceId(String instanceId) {
+		this.instanceId = instanceId;
+	}
+
+	public String getOrderId() {
 		return orderId;
 	}
+	
 }

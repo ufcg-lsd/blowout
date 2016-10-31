@@ -17,7 +17,6 @@ public interface InfrastructureProvider {
 	
 	AbstractResource getResource(String requestID);
 	
-	void deleteResource(AbstractResource resource) throws Exception;
+	void deleteResource(String resourceId) throws Exception;
 	
-	void cancelOrder(String orderId) throws Exception;
 }
