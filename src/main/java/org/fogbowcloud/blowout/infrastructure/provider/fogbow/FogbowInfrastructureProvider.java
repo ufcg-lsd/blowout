@@ -25,7 +25,7 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
 import org.fogbowcloud.blowout.core.util.AppUtil;
-import org.fogbowcloud.blowout.db.FogbowResourceIdDatastore;
+import org.fogbowcloud.blowout.database.FogbowResourceDatastore;
 import org.fogbowcloud.blowout.infrastructure.exception.InfrastructureException;
 import org.fogbowcloud.blowout.infrastructure.exception.RequestResourceException;
 import org.fogbowcloud.blowout.infrastructure.http.HttpWrapper;
@@ -73,14 +73,14 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 	private Properties properties;
 	private ScheduledExecutorService handleTokenUpdateExecutor;
 	private AbstractTokenUpdatePlugin tokenUpdatePlugin;
-	private FogbowResourceIdDatastore frDatastore;
+	private FogbowResourceDatastore frDatastore;
 	//Key is the resource ID
 	private Map<String, FogbowResource> resourcesMap = new ConcurrentHashMap<String, FogbowResource>();
 
 	public FogbowInfrastructureProvider(Properties properties, ScheduledExecutorService handleTokeUpdateExecutor)
 			throws Exception {
 		this(properties, handleTokeUpdateExecutor, createTokenUpdatePlugin(properties));
-		frDatastore = new FogbowResourceIdDatastore(properties);
+		frDatastore = new FogbowResourceDatastore(properties);
 		for (FogbowResource fogbowResource : frDatastore.getAllFogbowResources()) {
 			resourcesMap.put(fogbowResource.getId(), fogbowResource);
 		}
@@ -113,7 +113,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		handleTokenUpdateExecutor.scheduleWithFixedDelay(new Runnable() {
 			@Override
 			public void run() {
-				token = tokenUpdatePlugin.generateToken();
+				setToken(tokenUpdatePlugin.generateToken());
 			}
 		}, tokenUpdatePlugin.getUpdateTime(), tokenUpdatePlugin.getUpdateTime(),
 				tokenUpdatePlugin.getUpdateTimeUnits());
@@ -216,6 +216,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 					String host = addressInfo[0];
 					String port = addressInfo[1];
 
+					fogbowResource.setLocalCommandInterpreter(properties.getProperty(AppPropertiesConstants.LOCAL_COMMAND_INTERPRETER));
 					fogbowResource.putMetadata(AbstractResource.METADATA_SSH_HOST, host);
 					fogbowResource.putMetadata(AbstractResource.METADATA_SSH_PORT, port);
 					fogbowResource.putMetadata(AbstractResource.METADATA_SSH_USERNAME_ATT,
@@ -229,6 +230,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 					fogbowResource.putMetadata(AbstractResource.METADATA_MEN_SIZE, menSizeFormated);
 					fogbowResource.putMetadata(AbstractResource.METADATA_LOCATION,
 							"\"" + requestAttributes.get(REQUEST_ATTRIBUTE_MEMBER_ID) + "\"");
+					
 					// TODO Descomentar quando o fogbow estiver retornando este
 					// atributo
 					// newResource.putMetadata(Resource.METADATA_DISK_SIZE,
@@ -516,6 +518,10 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 	public Token getToken() {
 		return this.token;
+	}
+	
+	protected void setToken(Token token) {
+		this.token = token;
 	}
 
 

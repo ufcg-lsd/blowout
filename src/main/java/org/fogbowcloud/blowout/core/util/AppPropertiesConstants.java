@@ -36,6 +36,8 @@ public class AppPropertiesConstants {
 	public static final String EXECUTION_MONITOR_PERIOD = "execution_monitor_period";
 
 	public static final String REST_SERVER_PORT = "rest_server_port";
+	
+	public static final String LOCAL_COMMAND_INTERPRETER = "local_command_interpreter";
 
 	// ___________ DB CONSTANTS ______________//
 
@@ -44,6 +46,7 @@ public class AppPropertiesConstants {
 	public static final String DB_FILE_NAME = "legacyJobs.db";
 	public static final String DB_FILE_USERS = "usersmap.db";
 	public static final String DB_REST_SERVER_PORT = "db_rest_server_port";
+	public static final String DB_DATASTORE_URL = "datastore_url";
 
 	// ___________ APPLICATION HEADERS ____//
 

@@ -18,13 +18,15 @@ public abstract class Job implements Serializable {
 	
 	private String UUID = "";
 
-	private boolean isCreated = false;
-
 	public Job(List<Task> tasks) {
 		for(Task task : tasks){
-			LOGGER.debug("Adding task " + task.getId());
-			getTaskList().put(task.getId(), task);
+			addTask(task);
 		}
+	}
+	
+	public void addTask(Task task) {
+		LOGGER.debug("Adding task " + task.getId());
+		getTaskList().put(task.getId(), task);
 	}
 
 	public Map<String, Task> getTasks(){
@@ -36,21 +38,6 @@ public abstract class Job implements Serializable {
 	public abstract void fail(Task task);
 
 	public abstract String getId();
-
-	//TODO: it seems this *created* and restart methods help the Scheduler class to its job. I'm not sure
-	//if we should keep them.
-	public boolean isCreated() {
-		return this.isCreated;
-	}
-	
-	public void setCreated() {
-		this.isCreated = true;
-	}
-
-	public void restart() {
-		this.isCreated = false;
-		
-	}
 
 	public Map<String, Task> getTaskList() {
 		return taskList;

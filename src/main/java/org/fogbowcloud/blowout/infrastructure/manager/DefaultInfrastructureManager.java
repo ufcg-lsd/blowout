@@ -17,7 +17,7 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
 import org.fogbowcloud.blowout.core.util.DateUtils;
-import org.fogbowcloud.blowout.db.ResourceIdDatastore;
+import org.fogbowcloud.blowout.database.ResourceIdDatastore;
 import org.fogbowcloud.blowout.infrastructure.exception.InfrastructureException;
 import org.fogbowcloud.blowout.infrastructure.exception.RequestResourceException;
 import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
@@ -34,7 +34,8 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 	private final int MAX_CONNECTION_RETRIES = 5;
 	private final Long NO_EXPIRATION_DATE = new Long(0);
 	
-	private ManagerTimer executionTimer = new ManagerTimer(Executors.newScheduledThreadPool(1));
+	private Thread infrastructureServiceRunner;
+	private InfrastructureService infrastructureService;
 	private InfrastructureProvider infraProvider;
 	private Properties properties;
 	private DateUtils dateUtils = new DateUtils();
@@ -52,6 +53,14 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 	private int maxResourceReuses;
 	private ResourceIdDatastore ds;
 	private List<Specification> initialSpec;
+	
+	protected DefaultInfrastructureManager(List<Specification> initialSpec, boolean isElastic,
+			InfrastructureProvider infraProvider, Properties properties, ResourceIdDatastore ds) throws InfrastructureException{
+		this(initialSpec, isElastic, infraProvider, properties);
+		
+		this.ds = ds;
+		
+	}
 
 	public DefaultInfrastructureManager(List<Specification> initialSpec, boolean isElastic,
 			InfrastructureProvider infraProvider, Properties properties)
@@ -60,6 +69,7 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 		this.properties = properties;
 		this.initialSpec = initialSpec;
 		this.infraProvider = infraProvider;
+		this.isElastic = isElastic;
 
 		String resourceReuseTimesStr = this.properties.getProperty(AppPropertiesConstants.INFRA_RESOURCE_REUSE_TIMES,
 				String.valueOf(MAX_RESOURCE_REUSES));
@@ -67,13 +77,12 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 
 		this.validateProperties();
 
-		if (!isElastic && (initialSpec == null || initialSpec.isEmpty())) {
+		if (!this.isElastic && (initialSpec == null || initialSpec.isEmpty())) {
 			throw new IllegalArgumentException(
-					"No resource may be created with isElastic=" + isElastic + " and initialSpec=" + initialSpec + ".");
+					"No resource may be created with isElastic=" + this.isElastic + " and initialSpec=" + initialSpec + ".");
 		}
 
 		ds = new ResourceIdDatastore(properties);
-		this.isElastic = isElastic;
 	}
 
 	@Override
@@ -90,9 +99,10 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 		this.createInitialInfrastructure();
 		
 		//Starting the periodic management.
-		int infraManagementPeriod = Integer.parseInt(properties.getProperty(AppPropertiesConstants.INFRA_MANAGEMENT_SERVICE_TIME));
-		executionTimer.scheduleAtFixedRate(new InfrastructureService(), 0, infraManagementPeriod);
-
+		infrastructureService = new InfrastructureService();
+		infrastructureServiceRunner = new Thread();
+		infrastructureServiceRunner.start();
+		
 		LOGGER.info("Block while waiting initial resources? " + blockWhileInitializing);
 		if (blockWhileInitializing && initialSpec != null) {
 			while (idleResources.size() != initialSpec.size()) {
@@ -108,7 +118,8 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 		LOGGER.info("Stoping Infrastructure Manager");
 
 		//Stopping the periodic management.
-		executionTimer.cancel();
+		infrastructureService.terminate();
+		infrastructureServiceRunner.join();
 
 		for (String resourceId : pendingResources.keySet()) {
 			infraProvider.deleteResource(resourceId);
@@ -176,26 +187,45 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 		}
 	}
 	
-	protected class InfrastructureService implements Runnable {
+	private class InfrastructureService implements Runnable {
+		
+		private boolean stop = false;
+		
 		@Override
 		public void run() {
-
-			LOGGER.debug("Executing Infrastructure Manager periodic checks.");
-
-			Map<Specification, Integer> especificationsDemand = new ConcurrentHashMap<Specification, Integer>();
-
-			/* Step 1 - Check if there is any resource available for each open request. */
-			resolveOpenRequests(especificationsDemand);
-
-			/* Step 2 - Verify if any pending order is ready and if is, put the
-			 * new resource on idle pool and remove this order from pending list.
-			 */
-			checkPendingOrders(especificationsDemand);
-
-			/* Step 3 - Order new resources on Infrastructure Provider accordingly the demand. */
-			orderResourcesByDemand(especificationsDemand);
 			
+			int infraManagementPeriod = Integer.parseInt(properties.getProperty(AppPropertiesConstants.INFRA_MANAGEMENT_SERVICE_TIME));
+			
+			while(!stop){
+
+				LOGGER.debug("Executing Infrastructure Manager periodic checks.");
+
+				Map<Specification, Integer> especificationsDemand = new ConcurrentHashMap<Specification, Integer>();
+
+				/* Step 1 - Verify if any pending order is ready and if is, put the
+				 * new resource on idle pool and remove this order from pending list.
+				 */
+				checkPendingOrders(especificationsDemand);
+
+				/* Step 2 - Check if there is any resource available for each open request. */
+				resolveOpenRequests(especificationsDemand);
+
+				/* Step 3 - Order new resources on Infrastructure Provider accordingly the demand. */
+				orderResourcesByDemand(especificationsDemand);
+
+				try {
+					Thread.sleep(infraManagementPeriod);
+				} catch (InterruptedException e) {
+					LOGGER.error("Error on execution of InfrastructureService");
+				}
+
+			}
 		}
+		
+		public void terminate(){
+			stop = true;
+		}
+		
 
 	}
 
@@ -204,10 +234,6 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 		for (ResourceRequest request : getOpenRequests()) {
 			AbstractResource resource = this.resourceMatch(request, getIdleResources());
 			if (resource != null) {
-				// TODO this method should remove resource from idle, put on
-				// allocated resources (is needed this other list?)
-				// remove the request from the openRequestsList and call the
-				// "resourceReady" of the notifier.
 				this.relateResourceToRequest(resource, request);
 			} else {
 				Integer demand = especificationsDemand.get(request.getSpecification());
@@ -215,6 +241,7 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 					demand = new Integer(0);
 				}
 				demand = new Integer(demand.intValue() + 1);
+				especificationsDemand.put(request.getSpecification(), demand);
 			}
 		}
 	}
@@ -241,9 +268,11 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 			 * order 2 new resources for spec A, we need to ask only one more.
 			 */
 			Integer demand = especificationsDemand.get(spec);
-			if (demand != null) {
-				demand = new Integer(demand.intValue() - 1);
+			if (demand == null) {
+				demand = new Integer(0);
 			}
+			demand = new Integer(demand.intValue() - 1);
+			especificationsDemand.put(spec, demand);
 
 			AbstractResource newResource = infraProvider.getResource(orderId);
 			if (newResource != null) {
@@ -351,6 +380,10 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 		resources.addAll(allocatedResources);
 		resources.addAll(idleResources.keySet());
 		return resources;
+	}
+	
+	protected InfrastructureService getInfrastructureService(){
+		return infrastructureService;
 	}
 	
 	private void validateProperties() throws InfrastructureException {
