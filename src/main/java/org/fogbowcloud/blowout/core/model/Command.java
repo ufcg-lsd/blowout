@@ -60,4 +60,11 @@ public class Command implements Serializable{
 			return null;
 		}
 	}
+
+	public static Command fromJSON(JSONObject commandJSON) {
+		Command command = new Command(commandJSON.optString("command"), 
+				Type.valueOf(commandJSON.optString("type")));
+		command.setState(State.valueOf(commandJSON.optString("state")));
+		return command;
+	}
 }

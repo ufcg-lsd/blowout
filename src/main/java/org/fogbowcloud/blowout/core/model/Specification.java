@@ -292,4 +292,12 @@ public class Specification implements Serializable{
 			return null;
 		}
 	}
+
+	public static Specification fromJSON(JSONObject specJSON) {
+		Specification specification = new Specification(specJSON.optString("image"),
+				specJSON.optString("username"), specJSON.optString("publicKey"), 
+				specJSON.optString("privateKeyFilePath"), specJSON.optString("userDataFile"), 
+				specJSON.optString("userDataType"));
+		return specification;
+	}
 }
