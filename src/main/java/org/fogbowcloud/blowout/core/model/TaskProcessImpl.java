@@ -67,6 +67,8 @@ public class TaskProcessImpl implements TaskProcess {
 
 	@Override
 	public TaskExecutionResult executeTask(AbstractResource resource) {
+		
+		localCommandInterpreter = resource.getLocalCommandInterpreter();
 
 		TaskExecutionResult taskExecutionResult = new TaskExecutionResult();
 
@@ -196,4 +198,5 @@ public class TaskProcessImpl implements TaskProcess {
 	public Specification getSpecification() {
 		return this.spec;
 	}
+
 }

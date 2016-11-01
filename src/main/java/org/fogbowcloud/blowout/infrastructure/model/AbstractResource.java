@@ -42,6 +42,7 @@ public abstract class AbstractResource {
 	private Map<String, String> metadata = new HashMap<String, String>();
 	private int timesReused = 0;
 	private int connectionFailTries = 0;
+	private String localCommandInterpreter;
 	
 	public AbstractResource(String id, Properties properties) {
 		this.id = id;
@@ -116,6 +117,14 @@ public abstract class AbstractResource {
 
 	public void setState(ResourceStatus state) {
 		this.state = state;
+	}
+	
+	public String getLocalCommandInterpreter() {
+		return localCommandInterpreter;
+	}
+
+	public void setLocalCommandInterpreter(String localCommandInterpreter) {
+		this.localCommandInterpreter = localCommandInterpreter;
 	}
 	
 }

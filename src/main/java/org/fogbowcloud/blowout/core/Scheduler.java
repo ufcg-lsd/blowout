@@ -38,7 +38,6 @@ public class Scheduler implements Runnable, ResourceNotifier {
 
 	public Scheduler(InfrastructureManager infraManager, Job... jobs) {
 		for (Job aJob : jobs) {
-			aJob.restart();
 			jobList.add(aJob);
 		}
 		this.infraManager = infraManager;
@@ -83,16 +82,14 @@ public class Scheduler implements Runnable, ResourceNotifier {
 	}
 
 	protected void generateProcessForJob(Job job) {
-		if (!job.isCreated()) {
-			for (Task task : job.getTasks().values()) {
-				if (!task.isFinished()) {
-					TaskProcess tp = createTaskProcess(task, job.getUUID());
-					this.processQueue.add(tp);
-					this.allProcesses.put(tp, task);
-					task.addProcessId(tp.getProcessId());
-				}
+		
+		for (Task task : job.getTasks().values()) {
+			if (!task.isFinished() && TaskState.NOT_CREATED.equals(inferTaskState(task))) {
+				TaskProcess tp = createTaskProcess(task, job.getUUID());
+				this.processQueue.add(tp);
+				this.allProcesses.put(tp, task);
+				task.addProcessId(tp.getProcessId());
 			}
-			job.setCreated();
 		}
 	}
 
