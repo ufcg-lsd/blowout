@@ -1,4 +1,4 @@
-package org.fogbowcloud.blowout.scheduler.core.model;
+package org.fogbowcloud.blowout.infrastructure.model;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -6,12 +6,13 @@ import static org.mockito.Mockito.spy;
 
 import java.util.Properties;
 
-import org.fogbowcloud.blowout.core.infrastructure.fogbow.FogbowRequirementsHelper;
+import org.fogbowcloud.blowout.core.model.Specification;
+import org.fogbowcloud.blowout.infrastructure.provider.fogbow.FogbowRequirementsHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TestResource {
+public class TestFogbowResource {
 	
 	FogbowResource resource;
 	
@@ -20,9 +21,7 @@ public class TestResource {
 	@Before
 	public void setUp() throws Exception {
 		
-		
-		
-		resource = spy(new FogbowResource("resource_01",properties));
+		resource = spy(new FogbowResource("resource_01","order_01",properties));
 	}    
 
 	@After

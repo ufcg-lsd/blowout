@@ -1,4 +1,4 @@
-package org.fogbowcloud.blowout.scheduler.infrastructure.fogbow;
+package org.fogbowcloud.blowout.infrastructure.provider.fogbow;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

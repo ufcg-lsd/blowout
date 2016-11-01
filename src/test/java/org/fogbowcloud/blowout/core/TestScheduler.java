@@ -1,4 +1,4 @@
-package org.fogbowcloud.blowout.scheduler.core;
+package org.fogbowcloud.blowout.core;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -16,23 +16,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.fogbowcloud.blowout.core.model.Command;
+import org.fogbowcloud.blowout.core.model.Job;
+import org.fogbowcloud.blowout.core.model.Specification;
+import org.fogbowcloud.blowout.core.model.Task;
+import org.fogbowcloud.blowout.core.model.TaskImpl;
+import org.fogbowcloud.blowout.core.model.TaskProcess;
+import org.fogbowcloud.blowout.core.model.TaskProcessImpl;
+import org.fogbowcloud.blowout.core.model.TaskState;
+import org.fogbowcloud.blowout.infrastructure.manager.InfrastructureManager;
+import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
+import org.fogbowcloud.manager.occi.model.Token;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
-import org.fogbowcloud.blowout.core.core.model.Command;
-import org.fogbowcloud.blowout.core.core.model.Job;
-import org.fogbowcloud.blowout.core.core.model.Resource;
-import org.fogbowcloud.blowout.core.core.model.Specification;
-import org.fogbowcloud.blowout.core.core.model.Task;
-import org.fogbowcloud.blowout.core.core.model.TaskImpl;
-import org.fogbowcloud.blowout.core.core.model.TaskProcess;
-import org.fogbowcloud.blowout.core.core.model.TaskProcessImpl;
-import org.fogbowcloud.blowout.core.core.model.Job.TaskState;
-import org.fogbowcloud.blowout.core.infrastructure.InfrastructureManager;
-import org.fogbowcloud.manager.occi.model.Token;
 
 public class TestScheduler {
 
@@ -64,7 +64,6 @@ public class TestScheduler {
 		doReturn("uuid").when(jobMock3).getUUID();
 		infraManagerMock = mock(InfrastructureManager.class);
 		Token token = mock(Token.class);
-		doReturn(token).when(infraManagerMock).getToken();
 		doReturn(new Token.User("9999", "User")).when(token).getUser();
 		scheduler = spy(new Scheduler(infraManagerMock, executorService, jobMock, jobMock2));
 
@@ -92,7 +91,7 @@ public class TestScheduler {
 		doReturn(tasks).when(jobMock).getTasks();
 		doReturn(tasks2).when(jobMock2).getTasks();
 		scheduler.run();
-		verify(infraManagerMock).orderResource(Mockito.eq(spec), Mockito.eq(scheduler), Mockito.anyInt());
+		verify(infraManagerMock).request(Mockito.eq(spec), Mockito.eq(scheduler), Mockito.anyInt());
 	}
 
 	@Test
@@ -111,9 +110,7 @@ public class TestScheduler {
 		Task tMatch = tasks.get(tasks.keySet().iterator().next());
 
 		doReturn(tasks).when(jobMock).getTasks();
-		doReturn(false).when(jobMock).isCreated();
 		scheduler.run();
-		doReturn(true).when(jobMock).isCreated();
 		doReturn(specB).when(tMatch).getSpecification();
 		doReturn("resource01").when(resourceMock).getId();
 		doReturn(true).when(resourceMock).match(specB);

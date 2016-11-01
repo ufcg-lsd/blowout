@@ -11,8 +11,6 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
-import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
-import org.fogbowcloud.blowout.infrastructure.model.ResourceRequest;
 import org.h2.jdbcx.JdbcConnectionPool;
 
 public class ResourceIdDatastore {

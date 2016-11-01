@@ -11,7 +11,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.model.Specification;

@@ -1,4 +1,4 @@
-package org.fogbowcloud.blowout.scheduler.infrastructure.fogbow;
+package org.fogbowcloud.blowout.infrastructure.provider.fogbow;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -19,11 +19,12 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-import org.fogbowcloud.blowout.core.core.http.HttpWrapper;
-import org.fogbowcloud.blowout.core.core.model.Resource;
-import org.fogbowcloud.blowout.core.core.model.Specification;
-import org.fogbowcloud.blowout.core.core.util.AppPropertiesConstants;
-import org.fogbowcloud.blowout.core.infrastructure.exceptions.InfrastructureException;
+import org.fogbowcloud.blowout.core.model.Specification;
+import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
+import org.fogbowcloud.blowout.infrastructure.exception.InfrastructureException;
+import org.fogbowcloud.blowout.infrastructure.http.HttpWrapper;
+import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
+import org.fogbowcloud.blowout.infrastructure.token.AbstractTokenUpdatePlugin;
 import org.fogbowcloud.manager.occi.model.Token;
 import org.fogbowcloud.manager.occi.order.OrderConstants;
 import org.fogbowcloud.manager.occi.order.OrderState;
@@ -33,8 +34,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
-
-import old.org.fogbowcloud.blowout.infrastructure.plugin.AbstractTokenUpdatePlugin;
 
 
 public class TestFogbowInfrastructureProvider {
@@ -92,18 +91,6 @@ public class TestFogbowInfrastructureProvider {
 		verify(fogbowInfrastructureProvider).setToken(token);
 	}
 
-//	//@Test
-//	public void testHandleTokenUpdateWithException() throws FileNotFoundException, IOException{
-//		Token token = mock(Token.class);
-//		doThrow(new NullPointerException()).when(fogbowInfrastructureProvider).createToken("otherServer", "otherPassword");
-////		doReturn(token).when(fogbowInfrastructureProvider).createNewTokenFromFile(properties.getProperty(AppPropertiesConstants.INFRA_FOGBOW_TOKEN_PUBLIC_KEY_FILEPATH));
-////		doNothing().when(fogbowInfrastructureProvider).setToken(token);
-////		fogbowInfrastructureProvider.handleTokenUpdate(exec, "otherServer", "otherPassword");
-//		verify(fogbowInfrastructureProvider).setToken(token);
-//		verify(fogbowInfrastructureProvider).createNewTokenFromFile(properties.getProperty(AppPropertiesConstants.INFRA_FOGBOW_TOKEN_PUBLIC_KEY_FILEPATH));
-//
-//	}
-
 
 	@Test
 	public void requestResourceGetRequestIdTestSucess(){
@@ -145,7 +132,7 @@ public class TestFogbowInfrastructureProvider {
 
 		fogbowInfrastructureProvider.setHttpWrapper(httpWrapperMock);
 
-		FogbowResource newResource = fogbowInfrastructureProvider.getResource(requestIdMock);
+		FogbowResource newResource = (FogbowResource) fogbowInfrastructureProvider.getResource(requestIdMock);
 
 		assertNotNull(newResource);
 		assertEquals(requestIdMock, newResource.getId());
@@ -457,7 +444,7 @@ public class TestFogbowInfrastructureProvider {
 		properties.setProperty(AppPropertiesConstants.INFRA_IS_STATIC, "false");
 		properties.setProperty(AppPropertiesConstants.INFRA_PROVIDER_CLASS_NAME,
 				"org.fogbowcloud.scheduler.infrastructure.fogbow.FogbowInfrastructureProvider");
-		properties.setProperty(AppPropertiesConstants.INFRA_ORDER_SERVICE_TIME, "2000");
+		properties.setProperty(AppPropertiesConstants.INFRA_MANAGEMENT_SERVICE_TIME, "2000");
 		properties.setProperty(AppPropertiesConstants.INFRA_RESOURCE_SERVICE_TIME, "3000");
 		properties.setProperty(AppPropertiesConstants.INFRA_RESOURCE_CONNECTION_TIMEOUT, "10000");
 		properties.setProperty(AppPropertiesConstants.INFRA_RESOURCE_IDLE_LIFETIME, "300000");

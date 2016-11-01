@@ -1,4 +1,4 @@
-package org.fogbowcloud.blowout.scheduler.core.model;
+package org.fogbowcloud.blowout.infrastructure.model;
 
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -7,8 +7,7 @@ import static org.mockito.Mockito.when;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.fogbowcloud.blowout.core.core.model.Resource;
-import org.fogbowcloud.blowout.core.core.model.Specification;
+import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.manager.occi.order.OrderType;
 import org.mockito.Mockito;
 

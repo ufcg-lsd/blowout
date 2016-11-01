@@ -1,7 +1,5 @@
 package org.fogbowcloud.blowout.infrastructure.provider;
 
-import java.util.List;
-
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.infrastructure.exception.RequestResourceException;
 import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;

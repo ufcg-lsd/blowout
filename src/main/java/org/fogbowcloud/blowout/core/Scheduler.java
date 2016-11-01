@@ -19,7 +19,6 @@ import org.fogbowcloud.blowout.core.model.TaskState;
 import org.fogbowcloud.blowout.infrastructure.manager.InfrastructureManager;
 import org.fogbowcloud.blowout.infrastructure.manager.ResourceNotifier;
 import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
-import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
 
 public class Scheduler implements Runnable, ResourceNotifier {
 

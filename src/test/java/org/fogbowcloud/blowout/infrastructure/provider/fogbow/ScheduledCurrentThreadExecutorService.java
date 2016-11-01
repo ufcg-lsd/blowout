@@ -1,4 +1,4 @@
-package org.fogbowcloud.blowout.scheduler.infrastructure.fogbow;
+package org.fogbowcloud.blowout.infrastructure.provider.fogbow;
 
 import java.util.Collection;
 import java.util.List;

@@ -1,4 +1,4 @@
-package org.fogbowcloud.blowout.scheduler.infrastructure.fogbow;
+package org.fogbowcloud.blowout.infrastructure.provider.fogbow;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -10,11 +10,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.fogbowcloud.blowout.core.core.model.Resource;
-import org.fogbowcloud.blowout.core.core.model.Specification;
-import org.fogbowcloud.blowout.core.core.util.AppPropertiesConstants;
-import org.fogbowcloud.blowout.core.infrastructure.fogbow.FogbowRequirementsHelper;
-import org.fogbowcloud.blowout.scheduler.core.model.TestResourceHelper;
+import org.fogbowcloud.blowout.core.model.Specification;
+import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
+import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
+import org.fogbowcloud.blowout.infrastructure.model.TestResourceHelper;
 import org.fogbowcloud.manager.occi.order.OrderType;
 import org.junit.After;
 import org.junit.Before;
@@ -341,7 +340,7 @@ public class TestFogbowRequirementsHelper {
 		properties.setProperty(AppPropertiesConstants.INFRA_IS_STATIC, "false");
 		properties.setProperty(AppPropertiesConstants.INFRA_PROVIDER_CLASS_NAME,
 				"org.fogbowcloud.scheduler.infrastructure.fogbow.FogbowInfrastructureProvider");
-		properties.setProperty(AppPropertiesConstants.INFRA_ORDER_SERVICE_TIME, "2000");
+		properties.setProperty(AppPropertiesConstants.INFRA_MANAGEMENT_SERVICE_TIME, "2000");
 		properties.setProperty(AppPropertiesConstants.INFRA_RESOURCE_SERVICE_TIME, "3000");
 		properties.setProperty(AppPropertiesConstants.INFRA_RESOURCE_CONNECTION_TIMEOUT, "10000");
 		properties.setProperty(AppPropertiesConstants.INFRA_RESOURCE_IDLE_LIFETIME, "300000");
