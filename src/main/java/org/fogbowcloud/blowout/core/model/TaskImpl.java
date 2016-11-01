@@ -2,6 +2,7 @@ package org.fogbowcloud.blowout.core.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -245,6 +246,31 @@ public class TaskImpl implements Task {
 			LOGGER.debug("Error while trying to create a JSON from task", e);
 			return null;
 		}
+	}
+
+	public static Task fromJSON(JSONObject taskJSON) {
+		Specification specification = Specification.fromJSON(taskJSON.optJSONObject("spec"));
+		Task task = new TaskImpl(taskJSON.optString("id"), specification);
+		task.setRetries(taskJSON.optInt("retries"));
+		if (taskJSON.optBoolean("isFinished")) {
+			task.finish();
+		}
+		if (taskJSON.optBoolean("isFailed")) {
+			task.fail();
+		}
+		
+		JSONArray commands = taskJSON.optJSONArray("commands");
+		for (int i = 0; i < commands.length(); i++) {
+			task.addCommand(Command.fromJSON(commands.optJSONObject(i)));
+		}
+		
+		JSONObject metadata = taskJSON.optJSONObject("metadata");
+		Iterator<?> metadataKeys = metadata.keys();
+		while (metadataKeys.hasNext()) {
+			String key = (String) metadataKeys.next();
+			task.putMetadata(key, metadata.optString(key));
+		}
+		return task;
 	}
 	
 }
