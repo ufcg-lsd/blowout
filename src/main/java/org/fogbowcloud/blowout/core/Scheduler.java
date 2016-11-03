@@ -2,8 +2,10 @@ package org.fogbowcloud.blowout.core;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -30,21 +32,21 @@ public class Scheduler implements Runnable, ResourceNotifier {
 	private Map<String, AbstractResource> runningTasks = new HashMap<String, AbstractResource>();
 	private List<TaskProcess> runningProcesses = new ArrayList<TaskProcess>();
 	private List<TaskProcess> processQueue = new ArrayList<TaskProcess>();
+	private Queue<TaskProcess> waitingProcessQueue = new LinkedList<TaskProcess>();
 
 	private Map<TaskProcess, Task> allProcesses = new HashMap<TaskProcess, Task>();
 
 	private static final Logger LOGGER = Logger.getLogger(Scheduler.class);
 
-	public Scheduler(InfrastructureManager infraManager, Job... jobs) {
+	public Scheduler(InfrastructureManager infraManager, Job... jobs) throws Exception {
 		for (Job aJob : jobs) {
 			jobList.add(aJob);
 		}
 		this.infraManager = infraManager;
 		this.id = UUID.randomUUID().toString();
-
 	}
 
-	protected Scheduler(InfrastructureManager infraManager, ExecutorService taskExecutor, Job... jobs) {
+	protected Scheduler(InfrastructureManager infraManager, ExecutorService taskExecutor, Job... jobs) throws Exception {
 		this(infraManager, jobs);
 		this.taskExecutor = taskExecutor;
 	}
@@ -61,19 +63,20 @@ public class Scheduler implements Runnable, ResourceNotifier {
 		LOGGER.debug("There are " + this.processQueue.size() + " ready tasks.");
 		LOGGER.debug("Scheduler running tasks is " + runningTasks.size());
 
-		for (TaskProcess taskProcess : this.processQueue) {
+		while(waitingProcessQueue.peek() != null){
+			TaskProcess taskProcess = waitingProcessQueue.poll();
 			Specification taskSpec = taskProcess.getSpecification();
 			if (!specDemand.containsKey(taskSpec)) {
 				specDemand.put(taskSpec, 0);
 			}
+			
+			int currentDemand = specDemand.get(taskSpec);
+			specDemand.put(taskSpec, ++currentDemand);
+			LOGGER.debug("Current Demand is: " + currentDemand);
 
-			if (specDemand.get(taskSpec) < this.processQueue.size()) {
-				int currentDemand = specDemand.get(taskSpec);
-				specDemand.put(taskSpec, ++currentDemand);
-				LOGGER.debug("Current Demand is: " + currentDemand);
-			}
+			this.processQueue.add(taskProcess);
 		}
-
+		
 		LOGGER.debug("Current job demand is " + specDemand);
 		for (Specification spec : specDemand.keySet()) {
 			infraManager.request(spec, this, specDemand.get(spec));
@@ -85,7 +88,7 @@ public class Scheduler implements Runnable, ResourceNotifier {
 		for (Task task : job.getTasks().values()) {
 			if (!task.isFinished() && TaskState.NOT_CREATED.equals(inferTaskState(task))) {
 				TaskProcess tp = createTaskProcess(task, job.getUUID());
-				this.processQueue.add(tp);
+				this.waitingProcessQueue.add(tp);
 				this.allProcesses.put(tp, task);
 				task.addProcessId(tp.getProcessId());
 			}

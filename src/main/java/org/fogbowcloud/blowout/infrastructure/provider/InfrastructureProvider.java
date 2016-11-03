@@ -13,7 +13,7 @@ public interface InfrastructureProvider {
 	 */
 	String requestResource(Specification specification) throws RequestResourceException;
 	
-	AbstractResource getResource(String requestID);
+	AbstractResource getResource(String resourceId);
 	
 	void deleteResource(String resourceId) throws Exception;
 	

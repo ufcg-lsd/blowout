@@ -99,7 +99,7 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 		
 		//Starting the periodic management.
 		infrastructureService = new InfrastructureService();
-		infrastructureServiceRunner = new Thread();
+		infrastructureServiceRunner = new Thread(infrastructureService);
 		infrastructureServiceRunner.start();
 		
 		LOGGER.info("Block while waiting initial resources? " + blockWhileInitializing);
@@ -142,9 +142,10 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 	public void request(Specification specification, ResourceNotifier resourceNotifier, int resourceNumber) {
 			
 		String requestId = UUID.randomUUID().toString();
-		
-		ResourceRequest resourceRequest = new ResourceRequest(requestId, resourceNotifier, specification);
-		openRequests.add(resourceRequest);
+		for(int count = 0; count < resourceNumber; count++){
+			ResourceRequest resourceRequest = new ResourceRequest(requestId, resourceNotifier, specification);
+			openRequests.add(resourceRequest);
+		}
 
 	}
 
@@ -204,13 +205,13 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 				/* Step 1 - Verify if any pending order is ready and if is, put the
 				 * new resource on idle pool and remove this order from pending list.
 				 */
-				checkPendingOrders(especificationsDemand);
+				checkPendingResources(especificationsDemand);
 
 				/* Step 2 - Check if there is any resource available for each open request. */
 				resolveOpenRequests(especificationsDemand);
 
 				/* Step 3 - Order new resources on Infrastructure Provider accordingly the demand. */
-				orderResourcesByDemand(especificationsDemand);
+				requestResourcesByDemand(especificationsDemand);
 
 				try {
 					Thread.sleep(infraManagementPeriod);
@@ -253,11 +254,11 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 		return null;
 	}
 
-	private void checkPendingOrders(Map<Specification, Integer> especificationsDemand) {
+	private void checkPendingResources(Map<Specification, Integer> especificationsDemand) {
 
 		for (Entry<String, Specification> entry : getEntriesFromMap(pendingResources)) {
 
-			String orderId = entry.getKey();
+			String resourceId = entry.getKey();
 			Specification spec = entry.getValue();
 
 			/*
@@ -273,20 +274,20 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 			demand = new Integer(demand.intValue() - 1);
 			especificationsDemand.put(spec, demand);
 
-			AbstractResource newResource = infraProvider.getResource(orderId);
+			AbstractResource newResource = infraProvider.getResource(resourceId);
 			if (newResource != null) {
 				LOGGER.info("New resource " + newResource.getId() + " is being put into Idle Pool");
 				moveResourceToIdle(newResource);
-				pendingResources.remove(orderId);
+				pendingResources.remove(resourceId);
 				// updateInfrastuctureState();
 			}
 
 		}
 	}
 
-	private void orderResourcesByDemand(Map<Specification, Integer> especificationsDemand) {
+	private void requestResourcesByDemand(Map<Specification, Integer> especificationsDemand) {
 
-		List<String> newsOrdersIds = new ArrayList<String>();
+		List<String> requestedResourceIds = new ArrayList<String>();
 		
 		for (Entry<Specification, Integer> entry : getEntriesFromMap(especificationsDemand)) {
 
@@ -294,11 +295,11 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 			Integer qty = entry.getValue();
 			if (qty > 0) {
 				for (int count = 0; count < qty; count++) {
-					String orderId;
+					String resourceId;
 					try {
-						orderId = infraProvider.requestResource(spec);
-						pendingResources.put(orderId, spec);
-						newsOrdersIds.add(orderId);
+						resourceId = infraProvider.requestResource(spec);
+						pendingResources.put(resourceId, spec);
+						requestedResourceIds.add(resourceId);
 					} catch (RequestResourceException e) {
 						LOGGER.error("Erro while ordering resource for spec: " + spec, e);
 					}
@@ -306,7 +307,7 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 			}
 		}
 		
-		ds.addResourceIds(newsOrdersIds);
+		ds.addResourceIds(requestedResourceIds);
 	}
 
 	protected boolean relateResourceToRequest(AbstractResource resource, ResourceRequest request) {
