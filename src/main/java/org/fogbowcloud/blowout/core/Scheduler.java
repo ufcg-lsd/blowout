@@ -114,6 +114,8 @@ public class Scheduler implements Runnable, ResourceNotifier {
 							switch(taskResult.getExitValue()){
 							case TaskExecutionResult.OK:
 								taskCompleted(taskProcess);
+								Task task = allProcesses.get(taskProcess);
+								task.finish();
 							case TaskExecutionResult.NOK:
 								taskFailed(taskProcess);
 							}
