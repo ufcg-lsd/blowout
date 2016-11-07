@@ -68,7 +68,7 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 		this.properties = properties;
 		this.initialSpec = initialSpec;
 		this.infraProvider = infraProvider;
-		this.isElastic = isElastic;
+		this.isElastic = true;
 
 		String resourceReuseTimesStr = this.properties.getProperty(AppPropertiesConstants.INFRA_RESOURCE_REUSE_TIMES,
 				String.valueOf(MAX_RESOURCE_REUSES));
@@ -90,7 +90,11 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 
 		if (removePrevious) {
 			for(String resourceId : ds.getResourceIds()){
-				infraProvider.deleteResource(resourceId);
+				try{
+					infraProvider.deleteResource(resourceId);
+				}catch(Exception e){
+					LOGGER.warn("Was not possible to delete resource "+resourceId+" due: "+e.getMessage());
+				}
 			}
 			ds.deleteAll();
 		}
@@ -201,7 +205,9 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 				LOGGER.debug("Executing Infrastructure Manager periodic checks.");
 
 				Map<Specification, Integer> especificationsDemand = new ConcurrentHashMap<Specification, Integer>();
-
+				
+				checkInfrastructureIntegrity();
+				
 				/* Step 1 - Verify if any pending order is ready and if is, put the
 				 * new resource on idle pool and remove this order from pending list.
 				 */
@@ -229,6 +235,44 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 
 	}
 
+	private void checkInfrastructureIntegrity(){
+		
+		List<AbstractResource> resourcesToRemove = new ArrayList<AbstractResource>();
+
+		for (Entry<AbstractResource, Long> entry : idleResources.entrySet()) {
+			if (entry != null) {
+				AbstractResource r = entry.getKey();
+				String requestType = r.getMetadataValue(AbstractResource.METADATA_REQUEST_TYPE);
+				// Persistent resource can not be removed.
+				if (OrderType.ONE_TIME.getValue().equals(requestType)) {
+
+					if (isElastic && NO_EXPIRATION_DATE.compareTo(entry.getValue()) != 0) {
+						Date expirationDate = new Date(entry.getValue().longValue());
+						Date currentDate = new Date(dateUtils.currentTimeMillis());
+
+						if (expirationDate.before(currentDate)) {
+							resourcesToRemove.add(r);
+							LOGGER.info("Resource: [" + r.getId() + "] to be disposed due lifetime's expiration");
+							continue;
+						}
+					}
+				} 
+			}
+		}
+
+		for (AbstractResource resource : resourcesToRemove) {
+			if (resource != null) {
+				try {
+					infraProvider.deleteResource(resource.getId());
+					idleResources.remove(resource);
+				} catch (Exception e) {
+					LOGGER.error("Error while disposing resource: [" + resource.getId() + "]", e);
+				}
+			}
+		}
+		
+	}
+	
 	private void resolveOpenRequests(Map<Specification, Integer> especificationsDemand) {
 
 		for (ResourceRequest request : getOpenRequests()) {
@@ -320,6 +364,7 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 			// Moving resource from idle pool to allocated list.
 			idleResources.remove(resource);
 			allocatedResources.add(resource);
+			openRequests.remove(request);
 			request.getResourceNotifier().resourceReady(resource);
 
 			return true;

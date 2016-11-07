@@ -116,10 +116,11 @@ public class Scheduler implements Runnable, ResourceNotifier {
 								taskCompleted(taskProcess);
 								Task task = allProcesses.get(taskProcess);
 								task.finish();
-							case TaskExecutionResult.NOK:
+							default:
 								taskFailed(taskProcess);
 							}
 						} catch (Throwable e) {
+							taskFailed(taskProcess);
 							LOGGER.error("Error while executing task.", e);
 						}
 					}
