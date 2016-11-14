@@ -120,7 +120,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 	}
 
 	@Override
-	public String requestResource(Specification spec) throws RequestResourceException {
+	public AbstractResource requestResource(Specification spec) throws RequestResourceException {
 
 		LOGGER.debug("Requesting resource on Fogbow with specifications: " + spec.toString());
 
@@ -143,7 +143,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		String orderId = getOrderId(requestInformation);
 		String resourceId = String.valueOf(UUID.randomUUID());
 		
-		FogbowResource fogbowResource = new FogbowResource(resourceId, orderId, properties);
+		FogbowResource fogbowResource = new FogbowResource(resourceId, spec, orderId);
 		String requestType = spec
 				.getRequirementValue(FogbowRequirementsHelper.METADATA_FOGBOW_REQUEST_TYPE);
 		fogbowResource.putMetadata(AbstractResource.METADATA_REQUEST_TYPE, requestType);
@@ -155,7 +155,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		frDatastore.addFogbowResource(fogbowResource);
 		
 		LOGGER.debug("Request for Fogbow Resource was Successful. Resource ID: ["+resourceId+"] Order ID: [" + orderId + "]");
-		return resourceId;
+		return fogbowResource;
 	}
 
 
@@ -238,21 +238,20 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 					LOGGER.debug("New Fogbow Resource created - Instace ID: [" + instanceId + "]");
 					
+					fogbowResource.setState(ResourceStatus.READY);
+					
 					frDatastore.updateFogbowResource(fogbowResource);
 					return fogbowResource;
 					
 				} else {
 					LOGGER.debug("Instance attributes not yet ready for instance: [" + instanceId + "]");
-					return null;
 				}
 			}
 
 		} catch (Exception e) {
-
 			LOGGER.error("Error while getting resource from Order id: [" + fogbowResource.getOrderId() + "]", e);
-			return null;
 		}
-		return null;
+		return fogbowResource;
 	}
 
 	@Override
@@ -523,6 +522,5 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 	protected void setToken(Token token) {
 		this.token = token;
 	}
-
 
 }

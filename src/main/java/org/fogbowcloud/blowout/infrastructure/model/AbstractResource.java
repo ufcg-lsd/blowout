@@ -43,9 +43,11 @@ public abstract class AbstractResource {
 	private int timesReused = 0;
 	private int connectionFailTries = 0;
 	private String localCommandInterpreter;
+	private Specification requestedSpec;
 	
-	public AbstractResource(String id, Properties properties) {
+	public AbstractResource(String id, Specification requestedSpec) {
 		this.id = id;
+		this.requestedSpec = requestedSpec;
 	}
 
 	/**
@@ -125,6 +127,14 @@ public abstract class AbstractResource {
 
 	public void setLocalCommandInterpreter(String localCommandInterpreter) {
 		this.localCommandInterpreter = localCommandInterpreter;
+	}
+
+	public Specification getRequestedSpec() {
+		return requestedSpec;
+	}
+
+	public void setRequestedSpec(Specification requestedSpec) {
+		this.requestedSpec = requestedSpec;
 	}
 	
 }

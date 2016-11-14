@@ -9,9 +9,9 @@ public interface InfrastructureProvider {
 	/**
 	 * Creates new Request for resource and return the Request ID
 	 * @param specification
-	 * @return Request's ID
+	 * @return The requested resource
 	 */
-	String requestResource(Specification specification) throws RequestResourceException;
+	AbstractResource requestResource(Specification specification) throws RequestResourceException;
 	
 	AbstractResource getResource(String resourceId);
 	

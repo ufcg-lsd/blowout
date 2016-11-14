@@ -1,6 +1,5 @@
 package org.fogbowcloud.blowout.infrastructure.model;
 
-import java.util.Properties;
 import java.util.Scanner;
 
 import org.apache.log4j.Logger;
@@ -14,8 +13,8 @@ public class FogbowResource extends AbstractResource{
 	private final String orderId;
 	private String instanceId;
 	
-	public FogbowResource(String id, String orderId, Properties properties) {
-		super(id, properties);
+	public FogbowResource(String id, Specification spec, String orderId) {
+		super(id, spec);
 		this.orderId = orderId;
 	}
 
