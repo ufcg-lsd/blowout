@@ -272,5 +272,11 @@ public class TaskImpl implements Task {
 		}
 		return task;
 	}
+
+	@Override
+	public TaskState getState() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 }

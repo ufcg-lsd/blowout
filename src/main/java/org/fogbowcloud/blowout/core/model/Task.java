@@ -52,4 +52,6 @@ public interface Task extends Serializable{
 	List<String> getProcessId();
 	
 	public JSONObject toJSON();
+	
+	public TaskState getState();
 }
