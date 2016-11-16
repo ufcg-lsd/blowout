@@ -46,9 +46,10 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 
 		//Reduce demand by pending resources
 		for(AbstractResource pendingResource : resourceMonitor.getPendingResources()){
-			incrementDecrementDemand(specsDemand, pendingResource.getRequestedSpec(), true);
+			incrementDecrementDemand(specsDemand, pendingResource.getRequestedSpec(), false);
 		}
 
+		//Request resources according to the demand. 
 		for(Entry<Specification, Integer>  entry : specsDemand.entrySet()){
 
 			Specification spec = entry.getKey();
