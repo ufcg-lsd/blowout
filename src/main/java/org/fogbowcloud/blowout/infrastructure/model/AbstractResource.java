@@ -9,7 +9,7 @@ import org.fogbowcloud.blowout.core.model.Specification;
 
 public abstract class AbstractResource {
 
-	public static enum ResourceStatus{
+	public static enum ResourceState{
 		READY, NOT_READY
 	}
 	
@@ -36,7 +36,7 @@ public abstract class AbstractResource {
 
 	public static final String METADATA_REQUEST_TYPE = "metadataRequestType";
 	
-	private ResourceStatus state = ResourceStatus.NOT_READY;
+	private ResourceState state = ResourceState.NOT_READY;
 
 	private String id;
 	private Map<String, String> metadata = new HashMap<String, String>();
@@ -113,11 +113,11 @@ public abstract class AbstractResource {
 		return this.connectionFailTries;
 	}
 
-	public ResourceStatus getState() {
+	public ResourceState getState() {
 		return state;
 	}
 
-	public void setState(ResourceStatus state) {
+	public void setState(ResourceState state) {
 		this.state = state;
 	}
 	

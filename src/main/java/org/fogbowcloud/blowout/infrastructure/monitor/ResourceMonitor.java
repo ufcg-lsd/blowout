@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
 import org.fogbowcloud.blowout.infrastructure.manager.ResourceNotifier;
 import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
-import org.fogbowcloud.blowout.infrastructure.model.AbstractResource.ResourceStatus;
+import org.fogbowcloud.blowout.infrastructure.model.AbstractResource.ResourceState;
 import org.fogbowcloud.blowout.infrastructure.provider.InfrastructureProvider;
 
 public class ResourceMonitor {
@@ -62,7 +62,7 @@ public class ResourceMonitor {
 							ResourceNotifier resourceNotifier = entry.getValue();
 
 							resource = infraProvider.getResource(resource.getId());
-							if (ResourceStatus.READY.equals(resource.getState())) {
+							if (ResourceState.READY.equals(resource.getState())) {
 								resourceNotifier.resourceReady(resource);
 								monitoredResources.remove(resource);
 							}
