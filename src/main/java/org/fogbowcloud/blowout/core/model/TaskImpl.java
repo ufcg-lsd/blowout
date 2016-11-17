@@ -10,6 +10,7 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.model.Command.Type;
+import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,12 +40,16 @@ public class TaskImpl implements Task {
 	private Map<String, String> metadata = new HashMap<String, String>();
 	private boolean isFailed = false;
 	private int retries = 0;
+	private TaskState state;
+	private AbstractResource resource;
 
 	private long startedRunningAt = Long.MAX_VALUE;
 
 	public TaskImpl(String id, Specification spec) {
 		this.id = id;
 		this.spec = spec;
+		this.state = TaskState.READY;
+		this.resource = null;
 	}
 	
 	@Override
@@ -275,8 +280,19 @@ public class TaskImpl implements Task {
 
 	@Override
 	public TaskState getState() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.state;
+	}
+
+	@Override
+	public void setState(TaskState state) {
+		this.state = state;
+		
+	}
+
+	@Override
+	public void setResource(AbstractResource resource) {
+		this.resource = resource;
+		
 	}
 	
 }

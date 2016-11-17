@@ -7,9 +7,13 @@ import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
 
 public interface SchedulerInterface {
 
-	public boolean act(List<Task> tasks, List<AbstractResource> resources);
+	boolean act(List<Task> tasks, List<AbstractResource> resources);
 	
-	public void run(Task task);
-	
-	public void stop(Task task);
+
+	void runTask(Task task, AbstractResource resource);
+
+	void stopTask(Task task);
+
+
+	List<Task> getRunningTasks();
 }

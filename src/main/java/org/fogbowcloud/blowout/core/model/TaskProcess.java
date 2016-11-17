@@ -18,4 +18,5 @@ public interface TaskProcess {
 	
 	Specification getSpecification();
 	
+	AbstractResource getResource();
 }

@@ -21,59 +21,88 @@ public class StandardScheduler implements SchedulerInterface {
 	public boolean act(List<Task> tasks, List<AbstractResource> resources) {
 
 		for (AbstractResource resource : resources) {
-			actOnResource(resource);
+			actOnResource(resource, tasks);
 		}
 
 		for (Task task : tasks) {
-			solveTask(task);
+			actOnTask(task, resources);
 		}
-		
-		for (Task task : runningTasks.keySet()) {
-			if (!tasks.contains(task)) {
-				stopTask(task);
+
+		for (Task runningTask : runningTasks.keySet()) {
+			if (!tasks.contains(runningTask)) {
+				stopTask(runningTask);
 			}
 		}
 
 		return false;
 	}
 
-	private void actOnResource(AbstractResource resource) {
+	protected void actOnResource(AbstractResource resource, List<Task> tasks) {
 		AbstractResource.ResourceState state = resource.getState();
-		
+		// if resource idle
+		if (true) {
+			Task task = chooseTaskForRunning(tasks);
+			if (task != null) {
+				runTask(task, resource);
+			}
+		}
+
 	}
 
-	private void stopTask(Task task) {
-				//TODO: Find out how to stop the execution of the process
+	protected Task getTaskRunningOnResource(AbstractResource resource) {
+		for (TaskProcess tp : runningTasks.values()) {
+			if (tp.getResource() != null && tp.getResource().equals(resource)) {
+				for (Task task : runningTasks.keySet()) {
+					if (runningTasks.get(task).equals(tp)) {
+						return task;
+					}
+				}
+			}
+		}
+		return null;
 	}
 
-	private void solveTask(Task task) {
+	protected Task chooseTaskForRunning(List<Task> tasks) {
+		for (Task task : tasks) {
+			if (task.getState().equals(TaskState.READY)) {
+				return task;
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public void stopTask(Task task) {
+		// TODO: Find out how to stop the execution of the process
+		runningTasks.remove(task);
+	}
+
+	protected void actOnTask(Task task, List<AbstractResource> resources) {
 		TaskState currentState = task.getState();
 	}
 
-	private void runTask(Task task, AbstractResource resource) {
+	@Override
+	public void runTask(Task task, AbstractResource resource) {
 		TaskProcess tp = createProcess(task);
 		runningTasks.put(task, tp);
-		tp.executeTask(resource);
+		// submit to task executor
+		submitToMonitor(tp, resource);
+		task.setState(TaskState.RUNNING);
+
 	}
 
-	public TaskProcess createProcess(Task task) {
+	public void submitToMonitor(TaskProcess tp, AbstractResource resource) {
+
+	}
+
+	protected TaskProcess createProcess(Task task) {
 		TaskProcess tp = new TaskProcessImpl(task.getId(), task.getAllCommands(), task.getSpecification());
 		return tp;
 	}
-	
+
 	@SuppressWarnings("unchecked")
+	@Override
 	public List<Task> getRunningTasks() {
 		return (List<Task>) runningTasks.keySet();
 	}
-
-	@Override
-	public void run(Task task) {
-
-	}
-
-	@Override
-	public void stop(Task task) {
-
-	}
-
 }
