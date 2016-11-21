@@ -10,7 +10,7 @@ import org.fogbowcloud.blowout.core.model.Specification;
 public abstract class AbstractResource {
 
 	public static enum ResourceState{
-		READY, NOT_READY
+		READY, NOT_READY, TO_REMOVE
 	}
 	
 	public static final String ENV_HOST = "HOST";

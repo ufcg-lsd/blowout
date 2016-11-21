@@ -54,6 +54,8 @@ public class TestStandardScheduler {
 		
 		AbstractResource resource = new FogbowResource("resourceId", mock(Specification.class), "fakeOrderId");
 		
+		resources.add(resource);
+		
 		sched.act(tasks, resources);
 		
 		
@@ -67,6 +69,10 @@ public class TestStandardScheduler {
 		Task task = new TaskImpl("fakeId", mock(Specification.class));
 		tasks.add(task);
 		List<AbstractResource> resources = new ArrayList<AbstractResource>();
+		AbstractResource resource = new FogbowResource("resourceId", mock(Specification.class), "fakeOrderId");
+		
+		resources.add(resource);
+		
 		sched.act(tasks, resources);
 		
 		
@@ -80,9 +86,9 @@ public class TestStandardScheduler {
 		List<Task> tasks = new ArrayList<Task>();
 		Task task = new TaskImpl("fakeId", mock(Specification.class));
 		tasks.add(task);
+		
 		List<AbstractResource> resources = new ArrayList<AbstractResource>();
 		sched.act(tasks, resources);
-		
 		
 		List<Task> emptyTaskList = new ArrayList<Task>();
 		assertEquals(sched.getRunningTasks(), emptyTaskList);
@@ -114,24 +120,7 @@ public class TestStandardScheduler {
 		assertEquals(sched.getRunningTasks(), emptyTaskList);
 	}
 	
-	@Test
-	public void testActFailedTask() {
-		List<Task> tasks = new ArrayList<Task>();
-		Task task = new TaskImpl("fakeId", mock(Specification.class));
-		tasks.add(task);
-		List<AbstractResource> resources = new ArrayList<AbstractResource>();
-		sched.act(tasks, resources);
-		
-		
-		List<Task> emptyTaskList = new ArrayList<Task>();
-		assertEquals(sched.getRunningTasks(), emptyTaskList);
-	}
-	
-	@Test
-	public void testGetTaskRunningOnResource() {
-		
-	}
-	
+
 	@Test
 	public void testChooseTaskForRunning() {
 		

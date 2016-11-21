@@ -9,10 +9,11 @@ import org.fogbowcloud.blowout.core.model.TaskProcess;
 import org.fogbowcloud.blowout.core.model.TaskProcessImpl;
 import org.fogbowcloud.blowout.core.model.TaskState;
 import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
+import org.fogbowcloud.blowout.infrastructure.model.AbstractResource.ResourceState;
 
 public class StandardScheduler implements SchedulerInterface {
 
-	Map<Task, TaskProcess> runningTasks = new HashMap<Task, TaskProcess>();
+	Map<AbstractResource, Task> runningTasks = new HashMap<AbstractResource, Task>();
 
 	public StandardScheduler() {
 	}
@@ -23,12 +24,7 @@ public class StandardScheduler implements SchedulerInterface {
 		for (AbstractResource resource : resources) {
 			actOnResource(resource, tasks);
 		}
-
-		for (Task task : tasks) {
-			actOnTask(task, resources);
-		}
-
-		for (Task runningTask : runningTasks.keySet()) {
+		for (Task runningTask : runningTasks.values()) {
 			if (!tasks.contains(runningTask)) {
 				stopTask(runningTask);
 			}
@@ -40,28 +36,20 @@ public class StandardScheduler implements SchedulerInterface {
 	protected void actOnResource(AbstractResource resource, List<Task> tasks) {
 		AbstractResource.ResourceState state = resource.getState();
 		// if resource idle
-		if (true) {
+		if (resource.getState().equals(AbstractResource.ResourceState.READY)) {
 			Task task = chooseTaskForRunning(tasks);
 			if (task != null) {
 				runTask(task, resource);
 			}
 		}
-
-	}
-
-	protected Task getTaskRunningOnResource(AbstractResource resource) {
-		for (TaskProcess tp : runningTasks.values()) {
-			if (tp.getResource() != null && tp.getResource().equals(resource)) {
-				for (Task task : runningTasks.keySet()) {
-					if (runningTasks.get(task).equals(tp)) {
-						return task;
-					}
-				}
-			}
+		// if resource is to be removed
+		if (resource.getState().equals(AbstractResource.ResourceState.TO_REMOVE)) {
+			runningTasks.get(resource).setState(TaskState.FAILED);
+			runningTasks.remove(resource);
 		}
-		return null;
-	}
 
+	}
+	
 	protected Task chooseTaskForRunning(List<Task> tasks) {
 		for (Task task : tasks) {
 			if (task.getState().equals(TaskState.READY)) {
@@ -74,24 +62,28 @@ public class StandardScheduler implements SchedulerInterface {
 	@Override
 	public void stopTask(Task task) {
 		// TODO: Find out how to stop the execution of the process
-		runningTasks.remove(task);
+		for (AbstractResource resource : runningTasks.keySet()) {
+			if (runningTasks.get(resource).equals(task)) {
+				runningTasks.remove(resource);
+			}
+		}
 	}
 
 	protected void actOnTask(Task task, List<AbstractResource> resources) {
-		TaskState currentState = task.getState();
+		
 	}
 
 	@Override
 	public void runTask(Task task, AbstractResource resource) {
-		TaskProcess tp = createProcess(task);
-		runningTasks.put(task, tp);
+		runningTasks.put(resource, task);
 		// submit to task executor
-		submitToMonitor(tp, resource);
 		task.setState(TaskState.RUNNING);
+		resource.setState(ResourceState.NOT_READY);
+		submitToMonitor(task, resource);
 
 	}
 
-	public void submitToMonitor(TaskProcess tp, AbstractResource resource) {
+	public void submitToMonitor(Task task, AbstractResource resource) {
 
 	}
 
@@ -103,6 +95,6 @@ public class StandardScheduler implements SchedulerInterface {
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Task> getRunningTasks() {
-		return (List<Task>) runningTasks.keySet();
+		return (List<Task>) runningTasks.values();
 	}
 }
