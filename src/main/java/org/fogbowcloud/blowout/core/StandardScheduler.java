@@ -69,10 +69,6 @@ public class StandardScheduler implements SchedulerInterface {
 		}
 	}
 
-	protected void actOnTask(Task task, List<AbstractResource> resources) {
-		
-	}
-
 	@Override
 	public void runTask(Task task, AbstractResource resource) {
 		runningTasks.put(resource, task);
