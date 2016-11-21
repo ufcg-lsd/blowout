@@ -9,7 +9,7 @@ import org.fogbowcloud.blowout.core.model.TaskProcess;
 import org.fogbowcloud.blowout.core.model.TaskProcessImpl;
 import org.fogbowcloud.blowout.core.model.TaskState;
 import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
-import org.fogbowcloud.blowout.infrastructure.model.AbstractResource.ResourceState;
+import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 
 public class StandardScheduler implements SchedulerInterface {
 
@@ -34,16 +34,16 @@ public class StandardScheduler implements SchedulerInterface {
 	}
 
 	protected void actOnResource(AbstractResource resource, List<Task> tasks) {
-		AbstractResource.ResourceState state = resource.getState();
+		ResourceState state = resource.getState();
 		// if resource idle
-		if (resource.getState().equals(AbstractResource.ResourceState.READY)) {
+		if (resource.getState().equals(ResourceState.IDLE)) {
 			Task task = chooseTaskForRunning(tasks);
 			if (task != null) {
 				runTask(task, resource);
 			}
 		}
 		// if resource is to be removed
-		if (resource.getState().equals(AbstractResource.ResourceState.TO_REMOVE)) {
+		if (resource.getState().equals(ResourceState.TO_REMOVE)) {
 			runningTasks.get(resource).setState(TaskState.FAILED);
 			runningTasks.remove(resource);
 		}

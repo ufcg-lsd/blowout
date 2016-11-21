@@ -30,8 +30,8 @@ import org.fogbowcloud.blowout.infrastructure.exception.InfrastructureException;
 import org.fogbowcloud.blowout.infrastructure.exception.RequestResourceException;
 import org.fogbowcloud.blowout.infrastructure.http.HttpWrapper;
 import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
-import org.fogbowcloud.blowout.infrastructure.model.AbstractResource.ResourceState;
 import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
+import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 import org.fogbowcloud.blowout.infrastructure.provider.InfrastructureProvider;
 import org.fogbowcloud.blowout.infrastructure.token.AbstractTokenUpdatePlugin;
 import org.fogbowcloud.manager.core.UserdataUtils;
@@ -238,7 +238,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 					LOGGER.debug("New Fogbow Resource created - Instace ID: [" + instanceId + "]");
 					
-					fogbowResource.setState(ResourceState.READY);
+					fogbowResource.setState(ResourceState.IDLE);
 					
 					frDatastore.updateFogbowResource(fogbowResource);
 					return fogbowResource;

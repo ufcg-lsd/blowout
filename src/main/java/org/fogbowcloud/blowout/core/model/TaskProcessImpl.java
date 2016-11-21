@@ -199,4 +199,10 @@ public class TaskProcessImpl implements TaskProcess {
 		return this.spec;
 	}
 
+	@Override
+	public AbstractResource getResource() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
