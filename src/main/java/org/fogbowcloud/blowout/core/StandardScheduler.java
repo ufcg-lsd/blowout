@@ -23,7 +23,7 @@ public class StandardScheduler implements SchedulerInterface {
 	}
 
 	@Override
-	public boolean act(List<Task> tasks, List<AbstractResource> resources) {
+	public void act(List<Task> tasks, List<AbstractResource> resources) {
 
 		for (AbstractResource resource : resources) {
 			actOnResource(resource, tasks);
@@ -33,8 +33,11 @@ public class StandardScheduler implements SchedulerInterface {
 				stopTask(runningTask);
 			}
 		}
-
-		return false;
+		for (AbstractResource inUse : runningTasks.keySet()) {
+			if (!resources.contains(inUse)) {
+				stopTask(runningTasks.get(inUse));
+			}
+		}
 	}
 
 	protected void actOnResource(AbstractResource resource, List<Task> tasks) {
@@ -53,7 +56,7 @@ public class StandardScheduler implements SchedulerInterface {
 		}
 
 	}
-	
+
 	protected Task chooseTaskForRunning(List<Task> tasks) {
 		for (Task task : tasks) {
 			if (task.getState().equals(TaskState.READY)) {
@@ -75,12 +78,12 @@ public class StandardScheduler implements SchedulerInterface {
 
 	@Override
 	public void runTask(Task task, AbstractResource resource) {
-		
+
 		blowoutPool.allocateResource(resource);
 		runningTasks.put(resource, task);
 		// submit to task executor
 		task.setState(TaskState.RUNNING);
-		//resource.setState(ResourceState.NOT_READY);
+		// resource.setState(ResourceState.NOT_READY);
 		submitToMonitor(task, resource);
 
 	}
