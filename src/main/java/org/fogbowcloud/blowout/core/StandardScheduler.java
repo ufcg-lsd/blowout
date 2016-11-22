@@ -8,14 +8,17 @@ import org.fogbowcloud.blowout.core.model.Task;
 import org.fogbowcloud.blowout.core.model.TaskProcess;
 import org.fogbowcloud.blowout.core.model.TaskProcessImpl;
 import org.fogbowcloud.blowout.core.model.TaskState;
-import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
+import org.fogbowcloud.blowout.pool.AbstractResource;
+import org.fogbowcloud.blowout.pool.BlowoutPool;
 
 public class StandardScheduler implements SchedulerInterface {
 
 	Map<AbstractResource, Task> runningTasks = new HashMap<AbstractResource, Task>();
+	private BlowoutPool blowoutPool;
 
-	public StandardScheduler() {
+	public StandardScheduler(BlowoutPool blowoutPool) {
+		this.blowoutPool = blowoutPool;
 	}
 
 	@Override
@@ -71,10 +74,12 @@ public class StandardScheduler implements SchedulerInterface {
 
 	@Override
 	public void runTask(Task task, AbstractResource resource) {
+		
+		blowoutPool.allocateResource(resource);
 		runningTasks.put(resource, task);
 		// submit to task executor
 		task.setState(TaskState.RUNNING);
-		resource.setState(ResourceState.NOT_READY);
+		//resource.setState(ResourceState.NOT_READY);
 		submitToMonitor(task, resource);
 
 	}

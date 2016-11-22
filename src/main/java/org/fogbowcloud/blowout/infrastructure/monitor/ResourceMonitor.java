@@ -9,10 +9,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
-import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 import org.fogbowcloud.blowout.infrastructure.provider.InfrastructureProvider;
-import org.fogbowcloud.blowout.pool.ResourcePool;
+import org.fogbowcloud.blowout.pool.AbstractResource;
+import org.fogbowcloud.blowout.pool.BlowoutPool;
 import org.fogbowcloud.manager.occi.order.OrderType;
 
 public class ResourceMonitor {
@@ -20,8 +20,8 @@ public class ResourceMonitor {
 	private static final Logger LOGGER = Logger.getLogger(ResourceMonitor.class);
 
 	private InfrastructureProvider infraProvider;
-	private ResourcePool resourcePool;
-	private Map<AbstractResource, Long> idleResources = new ConcurrentHashMap<AbstractResource, Long>();
+	private BlowoutPool resourcePool;
+	private Map<String, Long> idleResources = new ConcurrentHashMap<String, Long>();
 	private List<AbstractResource> pendingResources = new ArrayList<AbstractResource>();
 
 	private Thread monitoringServiceRunner;
@@ -32,7 +32,7 @@ public class ResourceMonitor {
 	private int maxConnectionTries;
 	private int maxReuse;
 	
-	public ResourceMonitor(InfrastructureProvider infraProvider, ResourcePool resourcePool, Properties properties) {
+	public ResourceMonitor(InfrastructureProvider infraProvider, BlowoutPool resourcePool, Properties properties) {
 		this.infraProvider = infraProvider;
 		this.resourcePool = resourcePool;
 		infraMonitoringPeriod = Long
@@ -95,7 +95,6 @@ public class ResourceMonitor {
 			for (AbstractResource resource : getPendingResources()) {
 				resource = infraProvider.getResource(resource.getId());
 				if (ResourceState.IDLE.equals(resource.getState())) {
-					resource.setState(ResourceState.IDLE);
 					pendingResources.remove(resource);
 					resourcePool.addResource(resource);
 				}
@@ -116,7 +115,7 @@ public class ResourceMonitor {
 					if(isAlive){
 						moveResourceToIdle(resource);
 					}
-				} else if (ResourceState.DISPOSE.equals(resource.getState())) {
+				} else if (ResourceState.TO_REMOVE.equals(resource.getState())) {
 					try {
 						idleResources.remove(resource);
 						infraProvider.deleteResource(resource.getId());
@@ -148,7 +147,7 @@ public class ResourceMonitor {
 						Date expirationDate = new Date(since.longValue());
 						Date currentDate = new Date();
 						if (expirationDate.before(currentDate)) {
-							resource.setState(ResourceState.TO_REMOVE);
+							resourcePool.removeResource(resource);
 							idleResources.remove(resource);
 						}
 					}
@@ -158,21 +157,20 @@ public class ResourceMonitor {
 
 		private void moveResourceToIdle(AbstractResource resource) {
 			if(resource.getReusedTimes() < maxReuse){
-				resource.setState(ResourceState.IDLE);
-				idleResources.put(resource, Long.valueOf(new Date().getTime()));
+				idleResources.put(resource.getId(), Long.valueOf(new Date().getTime()));
 				//TODO this should be called here?
 				resourcePool.releaseResource(resource);
 			}else{
-				resource.setState(ResourceState.TO_REMOVE);
+				resourcePool.removeResource(resource);
 			}
 		}
 
 		private boolean checkResourceConnectivity(AbstractResource resource) {
 			if (!resource.checkConnectivity()) {
 				if(resource.getConnectionFailTries() >= maxConnectionTries){
-					resource.setState(ResourceState.TO_REMOVE);
+					resourcePool.removeResource(resource);
 				}else{
-					resource.setState(ResourceState.FAILED);
+					resourcePool.resourceFaild(resource);
 				}
 				idleResources.remove(resource);
 				return false;
@@ -222,7 +220,4 @@ public class ResourceMonitor {
 		return new ArrayList<AbstractResource>(pendingResources);
 	}
 	
-	public List<AbstractResource> getIdleResources() {
-		return new ArrayList<AbstractResource>(idleResources.keySet());
-	}
 }

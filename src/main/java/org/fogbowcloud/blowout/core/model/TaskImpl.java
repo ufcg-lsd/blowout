@@ -10,7 +10,7 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.model.Command.Type;
-import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
+import org.fogbowcloud.blowout.pool.AbstractResource;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

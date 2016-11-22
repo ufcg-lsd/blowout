@@ -29,11 +29,11 @@ import org.fogbowcloud.blowout.database.FogbowResourceDatastore;
 import org.fogbowcloud.blowout.infrastructure.exception.InfrastructureException;
 import org.fogbowcloud.blowout.infrastructure.exception.RequestResourceException;
 import org.fogbowcloud.blowout.infrastructure.http.HttpWrapper;
-import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
 import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 import org.fogbowcloud.blowout.infrastructure.provider.InfrastructureProvider;
 import org.fogbowcloud.blowout.infrastructure.token.AbstractTokenUpdatePlugin;
+import org.fogbowcloud.blowout.pool.AbstractResource;
 import org.fogbowcloud.manager.core.UserdataUtils;
 import org.fogbowcloud.manager.occi.model.Token;
 import org.fogbowcloud.manager.occi.model.Token.User;
@@ -149,7 +149,6 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		fogbowResource.putMetadata(AbstractResource.METADATA_REQUEST_TYPE, requestType);
 		fogbowResource.putMetadata(AbstractResource.METADATA_IMAGE, spec.getImage());
 		fogbowResource.putMetadata(AbstractResource.METADATA_PUBLIC_KEY, spec.getPublicKey());
-		fogbowResource.setState(ResourceState.NOT_READY);
 		
 		resourcesMap.put(resourceId, fogbowResource);
 		frDatastore.addFogbowResource(fogbowResource);
@@ -237,8 +236,6 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 					// instanceAttributes.get(INSTANCE_ATTRIBUTE_DISKSIZE));
 
 					LOGGER.debug("New Fogbow Resource created - Instace ID: [" + instanceId + "]");
-					
-					fogbowResource.setState(ResourceState.IDLE);
 					
 					frDatastore.updateFogbowResource(fogbowResource);
 					return fogbowResource;

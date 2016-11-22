@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
+import org.fogbowcloud.blowout.pool.AbstractResource;
 
 public class TaskProcessImpl implements TaskProcess {
 

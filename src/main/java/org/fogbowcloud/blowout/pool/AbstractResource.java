@@ -1,10 +1,12 @@
-package org.fogbowcloud.blowout.infrastructure.model;
+package org.fogbowcloud.blowout.pool;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.fogbowcloud.blowout.core.model.Specification;
+import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 
 public abstract class AbstractResource {
 
@@ -43,6 +45,7 @@ public abstract class AbstractResource {
 	public AbstractResource(String id, Specification requestedSpec) {
 		this.id = id;
 		this.requestedSpec = requestedSpec;
+		setState(ResourceState.NOT_READY);
 	}
 
 	/**
@@ -112,7 +115,7 @@ public abstract class AbstractResource {
 		return state;
 	}
 
-	public void setState(ResourceState state) {
+	protected synchronized void setState(ResourceState state) {
 		this.state = state;
 	}
 	

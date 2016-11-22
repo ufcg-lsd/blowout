@@ -2,7 +2,7 @@ package org.fogbowcloud.blowout.infrastructure.provider;
 
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.infrastructure.exception.RequestResourceException;
-import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
+import org.fogbowcloud.blowout.pool.AbstractResource;
 
 public interface InfrastructureProvider {
 

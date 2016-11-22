@@ -1,6 +1,6 @@
 package org.fogbowcloud.blowout.infrastructure.manager;
 
-import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
+import org.fogbowcloud.blowout.pool.AbstractResource;
 
 public interface ResourceNotifier {
 	

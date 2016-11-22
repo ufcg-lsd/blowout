@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.fogbowcloud.blowout.core.model.Command.Type;
-import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
+import org.fogbowcloud.blowout.pool.AbstractResource;
 import org.json.JSONObject;
 
 public interface Task extends Serializable{
