@@ -16,9 +16,9 @@ import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 import org.fogbowcloud.blowout.pool.AbstractResource;
 import org.fogbowcloud.blowout.pool.BlowoutPool;
 
-public class TaskMonitor {
+public class TaskMonitor implements Runnable{
 
-	Map<Task, TaskProcess> runningProcesses = new HashMap<Task, TaskProcess>();
+	Map<Task, TaskProcess> runningTasks = new HashMap<Task, TaskProcess>();
 	
 	private ExecutorService taskExecutor = Executors.newCachedThreadPool();
 
@@ -26,32 +26,33 @@ public class TaskMonitor {
 	
 	private BlowoutPool pool;
 	
-	public TaskMonitor(BlowoutPool pool) {
+	private long timeout;
+	
+	public TaskMonitor(BlowoutPool pool, long timeout) {
 		this.pool = pool;
+		this.timeout = timeout;
 	}
 	
-	public void start(){
-		executionMonitorTimer.scheduleAtFixedRate(new Runnable() {
-			
-			@Override
-			public void run() {
+	@Override
+	public void run() {
 				procMon();
+				try {
+					Thread.sleep(timeout);
+				} catch (InterruptedException e) {
 			}
-		}, 0, 30000);
 	}
+		
 
 	public void procMon() {
-		List<TaskProcess> processes = new ArrayList<TaskProcess>();
-		processes.addAll(runningProcesses.values());
-		for (TaskProcess tp : processes) {
+		for (TaskProcess tp : getRunningProcesses()) {
 			if (tp.getStatus().equals(TaskState.FAILED)) {
-				runningProcesses.remove(getTaskById(tp.getTaskId()));
+				getRunningTasks().remove(getTaskById(tp.getTaskId()));
 				if (tp.getResource()!= null) {
 					pool.putResource(tp.getResource(), ResourceState.FAILED);
 				}
 			}
 			if (tp.getStatus().equals(TaskState.FINNISHED)) {
-				runningProcesses.remove(getTaskById(tp.getTaskId()));
+				getRunningTasks().remove(getTaskById(tp.getTaskId()));
 				if (tp.getResource()!= null) {
 					pool.putResource(tp.getResource(), ResourceState.IDLE);
 				}
@@ -59,10 +60,21 @@ public class TaskMonitor {
 		}
 	}
 	
+	protected Map<Task, TaskProcess> getRunningTasks(){
+		return this.runningTasks;
+	}
+	
+	protected List<TaskProcess> getRunningProcesses(){
+		List<TaskProcess> processes = new ArrayList<TaskProcess>();
+		processes.addAll(runningTasks.values());
+		return processes;
+	}
+	
 	public void runTask(Task task,final AbstractResource resource) {
 		final TaskProcess tp = createProcess(task);
-		if (runningProcesses.get(task) == null) {
-			runningProcesses.put(task, tp);
+		if (runningTasks.get(task) == null) {
+			runningTasks.put(task, tp);
+			pool.putResource(resource, ResourceState.BUSY);
 		}
 		taskExecutor.submit(new Runnable() {
 			
@@ -74,7 +86,7 @@ public class TaskMonitor {
 	}
 
 	public Task getTaskById(String taskId) {
-		for (Task task : runningProcesses.keySet()) {
+		for (Task task : runningTasks.keySet()) {
 			if (task.getId().equals(taskId)) {
 				return task;
 			}

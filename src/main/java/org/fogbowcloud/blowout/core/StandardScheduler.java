@@ -9,6 +9,7 @@ import org.fogbowcloud.blowout.core.model.Task;
 import org.fogbowcloud.blowout.core.model.TaskProcess;
 import org.fogbowcloud.blowout.core.model.TaskProcessImpl;
 import org.fogbowcloud.blowout.core.model.TaskState;
+import org.fogbowcloud.blowout.core.monitor.TaskMonitor;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 import org.fogbowcloud.blowout.pool.AbstractResource;
 import org.fogbowcloud.blowout.pool.BlowoutPool;
@@ -16,10 +17,10 @@ import org.fogbowcloud.blowout.pool.BlowoutPool;
 public class StandardScheduler implements SchedulerInterface {
 
 	Map<AbstractResource, Task> runningTasks = new HashMap<AbstractResource, Task>();
-	private BlowoutPool blowoutPool;
+	private TaskMonitor taskMon;
 
-	public StandardScheduler(BlowoutPool blowoutPool) {
-		this.blowoutPool = blowoutPool;
+	public StandardScheduler(TaskMonitor taskMon) {
+		this.taskMon = taskMon;
 	}
 
 	@Override
@@ -51,7 +52,6 @@ public class StandardScheduler implements SchedulerInterface {
 		}
 		// if resource is to be removed
 		if (resource.getState().equals(ResourceState.TO_REMOVE)) {
-			runningTasks.get(resource).setState(TaskState.FAILED);
 			runningTasks.remove(resource);
 		}
 
@@ -59,7 +59,7 @@ public class StandardScheduler implements SchedulerInterface {
 
 	protected Task chooseTaskForRunning(List<Task> tasks) {
 		for (Task task : tasks) {
-			if (task.getState().equals(TaskState.READY)) {
+			if (!runningTasks.containsKey(task)) {
 				return task;
 			}
 		}
@@ -79,17 +79,15 @@ public class StandardScheduler implements SchedulerInterface {
 	@Override
 	public void runTask(Task task, AbstractResource resource) {
 
-		blowoutPool.putResource(resource, ResourceState.BUSY);
 		runningTasks.put(resource, task);
 		// submit to task executor
-		task.setState(TaskState.RUNNING);
 		// resource.setState(ResourceState.NOT_READY);
 		submitToMonitor(task, resource);
 
 	}
 
 	public void submitToMonitor(Task task, AbstractResource resource) {
-
+		taskMon.runTask(task, resource);
 	}
 
 	protected TaskProcess createProcess(Task task) {
