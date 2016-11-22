@@ -79,7 +79,7 @@ public class StandardScheduler implements SchedulerInterface {
 	@Override
 	public void runTask(Task task, AbstractResource resource) {
 
-		blowoutPool.allocateResource(resource);
+		blowoutPool.putResource(resource, ResourceState.BUSY);
 		runningTasks.put(resource, task);
 		// submit to task executor
 		task.setState(TaskState.RUNNING);

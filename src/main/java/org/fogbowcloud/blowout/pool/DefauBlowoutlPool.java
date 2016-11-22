@@ -2,6 +2,8 @@ package org.fogbowcloud.blowout.pool;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.fogbowcloud.blowout.core.SchedulerInterface;
 import org.fogbowcloud.blowout.core.model.Task;
@@ -10,7 +12,7 @@ import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 
 public class DefauBlowoutlPool implements BlowoutPool{
 
-	private List<AbstractResource> resourcePool = new ArrayList<AbstractResource>();
+	private Map<String, AbstractResource> resourcePool = new ConcurrentHashMap<String, AbstractResource>();
 	private List<Task> taskPool = new ArrayList<Task>();
 	private InfrastructureManager infraManager;
 	private SchedulerInterface schedulerInterface;
@@ -22,82 +24,50 @@ public class DefauBlowoutlPool implements BlowoutPool{
 	}
 	
 	@Override
-	public synchronized void addResource(AbstractResource resource) {
-		resource.setState(ResourceState.IDLE);
-		resourcePool.add(resource);
-		//TODO send all resources and tasks or filter by values?
+	public void putResource(AbstractResource resource, ResourceState state) {
+		resource.setState(state);
+		resourcePool.put(resource.getId(), resource);
 		try {
 			infraManager.act(getAllResources(), getAllTasks());
 			schedulerInterface.act(getAllTasks(), getAllResources());
 		} catch (Exception e) {
-			// TODO Do what when it fails?
+			// TODO TODO Do what when it fails?
 			e.printStackTrace();
 		}
-	}
-
-	@Override
-	public synchronized void resourceFailed(AbstractResource resource) {
-		resource.setState(ResourceState.FAILED);
 		
 	}
 
-
 	@Override
-	public void releaseResource(AbstractResource resource) {
-		resource.setState(ResourceState.IDLE);
-		try {
-			//FIXME Is there needing to call infraManager.act ???
-			infraManager.act(getAllResources(), getAllTasks());
-			schedulerInterface.act(getAllTasks(), getAllResources());
-		} catch (Exception e) {
-			// TODO Do what when it fails?
-			e.printStackTrace();
-		}
+	public List<AbstractResource> getAllResources() {
+		return new ArrayList<AbstractResource>(resourcePool.values());
 	}
 	
 	@Override
-	public List<AbstractResource> getAllResources() {
-		return new ArrayList<AbstractResource>(resourcePool);
-	}
-
-	@Override
-	public synchronized void allocateResource(AbstractResource resource) {
-		resource.setState(ResourceState.BUSY);
-		
+	public AbstractResource getResourceById(String resourceId) {
+		return resourcePool.get(resourceId);
 	}
 
 	@Override
 	public synchronized void removeResource(AbstractResource resource) {
-		
-		boolean isFreeToRemove = true;
-		
-		if(ResourceState.BUSY.equals(resource.getState())){
-			isFreeToRemove = false;
-		}
-		
-		//TODO verify on scheduler if this resource isn't being used.
-		
-		if(isFreeToRemove){
-			resource.setState(ResourceState.TO_REMOVE);
-		}
-		
+		resourcePool.remove(resource);
 	}
 
 	@Override
-	public synchronized void addTask(Task task) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public synchronized void taskFaild(Task task) {
+	public void putTask(Task task) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public List<Task> getAllTasks() {
-		return new ArrayList<Task>(taskPool);
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Task getTaskById(String taskId) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override

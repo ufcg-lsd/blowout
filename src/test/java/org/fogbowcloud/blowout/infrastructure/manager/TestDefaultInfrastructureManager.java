@@ -15,9 +15,12 @@ import org.fogbowcloud.blowout.core.model.Task;
 import org.fogbowcloud.blowout.core.model.TaskImpl;
 import org.fogbowcloud.blowout.core.model.TaskState;
 import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
+import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 import org.fogbowcloud.blowout.infrastructure.monitor.ResourceMonitor;
 import org.fogbowcloud.blowout.infrastructure.provider.InfrastructureProvider;
+import org.fogbowcloud.blowout.infrastructure.provider.fogbow.FogbowRequirementsHelper;
 import org.fogbowcloud.blowout.pool.AbstractResource;
+import org.fogbowcloud.blowout.pool.ResourceStateHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -267,6 +270,86 @@ public class TestDefaultInfrastructureManager {
 		List<AbstractResource> resources = new ArrayList<AbstractResource>();
 		List<AbstractResource> pendingResources = new ArrayList<AbstractResource>();
 		pendingResources.add(pendingResource);
+		
+		doReturn(pendingResources).when(resourceMonitor).getPendingResources();
+		
+		defaultInfrastructureManager.act(resources, tasks);
+		verify(infraProvider, times(1)).requestResource(specA);
+		verify(resourceMonitor, times(1)).addPendingResource(Mockito.any(AbstractResource.class));
+		
+	}
+	
+	
+	@Test
+	public void testActOnReadyTasksOneIdleResource() throws Exception {
+		
+		String resourceId = "Rsource01";
+		String orderId = "order01";
+		String taskIdA = "Task01";
+		
+		String image = "image";
+		String userName = "userName";
+		String publicKey = "publicKey";
+		String privateKey = "privateKey";
+		String fogbowRequirement = "Glue2vCPU >= 1 && Glue2RAM >= 1024 ";
+		String userDataFile = "scripts/lvl-user-data.sh";
+		String userDataType = "text/x-shellscript";
+		
+		String coreSize = "1";
+		String menSize = "1024";
+		String diskSize = "20";
+		String location = "edu.ufcg.lsd.cloud_1s";
+		
+		Specification specA = new Specification(image, userName, publicKey, privateKey, userDataFile, userDataType);
+		specA.addRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
+		
+		AbstractResource idleResource = new FogbowResource(resourceId, orderId, specA);
+		idleResource.putMetadata(AbstractResource.METADATA_IMAGE, "ImageA");
+		idleResource.putMetadata(AbstractResource.ENV_PRIVATE_KEY_FILE, "path");
+		ResourceStateHelper.changeResourceToState(idleResource, ResourceState.IDLE);
+		
+		
+		idleResource.putMetadata(FogbowResource.METADATA_IMAGE, image);
+		idleResource.putMetadata(FogbowResource.METADATA_PUBLIC_KEY, publicKey);
+		idleResource.putMetadata(FogbowResource.METADATA_VCPU, coreSize);
+		idleResource.putMetadata(FogbowResource.METADATA_MEN_SIZE, menSize);
+		idleResource.putMetadata(FogbowResource.METADATA_DISK_SIZE, diskSize);
+		idleResource.putMetadata(FogbowResource.METADATA_LOCATION, location);
+		
+		Task taskA = new TaskImpl(taskIdA, specA);
+		List<Task> tasks = new ArrayList<Task>();
+		tasks.add(taskA);
+		List<AbstractResource> resources = new ArrayList<AbstractResource>();
+		resources.add(idleResource);
+		List<AbstractResource> pendingResources = new ArrayList<AbstractResource>();
+		
+		doReturn(pendingResources).when(resourceMonitor).getPendingResources();
+		
+		defaultInfrastructureManager.act(resources, tasks);
+		verify(infraProvider, times(0)).requestResource(specA);
+		verify(resourceMonitor, times(0)).addPendingResource(Mockito.any(AbstractResource.class));
+		
+	}
+	
+	@Test
+	public void testActOnReadyTasksOneIdleResourceDiffSpec() throws Exception {
+		
+		String resourceId = "Rsource01";
+		String orderId = "order01";
+		String taskIdA = "Task01";
+		
+		Specification specA = new Specification("ImageA", "Fogbow", "myKeyA", "path");
+		Specification specB = new Specification("ImageB", "Fogbow", "myKeyB", "path");
+
+		Task taskA = new TaskImpl(taskIdA, specA);
+		AbstractResource idleResource = new FogbowResource(resourceId, orderId, specB);
+		ResourceStateHelper.changeResourceToState(idleResource, ResourceState.IDLE);
+		
+		List<Task> tasks = new ArrayList<Task>();
+		tasks.add(taskA);
+		List<AbstractResource> resources = new ArrayList<AbstractResource>();
+		resources.add(idleResource);
+		List<AbstractResource> pendingResources = new ArrayList<AbstractResource>();
 		
 		doReturn(pendingResources).when(resourceMonitor).getPendingResources();
 		

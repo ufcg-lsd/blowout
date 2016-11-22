@@ -12,6 +12,7 @@ import org.fogbowcloud.blowout.core.model.TaskProcess;
 import org.fogbowcloud.blowout.core.model.TaskProcessImpl;
 import org.fogbowcloud.blowout.core.model.TaskState;
 import org.fogbowcloud.blowout.core.util.ManagerTimer;
+import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 import org.fogbowcloud.blowout.pool.AbstractResource;
 import org.fogbowcloud.blowout.pool.BlowoutPool;
 
@@ -46,13 +47,13 @@ public class TaskMonitor {
 			if (tp.getStatus().equals(TaskState.FAILED)) {
 				runningProcesses.remove(getTaskById(tp.getTaskId()));
 				if (tp.getResource()!= null) {
-					pool.resourceFailed(tp.getResource());
+					pool.putResource(tp.getResource(), ResourceState.FAILED);
 				}
 			}
 			if (tp.getStatus().equals(TaskState.FINNISHED)) {
 				runningProcesses.remove(getTaskById(tp.getTaskId()));
 				if (tp.getResource()!= null) {
-					pool.releaseResource(tp.getResource());
+					pool.putResource(tp.getResource(), ResourceState.IDLE);
 				}
 			}
 		}

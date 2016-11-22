@@ -46,14 +46,11 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 					if (resource.match(task.getSpecification())) {
 						resourceResolved = true;
 					}
-
 				}
 				if (!resourceResolved) {
 					incrementDecrementDemand(specsDemand, task.getSpecification(), true);
 				}
-
 			}
-
 		}
 
 		// Reduce demand by pending resources
