@@ -20,8 +20,8 @@ public class TestFogbowResource {
 	
 	@Before
 	public void setUp() throws Exception {
-		
-		resource = spy(new FogbowResource("resource_01","order_01",properties));
+		Specification spec = new Specification("Image01", "Fogbow", "fogbowKey", "privateFile");
+		resource = spy(new FogbowResource("resource_01","order_01", spec));
 	}    
 
 	@After

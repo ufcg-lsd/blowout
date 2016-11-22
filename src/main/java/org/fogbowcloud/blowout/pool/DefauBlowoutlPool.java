@@ -28,8 +28,9 @@ public class DefauBlowoutlPool implements BlowoutPool{
 		//TODO send all resources and tasks or filter by values?
 		try {
 			infraManager.act(getAllResources(), getAllTasks());
+			schedulerInterface.act(getAllTasks(), getAllResources());
 		} catch (Exception e) {
-			// TODO What to do when it fails?
+			// TODO Do what when it fails?
 			e.printStackTrace();
 		}
 	}
@@ -45,9 +46,11 @@ public class DefauBlowoutlPool implements BlowoutPool{
 	public void releaseResource(AbstractResource resource) {
 		resource.setState(ResourceState.IDLE);
 		try {
+			//FIXME Is there needing to call infraManager.act ???
 			infraManager.act(getAllResources(), getAllTasks());
+			schedulerInterface.act(getAllTasks(), getAllResources());
 		} catch (Exception e) {
-			// TODO What to do when it fails?
+			// TODO Do what when it fails?
 			e.printStackTrace();
 		}
 	}

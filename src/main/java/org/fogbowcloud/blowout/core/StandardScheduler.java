@@ -1,5 +1,6 @@
 package org.fogbowcloud.blowout.core;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -96,6 +97,6 @@ public class StandardScheduler implements SchedulerInterface {
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Task> getRunningTasks() {
-		return (List<Task>) runningTasks.values();
+		return new ArrayList<Task>(runningTasks.values());
 	}
 }

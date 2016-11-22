@@ -328,7 +328,7 @@ public class FogbowResourceDatastore {
 		JSONObject jsonSpec = new JSONObject(specification);
 		Specification spec = Specification.fromJSON(jsonSpec);
 		
-		FogbowResource fogbowResource = new FogbowResource(id, spec, orderId);
+		FogbowResource fogbowResource = new FogbowResource(id, orderId, spec);
 		fogbowResource.setInstanceId(instanceId);
 		return fogbowResource; 
 	}

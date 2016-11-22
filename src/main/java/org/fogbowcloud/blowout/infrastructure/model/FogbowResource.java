@@ -14,7 +14,7 @@ public class FogbowResource extends AbstractResource{
 	private final String orderId;
 	private String instanceId;
 	
-	public FogbowResource(String id, Specification spec, String orderId) {
+	public FogbowResource(String id, String orderId, Specification spec) {
 		super(id, spec);
 		this.orderId = orderId;
 	}

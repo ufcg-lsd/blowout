@@ -1,26 +1,33 @@
 package org.fogbowcloud.blowout.core.model;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.fogbowcloud.blowout.core.SchedulerInterface;
 import org.fogbowcloud.blowout.core.StandardScheduler;
-import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
 import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
+import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
+import org.fogbowcloud.blowout.pool.AbstractResource;
+import org.fogbowcloud.blowout.pool.BlowoutPool;
+import org.fogbowcloud.blowout.pool.ResourceStateHelper;
 import org.junit.Before;
 import org.junit.Test;
-import static org.mockito.Mockito.*;
+import org.mockito.Mockito;
 
 
 public class TestStandardScheduler {
 
 	SchedulerInterface sched;
+	BlowoutPool blowoutPool;
 	
 	@Before
 	public void setUp() {
-		this.sched = spy(new StandardScheduler());
+		this.blowoutPool = Mockito.mock(BlowoutPool.class);
+		this.sched = spy(new StandardScheduler(blowoutPool));
 	}
 	
 	@Test
@@ -52,7 +59,7 @@ public class TestStandardScheduler {
 		List<Task> tasks = new ArrayList<Task>();
 		List<AbstractResource> resources = new ArrayList<AbstractResource>();
 		
-		AbstractResource resource = new FogbowResource("resourceId", mock(Specification.class), "fakeOrderId");
+		AbstractResource resource = new FogbowResource("resourceId", "fakeOrderId", mock(Specification.class));
 		
 		resources.add(resource);
 		
@@ -69,8 +76,8 @@ public class TestStandardScheduler {
 		Task task = new TaskImpl("fakeId", mock(Specification.class));
 		tasks.add(task);
 		List<AbstractResource> resources = new ArrayList<AbstractResource>();
-		AbstractResource resource = new FogbowResource("resourceId", mock(Specification.class), "fakeOrderId");
-		
+		AbstractResource resource = new FogbowResource("resourceId", "fakeOrderId", mock(Specification.class));
+		ResourceStateHelper.changeResourceToState(resource, ResourceState.IDLE);
 		resources.add(resource);
 		
 		sched.act(tasks, resources);

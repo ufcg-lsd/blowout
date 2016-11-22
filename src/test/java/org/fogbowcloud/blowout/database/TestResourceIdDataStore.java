@@ -14,6 +14,7 @@ import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
 import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
 import org.junit.After;
@@ -36,6 +37,7 @@ public class TestResourceIdDataStore {
 	
 	Properties properties = null;
 	FogbowResourceDatastore db = null; 
+	Specification spec = new Specification("imageA", "userA", "publicKey", "filePath");
 
 	@Before
 	public void initialize() {		
@@ -57,7 +59,7 @@ public class TestResourceIdDataStore {
 	@Test
 	public void testeAddFogbowResource() throws SQLException, InterruptedException {
 
-		FogbowResource resource = new FogbowResource(FAKE_RESOURCE_ID1, FAKE_ORDER_ID1, properties);
+		FogbowResource resource = new FogbowResource(FAKE_RESOURCE_ID1, FAKE_ORDER_ID1, spec);
 		
 		db.addFogbowResource(resource);
 		List<FogbowResource> fogbowResources = db.getAllFogbowResources();
@@ -73,8 +75,8 @@ public class TestResourceIdDataStore {
 	@Test
 	public void testeAddFogbowResources() throws SQLException, InterruptedException {
 		
-		FogbowResource resourceA = new FogbowResource(FAKE_RESOURCE_ID1, FAKE_ORDER_ID1, properties);
-		FogbowResource resourceB = new FogbowResource(FAKE_RESOURCE_ID2, FAKE_ORDER_ID2, properties);
+		FogbowResource resourceA = new FogbowResource(FAKE_RESOURCE_ID1, FAKE_ORDER_ID1, spec);
+		FogbowResource resourceB = new FogbowResource(FAKE_RESOURCE_ID2, FAKE_ORDER_ID2, spec);
 		
 		List<FogbowResource> fogbowResources = new ArrayList<FogbowResource>();
 		fogbowResources.add(resourceA);
@@ -101,8 +103,8 @@ public class TestResourceIdDataStore {
 	@Test
 	public void testUpdateResource() throws SQLException, InterruptedException {
 		
-		FogbowResource resourceA = new FogbowResource(FAKE_RESOURCE_ID1, FAKE_ORDER_ID1, properties);
-		FogbowResource resourceB = new FogbowResource(FAKE_RESOURCE_ID2, FAKE_ORDER_ID2, properties);
+		FogbowResource resourceA = new FogbowResource(FAKE_RESOURCE_ID1, FAKE_ORDER_ID1, spec);
+		FogbowResource resourceB = new FogbowResource(FAKE_RESOURCE_ID2, FAKE_ORDER_ID2, spec);
 		
 		List<FogbowResource> fogbowResources = new ArrayList<FogbowResource>();
 		fogbowResources.add(resourceA);
@@ -133,8 +135,8 @@ public class TestResourceIdDataStore {
 	@Test
 	public void tesSpecificFogbowResource() throws SQLException, InterruptedException {
 		
-		FogbowResource resourceA = new FogbowResource(FAKE_RESOURCE_ID1, FAKE_ORDER_ID1, properties);
-		FogbowResource resourceB = new FogbowResource(FAKE_RESOURCE_ID2, FAKE_ORDER_ID2, properties);
+		FogbowResource resourceA = new FogbowResource(FAKE_RESOURCE_ID1, FAKE_ORDER_ID1, spec);
+		FogbowResource resourceB = new FogbowResource(FAKE_RESOURCE_ID2, FAKE_ORDER_ID2, spec);
 		
 		List<FogbowResource> fogbowResources = new ArrayList<FogbowResource>();
 		fogbowResources.add(resourceA);
@@ -160,8 +162,8 @@ public class TestResourceIdDataStore {
 	@Test
 	public void testDeleteAll() throws SQLException, InterruptedException {
 		
-		FogbowResource resourceA = new FogbowResource(FAKE_RESOURCE_ID1, FAKE_ORDER_ID1, properties);
-		FogbowResource resourceB = new FogbowResource(FAKE_RESOURCE_ID2, FAKE_ORDER_ID2, properties);
+		FogbowResource resourceA = new FogbowResource(FAKE_RESOURCE_ID1, FAKE_ORDER_ID1, spec);
+		FogbowResource resourceB = new FogbowResource(FAKE_RESOURCE_ID2, FAKE_ORDER_ID2, spec);
 		
 		List<FogbowResource> fogbowResources = new ArrayList<FogbowResource>();
 		fogbowResources.add(resourceA);

@@ -143,7 +143,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		String orderId = getOrderId(requestInformation);
 		String resourceId = String.valueOf(UUID.randomUUID());
 		
-		FogbowResource fogbowResource = new FogbowResource(resourceId, spec, orderId);
+		FogbowResource fogbowResource = new FogbowResource(resourceId, orderId, spec);
 		String requestType = spec
 				.getRequirementValue(FogbowRequirementsHelper.METADATA_FOGBOW_REQUEST_TYPE);
 		fogbowResource.putMetadata(AbstractResource.METADATA_REQUEST_TYPE, requestType);

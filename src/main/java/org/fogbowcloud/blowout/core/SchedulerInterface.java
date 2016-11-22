@@ -9,11 +9,9 @@ public interface SchedulerInterface {
 
 	boolean act(List<Task> tasks, List<AbstractResource> resources);
 	
-
 	void runTask(Task task, AbstractResource resource);
 
 	void stopTask(Task task);
-
 
 	List<Task> getRunningTasks();
 }
