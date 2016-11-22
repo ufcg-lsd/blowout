@@ -36,7 +36,7 @@ public class DefauBlowoutlPool implements BlowoutPool{
 	}
 
 	@Override
-	public synchronized void resourceFaild(AbstractResource resource) {
+	public synchronized void resourceFailed(AbstractResource resource) {
 		resource.setState(ResourceState.FAILED);
 		
 	}

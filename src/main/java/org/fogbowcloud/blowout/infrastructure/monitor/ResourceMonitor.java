@@ -170,7 +170,7 @@ public class ResourceMonitor {
 				if(resource.getConnectionFailTries() >= maxConnectionTries){
 					resourcePool.removeResource(resource);
 				}else{
-					resourcePool.resourceFaild(resource);
+					resourcePool.resourceFailed(resource);
 				}
 				idleResources.remove(resource);
 				return false;

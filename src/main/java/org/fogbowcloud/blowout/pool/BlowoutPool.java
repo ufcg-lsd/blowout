@@ -9,7 +9,7 @@ public interface BlowoutPool{
 	
 	void addResource(AbstractResource resource);
 	
-	void resourceFaild(AbstractResource resource);
+	void resourceFailed(AbstractResource resource);
 	
 	List<AbstractResource> getAllResources();
 	

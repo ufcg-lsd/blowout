@@ -4,22 +4,39 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.fogbowcloud.blowout.core.model.Task;
 import org.fogbowcloud.blowout.core.model.TaskProcess;
 import org.fogbowcloud.blowout.core.model.TaskProcessImpl;
 import org.fogbowcloud.blowout.core.model.TaskState;
+import org.fogbowcloud.blowout.core.util.ManagerTimer;
+import org.fogbowcloud.blowout.pool.AbstractResource;
+import org.fogbowcloud.blowout.pool.BlowoutPool;
 
 public class TaskMonitor {
 
 	Map<Task, TaskProcess> runningProcesses = new HashMap<Task, TaskProcess>();
+	
+	private ExecutorService taskExecutor = Executors.newCachedThreadPool();
 
-	public void monitorTasks(List<Task> tasks) {
-		for (Task task : tasks) {
-			if (runningProcesses.get(task) == null) {
-				runningProcesses.put(task, createProcess(task));
+	private static ManagerTimer executionMonitorTimer = new ManagerTimer(Executors.newScheduledThreadPool(1));
+	
+	private BlowoutPool pool;
+	
+	public TaskMonitor(BlowoutPool pool) {
+		this.pool = pool;
+	}
+	
+	public void start(){
+		executionMonitorTimer.scheduleAtFixedRate(new Runnable() {
+			
+			@Override
+			public void run() {
+				procMon();
 			}
-		}
+		}, 0, 30000);
 	}
 
 	public void procMon() {
@@ -28,11 +45,31 @@ public class TaskMonitor {
 		for (TaskProcess tp : processes) {
 			if (tp.getStatus().equals(TaskState.FAILED)) {
 				runningProcesses.remove(getTaskById(tp.getTaskId()));
+				if (tp.getResource()!= null) {
+					pool.resourceFailed(tp.getResource());
+				}
 			}
-			if (tp.getStatus().equals(TaskState.READY)) {
-				//submit task
+			if (tp.getStatus().equals(TaskState.FINNISHED)) {
+				runningProcesses.remove(getTaskById(tp.getTaskId()));
+				if (tp.getResource()!= null) {
+					pool.releaseResource(tp.getResource());
+				}
 			}
 		}
+	}
+	
+	public void runTask(Task task,final AbstractResource resource) {
+		final TaskProcess tp = createProcess(task);
+		if (runningProcesses.get(task) == null) {
+			runningProcesses.put(task, tp);
+		}
+		taskExecutor.submit(new Runnable() {
+			
+			@Override
+			public void run() {
+				tp.executeTask(resource);
+			}
+		});
 	}
 
 	public Task getTaskById(String taskId) {
