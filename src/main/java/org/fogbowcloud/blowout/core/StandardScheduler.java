@@ -71,6 +71,7 @@ public class StandardScheduler implements SchedulerInterface {
 		// TODO: Find out how to stop the execution of the process
 		for (AbstractResource resource : runningTasks.keySet()) {
 			if (runningTasks.get(resource).equals(task)) {
+				this.taskMon.stopTask(task);
 				runningTasks.remove(resource);
 			}
 		}

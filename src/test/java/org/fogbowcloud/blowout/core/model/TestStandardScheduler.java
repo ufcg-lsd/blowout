@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.fogbowcloud.blowout.core.SchedulerInterface;
 import org.fogbowcloud.blowout.core.StandardScheduler;
+import org.fogbowcloud.blowout.core.monitor.TaskMonitor;
 import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 import org.fogbowcloud.blowout.pool.AbstractResource;
@@ -22,12 +23,12 @@ import org.mockito.Mockito;
 public class TestStandardScheduler {
 
 	SchedulerInterface sched;
-	BlowoutPool blowoutPool;
+	TaskMonitor taskMon;
 	
 	@Before
 	public void setUp() {
-		this.blowoutPool = Mockito.mock(BlowoutPool.class);
-		this.sched = spy(new StandardScheduler(blowoutPool));
+		this.taskMon = Mockito.mock(TaskMonitor.class);
+		this.sched = spy(new StandardScheduler(taskMon));
 	}
 	
 	@Test

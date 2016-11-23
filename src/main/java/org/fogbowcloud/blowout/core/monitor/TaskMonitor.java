@@ -103,4 +103,13 @@ public class TaskMonitor implements Runnable{
 		return tp;
 	}
 
+	public void stopTask(Task task) {
+		TaskProcess processToHalt = getRunningTasks().get(task);
+		if (processToHalt != null) {
+			if (processToHalt.getResource() != null) {
+				pool.updateResource(processToHalt.getResource(), ResourceState.FAILED);
+			}
+		}
+		
+	}
 }
