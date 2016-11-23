@@ -72,17 +72,21 @@ public class TaskMonitor implements Runnable{
 	
 	public void runTask(Task task,final AbstractResource resource) {
 		final TaskProcess tp = createProcess(task);
-		if (runningTasks.get(task) == null) {
-			runningTasks.put(task, tp);
+		if (getRunningTasks().get(task) == null) {
+			getRunningTasks().put(task, tp);
 			pool.putResource(resource, ResourceState.BUSY);
 		}
-		taskExecutor.submit(new Runnable() {
+		getExecutorService().submit(new Runnable() {
 			
 			@Override
 			public void run() {
 				tp.executeTask(resource);
 			}
 		});
+	}
+	
+	protected ExecutorService getExecutorService() {
+		return this.taskExecutor;
 	}
 
 	public Task getTaskById(String taskId) {
