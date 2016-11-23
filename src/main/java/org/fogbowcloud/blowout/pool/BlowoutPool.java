@@ -3,12 +3,13 @@ package org.fogbowcloud.blowout.pool;
 import java.util.List;
 
 import org.fogbowcloud.blowout.core.model.Task;
-import org.fogbowcloud.blowout.infrastructure.manager.ResourceNotifier;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 
 public interface BlowoutPool{
 	
-	void putResource(AbstractResource resource, ResourceState state);
+	void addResource(AbstractResource resource);
+	
+	void updateResource(AbstractResource resource, ResourceState state);
 	
 	List<AbstractResource> getAllResources();
 	
