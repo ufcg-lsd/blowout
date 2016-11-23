@@ -24,17 +24,26 @@ public class DefauBlowoutlPool implements BlowoutPool{
 	}
 	
 	@Override
-	public void putResource(AbstractResource resource, ResourceState state) {
-		resource.setState(state);
+	public void addResource(AbstractResource resource) {
+		resource.setState(ResourceState.IDLE);
 		resourcePool.put(resource.getId(), resource);
-		try {
-			infraManager.act(getAllResources(), getAllTasks());
-			schedulerInterface.act(getAllTasks(), getAllResources());
-		} catch (Exception e) {
-			// TODO TODO Do what when it fails?
-			e.printStackTrace();
-		}
+	}
+	
+	@Override
+	public void updateResource(AbstractResource resource, ResourceState state) {
 		
+		AbstractResource oldResource = resourcePool.get(resource.getId());
+		if(oldResource != null){
+			oldResource.setState(state);
+			resourcePool.put(resource.getId(), oldResource);
+			try {
+				infraManager.act(getAllResources(), getAllTasks());
+				schedulerInterface.act(getAllTasks(), getAllResources());
+			} catch (Exception e) {
+				// TODO TODO Do what when it fails?
+				e.printStackTrace();
+			}
+		}
 	}
 
 	@Override
@@ -75,6 +84,7 @@ public class DefauBlowoutlPool implements BlowoutPool{
 		// TODO Auto-generated method stub
 		
 	}
+
 
 	
 

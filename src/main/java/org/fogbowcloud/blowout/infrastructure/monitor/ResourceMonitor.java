@@ -96,7 +96,7 @@ public class ResourceMonitor {
 				resource = infraProvider.getResource(resource.getId());
 				if (ResourceState.IDLE.equals(resource.getState())) {
 					pendingResources.remove(resource);
-					resourcePool.putResource(resource, ResourceState.IDLE);
+					resourcePool.updateResource(resource, ResourceState.IDLE);
 				}
 			}
 		}
@@ -147,7 +147,7 @@ public class ResourceMonitor {
 						Date expirationDate = new Date(since.longValue());
 						Date currentDate = new Date();
 						if (expirationDate.before(currentDate)) {
-							resourcePool.putResource(resource, ResourceState.TO_REMOVE);
+							resourcePool.updateResource(resource, ResourceState.TO_REMOVE);
 							idleResources.remove(resource);
 						}
 					}
@@ -159,18 +159,18 @@ public class ResourceMonitor {
 			if(resource.getReusedTimes() < maxReuse){
 				idleResources.put(resource.getId(), Long.valueOf(new Date().getTime()));
 				//TODO this should be called here?
-				resourcePool.putResource(resource, ResourceState.IDLE);
+				resourcePool.updateResource(resource, ResourceState.IDLE);
 			}else{
-				resourcePool.putResource(resource, ResourceState.TO_REMOVE);
+				resourcePool.updateResource(resource, ResourceState.TO_REMOVE);
 			}
 		}
 
 		private boolean checkResourceConnectivity(AbstractResource resource) {
 			if (!resource.checkConnectivity()) {
 				if(resource.getConnectionFailTries() >= maxConnectionTries){
-					resourcePool.putResource(resource, ResourceState.TO_REMOVE);
+					resourcePool.updateResource(resource, ResourceState.TO_REMOVE);
 				}else{
-					resourcePool.putResource(resource, ResourceState.FAILED);
+					resourcePool.updateResource(resource, ResourceState.FAILED);
 				}
 				return false;
 			}

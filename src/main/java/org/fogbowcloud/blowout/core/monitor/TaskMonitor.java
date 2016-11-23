@@ -48,13 +48,13 @@ public class TaskMonitor implements Runnable{
 			if (tp.getStatus().equals(TaskState.FAILED)) {
 				getRunningTasks().remove(getTaskById(tp.getTaskId()));
 				if (tp.getResource()!= null) {
-					pool.putResource(tp.getResource(), ResourceState.FAILED);
+					pool.updateResource(tp.getResource(), ResourceState.FAILED);
 				}
 			}
 			if (tp.getStatus().equals(TaskState.FINNISHED)) {
 				getRunningTasks().remove(getTaskById(tp.getTaskId()));
 				if (tp.getResource()!= null) {
-					pool.putResource(tp.getResource(), ResourceState.IDLE);
+					pool.updateResource(tp.getResource(), ResourceState.IDLE);
 				}
 			}
 		}
@@ -74,7 +74,7 @@ public class TaskMonitor implements Runnable{
 		final TaskProcess tp = createProcess(task);
 		if (getRunningTasks().get(task) == null) {
 			getRunningTasks().put(task, tp);
-			pool.putResource(resource, ResourceState.BUSY);
+			pool.updateResource(resource, ResourceState.BUSY);
 		}
 		getExecutorService().submit(new Runnable() {
 			

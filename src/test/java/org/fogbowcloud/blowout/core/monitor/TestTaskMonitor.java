@@ -50,8 +50,8 @@ public class TestTaskMonitor {
 		
 		
 		this.taskMon.procMon();
-		verify(pool, never()).putResource(fakeResource, ResourceState.FAILED);
-		verify(pool, never()).putResource(fakeResource, ResourceState.IDLE);
+		verify(pool, never()).updateResource(fakeResource, ResourceState.FAILED);
+		verify(pool, never()).updateResource(fakeResource, ResourceState.IDLE);
 	}
 	
 	@Test
@@ -73,8 +73,8 @@ public class TestTaskMonitor {
 		
 		this.taskMon.procMon();
 		
-		verify(pool).putResource(fakeResource, ResourceState.FAILED);
-		verify(pool, never()).putResource(fakeResource, ResourceState.IDLE);
+		verify(pool).updateResource(fakeResource, ResourceState.FAILED);
+		verify(pool, never()).updateResource(fakeResource, ResourceState.IDLE);
 	}
 	
 	@Test
@@ -96,8 +96,8 @@ public class TestTaskMonitor {
 		
 		this.taskMon.procMon();
 		
-		verify(pool, never()).putResource(fakeResource, ResourceState.FAILED);
-		verify(pool ).putResource(fakeResource, ResourceState.IDLE);
+		verify(pool, never()).updateResource(fakeResource, ResourceState.FAILED);
+		verify(pool ).updateResource(fakeResource, ResourceState.IDLE);
 	}
 	
 	@Test
@@ -110,7 +110,7 @@ public class TestTaskMonitor {
 		List<TaskProcess> runningPrc = new ArrayList<TaskProcess>();
 		runningPrc.add(fakeProcess);
 		doReturn(runningPrc).when(this.taskMon).getRunningProcesses();
-		doNothing().when(pool).putResource(fakeResource, ResourceState.BUSY);
+		doNothing().when(pool).updateResource(fakeResource, ResourceState.BUSY);
 		ExecutorService execServ = mock(ExecutorService.class);
 		doReturn(execServ).when(this.taskMon).getExecutorService();
 		doReturn(mock(Future.class)).when(execServ).submit(any(Runnable.class));
