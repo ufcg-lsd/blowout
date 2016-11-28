@@ -39,6 +39,8 @@ public class TaskProcessImpl implements TaskProcess {
 	private String processId;
 
 	private String userId;
+	
+	private AbstractResource resource;
 
 	public TaskProcessImpl(String taskId, List<Command> commandList, Specification spec) {
 		// check parameters?
@@ -67,7 +69,7 @@ public class TaskProcessImpl implements TaskProcess {
 
 	@Override
 	public TaskExecutionResult executeTask(AbstractResource resource) {
-		
+		this.resource = resource;
 		localCommandInterpreter = resource.getLocalCommandInterpreter();
 
 		TaskExecutionResult taskExecutionResult = new TaskExecutionResult();
@@ -201,8 +203,7 @@ public class TaskProcessImpl implements TaskProcess {
 
 	@Override
 	public AbstractResource getResource() {
-		// TODO Auto-generated method stub
-		return null;
+		return resource;
 	}
 
 }

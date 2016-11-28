@@ -23,23 +23,39 @@ public class TaskMonitor implements Runnable{
 	private ExecutorService taskExecutor = Executors.newCachedThreadPool();
 
 	private static ManagerTimer executionMonitorTimer = new ManagerTimer(Executors.newScheduledThreadPool(1));
+	private Thread monitoringServiceRunner;
 	
 	private BlowoutPool pool;
 	
 	private long timeout;
+	
+	private boolean active = false;
 	
 	public TaskMonitor(BlowoutPool pool, long timeout) {
 		this.pool = pool;
 		this.timeout = timeout;
 	}
 	
+	public void start() {
+		active = true;
+		monitoringServiceRunner = new Thread(this);
+		monitoringServiceRunner.start();
+	}
+	
+	public void stop(){
+		active = false;
+		monitoringServiceRunner.interrupt();
+	}
+	
 	@Override
 	public void run() {
-				procMon();
-				try {
-					Thread.sleep(timeout);
-				} catch (InterruptedException e) {
+		while(active){
+			procMon();
+			try {
+				Thread.sleep(timeout);
+			} catch (InterruptedException e) {
 			}
+		}
 	}
 		
 
@@ -52,7 +68,9 @@ public class TaskMonitor implements Runnable{
 				}
 			}
 			if (tp.getStatus().equals(TaskState.FINNISHED)) {
-				getRunningTasks().remove(getTaskById(tp.getTaskId()));
+				Task task = getTaskById(tp.getTaskId());
+				task.finish();
+				getRunningTasks().remove(task);
 				if (tp.getResource()!= null) {
 					pool.updateResource(tp.getResource(), ResourceState.IDLE);
 				}
@@ -85,6 +103,18 @@ public class TaskMonitor implements Runnable{
 		});
 	}
 	
+	public TaskState getTaskState(Task task){
+		
+		TaskProcess tp = runningTasks.get(task);
+		if(tp == null){
+			if(task.isFinished()){
+				return TaskState.COMPLETED;
+			}
+			return TaskState.READY;
+		}
+		return tp.getStatus();
+	}
+	
 	protected ExecutorService getExecutorService() {
 		return this.taskExecutor;
 	}
@@ -107,7 +137,7 @@ public class TaskMonitor implements Runnable{
 		TaskProcess processToHalt = getRunningTasks().get(task);
 		if (processToHalt != null) {
 			if (processToHalt.getResource() != null) {
-				pool.updateResource(processToHalt.getResource(), ResourceState.FAILED);
+				pool.updateResource(processToHalt.getResource(), ResourceState.IDLE);
 			}
 		}
 		

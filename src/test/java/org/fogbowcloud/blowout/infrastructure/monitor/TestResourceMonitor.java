@@ -1,12 +1,19 @@
 package org.fogbowcloud.blowout.infrastructure.monitor;
 
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
+import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
+import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
+import org.fogbowcloud.blowout.infrastructure.monitor.ResourceMonitor.MonitoringService;
 import org.fogbowcloud.blowout.infrastructure.provider.InfrastructureProvider;
 import org.fogbowcloud.blowout.pool.AbstractResource;
 import org.fogbowcloud.blowout.pool.BlowoutPool;
@@ -27,12 +34,11 @@ public class TestResourceMonitor {
 		infraProvider = Mockito.mock(InfrastructureProvider.class);
 		resourcePool = Mockito.mock(BlowoutPool.class);
 		Properties properties = new Properties();
-		properties.setProperty(AppPropertiesConstants.INFRA_MONITOR_PERIOD, "120000");
+		properties.setProperty(AppPropertiesConstants.INFRA_MONITOR_PERIOD, "1000");
 		properties.setProperty(AppPropertiesConstants.INFRA_RESOURCE_IDLE_LIFETIME, "120000");
 		properties.setProperty(AppPropertiesConstants.INFRA_RESOURCE_CONNECTION_RETRY, "3");
 		
 		resourceMonitor = Mockito.spy(new ResourceMonitor(infraProvider, resourcePool, properties));
-		
 	}
 
 	@After
@@ -41,155 +47,64 @@ public class TestResourceMonitor {
 	}
 
 	@Test
-	public void propertiesEmptyTest() throws Exception {
+	public void testProcessPendingResource() throws Exception {
 
 		List<AbstractResource> resources = new ArrayList<AbstractResource>();
 		
+		String resourceId = "resourceA";
+		String orderId = "orderA";
+		
+		Specification specA = new Specification("ImageA", "Fogbow", "myKeyA", "path");
+		
+		AbstractResource resource = new FogbowResource(resourceId, orderId, specA);
+		
 		doReturn(resources).when(resourcePool).getAllResources();
+		doReturn(resource).when(infraProvider).getResource(resourceId);
+		
+		resourceMonitor.addPendingResource(resourceId, specA);
+		resourceMonitor.getMonitoringService().monitorProcess();
+		
+		verify(resourcePool, times(1)).addResource(resource);
+		assertTrue(resourceMonitor.getPendingResources().isEmpty());
+
+	}
+	
+	@Test
+	public void testProcessTwoPendingResourceOnReady() throws Exception {
+
+		List<AbstractResource> resources = new ArrayList<AbstractResource>();
+		
+		String resourceIdA = "resourceA";
+		String orderIdA = "orderA";
+		
+		String resourceIdB = "resourceB";
+		String orderIdB = "orderB";
+		
+		Specification spec = new Specification("ImageA", "Fogbow", "myKeyA", "path");
+		
+		AbstractResource resource = new FogbowResource(resourceIdA, orderIdA, spec);
+		
+		doReturn(resources).when(resourcePool).getAllResources();
+		doReturn(resource).when(infraProvider).getResource(resourceIdA);
+		doReturn(null).when(infraProvider).getResource(resourceIdB);
+		
+		resourceMonitor.addPendingResource(resourceIdA, spec);
+		resourceMonitor.addPendingResource(resourceIdB, spec);
+		resourceMonitor.getMonitoringService().monitorProcess();
+		
+		verify(resourcePool, times(1)).addResource(resource);
+		assertEquals(1, resourceMonitor.getPendingResources().size());
 
 	}
 	
 	
-//	private boolean paused = false;
-//	private boolean active = true;
-//
-//	@Override
-//	public void run() {
-//
-//		while (active) {
-//
-//			try {
-//
-//				List<AbstractResource> resources = resourcePool.getAllResources();
-//
-//				checkIsPaused();
-//
-//				if (resources.isEmpty() && resources.isEmpty()) {
-//					pause();
-//					monitoringServiceRunner.join();
-//				} else {
-//					monitoringPendingResources();
-//					monitoringResources(resources);
-//					Thread.sleep(infraMonitoringPeriod);
-//				}
-//			} catch (InterruptedException e) {
-//				LOGGER.error("Error while executing MonitoringService");
-//			}
-//		}
-//
-//	}
-//	
-//	private void monitoringPendingResources() {
-//
-//		for (AbstractResource resource : getPendingResources()) {
-//			resource = infraProvider.getResource(resource.getId());
-//			if (ResourceState.READY.equals(resource.getState())) {
-//				resource.setState(ResourceState.READY);
-//				pendingResources.remove(resource);
-//				resourcePool.addResource(resource);
-//			}
-//		}
-//	}
-//	
-//	private void monitoringResources(List<AbstractResource> resources) {
-//
-//		for (AbstractResource resource : resources) {
-//
-//			if (ResourceState.READY.equals(resource.getState())) {
-//				this.checkResourceConnectivity(resource);
-//			} else if (ResourceState.IDLE.equals(resource.getState())) {
-//				resolveIdleResource(resource);
-//			} else if (ResourceState.BUSY.equals(resource.getState())) {
-//				idleResources.remove(resource);
-//			} else if (ResourceState.FAILED.equals(resource.getState())) {
-//				boolean isAlive = this.checkResourceConnectivity(resource);
-//				if(isAlive){
-//					moveResourceToIdle(resource);
-//				}
-//			} else if (ResourceState.TO_REMOVE.equals(resource.getState())) {
-//				try {
-//					infraProvider.deleteResource(resource.getId());
-//					resourcePool.removeResource(resource);
-//					idleResources.remove(resource);
-//				} catch (Exception e) {
-//					LOGGER.error("Error while tring to remove resource "+resource.getId()+" - "+e.getMessage());
-//				}
-//				
-//			}
-//
-//		}
-//	}
-//
-//	private void resolveIdleResource(AbstractResource resource) {
-//
-//		Long since = idleResources.get(resource);
-//
-//		// If since == null, resource must go to IDLE list.
-//		if (since == null) {
-//			moveResourceToIdle(resource);
-//		} else {
-//
-//			String requestType = resource.getMetadataValue(AbstractResource.METADATA_REQUEST_TYPE);
-//			if (OrderType.ONE_TIME.getValue().equals(requestType)) {
-//
-//				boolean isAlive = checkResourceConnectivity(resource);
-//				// Has expiration time?
-//				if (isAlive && noExpirationTime.compareTo(idleLifeTime) != 0) {
-//					Date expirationDate = new Date(since.longValue());
-//					Date currentDate = new Date();
-//					if (expirationDate.before(currentDate)) {
-//						resource.setState(ResourceState.TO_REMOVE);
-//						idleResources.remove(resource);
-//					}
-//				}
-//			}
-//		}
-//	}
-//
-//	private void moveResourceToIdle(AbstractResource resource) {
-//		resource.setState(ResourceState.IDLE);
-//		idleResources.put(resource, Long.valueOf(new Date().getTime()));
-//		//TODO this should be called here?
-//		resourcePool.releaseResource(resource);
-//	}
-//
-//	private boolean checkResourceConnectivity(AbstractResource resource) {
-//		if (!resource.checkConnectivity()) {
-//			if(resource.getConnectionFailTries() >= maxConnectionTries){
-//				resource.setState(ResourceState.TO_REMOVE);
-//			}else{
-//				resource.setState(ResourceState.FAILED);
-//			}
-//			idleResources.remove(resource);
-//			return false;
-//		}
-//		return true;
-//	}
-//
-//	public void checkIsPaused() throws InterruptedException {
-//		synchronized (this) {
-//			while (paused) {
-//				wait();
-//			}
-//		}
-//	}
-//	
-//
-//	public synchronized void stop() {
-//		active = false;
-//	}
-//
-//	public synchronized void pause() {
-//		paused = true;
-//	}
-//
-//	public synchronized void resume() {
-//		paused = false;
-//		notify();
-//	}
-//
-//	public boolean isPaused() {
-//		return paused;
-//	}
+	@Test
+	public void testPause() throws Exception {
+
+		resourceMonitor.getMonitoringService().monitorProcess();
+		assertTrue(resourceMonitor.getMonitoringService().isPaused());
+
+	}
+	
 	
 }

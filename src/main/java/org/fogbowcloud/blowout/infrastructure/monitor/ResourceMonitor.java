@@ -8,6 +8,7 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
+import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 import org.fogbowcloud.blowout.infrastructure.provider.InfrastructureProvider;
@@ -22,7 +23,7 @@ public class ResourceMonitor {
 	private InfrastructureProvider infraProvider;
 	private BlowoutPool resourcePool;
 	private Map<String, Long> idleResources = new ConcurrentHashMap<String, Long>();
-	private List<AbstractResource> pendingResources = new ArrayList<AbstractResource>();
+	private Map<String, Specification> pendingResources = new ConcurrentHashMap<String, Specification>();
 
 	private Thread monitoringServiceRunner;
 	private MonitoringService monitoringService;
@@ -32,11 +33,11 @@ public class ResourceMonitor {
 	private int maxConnectionTries;
 	private int maxReuse;
 	
-	public ResourceMonitor(InfrastructureProvider infraProvider, BlowoutPool resourcePool, Properties properties) {
+	public ResourceMonitor(InfrastructureProvider infraProvider, BlowoutPool blowoutPool, Properties properties) {
 		this.infraProvider = infraProvider;
-		this.resourcePool = resourcePool;
+		this.resourcePool = blowoutPool;
 		infraMonitoringPeriod = Long
-				.parseLong(properties.getProperty(AppPropertiesConstants.INFRA_MONITOR_PERIOD, "0"));
+				.parseLong(properties.getProperty(AppPropertiesConstants.INFRA_MONITOR_PERIOD, "30000"));
 		this.idleLifeTime = Long
 				.parseLong(properties.getProperty(AppPropertiesConstants.INFRA_RESOURCE_IDLE_LIFETIME, "0"));
 		this.maxConnectionTries = Integer
@@ -44,16 +45,22 @@ public class ResourceMonitor {
 		this.maxReuse = Integer
 				.parseInt(properties.getProperty(AppPropertiesConstants.INFRA_RESOURCE_REUSE_TIMES, "1"));
 		
+		monitoringService = new MonitoringService();
+		monitoringServiceRunner = new Thread(monitoringService);
+		List<AbstractResource> previouResources = infraProvider.getAllResources();
+		if (previouResources != null && !previouResources.isEmpty()) {
+			resourcePool.addResourceList(previouResources);
+		}
+		
 	}
 
 	public void start() {
-		monitoringService = new MonitoringService();
-		monitoringServiceRunner = new Thread(monitoringService);
 		monitoringServiceRunner.start();
+		LOGGER.warn("Started");
 	}
 
-	public void addPendingResource(AbstractResource resource){
-		pendingResources.add(resource);
+	public void addPendingResource(String resourceId, Specification spec){
+		pendingResources.put(resourceId, spec);
 		if(monitoringService.isPaused()){
 			monitoringService.resume();
 		}
@@ -70,33 +77,31 @@ public class ResourceMonitor {
 			while (active) {
 
 				try {
-
-					List<AbstractResource> resources = resourcePool.getAllResources();
-
-					checkIsPaused();
-
-					if (resources.isEmpty() && resources.isEmpty()) {
-						pause();
-						monitoringServiceRunner.join();
-					} else {
-						monitoringPendingResources();
-						monitoringResources(resources);
-						Thread.sleep(infraMonitoringPeriod);
-					}
+					//checkIsPaused();
+					monitorProcess();
+					Thread.sleep(infraMonitoringPeriod);
+					
 				} catch (InterruptedException e) {
 					LOGGER.error("Error while executing MonitoringService");
 				}
 			}
 
 		}
+
+		protected void monitorProcess() throws InterruptedException {
+			
+			List<AbstractResource> resources = resourcePool.getAllResources();
+			monitoringPendingResources();
+			monitoringResources(resources);
+		}
 		
 		private void monitoringPendingResources() {
 
-			for (AbstractResource resource : getPendingResources()) {
-				resource = infraProvider.getResource(resource.getId());
-				if (ResourceState.IDLE.equals(resource.getState())) {
-					pendingResources.remove(resource);
-					resourcePool.updateResource(resource, ResourceState.IDLE);
+			for (String resourceId : getPendingResources()) {
+				AbstractResource resource = infraProvider.getResource(resourceId);
+				if (resource != null) {
+					pendingResources.remove(resourceId);
+					resourcePool.addResource(resource);
 				}
 			}
 		}
@@ -131,7 +136,7 @@ public class ResourceMonitor {
 
 		private void resolveIdleResource(AbstractResource resource) {
 
-			Long since = idleResources.get(resource);
+			Long since = idleResources.get(resource.getId());
 
 			// If since == null, resource must go to IDLE list.
 			if (since == null) {
@@ -159,7 +164,7 @@ public class ResourceMonitor {
 			if(resource.getReusedTimes() < maxReuse){
 				idleResources.put(resource.getId(), Long.valueOf(new Date().getTime()));
 				//TODO this should be called here?
-				resourcePool.updateResource(resource, ResourceState.IDLE);
+				//resourcePool.updateResource(resource, ResourceState.IDLE);
 			}else{
 				resourcePool.updateResource(resource, ResourceState.TO_REMOVE);
 			}
@@ -187,6 +192,9 @@ public class ResourceMonitor {
 		
 
 		public synchronized void stop() {
+			if(paused){
+				resume();
+			}
 			active = false;
 		}
 
@@ -211,12 +219,20 @@ public class ResourceMonitor {
 		monitoringService.stop();
 	}
 
+	protected void setMonitoringService(MonitoringService monitoringService){
+		this.monitoringService = monitoringService;
+	}
+	
 	protected MonitoringService getMonitoringService(){
 		return monitoringService;
 	}
 	
-	public List<AbstractResource> getPendingResources() {
-		return new ArrayList<AbstractResource>(pendingResources);
+	public List<String> getPendingResources() {
+		return new ArrayList<String>(pendingResources.keySet());
+	}
+	
+	public List<Specification> getPendingSpecification() {
+		return new ArrayList<Specification>(pendingResources.values());
 	}
 	
 }

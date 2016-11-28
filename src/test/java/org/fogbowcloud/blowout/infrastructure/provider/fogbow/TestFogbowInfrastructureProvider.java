@@ -108,8 +108,8 @@ public class TestFogbowInfrastructureProvider {
 
 			fogbowInfrastructureProvider.setHttpWrapper(httpWrapperMock);
 
-			AbstractResource resource = fogbowInfrastructureProvider.requestResource(specs);
-			assertEquals(requestIdMokc, resource.getId());
+			String resourceId = fogbowInfrastructureProvider.requestResource(specs);
+			assertEquals(requestIdMokc, resourceId);
 
 		} catch (Exception e) {
 			e.printStackTrace();

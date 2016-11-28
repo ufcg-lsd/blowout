@@ -53,23 +53,21 @@ public class TestDefaultInfrastructureManager {
 	public void testActOneReadyTaskNoResource() throws Exception {
 		
 		String resourceId = "Rsource01";
-		String orderId = "order01";
 		String taskId = "Task01";
 		Specification spec = new Specification("Image", "Fogbow", "myKey", "path");
 
 		Task task = new TaskImpl(taskId, spec);
-		AbstractResource newResource = new FogbowResource(resourceId, orderId, spec);
 		
 		List<Task> tasks = new ArrayList<Task>();
 		tasks.add(task);
 		List<AbstractResource> resources = new ArrayList<AbstractResource>();
 		
-		doReturn(newResource).when(infraProvider).requestResource(spec);
+		doReturn(resourceId).when(infraProvider).requestResource(spec);
 		doReturn(new ArrayList<AbstractResource>()).when(resourceMonitor).getPendingResources();
 		
 		defaultInfrastructureManager.act(resources, tasks);
 		verify(infraProvider, times(1)).requestResource(spec);
-		verify(resourceMonitor, times(1)).addPendingResource(newResource);
+		verify(resourceMonitor, times(1)).addPendingResource(resourceId, spec);
 		
 	}
 	
@@ -99,10 +97,10 @@ public class TestDefaultInfrastructureManager {
 		AbstractResource newResourceB = new FogbowResource(resourceIdB, orderIdB, spec);
 		AbstractResource newResourceC = new FogbowResource(resourceIdC, orderIdC, spec);
 		
-		final Queue<AbstractResource> resourcesToReturn = new LinkedList<AbstractResource>();
-		resourcesToReturn.add(newResourceA);
-		resourcesToReturn.add(newResourceB);
-		resourcesToReturn.add(newResourceC);
+		final Queue<String> resourcesToReturn = new LinkedList<String>();
+		resourcesToReturn.add(resourceIdA);
+		resourcesToReturn.add(resourceIdB);
+		resourcesToReturn.add(resourceIdC);
 		
 		List<Task> tasks = new ArrayList<Task>();
 		tasks.add(taskA);
@@ -110,10 +108,10 @@ public class TestDefaultInfrastructureManager {
 		tasks.add(taskC);
 		List<AbstractResource> resources = new ArrayList<AbstractResource>();
 		
-		Answer<AbstractResource> requestResourceAnswer = new Answer<AbstractResource>() {
+		Answer<String> requestResourceAnswer = new Answer<String>() {
 			
 			@Override
-			public AbstractResource answer(InvocationOnMock invocation) throws Throwable {
+			public String answer(InvocationOnMock invocation) throws Throwable {
 				return resourcesToReturn.poll();
 			}
 		};
@@ -123,9 +121,9 @@ public class TestDefaultInfrastructureManager {
 		
 		defaultInfrastructureManager.act(resources, tasks);
 		verify(infraProvider, times(3)).requestResource(spec);
-		verify(resourceMonitor, times(1)).addPendingResource(newResourceA);
-		verify(resourceMonitor, times(1)).addPendingResource(newResourceB);
-		verify(resourceMonitor, times(1)).addPendingResource(newResourceC);
+		verify(resourceMonitor, times(1)).addPendingResource(resourceIdA, spec);
+		verify(resourceMonitor, times(1)).addPendingResource(resourceIdB, spec);
+		verify(resourceMonitor, times(1)).addPendingResource(resourceIdC, spec);
 		
 	}
 	
@@ -167,10 +165,10 @@ public class TestDefaultInfrastructureManager {
 		AbstractResource newResourceB = new FogbowResource(resourceIdB, orderIdB, spec);
 		AbstractResource newResourceC = new FogbowResource(resourceIdC, orderIdC, spec);
 		
-		final Queue<AbstractResource> resourcesToReturn = new LinkedList<AbstractResource>();
-		resourcesToReturn.add(newResourceA);
-		resourcesToReturn.add(newResourceB);
-		resourcesToReturn.add(newResourceC);
+		final Queue<String> resourcesToReturn = new LinkedList<String>();
+		resourcesToReturn.add(resourceIdA);
+		resourcesToReturn.add(resourceIdB);
+		resourcesToReturn.add(resourceIdC);
 		
 		List<Task> tasks = new ArrayList<Task>();
 		tasks.add(taskA);
@@ -182,10 +180,10 @@ public class TestDefaultInfrastructureManager {
 		
 		List<AbstractResource> resources = new ArrayList<AbstractResource>();
 		
-		Answer<AbstractResource> requestResourceAnswer = new Answer<AbstractResource>() {
+		Answer<String> requestResourceAnswer = new Answer<String>() {
 			
 			@Override
-			public AbstractResource answer(InvocationOnMock invocation) throws Throwable {
+			public String answer(InvocationOnMock invocation) throws Throwable {
 				return resourcesToReturn.poll();
 			}
 		};
@@ -195,7 +193,7 @@ public class TestDefaultInfrastructureManager {
 		
 		defaultInfrastructureManager.act(resources, tasks);
 		verify(infraProvider, times(1)).requestResource(spec);
-		verify(resourceMonitor, times(1)).addPendingResource(newResourceA);
+		verify(resourceMonitor, times(1)).addPendingResource(resourceIdA, spec);
 		
 	}
 	
@@ -208,19 +206,21 @@ public class TestDefaultInfrastructureManager {
 		Specification spec = new Specification("Image", "Fogbow", "myKey", "path");
 
 		Task task = new TaskImpl(taskId, spec);
-		AbstractResource pendingResource = new FogbowResource(resourceId, orderId, spec);
 		
 		List<Task> tasks = new ArrayList<Task>();
 		tasks.add(task);
 		List<AbstractResource> resources = new ArrayList<AbstractResource>();
-		List<AbstractResource> pendingResources = new ArrayList<AbstractResource>();
-		pendingResources.add(pendingResource);
+		List<String> pendingResources = new ArrayList<String>();
+		pendingResources.add(resourceId);
+		List<Specification> pendingSpecs = new ArrayList<Specification>();
+		pendingSpecs.add(spec);
 		
 		doReturn(pendingResources).when(resourceMonitor).getPendingResources();
+		doReturn(pendingSpecs).when(resourceMonitor).getPendingSpecification();
 		
 		defaultInfrastructureManager.act(resources, tasks);
 		verify(infraProvider, times(0)).requestResource(spec);
-		verify(resourceMonitor, times(0)).addPendingResource(Mockito.any(AbstractResource.class));
+		verify(resourceMonitor, times(0)).addPendingResource(Mockito.any(String.class), Mockito.any(Specification.class));
 		
 	}
 	
@@ -228,27 +228,28 @@ public class TestDefaultInfrastructureManager {
 	public void testActTwoReadyTasksOnePendingResource() throws Exception {
 		
 		String resourceId = "Rsource01";
-		String orderId = "order01";
 		String taskIdA = "Task01";
 		String taskIdB = "Task02";
 		Specification spec = new Specification("Image", "Fogbow", "myKey", "path");
 
 		Task taskA = new TaskImpl(taskIdA, spec);
 		Task taskB = new TaskImpl(taskIdB, spec);
-		AbstractResource pendingResource = new FogbowResource(resourceId, orderId, spec);
 		
 		List<Task> tasks = new ArrayList<Task>();
 		tasks.add(taskA);
 		tasks.add(taskB);
 		List<AbstractResource> resources = new ArrayList<AbstractResource>();
-		List<AbstractResource> pendingResources = new ArrayList<AbstractResource>();
-		pendingResources.add(pendingResource);
+		List<String> pendingResources = new ArrayList<String>();
+		pendingResources.add(resourceId);
+		List<Specification> pendingSpecs = new ArrayList<Specification>();
+		pendingSpecs.add(spec);
 		
 		doReturn(pendingResources).when(resourceMonitor).getPendingResources();
+		doReturn(pendingSpecs).when(resourceMonitor).getPendingSpecification();
 		
 		defaultInfrastructureManager.act(resources, tasks);
 		verify(infraProvider, times(1)).requestResource(spec);
-		verify(resourceMonitor, times(1)).addPendingResource(Mockito.any(AbstractResource.class));
+		verify(resourceMonitor, times(1)).addPendingResource(Mockito.any(String.class), Mockito.any(Specification.class));
 		
 	}
 	
@@ -275,7 +276,7 @@ public class TestDefaultInfrastructureManager {
 		
 		defaultInfrastructureManager.act(resources, tasks);
 		verify(infraProvider, times(1)).requestResource(specA);
-		verify(resourceMonitor, times(1)).addPendingResource(Mockito.any(AbstractResource.class));
+		verify(resourceMonitor, times(1)).addPendingResource(Mockito.any(String.class), Mockito.any(Specification.class));
 		
 	}
 	
@@ -327,7 +328,7 @@ public class TestDefaultInfrastructureManager {
 		
 		defaultInfrastructureManager.act(resources, tasks);
 		verify(infraProvider, times(0)).requestResource(specA);
-		verify(resourceMonitor, times(0)).addPendingResource(Mockito.any(AbstractResource.class));
+		verify(resourceMonitor, times(0)).addPendingResource(Mockito.any(String.class), Mockito.any(Specification.class));
 		
 	}
 	
@@ -355,7 +356,7 @@ public class TestDefaultInfrastructureManager {
 		
 		defaultInfrastructureManager.act(resources, tasks);
 		verify(infraProvider, times(1)).requestResource(specA);
-		verify(resourceMonitor, times(1)).addPendingResource(Mockito.any(AbstractResource.class));
+		verify(resourceMonitor, times(1)).addPendingResource(Mockito.any(String.class), Mockito.any(Specification.class));
 		
 	}
 	

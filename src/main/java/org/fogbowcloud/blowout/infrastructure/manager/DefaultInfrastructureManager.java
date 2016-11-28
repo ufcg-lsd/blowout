@@ -33,11 +33,11 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 
 		Map<Specification, Integer> specsDemand = new HashMap<Specification, Integer>();
 
-		List<AbstractResource> idleResources = filterResourcesByState(resources, ResourceState.IDLE);
+		List<AbstractResource> idleResources = filterResourcesByState(resources, ResourceState.IDLE, ResourceState.BUSY);
 		// Generate demand for tasks
 		for (Task task : tasks) {
 
-			if (TaskState.READY.equals(task.getState())) {
+			if (!task.isFinished()) {
 
 				boolean resourceResolved = false;
 
@@ -54,8 +54,8 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 		}
 
 		// Reduce demand by pending resources
-		for (AbstractResource pendingResource : resourceMonitor.getPendingResources()) {
-			incrementDecrementDemand(specsDemand, pendingResource.getRequestedSpec(), false);
+		for (Specification pendingSpec : resourceMonitor.getPendingSpecification()) {
+			incrementDecrementDemand(specsDemand, pendingSpec, false);
 		}
 
 		// Request resources according to the demand.
@@ -65,8 +65,8 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 			Integer qty = entry.getValue();
 			for (int count = 0; count < qty.intValue(); count++) {
 
-				AbstractResource resource = infraProvider.requestResource(spec);
-				resourceMonitor.addPendingResource(resource);
+				String resourceId = infraProvider.requestResource(spec);
+				resourceMonitor.addPendingResource(resourceId, spec);
 
 			}
 
@@ -74,12 +74,14 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 	}
 
 	private List<AbstractResource> filterResourcesByState(List<AbstractResource> resources,
-			ResourceState resourceState) {
+			ResourceState... resourceStates) {
 
 		List<AbstractResource> filteredResources = new ArrayList<AbstractResource>();
 		for (AbstractResource resource : resources) {
-			if (resourceState.equals(resource.getState())) {
-				filteredResources.add(resource);
+			for(ResourceState state : resourceStates){
+				if (state.equals(resource.getState())) {
+					filteredResources.add(resource);
+				}
 			}
 		}
 

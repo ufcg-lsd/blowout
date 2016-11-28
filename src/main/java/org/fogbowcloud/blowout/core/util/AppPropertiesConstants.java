@@ -1,6 +1,13 @@
 package org.fogbowcloud.blowout.core.util;
 
 public class AppPropertiesConstants {
+	
+	//-------------------IMPLEMENTATION PLUGINS----------------------------//
+	public static final String IMPLEMENTATION_INFRA_MANAGER = "impl_infra_manager_class_name";
+	public static final String IMPLEMENTATION_SCHEDULER = "impl_scheduler_class_name";
+	public static final String IMPLEMENTATION_BLOWOUT_POOL = "impl_blowout_pool_class_name";
+	public static final String BLOWOUT_CONFIG_FILE = "blowout.configuration";
+	
 
 	// __________ INFRASTRUCTURE CONSTANTS __________ //
 	public static final String INFRA_IS_STATIC = "infra_is_elastic";
@@ -12,21 +19,20 @@ public class AppPropertiesConstants {
 	public static final String INFRA_RESOURCE_REUSE_TIMES = "max_resource_reuse";
 	public static final String INFRA_RESOURCE_CONNECTION_RETRY = "max_resource_connection_retry";
 	public static final String INFRA_MONITOR_PERIOD = "infra_monitor_period";
-
 	public static final String INFRA_INITIAL_SPECS_FILE_PATH = "infra_initial_specs_file_path";
-	public static final String INFRA_CRAWLER_SPECS_FILE_PATH = "infra_crawler_specs_file_path";
-	public static final String INFRA_SCHEDULER_SPECS_FILE_PATH = "infra_scheduler_specs_file_path";
-	public static final String INFRA_FETCHER_SPECS_FILE_PATH = "infra_fetcher_specs_file_path";
 	public static final String INFRA_SPECS_BLOCK_CREATING = "infra_specs_block_creating";
-	public static final String SCHEDULER_PERIOD = "scheduler_period";
-
 	public static final String INFRA_INITIAL_SPECS_BLOCK_CREATING = "infra_initial_specs_block_creating";
+	
+
+	public static final String SCHEDULER_PERIOD = "scheduler_period";
 
 	// __________ FOGBOW INFRASTRUCTURE CONSTANTS __________ //
 	public static final String INFRA_FOGBOW_MANAGER_BASE_URL = "infra_fogbow_manager_base_url";
 	public static final String INFRA_FOGBOW_TOKEN_PUBLIC_KEY_FILEPATH = "infra_fogbow_token_public_key_filepath";
 	public static final String INFRA_FOGBOW_USERNAME = "fogbow_username";
 	public static final String INFRA_FOGBOW_TOKEN_UPDATE_PLUGIN = "infra_fogbow_token_update_plugin";
+
+	//---------------TOKEN PROPERTIES ------------------//
 	public static final String TOKEN_UPDATE_TIME = "token_update.time";
 	public static final String TOKEN_UPDATE_TIME_UNIT = "token_update.time.unit";
 	public static final String NAF_IDENTITY_PRIVATE_KEY = "naf_identity_private_key";
@@ -57,13 +63,5 @@ public class AppPropertiesConstants {
 	public static final String X_AUTH_USER = "X-auth-username";
 	public static final String X_AUTH_HASH = "X-auth-hash";
 
-	// ___________ SWIFT PROPERTIES ___________//
-	public static final String SWIFT_CONTAINER_NAME = "swift_container_name";
-	public static final String SWIFT_PSEUD_FOLDER_PREFIX = "swift_pseud_folder_prefix";
-	public static final String SWIFT_USERNAME = "swift_username";
-	public static final String SWIFT_PASSWORD = "swift_password";
-	public static final String SWIFT_TENANT_NAME = "swift_tenant_name";
-	public static final String SWIFT_AUTH_URL = "swift_auth_url";
-	public static final String SWIFT_IMAGE_EXTENSION = "swift_image_extension";
-
+	
 }
