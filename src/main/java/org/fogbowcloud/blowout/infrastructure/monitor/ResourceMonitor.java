@@ -1,6 +1,7 @@
 package org.fogbowcloud.blowout.infrastructure.monitor;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -118,7 +119,7 @@ public class ResourceMonitor {
 					idleResources.remove(resource);
 					boolean isAlive = this.checkResourceConnectivity(resource);
 					if(isAlive){
-						moveResourceToIdle(resource);
+						resourcePool.updateResource(resource, ResourceState.IDLE);
 					}
 				} else if (ResourceState.TO_REMOVE.equals(resource.getState())) {
 					try {
@@ -136,10 +137,10 @@ public class ResourceMonitor {
 
 		private void resolveIdleResource(AbstractResource resource) {
 
-			Long since = idleResources.get(resource.getId());
+			Long expirationDateTime = idleResources.get(resource.getId());
 
 			// If since == null, resource must go to IDLE list.
-			if (since == null) {
+			if (expirationDateTime == null) {
 				moveResourceToIdle(resource);
 			} else {
 
@@ -148,10 +149,11 @@ public class ResourceMonitor {
 
 					boolean isAlive = checkResourceConnectivity(resource);
 					// Has expiration time?
-					if (isAlive && noExpirationTime.compareTo(idleLifeTime) != 0) {
-						Date expirationDate = new Date(since.longValue());
+					if (isAlive && noExpirationTime.compareTo(expirationDateTime) != 0) {
+						Date expirationDate = new Date(expirationDateTime.longValue());
 						Date currentDate = new Date();
 						if (expirationDate.before(currentDate)) {
+							LOGGER.warn("Removing resource "+resource.getId()+" due Idle time expired.");
 							resourcePool.updateResource(resource, ResourceState.TO_REMOVE);
 							idleResources.remove(resource);
 						}
@@ -162,9 +164,13 @@ public class ResourceMonitor {
 
 		private void moveResourceToIdle(AbstractResource resource) {
 			if(resource.getReusedTimes() < maxReuse){
-				idleResources.put(resource.getId(), Long.valueOf(new Date().getTime()));
-				//TODO this should be called here?
-				//resourcePool.updateResource(resource, ResourceState.IDLE);
+				Long expirationDate = (long) 0;
+				expirationDate = Long.valueOf(+idleLifeTime);
+				Calendar c = Calendar.getInstance();
+				c.setTime(new Date());
+				c.add(Calendar.MILLISECOND, idleLifeTime.intValue());
+				expirationDate = c.getTimeInMillis();
+				idleResources.put(resource.getId(), expirationDate);
 			}else{
 				resourcePool.updateResource(resource, ResourceState.TO_REMOVE);
 			}

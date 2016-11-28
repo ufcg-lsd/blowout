@@ -32,7 +32,7 @@ public class FogbowResourceDatastore {
 	
 	//SQLs
 	private static final String INSERT_FOGBOW_RESOURCE_SQL = "INSERT INTO " + FOGBOW_RESOURCE_TABLE_NAME
-			+ " VALUES(?,?,?)";
+			+ " VALUES(?,?,?,?)";
 	private static final String UPDATE_FOGBOW_RESOURCE = "UPDATE " + FOGBOW_RESOURCE_TABLE_NAME
 			+ " SET "+ORDER_ID+"=? , "+INSTANCE_ID+"=? WHERE "+RESOURCE_ID+"=?";
 	private static final String SELECT_REQUEST_ID = "SELECT * FROM " + FOGBOW_RESOURCE_TABLE_NAME;

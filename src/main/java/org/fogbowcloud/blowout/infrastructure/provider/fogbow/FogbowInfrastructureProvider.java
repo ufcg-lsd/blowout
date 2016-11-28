@@ -76,7 +76,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 	// Key is the resource ID
 	private Map<String, FogbowResource> resourcesMap = new ConcurrentHashMap<String, FogbowResource>();
 
-	public FogbowInfrastructureProvider(Properties properties, ScheduledExecutorService handleTokeUpdateExecutor,
+	protected FogbowInfrastructureProvider(Properties properties, ScheduledExecutorService handleTokeUpdateExecutor,
 			boolean cleanPrevious) throws Exception {
 		this(properties, handleTokeUpdateExecutor, createTokenUpdatePlugin(properties));
 		frDatastore = new FogbowResourceDatastore(properties);
@@ -483,14 +483,15 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 	private static AbstractTokenUpdatePlugin createTokenUpdatePlugin(Properties properties) throws Exception {
 
-		String providerClassName = properties.getProperty(AppPropertiesConstants.INFRA_FOGBOW_TOKEN_UPDATE_PLUGIN);
+		String providerClassName = properties.getProperty(AppPropertiesConstants.INFRA_AUTH_TOKEN_UPDATE_PLUGIN);
 
 		Object clazz = Class.forName(providerClassName).getConstructor(Properties.class).newInstance(properties);
 		if (!(clazz instanceof AbstractTokenUpdatePlugin)) {
 			throw new Exception("Provider Class Name is not a TokenUpdatePluginInterface implementation");
 		}
-
-		return (AbstractTokenUpdatePlugin) clazz;
+		AbstractTokenUpdatePlugin tokenUpdatePlugin = (AbstractTokenUpdatePlugin) clazz;
+		tokenUpdatePlugin.validateProperties();
+		return tokenUpdatePlugin;
 	}
 
 	private OrderState getRequestState(String requestValue) {

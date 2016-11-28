@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
+import org.fogbowcloud.blowout.core.exception.BlowoutException;
 import org.fogbowcloud.blowout.core.model.Task;
 import org.fogbowcloud.blowout.core.model.TaskState;
 import org.fogbowcloud.blowout.core.monitor.TaskMonitor;
@@ -20,7 +21,7 @@ import org.fogbowcloud.blowout.pool.BlowoutPool;
 public class BlowoutController {
 
 	public static final Logger LOGGER = Logger.getLogger(BlowoutController.class);
-	
+
 	private String DEFAULT_IMPLEMENTATION_BLOWOUT_POOL = "org.fogbowcloud.blowout.pool.DefauBlowoutlPool";
 	private String DEFAULT_IMPLEMENTATION_SCHEDULER = "org.fogbowcloud.blowout.core.StandardScheduler";
 	private String DEFAULT_IMPLEMENTATION_INFRA_MANAGER = "org.fogbowcloud.blowout.infrastructure.manager.DefaultInfrastructureManager";
@@ -40,45 +41,45 @@ public class BlowoutController {
 	private boolean started = false;
 	private Properties properties;
 
-	public BlowoutController() {
+	public BlowoutController() throws BlowoutException {
 
 		try {
 
-			String configFile = System.getProperty(AppPropertiesConstants.BLOWOUT_CONFIG_FILE);
+			String configFile = System.getProperty(AppPropertiesConstants.BLOWOUT_CONFIG_FILE,
+					AppPropertiesConstants.DEFAULT_BLOWOUT_CONFIG_FILE);
 
 			properties = new Properties();
 			properties.load(new FileInputStream(configFile));
-			
-			if(!this.checkProperties(properties)){
-				throw new Exception("Error on validate the file "+configFile);
+
+			if (!this.checkProperties(properties)) {
+				throw new BlowoutException("Error on validate the file " + configFile);
 			}
-			
+
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error("Configuration File not found.");
+			throw new BlowoutException("Configuration File not found.", e);
 		} catch (IOException e) {
-			// TODO Create a new exception for blowout and throws
-			e.printStackTrace();
+			LOGGER.error("Error while tring to open Configuration File.");
+			throw new BlowoutException("Error while tring to open Configuration File.", e);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new BlowoutException("Error while initialize Blowout Controller.", e);
 		}
 
 	}
 
 	public void start(boolean removePreviousResouces) throws Exception {
-		
+
 		started = true;
 
 		blowoutPool = createBlowoutInstance();
-		infraProvider = createInfraProviderInstance();
+		infraProvider = createInfraProviderInstance(removePreviousResouces);
 
 		taskMonitor = new TaskMonitor(blowoutPool, 30000);
 		taskMonitor.start();
 		resourceMonitor = new ResourceMonitor(infraProvider, blowoutPool, properties);
 		resourceMonitor.start();
 
-		schedulerInterface = createSchedulerInstance();
+		schedulerInterface = createSchedulerInstance(taskMonitor);
 		infraManager = createInfraManagerInstance();
 
 		blowoutPool.start(infraManager, schedulerInterface);
@@ -92,40 +93,39 @@ public class BlowoutController {
 
 		taskMonitor.stop();
 		resourceMonitor.stop();
-		
+
 		started = false;
 	}
 
 	public void addTask(Task task) {
-		if(!started){
-			//TODO Throw new Blowout exception
+		if (!started) {
+			// TODO Throw new Blowout exception
 		}
 		blowoutPool.putTask(task);
 	}
 
 	public void addTaskList(List<Task> tasks) {
-		if(!started){
-			//TODO Throw new Blowout exception
+		if (!started) {
+			// TODO Throw new Blowout exception
 		}
 		blowoutPool.addTasks(tasks);
 	}
-	
-	public void cleanTask(Task task){
-		//TODO remove task from the pool. 
+
+	public void cleanTask(Task task) {
+		// TODO remove task from the pool.
 		blowoutPool.removeTask(task);
 	}
-	
-	public TaskState getTaskState(String taskId){
+
+	public TaskState getTaskState(String taskId) {
 		Task task = null;
 		for (Task t : blowoutPool.getAllTasks()) {
-			if(t.getId().equals(taskId)){
+			if (t.getId().equals(taskId)) {
 				task = t;
 			}
 		}
-		if(task == null){
-			//TODO throw blowout exception
-			return null;
-		}else{
+		if (task == null) {
+			return TaskState.NOT_CREATED;
+		} else {
 			return taskMonitor.getTaskState(task);
 		}
 	}
@@ -134,18 +134,18 @@ public class BlowoutController {
 		String providerClassName = this.properties.getProperty(AppPropertiesConstants.IMPLEMENTATION_BLOWOUT_POOL,
 				DEFAULT_IMPLEMENTATION_BLOWOUT_POOL);
 		Class<?> forName = Class.forName(providerClassName);
-		Object clazz = forName.getConstructor(Properties.class).newInstance();
+		Object clazz = forName.getConstructor().newInstance();
 		if (!(clazz instanceof BlowoutPool)) {
 			throw new Exception("Blowout Pool Class Name is not a BlowoutPool implementation");
 		}
 		return (BlowoutPool) clazz;
 	}
 
-	private InfrastructureProvider createInfraProviderInstance() throws Exception {
-		String providerClassName = this.properties.getProperty(AppPropertiesConstants.INFRA_PROVIDER_CLASS_NAME,
+	private InfrastructureProvider createInfraProviderInstance(boolean removePreviousResouces) throws Exception {
+		String providerClassName = this.properties.getProperty(AppPropertiesConstants.IMPLEMENTATION_INFRA_PROVIDER,
 				DEFAULT_IMPLEMENTATION_INFRA_PROVIDER);
 		Class<?> forName = Class.forName(providerClassName);
-		Object clazz = forName.getConstructor(Properties.class).newInstance(properties);
+		Object clazz = forName.getConstructor(Properties.class, Boolean.TYPE).newInstance(properties, removePreviousResouces);
 		if (!(clazz instanceof InfrastructureProvider)) {
 			throw new Exception("Provider Class Name is not a InfrastructureProvider implementation");
 		}
@@ -156,18 +156,18 @@ public class BlowoutController {
 		String providerClassName = this.properties.getProperty(AppPropertiesConstants.IMPLEMENTATION_INFRA_MANAGER,
 				DEFAULT_IMPLEMENTATION_INFRA_MANAGER);
 		Class<?> forName = Class.forName(providerClassName);
-		Object clazz = forName.getConstructor(Properties.class).newInstance(infraProvider, resourceMonitor);
+		Object clazz = forName.getConstructor(InfrastructureProvider.class, ResourceMonitor.class).newInstance(infraProvider, resourceMonitor);
 		if (!(clazz instanceof InfrastructureManager)) {
 			throw new Exception("Infrastructure Manager Class Name is not a InfrastructureManager implementation");
 		}
 		return (InfrastructureManager) clazz;
 	}
 
-	private SchedulerInterface createSchedulerInstance() throws Exception {
+	private SchedulerInterface createSchedulerInstance(TaskMonitor taskMonitor) throws Exception {
 		String providerClassName = this.properties.getProperty(AppPropertiesConstants.IMPLEMENTATION_SCHEDULER,
 				DEFAULT_IMPLEMENTATION_SCHEDULER);
 		Class<?> forName = Class.forName(providerClassName);
-		Object clazz = forName.getConstructor(Properties.class).newInstance(taskMonitor);
+		Object clazz = forName.getConstructor(TaskMonitor.class).newInstance(taskMonitor);
 		if (!(clazz instanceof SchedulerInterface)) {
 			throw new Exception("Scheduler Class Name is not a SchedulerInterface implementation");
 		}
@@ -175,12 +175,8 @@ public class BlowoutController {
 	}
 
 	private static boolean checkProperties(Properties properties) {
-		if (!properties.containsKey(AppPropertiesConstants.INFRA_PROVIDER_CLASS_NAME)) {
-			LOGGER.error("Required property " + AppPropertiesConstants.INFRA_PROVIDER_CLASS_NAME + " was not set");
-			return false;
-		}
-		if (!properties.containsKey(AppPropertiesConstants.INFRA_RESOURCE_SERVICE_TIME)) {
-			LOGGER.error("Required property " + AppPropertiesConstants.INFRA_RESOURCE_SERVICE_TIME + " was not set");
+		if (!properties.containsKey(AppPropertiesConstants.IMPLEMENTATION_INFRA_PROVIDER)) {
+			LOGGER.error("Required property " + AppPropertiesConstants.IMPLEMENTATION_INFRA_PROVIDER + " was not set");
 			return false;
 		}
 		if (!properties.containsKey(AppPropertiesConstants.INFRA_RESOURCE_IDLE_LIFETIME)) {
@@ -192,72 +188,13 @@ public class BlowoutController {
 					"Required property " + AppPropertiesConstants.INFRA_RESOURCE_CONNECTION_TIMEOUT + " was not set");
 			return false;
 		}
-		if (!properties.containsKey(AppPropertiesConstants.REST_SERVER_PORT)) {
-			LOGGER.error("Required property " + AppPropertiesConstants.REST_SERVER_PORT + " was not set");
-			return false;
-		}
-		if (!properties.containsKey(AppPropertiesConstants.EXECUTION_MONITOR_PERIOD)) {
-			LOGGER.error("Required property " + AppPropertiesConstants.EXECUTION_MONITOR_PERIOD + " was not set");
-			return false;
-		}
 		if (!properties.containsKey(AppPropertiesConstants.INFRA_IS_STATIC)) {
 			LOGGER.error("Required property " + AppPropertiesConstants.INFRA_IS_STATIC + " was not set");
 			return false;
 		}
-		if (!properties.containsKey(AppPropertiesConstants.INFRA_FOGBOW_USERNAME)) {
-			LOGGER.error("Required property " + AppPropertiesConstants.INFRA_FOGBOW_USERNAME + " was not set");
-			return false;
-		}
-
-		if (properties.containsKey(
-				AppPropertiesConstants.INFRA_FOGBOW_TOKEN_UPDATE_PLUGIN)) {
-
-			String tokenUpdatePluginClass = properties.getProperty(
-					AppPropertiesConstants.INFRA_FOGBOW_TOKEN_UPDATE_PLUGIN);
-
-			// Checking for required properties of Keystone Token Update
-			// Plugin
-			if (tokenUpdatePluginClass
-					.equals("org.fogbowcloud.blowout.infrastructure.plugin.KeystoneTokenUpdatePlugin")) {
-				if (!properties.containsKey("fogbow.keystone.username")) {
-					LOGGER.error("Required property " + "fogbow.keystone.username" + " was not set");
-					return false;
-				}
-			}
-
-						
-			// Checking for required properties of NAF Token Update Plugin
-			if (tokenUpdatePluginClass.equals("org.fogbowcloud.blowout.infrastructure.plugin.NAFTokenUpdatePlugin")) {
-				if (!properties.containsKey(AppPropertiesConstants.NAF_IDENTITY_PRIVATE_KEY)) {
-					LOGGER.error("Required property " + AppPropertiesConstants.NAF_IDENTITY_PRIVATE_KEY + " was not set");
-					return false;
-				}
-
-				if (!properties.containsKey(AppPropertiesConstants.NAF_IDENTITY_PUBLIC_KEY)) {
-					LOGGER.error("Required property " + AppPropertiesConstants.NAF_IDENTITY_PUBLIC_KEY + " was not set");
-					return false;
-				}
-
-				if (!properties.containsKey(AppPropertiesConstants.NAF_IDENTITY_TOKEN_GENERATOR_URL)) {
-					LOGGER.error("Required property " + AppPropertiesConstants.NAF_IDENTITY_TOKEN_GENERATOR_URL + " was not set");
-					return false;
-				}
-
-				if (!properties.containsKey(AppPropertiesConstants.NAF_IDENTITY_TOKEN_USERNAME)) {
-					LOGGER.error("Required property " + AppPropertiesConstants.NAF_IDENTITY_TOKEN_USERNAME + " was not set");
-					return false;
-				}
-
-				if (!properties.containsKey(AppPropertiesConstants.NAF_IDENTITY_TOKEN_PASSWORD)) {
-					LOGGER.error("Required property " + AppPropertiesConstants.NAF_IDENTITY_TOKEN_PASSWORD + " was not set");
-					return false;
-				}
-			}
-
-		} else {
-			LOGGER.error("Required property "
-					+ AppPropertiesConstants.INFRA_FOGBOW_TOKEN_UPDATE_PLUGIN
-					+ " was not set");
+		if (!properties.containsKey(AppPropertiesConstants.INFRA_AUTH_TOKEN_UPDATE_PLUGIN)) {
+			LOGGER.error(
+					"Required property " + AppPropertiesConstants.INFRA_AUTH_TOKEN_UPDATE_PLUGIN + " was not set");
 			return false;
 		}
 		LOGGER.debug("All properties are set");

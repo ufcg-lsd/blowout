@@ -25,7 +25,6 @@ import org.fogbowcloud.blowout.infrastructure.exception.InfrastructureException;
 import org.fogbowcloud.blowout.infrastructure.http.HttpWrapper;
 import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
 import org.fogbowcloud.blowout.infrastructure.token.AbstractTokenUpdatePlugin;
-import org.fogbowcloud.blowout.pool.AbstractResource;
 import org.fogbowcloud.manager.occi.model.Token;
 import org.fogbowcloud.manager.occi.order.OrderConstants;
 import org.fogbowcloud.manager.occi.order.OrderState;
@@ -443,17 +442,11 @@ public class TestFogbowInfrastructureProvider {
 		properties = new Properties();
 
 		properties.setProperty(AppPropertiesConstants.INFRA_IS_STATIC, "false");
-		properties.setProperty(AppPropertiesConstants.INFRA_PROVIDER_CLASS_NAME,
+		properties.setProperty(AppPropertiesConstants.IMPLEMENTATION_INFRA_PROVIDER,
 				"org.fogbowcloud.scheduler.infrastructure.fogbow.FogbowInfrastructureProvider");
-		properties.setProperty(AppPropertiesConstants.INFRA_MANAGEMENT_SERVICE_TIME, "2000");
-		properties.setProperty(AppPropertiesConstants.INFRA_RESOURCE_SERVICE_TIME, "3000");
 		properties.setProperty(AppPropertiesConstants.INFRA_RESOURCE_CONNECTION_TIMEOUT, "10000");
 		properties.setProperty(AppPropertiesConstants.INFRA_RESOURCE_IDLE_LIFETIME, "300000");
-		properties.setProperty(AppPropertiesConstants.INFRA_INITIAL_SPECS_FILE_PATH, "src/test/resources/Specs_Json");
-		properties.setProperty(AppPropertiesConstants.INFRA_SPECS_BLOCK_CREATING, "false");
 		properties.setProperty(AppPropertiesConstants.INFRA_FOGBOW_MANAGER_BASE_URL, "100_02_01_01:8098");
-		properties.setProperty(AppPropertiesConstants.INFRA_FOGBOW_TOKEN_PUBLIC_KEY_FILEPATH,
-				"src/test/resources/publickey_file");
 		properties.setProperty("fogbow.voms.server", "server");
 		properties.setProperty("fogbow.voms.certificate.password", "password");
 

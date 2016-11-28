@@ -3,6 +3,7 @@ package org.fogbowcloud.blowout.infrastructure.token;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
+import org.fogbowcloud.blowout.core.exception.BlowoutException;
 import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
 import org.fogbowcloud.manager.occi.model.Token;
 
@@ -42,5 +43,7 @@ public abstract class AbstractTokenUpdatePlugin {
 		return DEFAULT_UPDATE_TIME_UNIT;
 		
 	}
+	
+	public abstract void validateProperties() throws BlowoutException;
 
 }
