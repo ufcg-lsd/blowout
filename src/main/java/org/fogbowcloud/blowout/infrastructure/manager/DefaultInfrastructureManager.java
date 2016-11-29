@@ -33,7 +33,8 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 
 		Map<Specification, Integer> specsDemand = new HashMap<Specification, Integer>();
 
-		List<AbstractResource> idleResources = filterResourcesByState(resources, ResourceState.IDLE, ResourceState.BUSY);
+		List<AbstractResource> idleResources = filterResourcesByState(resources, ResourceState.IDLE, 
+				ResourceState.BUSY, ResourceState.FAILED);
 		// Generate demand for tasks
 		for (Task task : tasks) {
 

@@ -85,7 +85,11 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 			resourcesMap.put(fogbowResource.getId(), fogbowResource);
 
 			if(cleanPrevious){
-				this.deleteResource(fogbowResource.getId());
+				try{
+					this.deleteResource(fogbowResource.getId());
+				}catch(Exception e){
+					LOGGER.error("Error while trying to delete resource on initialization: "+fogbowResource.getId());
+				}
 			}
 			
 		}
