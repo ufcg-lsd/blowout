@@ -119,7 +119,9 @@ public class ResourceMonitor {
 					idleResources.remove(resource);
 					boolean isAlive = this.checkResourceConnectivity(resource);
 					if(isAlive){
-						resourcePool.updateResource(resource, ResourceState.IDLE);
+						if(moveResourceToIdle(resource)){
+							resourcePool.updateResource(resource, ResourceState.IDLE);
+						}
 					}
 				} else if (ResourceState.TO_REMOVE.equals(resource.getState())) {
 					try {
@@ -162,7 +164,7 @@ public class ResourceMonitor {
 			}
 		}
 
-		private void moveResourceToIdle(AbstractResource resource) {
+		private boolean moveResourceToIdle(AbstractResource resource) {
 			if(resource.getReusedTimes() < maxReuse){
 				Long expirationDate = (long) 0;
 				expirationDate = Long.valueOf(+idleLifeTime);
@@ -171,8 +173,10 @@ public class ResourceMonitor {
 				c.add(Calendar.MILLISECOND, idleLifeTime.intValue());
 				expirationDate = c.getTimeInMillis();
 				idleResources.put(resource.getId(), expirationDate);
+				return true;
 			}else{
 				resourcePool.updateResource(resource, ResourceState.TO_REMOVE);
+				return false;
 			}
 		}
 

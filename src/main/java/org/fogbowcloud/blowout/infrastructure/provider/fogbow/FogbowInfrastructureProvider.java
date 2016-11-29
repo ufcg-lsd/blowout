@@ -81,11 +81,13 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		this(properties, handleTokeUpdateExecutor, createTokenUpdatePlugin(properties));
 		frDatastore = new FogbowResourceDatastore(properties);
 		for (FogbowResource fogbowResource : frDatastore.getAllFogbowResources()) {
+			
+			resourcesMap.put(fogbowResource.getId(), fogbowResource);
+
 			if(cleanPrevious){
 				this.deleteResource(fogbowResource.getId());
-			}else{
-				resourcesMap.put(fogbowResource.getId(), fogbowResource);
 			}
+			
 		}
 	}
 

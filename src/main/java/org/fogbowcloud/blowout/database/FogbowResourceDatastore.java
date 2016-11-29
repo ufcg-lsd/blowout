@@ -23,12 +23,12 @@ public class FogbowResourceDatastore {
 
 	private static final Logger LOGGER = Logger.getLogger(FogbowResourceDatastore.class);
 
-	protected static final String FOGBOW_RESOURCE_TABLE_NAME = "fogbow_resource_id_store";
+	protected static final String FOGBOW_RESOURCE_TABLE_NAME = "fogbow_resource_store";
 
 	protected static final String RESOURCE_ID = "resource_id";
 	protected static final String ORDER_ID = "order_id";
 	protected static final String INSTANCE_ID = "instance_id";
-	protected static final String SPEC = "specification";
+	protected static final String SPEC = "spec";
 	
 	//SQLs
 	private static final String INSERT_FOGBOW_RESOURCE_SQL = "INSERT INTO " + FOGBOW_RESOURCE_TABLE_NAME
