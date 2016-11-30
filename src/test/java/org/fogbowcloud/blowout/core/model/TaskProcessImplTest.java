@@ -32,7 +32,10 @@ public class TaskProcessImplTest {
 
 		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec));
 
-		doReturn(0).when(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
+		TaskExecutionResult terSuccess = new TaskExecutionResult();
+		terSuccess.finish(0);
+		
+		doReturn(terSuccess).when(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
 		//
 		tp.executeTask(resource);
 
@@ -50,7 +53,10 @@ public class TaskProcessImplTest {
 
 		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec));
 
-		doReturn(1).when(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
+		TaskExecutionResult terFail = new TaskExecutionResult();
+		terFail.finish(1);
+		
+		doReturn(terFail).when(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
 
 		tp.executeTask(resource);
 
@@ -70,9 +76,12 @@ public class TaskProcessImplTest {
 
 		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec));
 
-		doReturn(0).when(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
-		doReturn(0).when(tp).executeCommandString(FAKE_COMMAND2, Command.Type.LOCAL, resource);
-		doReturn(0).when(tp).executeCommandString(FAKE_COMMAND3, Command.Type.LOCAL, resource);
+		TaskExecutionResult terSuccess = new TaskExecutionResult();
+		terSuccess.finish(0);
+		
+		doReturn(terSuccess).when(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
+		doReturn(terSuccess).when(tp).executeCommandString(FAKE_COMMAND2, Command.Type.LOCAL, resource);
+		doReturn(terSuccess).when(tp).executeCommandString(FAKE_COMMAND3, Command.Type.LOCAL, resource);
 
 		tp.executeTask(resource);
 
@@ -93,9 +102,14 @@ public class TaskProcessImplTest {
 		FogbowResource resource = mock(FogbowResource.class);
 
 		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec));
+		
+		TaskExecutionResult terSuccess = new TaskExecutionResult();
+		terSuccess.finish(0);
+		TaskExecutionResult terFail = new TaskExecutionResult();
+		terFail.finish(1);
 
-		doReturn(0).when(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
-		doReturn(1).when(tp).executeCommandString(FAKE_COMMAND2, Command.Type.LOCAL, resource);
+		doReturn(terSuccess).when(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
+		doReturn(terFail).when(tp).executeCommandString(FAKE_COMMAND2, Command.Type.LOCAL, resource);
 
 		tp.executeTask(resource);
 
@@ -107,6 +121,10 @@ public class TaskProcessImplTest {
 
 	@Test
 	public void testExecThreeCommandsFirstFails() {
+		
+		TaskExecutionResult ter = new TaskExecutionResult();
+		ter.finish(1);
+		
 		String taskId = FAKE_TASK_ID;
 		Specification spec = mock(Specification.class);
 		List<Command> commandList = new ArrayList<Command>();
@@ -117,7 +135,7 @@ public class TaskProcessImplTest {
 
 		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec));
 
-		doReturn(1).when(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
+		doReturn(ter).when(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
 
 		tp.executeTask(resource);
 

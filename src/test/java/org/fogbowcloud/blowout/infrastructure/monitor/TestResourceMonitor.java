@@ -98,13 +98,5 @@ public class TestResourceMonitor {
 	}
 	
 	
-	@Test
-	public void testPause() throws Exception {
-
-		resourceMonitor.getMonitoringService().monitorProcess();
-		assertTrue(resourceMonitor.getMonitoringService().isPaused());
-
-	}
-	
 	
 }
