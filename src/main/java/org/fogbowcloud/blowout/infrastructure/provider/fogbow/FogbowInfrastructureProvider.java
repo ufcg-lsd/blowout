@@ -412,7 +412,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		return httpWrapper.doRequest(method, endpoint, token.getAccessId(), headers);
 	}
 
-	private String getOrderId(String requestInformation) {
+	protected String getOrderId(String requestInformation) {
 		String[] requestRes = requestInformation.split(":");
 		String[] requestId = requestRes[requestRes.length - 1].split("/");
 		return requestId[requestId.length - 1];
@@ -531,6 +531,22 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 	protected void setToken(Token token) {
 		this.token = token;
+	}
+
+	protected Map<String, FogbowResource> getResourcesMap() {
+		return resourcesMap;
+	}
+
+	protected void setResourcesMap(Map<String, FogbowResource> resourcesMap) {
+		this.resourcesMap = resourcesMap;
+	}
+
+	protected FogbowResourceDatastore getFrDatastore() {
+		return frDatastore;
+	}
+
+	protected void setFrDatastore(FogbowResourceDatastore frDatastore) {
+		this.frDatastore = frDatastore;
 	}
 
 }
