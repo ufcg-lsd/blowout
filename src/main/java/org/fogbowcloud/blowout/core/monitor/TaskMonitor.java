@@ -142,4 +142,8 @@ public class TaskMonitor implements Runnable{
 		}
 		
 	}
+	
+	public BlowoutPool getBlowoutPool() {
+		return this.pool;
+	}
 }

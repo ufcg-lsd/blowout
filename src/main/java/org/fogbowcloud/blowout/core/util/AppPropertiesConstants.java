@@ -22,6 +22,7 @@ public class AppPropertiesConstants {
 	public static final String INFRA_AUTH_TOKEN_PREFIX = "auth_token_prop_";
 	public static final String INFRA_AUTH_TOKEN_UPDATE_PLUGIN = "infra_auth_token_update_plugin";
 	
+	
 
 	// __________ FOGBOW INFRASTRUCTURE CONSTANTS __________ //
 	public static final String INFRA_FOGBOW_MANAGER_BASE_URL = "infra_fogbow_manager_base_url";
@@ -34,12 +35,16 @@ public class AppPropertiesConstants {
 
 	// ___________ DB CONSTANTS ______________//
 	public static final String DB_DATASTORE_URL = "blowout_datastore_url";
+	public static final String DB_REST_SERVER_PORT = "blowout_rest_server_port";
 
 	// ___________ APPLICATION HEADERS ____//
 
 	public static final String X_AUTH_NONCE = "X-auth-nonce";
 	public static final String X_AUTH_USER = "X-auth-username";
 	public static final String X_AUTH_HASH = "X-auth-hash";
+	public static final String INFRA_INITIAL_SPECS_FILE_PATH = "infra_initial_specs_file_path";
+	public static final String INFRA_PROVIDER_CLASS_NAME = "infra_provider_class_name";
+	public static final String INFRA_SPECS_BLOCK_CREATING = "infra_specs_block_creating";
 
 	
 }

@@ -12,7 +12,7 @@ import org.fogbowcloud.blowout.database.ResourceIdDatastore;
 import org.fogbowcloud.blowout.infrastructure.manager.InfrastructureManager;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 
-public class DefauBlowoutlPool implements BlowoutPool {
+public class DefaultBlowoutlPool implements BlowoutPool {
 
 	private Map<String, AbstractResource> resourcePool = new ConcurrentHashMap<String, AbstractResource>();
 	private List<Task> taskPool = new ArrayList<Task>();
