@@ -34,8 +34,8 @@ public class TestFogbowResourceDataStore {
 		LOGGER.debug("Creating data store.");
 		new File(DATASTORE_PATH).mkdir();
 		properties = new Properties();
-		properties.put(AppPropertiesConstants.DB_DATASTORE_URL, "jdbc:h2:mem:"
-				+ new File(DATASTORE_PATH).getAbsolutePath() + "resourceRequests");
+		properties.put(AppPropertiesConstants.DB_DATASTORE_URL, "jdbc:sqlite:"
+				+ new File(DATASTORE_PATH).getAbsolutePath() + "/resourceRequests");
 
 		db = spy(new ResourceIdDatastore(properties));
 	}
@@ -43,7 +43,6 @@ public class TestFogbowResourceDataStore {
 	@After
 	public void tearDown() throws IOException{
 		FileUtils.cleanDirectory(new File (DATASTORE_PATH));
-		db.dispose();
 	}
 	
 	@Test

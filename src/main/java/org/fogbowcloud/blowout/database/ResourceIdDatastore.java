@@ -1,6 +1,7 @@
 package org.fogbowcloud.blowout.database;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,7 +12,6 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
-import org.h2.jdbcx.JdbcConnectionPool;
 
 public class ResourceIdDatastore {
 
@@ -22,6 +22,10 @@ public class ResourceIdDatastore {
 
 	protected static final String RESOURCE_ID = "resource_id";
 	
+	protected static final String MANAGER_DATASTORE_SQLITE_DRIVER = "org.sqlite.JDBC";
+	
+	protected static final String PREFIX_DATASTORE_URL = "jdbc:sqlite:";
+	
 	//SQLs
 	private static final String INSERT_MEMBER_USAGE_SQL = "INSERT INTO " + RESOURCE_IDS_TABLE_NAME
 			+ " VALUES(?)";
@@ -31,7 +35,6 @@ public class ResourceIdDatastore {
 	private static final String DELETE_BY_RESOURCE_ID_SQL = DELETE_ALL_CONTENT_SQL + " WHERE "+RESOURCE_ID+"=? ";
 
 	private String dataStoreURL;
-	private JdbcConnectionPool cp;
 
 	public ResourceIdDatastore(Properties properties) {
 		this.dataStoreURL = properties.getProperty(AppPropertiesConstants.DB_DATASTORE_URL);
@@ -41,9 +44,8 @@ public class ResourceIdDatastore {
 		try {
 			LOGGER.debug("DatastoreURL: " + dataStoreURL);
 
-			Class.forName("org.h2.Driver");
-			this.cp = JdbcConnectionPool.create(dataStoreURL, "sa", "");
-
+			Class.forName(MANAGER_DATASTORE_SQLITE_DRIVER);
+			
 			connection = getConnection();
 			statement = connection.createStatement();
 			statement.execute("CREATE TABLE IF NOT EXISTS " + RESOURCE_IDS_TABLE_NAME
@@ -60,7 +62,7 @@ public class ResourceIdDatastore {
 
 	public Connection getConnection() throws SQLException {
 		try {
-			return cp.getConnection();
+			return DriverManager.getConnection(this.dataStoreURL);
 		} catch (SQLException e) {
 			LOGGER.error("Error while getting a new connection from the connection pool.", e);
 			throw e;
@@ -219,11 +221,7 @@ public class ResourceIdDatastore {
 			connection = getConnection();
 			connection.setAutoCommit(false);
 			deleteOldContent = connection.prepareStatement(DELETE_ALL_CONTENT_SQL);
-			deleteOldContent.addBatch();
-			if (hasBatchExecutionError(deleteOldContent.executeBatch())){
-				connection.rollback();
-				return false;
-			}
+			deleteOldContent.execute();
 			connection.commit();
 			return true;
 		} catch (SQLException e) {
@@ -249,11 +247,6 @@ public class ResourceIdDatastore {
 			}
 		}
 		return false;
-	}
-
-
-	public void dispose() {
-		cp.dispose();
 	}
 
 }
