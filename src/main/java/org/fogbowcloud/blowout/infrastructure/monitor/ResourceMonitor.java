@@ -165,6 +165,11 @@ public class ResourceMonitor {
 		}
 
 		private boolean moveResourceToIdle(AbstractResource resource) {
+			// TODO: Check the following options for maxReuse problem
+			//       1. See if it's viable to only mark resource as TO_REMOVE
+			//          if there's no task processes READY or RUNNING
+			//       2. Make maxReuse indefinite by default and not one
+			//       3. Always reuse instance
 			if(resource.getReusedTimes() < maxReuse){
 				Long expirationDate = (long) 0;
 				expirationDate = Long.valueOf(+idleLifeTime);
