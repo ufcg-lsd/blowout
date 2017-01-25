@@ -95,7 +95,8 @@ public class TaskProcessImpl implements TaskProcess {
 		return taskExecutionResult;
 	}
 
-	private void setStatus(TaskState status) {
+	@Override
+	public void setStatus(TaskState status) {
 		this.status = status;
 	}
 

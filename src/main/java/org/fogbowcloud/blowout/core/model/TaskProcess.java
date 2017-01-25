@@ -19,4 +19,6 @@ public interface TaskProcess {
 	Specification getSpecification();
 	
 	AbstractResource getResource();
+	
+	void setStatus(TaskState taskState);
 }
