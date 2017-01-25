@@ -22,7 +22,7 @@ public class BlowoutController {
 
 	public static final Logger LOGGER = Logger.getLogger(BlowoutController.class);
 
-	private String DEFAULT_IMPLEMENTATION_BLOWOUT_POOL = "org.fogbowcloud.blowout.pool.DefauBlowoutlPool";
+	private String DEFAULT_IMPLEMENTATION_BLOWOUT_POOL = "org.fogbowcloud.blowout.pool.DefaultBlowoutPool";
 	private String DEFAULT_IMPLEMENTATION_SCHEDULER = "org.fogbowcloud.blowout.core.StandardScheduler";
 	private String DEFAULT_IMPLEMENTATION_INFRA_MANAGER = "org.fogbowcloud.blowout.infrastructure.manager.DefaultInfrastructureManager";
 	private String DEFAULT_IMPLEMENTATION_INFRA_PROVIDER = "org.fogbowcloud.blowout.infrastructure.provider.fogbow.FogbowInfrastructureProvider";
@@ -41,26 +41,16 @@ public class BlowoutController {
 	private boolean started = false;
 	private Properties properties;
 
-	public BlowoutController() throws BlowoutException {
-
+	public BlowoutController(Properties properties) throws BlowoutException {
+		this.properties = properties;
 		try {
 
-			String configFile = System.getProperty(AppPropertiesConstants.BLOWOUT_CONFIG_FILE,
-					AppPropertiesConstants.DEFAULT_BLOWOUT_CONFIG_FILE);
 
-			properties = new Properties();
-			properties.load(new FileInputStream(configFile));
 
 			if (!this.checkProperties(properties)) {
-				throw new BlowoutException("Error on validate the file " + configFile);
+				throw new BlowoutException("Error on validate the file ");
 			}
 
-		} catch (FileNotFoundException e) {
-			LOGGER.error("Configuration File not found.");
-			throw new BlowoutException("Configuration File not found.", e);
-		} catch (IOException e) {
-			LOGGER.error("Error while tring to open Configuration File.");
-			throw new BlowoutException("Error while tring to open Configuration File.", e);
 		} catch (Exception e) {
 			throw new BlowoutException("Error while initialize Blowout Controller.", e);
 		}
