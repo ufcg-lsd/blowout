@@ -57,6 +57,7 @@ public class FogbowResourceDatastore {
 			Class.forName(MANAGER_DATASTORE_SQLITE_DRIVER);
 
 			connection = getConnection();
+			connection.setAutoCommit(false);
 			statement = connection.createStatement();
 			statement.execute("CREATE TABLE IF NOT EXISTS " + FOGBOW_RESOURCE_TABLE_NAME + "(" + RESOURCE_ID
 					+ " VARCHAR(255) PRIMARY KEY," + ORDER_ID + " VARCHAR(255)," + INSTANCE_ID + " VARCHAR(255)," + SPEC

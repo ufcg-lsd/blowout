@@ -12,15 +12,14 @@ import org.fogbowcloud.manager.occi.model.Token;
 public class LDAPTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
 
 	private static final Logger LOGGER = Logger.getLogger(LDAPTokenUpdatePlugin.class);
-	private static final String LDAP_USERNAME = AppPropertiesConstants.INFRA_AUTH_TOKEN_PREFIX + "ldap_username";
-	private static final String LDAP_PASSWORD = AppPropertiesConstants.INFRA_AUTH_TOKEN_PREFIX + "ldap_password";
-	private static final String LDAP_AUTH_URL = AppPropertiesConstants.INFRA_AUTH_TOKEN_PREFIX + "ldap_auth_url";
-	private static final String LDAP_BASE = AppPropertiesConstants.INFRA_AUTH_TOKEN_PREFIX + "ldap_base";
+	private static final String LDAP_USERNAME = "fogbow.ldap.username";
+	private static final String LDAP_PASSWORD = "fogbow.ldap.password";
+	private static final String LDAP_AUTH_URL = "fogbow.ldap.auth.url";
+	private static final String LDAP_BASE = "fogbow.ldap.base";
 	private static final String LDAP_ENCRYPT_TYPE = AppPropertiesConstants.INFRA_AUTH_TOKEN_PREFIX
 			+ "ldap_encrypt_type";
-	private static final String LDAP_PRIVATE_KEY = AppPropertiesConstants.INFRA_AUTH_TOKEN_PREFIX
-			+ "ldap_private_key";
-	private static final String LDAP_PUBLIC_KEY = AppPropertiesConstants.INFRA_AUTH_TOKEN_PREFIX+"ldap_public_key";
+	private static final String LDAP_PRIVATE_KEY = "fogbow.ldap.private.key";
+	private static final String LDAP_PUBLIC_KEY = "fogbow.ldap.public.key";
 
 	private String userName;
 	private String password;
