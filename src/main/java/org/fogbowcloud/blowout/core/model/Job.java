@@ -1,6 +1,7 @@
 package org.fogbowcloud.blowout.core.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,13 +24,16 @@ public abstract class Job implements Serializable {
 		}
 	}
 	
+	public Job() {
+	}
+
 	public void addTask(Task task) {
 		LOGGER.debug("Adding task " + task.getId());
 		getTaskList().put(task.getId(), task);
 	}
 
-	public Map<String, Task> getTasks(){
-		return this.getTaskList();
+	public Map<String, Task> getTaskList(){
+		return this.taskList;
 	}
 	
 	public abstract void finish(Task task);
@@ -38,8 +42,10 @@ public abstract class Job implements Serializable {
 
 	public abstract String getId();
 
-	public Map<String, Task> getTaskList() {
-		return taskList;
+	public ArrayList<Task> getTasks() {
+		ArrayList<Task> tasks = new ArrayList<Task>();
+		tasks.addAll(getTaskList().values());
+		return tasks;
 	}
 	
 	public void setUUID(String UUID) {
