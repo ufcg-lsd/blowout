@@ -84,6 +84,10 @@ public class TaskProcessImpl implements TaskProcess {
 			taskExecutionResult = executeCommandString(commandString, command.getType(), resource);
 			LOGGER.debug("Command result: " + taskExecutionResult.getExitValue());
 			if (taskExecutionResult.getExitValue() != TaskExecutionResult.OK) {
+				if(taskExecutionResult.getExitValue() == TaskExecutionResult.TIMEOUT) {
+					this.setStatus(TaskState.TIMEDOUT);
+					break;
+				}
 				this.setStatus(TaskState.FAILED);
 				break;
 			}

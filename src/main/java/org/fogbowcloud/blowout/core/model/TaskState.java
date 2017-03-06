@@ -2,7 +2,7 @@ package org.fogbowcloud.blowout.core.model;
 
 public enum TaskState {
 
-	READY("Ready"), RUNNING("Running"), FINNISHED("Finished"), COMPLETED("Completed"), FAILED("Failed"), NOT_CREATED("Not Created");
+	READY("Ready"), RUNNING("Running"), FINNISHED("Finished"), COMPLETED("Completed"), FAILED("Failed"), NOT_CREATED("Not Created"), TIMEDOUT("Timedout");
 	
 	private String desc;
 	

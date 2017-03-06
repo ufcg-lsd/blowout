@@ -1,8 +1,5 @@
 package org.fogbowcloud.blowout.core;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
@@ -27,18 +24,18 @@ public class BlowoutController {
 	private String DEFAULT_IMPLEMENTATION_INFRA_MANAGER = "org.fogbowcloud.blowout.infrastructure.manager.DefaultInfrastructureManager";
 	private String DEFAULT_IMPLEMENTATION_INFRA_PROVIDER = "org.fogbowcloud.blowout.infrastructure.provider.fogbow.FogbowInfrastructureProvider";
 
-	private BlowoutPool blowoutPool;
+	protected static BlowoutPool blowoutPool;
 
 	// Scheduler elements
-	private SchedulerInterface schedulerInterface;
+	protected SchedulerInterface schedulerInterface;
 	private TaskMonitor taskMonitor;
 
 	// Infrastructure elements.
-	private InfrastructureProvider infraProvider;
-	private InfrastructureManager infraManager;
-	private ResourceMonitor resourceMonitor;
+	protected InfrastructureProvider infraProvider;
+	protected InfrastructureManager infraManager;
+	protected ResourceMonitor resourceMonitor;
 
-	private boolean started = false;
+	protected boolean started = false;
 	private Properties properties;
 
 	public BlowoutController(Properties properties) throws BlowoutException {
@@ -120,7 +117,7 @@ public class BlowoutController {
 		}
 	}
 
-	private BlowoutPool createBlowoutInstance() throws Exception {
+	protected BlowoutPool createBlowoutInstance() throws Exception {
 		String providerClassName = this.properties.getProperty(AppPropertiesConstants.IMPLEMENTATION_BLOWOUT_POOL,
 				DEFAULT_IMPLEMENTATION_BLOWOUT_POOL);
 		Class<?> forName = Class.forName(providerClassName);
@@ -131,7 +128,7 @@ public class BlowoutController {
 		return (BlowoutPool) clazz;
 	}
 
-	private InfrastructureProvider createInfraProviderInstance(boolean removePreviousResouces) throws Exception {
+	protected InfrastructureProvider createInfraProviderInstance(boolean removePreviousResouces) throws Exception {
 		String providerClassName = this.properties.getProperty(AppPropertiesConstants.IMPLEMENTATION_INFRA_PROVIDER,
 				DEFAULT_IMPLEMENTATION_INFRA_PROVIDER);
 		Class<?> forName = Class.forName(providerClassName);
@@ -142,7 +139,7 @@ public class BlowoutController {
 		return (InfrastructureProvider) clazz;
 	}
 
-	private InfrastructureManager createInfraManagerInstance() throws Exception {
+	protected InfrastructureManager createInfraManagerInstance() throws Exception {
 		String providerClassName = this.properties.getProperty(AppPropertiesConstants.IMPLEMENTATION_INFRA_MANAGER,
 				DEFAULT_IMPLEMENTATION_INFRA_MANAGER);
 		Class<?> forName = Class.forName(providerClassName);
@@ -153,7 +150,7 @@ public class BlowoutController {
 		return (InfrastructureManager) clazz;
 	}
 
-	private SchedulerInterface createSchedulerInstance(TaskMonitor taskMonitor) throws Exception {
+	protected SchedulerInterface createSchedulerInstance(TaskMonitor taskMonitor) throws Exception {
 		String providerClassName = this.properties.getProperty(AppPropertiesConstants.IMPLEMENTATION_SCHEDULER,
 				DEFAULT_IMPLEMENTATION_SCHEDULER);
 		Class<?> forName = Class.forName(providerClassName);
