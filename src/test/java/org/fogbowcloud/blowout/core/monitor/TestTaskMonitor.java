@@ -1,8 +1,8 @@
 package org.fogbowcloud.blowout.core.monitor;
 
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
@@ -40,7 +39,6 @@ public class TestTaskMonitor {
 	
 	@Test
 	public void testProcMonNothingHappens() {
-		Task fakeTask = mock(Task.class);
 		TaskProcess fakeProcess = mock(TaskProcess.class);
 		doReturn(TaskState.RUNNING).when(fakeProcess).getStatus();
 		AbstractResource fakeResource = mock(AbstractResource.class);

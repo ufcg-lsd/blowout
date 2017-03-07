@@ -78,11 +78,11 @@ public class TaskMonitor implements Runnable{
 		}
 	}
 	
-	protected Map<Task, TaskProcess> getRunningTasks(){
+	public Map<Task, TaskProcess> getRunningTasks(){
 		return this.runningTasks;
 	}
 	
-	protected List<TaskProcess> getRunningProcesses(){
+	public List<TaskProcess> getRunningProcesses(){
 		List<TaskProcess> processes = new ArrayList<TaskProcess>();
 		processes.addAll(runningTasks.values());
 		return processes;
@@ -115,7 +115,7 @@ public class TaskMonitor implements Runnable{
 		return tp.getStatus();
 	}
 	
-	protected ExecutorService getExecutorService() {
+	public ExecutorService getExecutorService() {
 		return this.taskExecutor;
 	}
 
