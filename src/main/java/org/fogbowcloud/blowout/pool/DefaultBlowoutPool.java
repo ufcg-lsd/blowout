@@ -99,7 +99,12 @@ public class DefaultBlowoutPool implements BlowoutPool {
 
 	@Override
 	public Task getTaskById(String taskId) {
-		// TODO Auto-generated method stub
+		for(int i = 0; i <= taskPool.size(); i++) {
+			if(taskPool.get(i).getId().equals(taskId)) {
+				return taskPool.get(i);
+			}
+		}
+		
 		return null;
 	}
 
