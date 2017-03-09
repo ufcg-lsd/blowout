@@ -59,7 +59,7 @@ public class StandardScheduler implements SchedulerInterface {
 
 	protected Task chooseTaskForRunning(List<Task> tasks) {
 		for (Task task : tasks) {
-			if (!task.isFinished() && !runningTasks.containsKey(task)) {
+			if (!task.isFinished() && !runningTasks.containsValue(task)) {
 				return task;
 			}
 		}
