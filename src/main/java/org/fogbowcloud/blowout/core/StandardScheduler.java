@@ -8,15 +8,13 @@ import java.util.Map;
 import org.fogbowcloud.blowout.core.model.Task;
 import org.fogbowcloud.blowout.core.model.TaskProcess;
 import org.fogbowcloud.blowout.core.model.TaskProcessImpl;
-import org.fogbowcloud.blowout.core.model.TaskState;
 import org.fogbowcloud.blowout.core.monitor.TaskMonitor;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 import org.fogbowcloud.blowout.pool.AbstractResource;
-import org.fogbowcloud.blowout.pool.BlowoutPool;
 
 public class StandardScheduler implements SchedulerInterface {
 
-	Map<AbstractResource, Task> runningTasks = new HashMap<AbstractResource, Task>();
+	private Map<AbstractResource, Task> runningTasks = new HashMap<AbstractResource, Task>();
 	private TaskMonitor taskMon;
 
 	public StandardScheduler(TaskMonitor taskMon) {
@@ -25,7 +23,6 @@ public class StandardScheduler implements SchedulerInterface {
 
 	@Override
 	public void act(List<Task> tasks, List<AbstractResource> resources) {
-
 		for (AbstractResource resource : resources) {
 			actOnResource(resource, tasks);
 		}
@@ -42,10 +39,9 @@ public class StandardScheduler implements SchedulerInterface {
 	}
 
 	protected void actOnResource(AbstractResource resource, List<Task> tasks) {
-		ResourceState state = resource.getState();
 		// if resource idle
 		if (resource.getState().equals(ResourceState.IDLE)) {
-			Task task = chooseTaskForRunning(tasks);
+			Task task = chooseTaskForRunning(resource, tasks);
 			if (task != null) {
 				runTask(task, resource);
 			}
@@ -57,9 +53,10 @@ public class StandardScheduler implements SchedulerInterface {
 
 	}
 
-	protected Task chooseTaskForRunning(List<Task> tasks) {
+	protected Task chooseTaskForRunning(AbstractResource resource, List<Task> tasks) {
 		for (Task task : tasks) {
-			if (!task.isFinished() && !runningTasks.containsKey(task)) {
+			boolean isSameSpecification = resource.getRequestedSpec().equals(task.getSpecification());
+			if (!task.isFinished() && !runningTasks.containsValue(task) && isSameSpecification) {
 				return task;
 			}
 		}
@@ -96,9 +93,12 @@ public class StandardScheduler implements SchedulerInterface {
 		return tp;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<Task> getRunningTasks() {
 		return new ArrayList<Task>(runningTasks.values());
+	}
+	
+	protected void setRunningTasks(Map<AbstractResource, Task> runningTasks) {
+		this.runningTasks = runningTasks;
 	}
 }
