@@ -11,7 +11,6 @@ import org.fogbowcloud.blowout.core.model.Task;
 import org.fogbowcloud.blowout.core.model.TaskProcess;
 import org.fogbowcloud.blowout.core.model.TaskProcessImpl;
 import org.fogbowcloud.blowout.core.model.TaskState;
-import org.fogbowcloud.blowout.core.util.ManagerTimer;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 import org.fogbowcloud.blowout.pool.AbstractResource;
 import org.fogbowcloud.blowout.pool.BlowoutPool;
@@ -22,7 +21,6 @@ public class TaskMonitor implements Runnable{
 	
 	private ExecutorService taskExecutor = Executors.newCachedThreadPool();
 
-	private static ManagerTimer executionMonitorTimer = new ManagerTimer(Executors.newScheduledThreadPool(1));
 	private Thread monitoringServiceRunner;
 	
 	private BlowoutPool pool;
@@ -57,8 +55,7 @@ public class TaskMonitor implements Runnable{
 			}
 		}
 	}
-		
-
+	
 	public void procMon() {
 		for (TaskProcess tp : getRunningProcesses()) {
 			if (tp.getStatus().equals(TaskState.FAILED)) {

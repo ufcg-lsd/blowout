@@ -3,16 +3,17 @@ package org.fogbowcloud.blowout.pool;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.SchedulerInterface;
 import org.fogbowcloud.blowout.core.model.Task;
-import org.fogbowcloud.blowout.database.ResourceIdDatastore;
 import org.fogbowcloud.blowout.infrastructure.manager.InfrastructureManager;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 
 public class DefaultBlowoutPool implements BlowoutPool {
+	
+	public static final Logger LOGGER = Logger.getLogger(DefaultBlowoutPool.class);
 
 	private Map<String, AbstractResource> resourcePool = new ConcurrentHashMap<String, AbstractResource>();
 	private List<Task> taskPool = new ArrayList<Task>();
@@ -44,21 +45,20 @@ public class DefaultBlowoutPool implements BlowoutPool {
 	@Override
 	public void updateResource(AbstractResource resource, ResourceState state) {
 
-		AbstractResource oldResource = resourcePool.get(resource.getId());
-		if (oldResource != null) {
-			oldResource.setState(state);
-			resourcePool.put(resource.getId(), oldResource);
+		AbstractResource currentResource = resourcePool.get(resource.getId());
+		if (currentResource != null) {
+			currentResource.setState(state);
+			resourcePool.put(resource.getId(), currentResource);
 			callAct();
 		}
 	}
 
-	private void callAct() {
+	protected synchronized void callAct() {
 		try {
 			infraManager.act(getAllResources(), getAllTasks());
 			schedulerInterface.act(getAllTasks(), getAllResources());
 		} catch (Exception e) {
-			// TODO TODO Do what when it fails?
-			e.printStackTrace();
+			LOGGER.error("Error while calling act", e);
 		}
 	}
 
@@ -114,20 +114,35 @@ public class DefaultBlowoutPool implements BlowoutPool {
 		callAct();
 	}
 
-	public InfrastructureManager getInfraManager() {
+	protected InfrastructureManager getInfraManager() {
 		return infraManager;
 	}
 
-	public void setInfraManager(InfrastructureManager infraManager) {
+	protected void setInfraManager(InfrastructureManager infraManager) {
 		this.infraManager = infraManager;
 	}
 
-	public SchedulerInterface getSchedulerInterface() {
+	protected SchedulerInterface getSchedulerInterface() {
 		return schedulerInterface;
 	}
 
-	public void setSchedulerInterface(SchedulerInterface schedulerInterface) {
+	protected void setSchedulerInterface(SchedulerInterface schedulerInterface) {
 		this.schedulerInterface = schedulerInterface;
 	}
 
+	protected Map<String, AbstractResource> getResourcePool() {
+		return resourcePool;
+	}
+
+	protected void setResourcePool(Map<String, AbstractResource> resourcePool) {
+		this.resourcePool = resourcePool;
+	}
+
+	protected List<Task> getTaskPool() {
+		return taskPool;
+	}
+
+	protected void setTaskPool(List<Task> taskPool) {
+		this.taskPool = taskPool;
+	}
 }
