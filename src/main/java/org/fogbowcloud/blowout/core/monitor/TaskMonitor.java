@@ -60,7 +60,7 @@ public class TaskMonitor implements Runnable{
 		for (TaskProcess tp : getRunningProcesses()) {
 			if (tp.getStatus().equals(TaskState.FAILED)) {
 				getRunningTasks().remove(getTaskById(tp.getTaskId()));
-				if (tp.getResource()!= null) {
+				if (tp.getResource() != null) {
 					pool.updateResource(tp.getResource(), ResourceState.FAILED);
 				}
 			}
@@ -77,6 +77,10 @@ public class TaskMonitor implements Runnable{
 	
 	public Map<Task, TaskProcess> getRunningTasks(){
 		return this.runningTasks;
+	}
+	
+	protected void setRunningTasks(Map<Task, TaskProcess> runningTasks){
+		this.runningTasks = runningTasks;
 	}
 	
 	public List<TaskProcess> getRunningProcesses(){

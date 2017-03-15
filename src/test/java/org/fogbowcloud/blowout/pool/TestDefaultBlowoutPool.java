@@ -93,4 +93,9 @@ public class TestDefaultBlowoutPool {
 		// expect
 		Assert.assertEquals(ResourceState.IDLE, resource.getState());
 	}
+	
+	@Test
+	public void testAddResourceToList() {
+		
+	}
 }

@@ -103,6 +103,10 @@ public class TaskProcessImpl implements TaskProcess {
 	public void setStatus(TaskState status) {
 		this.status = status;
 	}
+	
+	public void setResource(AbstractResource resource) {
+		this.resource = resource;
+	}
 
 	private String getExecutableCommandString(Command command) {
 		if (command.getType().equals(Command.Type.LOCAL)) {

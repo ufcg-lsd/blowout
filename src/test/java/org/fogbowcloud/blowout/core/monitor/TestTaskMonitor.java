@@ -15,12 +15,21 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
+import org.fogbowcloud.blowout.core.StandardScheduler;
+import org.fogbowcloud.blowout.core.model.Command;
+import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.model.Task;
+import org.fogbowcloud.blowout.core.model.TaskImpl;
 import org.fogbowcloud.blowout.core.model.TaskProcess;
+import org.fogbowcloud.blowout.core.model.TaskProcessImpl;
 import org.fogbowcloud.blowout.core.model.TaskState;
+import org.fogbowcloud.blowout.infrastructure.manager.DefaultInfrastructureManager;
+import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 import org.fogbowcloud.blowout.pool.AbstractResource;
 import org.fogbowcloud.blowout.pool.BlowoutPool;
+import org.fogbowcloud.blowout.pool.DefaultBlowoutPool;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -30,11 +39,121 @@ public class TestTaskMonitor {
 	private static final String FAKE_ID = "fakeId";
 	public TaskMonitor taskMon;
 	public BlowoutPool pool;
+	public Specification spec;
 	
 	@Before
 	public void setUp(){
 		pool = mock(BlowoutPool.class);
 		this.taskMon = spy(new TaskMonitor(pool, 0));
+		spec = mock(Specification.class);
+	}
+	
+	@Test
+	public void testGetTaskStateCorrect() {
+		// set up
+		TaskImpl taskImpl = new TaskImpl("task-id", spec);
+		taskImpl.setState(TaskState.RUNNING);
+		
+		List<Command> commandListMock = mock(ArrayList.class);
+		
+		TaskProcessImpl taskProcessImpl = new TaskProcessImpl(taskImpl.getId(), commandListMock, spec);
+		taskProcessImpl.setStatus(TaskState.RUNNING);
+		
+		Map<Task, TaskProcess> runningTasks = mock(Map.class);
+		
+		TaskMonitor taskMon = new TaskMonitor(pool, 3000);
+		taskMon.setRunningTasks(runningTasks);
+		
+		doReturn(taskProcessImpl).when(runningTasks).get(taskImpl);
+		
+		// exercise
+		TaskState state = taskMon.getTaskState(taskImpl);
+		
+		// expect
+		Assert.assertEquals(TaskState.RUNNING, state);
+	}
+	
+	@Test
+	public void testGetTaskStateCompleted() {
+		// set up
+		TaskImpl taskImpl = new TaskImpl("task-id", spec);
+		taskImpl.setState(TaskState.FINNISHED);
+		taskImpl.finish();
+		
+		Map<Task, TaskProcess> runningTasks = mock(Map.class);
+		
+		TaskMonitor taskMon = new TaskMonitor(pool, 3000);
+		taskMon.setRunningTasks(runningTasks);
+		
+		doReturn(null).when(runningTasks).get(taskImpl);
+		
+		// exercise
+		TaskState state = taskMon.getTaskState(taskImpl);
+		
+		// expect
+		Assert.assertEquals(TaskState.COMPLETED, state);
+	}
+	
+	@Test
+	public void testGetTaskStateReady() {
+		// set up
+		TaskImpl taskImpl = new TaskImpl("task-id", spec);
+		taskImpl.setState(TaskState.READY);
+		
+		Map<Task, TaskProcess> runningTasks = mock(Map.class);
+		
+		TaskMonitor taskMon = new TaskMonitor(pool, 3000);
+		taskMon.setRunningTasks(runningTasks);
+		
+		doReturn(null).when(runningTasks).get(taskImpl);
+		
+		// exercise
+		TaskState state = taskMon.getTaskState(taskImpl);
+		
+		// expect
+		Assert.assertEquals(TaskState.READY, state);
+	}
+	
+	@Test
+	public void testTaskFinished() {
+		// set up
+		DefaultInfrastructureManager infraManager = mock(DefaultInfrastructureManager.class);
+		StandardScheduler standardScheduler = mock(StandardScheduler.class);
+		
+		DefaultBlowoutPool blowoutPool = new DefaultBlowoutPool();
+		blowoutPool.start(infraManager, standardScheduler);
+
+		TaskImpl taskOne = new TaskImpl("task-one-id", spec);
+		
+		List<Task> taskList = new ArrayList<Task>();
+		taskList.add(taskOne);
+		
+		blowoutPool.addTasks(taskList);
+		
+		AbstractResource resourceOne = new FogbowResource("resource-one-id", "order-one-id", spec);
+		
+		blowoutPool.addResource(resourceOne);
+		
+		List<Command> commandListMock = mock(ArrayList.class);
+		
+		TaskProcessImpl taskProcessOne = new TaskProcessImpl(taskOne.getId(), commandListMock, spec);
+		
+		taskProcessOne.setResource(resourceOne);
+		
+		taskProcessOne.setStatus(TaskState.FINNISHED);
+		
+		Map<Task, TaskProcess> runningTasks = new HashMap<Task, TaskProcess>();
+		runningTasks.put(taskOne, taskProcessOne);
+		
+		TaskMonitor taskMon = new TaskMonitor(blowoutPool, 3000);
+		taskMon.setRunningTasks(runningTasks);
+		
+		// exercise
+		taskMon.procMon();
+		
+		// expect
+		Assert.assertEquals(ResourceState.IDLE, resourceOne.getState());
+		Assert.assertEquals(true, taskOne.isFinished());
 	}
 	
 	@Test
