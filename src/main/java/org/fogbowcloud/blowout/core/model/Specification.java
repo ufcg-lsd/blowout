@@ -23,6 +23,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
 public class Specification implements Serializable {
+	private static final String REQUIREMENTS_MAP_STR = "requirementsMap";
+
+	private static final String USER_DATA_TYPE_STR = "userDataType";
+
+	private static final String USER_DATA_FILE_STR = "userDataFile";
+
+	private static final String CONTEXT_SCRIPT_STR = "contextScript";
+
+	private static final String PRIVATE_KEY_FILE_PATH_STR = "privateKeyFilePath";
+
+	private static final String PUBLIC_KEY_STR = "publicKey";
+
+	private static final String USERNAME_STR = "username";
+
+	private static final String IMAGE_STR = "image";
+
 	private static final Logger LOGGER = Logger.getLogger(Specification.class);
 
 	/**
@@ -279,14 +295,14 @@ public class Specification implements Serializable {
 	public JSONObject toJSON() {
 		try {
 			JSONObject specification = new JSONObject();
-			specification.put("image", this.getImage());
-			specification.put("username", this.getUsername());
-			specification.put("publicKey", this.getPublicKey());
-			specification.put("privateKeyFilePath", this.getPrivateKeyFilePath());
-			specification.put("contextScript", this.getContextScript());
-			specification.put("userDataFile", this.getUserDataFile());
-			specification.put("userDataType", this.getUserDataType());
-			specification.put("requirementsMap", getAllRequirements().toString());
+			specification.put(IMAGE_STR, this.getImage());
+			specification.put(USERNAME_STR, this.getUsername());
+			specification.put(PUBLIC_KEY_STR, this.getPublicKey());
+			specification.put(PRIVATE_KEY_FILE_PATH_STR, this.getPrivateKeyFilePath());
+			specification.put(CONTEXT_SCRIPT_STR, this.getContextScript());
+			specification.put(USER_DATA_FILE_STR, this.getUserDataFile());
+			specification.put(USER_DATA_TYPE_STR, this.getUserDataType());
+			specification.put(REQUIREMENTS_MAP_STR, getAllRequirements().toString());
 			return specification;
 		} catch (JSONException e) {
 			LOGGER.debug("Error while trying to create a JSON from Specification", e);
@@ -295,10 +311,10 @@ public class Specification implements Serializable {
 	}
 
 	public static Specification fromJSON(JSONObject specJSON) {
-		Specification specification = new Specification(specJSON.optString("image"), specJSON.optString("username"),
-				specJSON.optString("publicKey"), specJSON.optString("privateKeyFilePath"),
-				specJSON.optString("userDataFile"), specJSON.optString("userDataType"));
-		HashMap<String, String> reqMap = (HashMap<String, String>) toMap(specJSON.optString("requirementsMap"));
+		Specification specification = new Specification(specJSON.optString(IMAGE_STR), specJSON.optString(USERNAME_STR),
+				specJSON.optString(PUBLIC_KEY_STR), specJSON.optString(PRIVATE_KEY_FILE_PATH_STR),
+				specJSON.optString(USER_DATA_FILE_STR), specJSON.optString(USER_DATA_TYPE_STR));
+		HashMap<String, String> reqMap = (HashMap<String, String>) toMap(specJSON.optString(REQUIREMENTS_MAP_STR));
 		specification.putAllRequirements(reqMap);
 		return specification;
 	}
