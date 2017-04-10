@@ -18,9 +18,11 @@ import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
-public class Specification implements Serializable{
+public class Specification implements Serializable {
 	private static final Logger LOGGER = Logger.getLogger(Specification.class);
 
 	/**
@@ -34,16 +36,15 @@ public class Specification implements Serializable{
 	String contextScript;
 	String userDataFile;
 	String userDataType;
-	
+
 	Map<String, String> requirements = new HashMap<String, String>();
-	
-	public Specification(String image, String username, String publicKey,
-			String privateKeyFilePath) {
+
+	public Specification(String image, String username, String publicKey, String privateKeyFilePath) {
 		this(image, username, publicKey, privateKeyFilePath, null, null);
 	}
 
-	public Specification(String image, String username, String publicKey,
-			String privateKeyFilePath, String userDataFile, String userDataType) {
+	public Specification(String image, String username, String publicKey, String privateKeyFilePath,
+			String userDataFile, String userDataType) {
 		this.image = image;
 		this.username = username;
 		this.publicKey = publicKey;
@@ -51,69 +52,68 @@ public class Specification implements Serializable{
 		this.userDataFile = userDataFile;
 		this.userDataType = userDataType;
 	}
-	
-	public void addRequirement(String key, String value){
+
+	public void addRequirement(String key, String value) {
 		requirements.put(key, value);
 	}
-	
-	public String getRequirementValue(String key){
+
+	public String getRequirementValue(String key) {
 		return requirements.get(key);
 	}
 
-	public void putAllRequirements(Map<String, String> requirements){
-		for(Entry<String, String> e : requirements.entrySet()){
-			requirements.put(e.getKey(), e.getValue());
+	public void putAllRequirements(Map<String, String> requirements) {
+		for (Entry<String, String> e : requirements.entrySet()) {
+			
+			this.requirements.put(e.getKey(), e.getValue());
 		}
 	}
-	
-	public Map<String, String> getAllRequirements(){
+
+	public Map<String, String> getAllRequirements() {
 		return requirements;
 	}
-	
-	public void removeAllRequirements(){
+
+	public void removeAllRequirements() {
 		requirements = new HashMap<String, String>();
 	}
-	
-	public static List<Specification> getSpecificationsFromJSonFile(String jsonFilePath) throws IOException{
-		
+
+	public static List<Specification> getSpecificationsFromJSonFile(String jsonFilePath) throws IOException {
 
 		List<Specification> specifications = new ArrayList<Specification>();
 		if (jsonFilePath != null && !jsonFilePath.isEmpty()) {
-			
+
 			BufferedReader br = new BufferedReader(new FileReader(jsonFilePath));
 
 			Gson gson = new Gson();
 			specifications = Arrays.asList(gson.fromJson(br, Specification[].class));
 			br.close();
-			
-			for(Specification spec : specifications){
-				
+
+			for (Specification spec : specifications) {
+
 				File file = new File(spec.getPublicKey());
-				if(file.exists()){
+				if (file.exists()) {
 					StringBuilder sb = new StringBuilder();
 					BufferedReader brSpec = new BufferedReader(new FileReader(file));
 					String line = "";
-					while((line = brSpec.readLine()) != null && !line.isEmpty()){
+					while ((line = brSpec.readLine()) != null && !line.isEmpty()) {
 						sb.append(line);
 					}
 					spec.setPublicKey(sb.toString());
 				}
 			}
-			
-			
+
 		}
 		return specifications;
 	}
-	
-	public boolean parseToJsonFile(String jsonDestFilePath){
-		
+
+	public boolean parseToJsonFile(String jsonDestFilePath) {
+
 		List<Specification> spec = new ArrayList<Specification>();
 		spec.add(this);
 		return Specification.parseSpecsToJsonFile(spec, jsonDestFilePath);
-	} 
-	
-	public static boolean parseSpecsToJsonFile(List<Specification> specs, String jsonDestFilePath){
-		
+	}
+
+	public static boolean parseSpecsToJsonFile(List<Specification> specs, String jsonDestFilePath) {
+
 		if (jsonDestFilePath != null && !jsonDestFilePath.isEmpty()) {
 
 			BufferedWriter bw;
@@ -127,14 +127,13 @@ public class Specification implements Serializable{
 			} catch (IOException e) {
 				return false;
 			}
-		}else{
+		} else {
 			return false;
 		}
 	}
-	
+
 	// ----- GETTERS and SETTERS ------ //
-	
-	
+
 	public String getImage() {
 		return image;
 	}
@@ -150,7 +149,7 @@ public class Specification implements Serializable{
 	public String getPublicKey() {
 		return publicKey;
 	}
-	
+
 	public void setPublicKey(String publicKey) {
 		this.publicKey = publicKey;
 	}
@@ -162,7 +161,7 @@ public class Specification implements Serializable{
 	public void setContextScript(String contextScript) {
 		this.contextScript = contextScript;
 	}
-	
+
 	public String getUserDataFile() {
 		return userDataFile;
 	}
@@ -170,15 +169,15 @@ public class Specification implements Serializable{
 	public void setUserDataFile(String userDataFile) {
 		this.userDataFile = userDataFile;
 	}
-	
+
 	public String getUserDataType() {
 		return userDataType;
 	}
-	
+
 	public void setUserDataType(String userDataType) {
 		this.userDataType = userDataType;
-	} 
-	
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
@@ -187,10 +186,10 @@ public class Specification implements Serializable{
 		if (contextScript != null && !contextScript.isEmpty()) {
 			sb.append("\nContextScript: " + contextScript);
 		}
-		if(userDataFile != null && !userDataFile.isEmpty()) {
+		if (userDataFile != null && !userDataFile.isEmpty()) {
 			sb.append("\nUserDataFile:" + userDataFile);
 		}
-		if(userDataType != null && !userDataType.isEmpty()) {
+		if (userDataType != null && !userDataType.isEmpty()) {
 			sb.append("\nUserDataType:" + userDataType);
 		}
 		if (requirements != null && !requirements.isEmpty()) {
@@ -247,15 +246,15 @@ public class Specification implements Serializable{
 				return false;
 		} else if (!publicKey.equals(other.publicKey))
 			return false;
-		if(userDataFile == null) {
-			if(other.userDataFile != null)
+		if (userDataFile == null) {
+			if (other.userDataFile != null)
 				return false;
-		} else if(!userDataFile.equals(other.userDataFile))
+		} else if (!userDataFile.equals(other.userDataFile))
 			return false;
-		if(userDataType == null) {
-			if(other.userDataType != null)
+		if (userDataType == null) {
+			if (other.userDataType != null)
 				return false;
-		} else if(!userDataType.equals(other.userDataType))
+		} else if (!userDataType.equals(other.userDataType))
 			return false;
 		if (requirements == null) {
 			if (other.requirements != null)
@@ -269,13 +268,14 @@ public class Specification implements Serializable{
 			return false;
 		return true;
 	}
-	
+
 	public Specification clone() {
-		Specification cloneSpec = new Specification(this.image, this.username, this.publicKey, this.privateKeyFilePath, this.userDataFile, this.userDataType);
+		Specification cloneSpec = new Specification(this.image, this.username, this.publicKey, this.privateKeyFilePath,
+				this.userDataFile, this.userDataType);
 		cloneSpec.putAllRequirements(this.getAllRequirements());
 		return cloneSpec;
 	}
-	
+
 	public JSONObject toJSON() {
 		try {
 			JSONObject specification = new JSONObject();
@@ -286,6 +286,7 @@ public class Specification implements Serializable{
 			specification.put("contextScript", this.getContextScript());
 			specification.put("userDataFile", this.getUserDataFile());
 			specification.put("userDataType", this.getUserDataType());
+			specification.put("requirementsMap", getAllRequirements().toString());
 			return specification;
 		} catch (JSONException e) {
 			LOGGER.debug("Error while trying to create a JSON from Specification", e);
@@ -294,10 +295,29 @@ public class Specification implements Serializable{
 	}
 
 	public static Specification fromJSON(JSONObject specJSON) {
-		Specification specification = new Specification(specJSON.optString("image"),
-				specJSON.optString("username"), specJSON.optString("publicKey"), 
-				specJSON.optString("privateKeyFilePath"), specJSON.optString("userDataFile"), 
-				specJSON.optString("userDataType"));
+		Specification specification = new Specification(specJSON.optString("image"), specJSON.optString("username"),
+				specJSON.optString("publicKey"), specJSON.optString("privateKeyFilePath"),
+				specJSON.optString("userDataFile"), specJSON.optString("userDataType"));
+		HashMap<String, String> reqMap = (HashMap<String, String>) toMap(specJSON.optString("requirementsMap"));
+		specification.putAllRequirements(reqMap);
 		return specification;
+	}
+
+
+	public static Map<String, String> toMap(String jsonStr) {
+		Map<String, String> newMap = new HashMap<String, String>();
+		jsonStr = jsonStr.replace("{", "").replace("}", "");
+		String[] blocks = jsonStr.split(",");
+		for (int i = 0; i < blocks.length; i++) {
+			String block = blocks[i];
+			int indexOfCarac = block.indexOf("=");
+			if (indexOfCarac < 0) {
+				continue;
+			}
+			String key = block.substring(0, indexOfCarac).trim();
+			String value = block.substring(indexOfCarac + 1, block.length()).trim();
+			newMap.put(key, value);
+		}
+		return newMap;
 	}
 }

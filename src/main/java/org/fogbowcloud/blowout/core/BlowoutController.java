@@ -84,16 +84,16 @@ public class BlowoutController {
 		started = false;
 	}
 
-	public void addTask(Task task) {
+	public void addTask(Task task) throws BlowoutException {
 		if (!started) {
-			// TODO Throw new Blowout exception
+			throw new BlowoutException("Blowout hasn't been started yet");
 		}
 		blowoutPool.putTask(task);
 	}
 
-	public void addTaskList(List<Task> tasks) {
+	public void addTaskList(List<Task> tasks) throws BlowoutException {
 		if (!started) {
-			// TODO Throw new Blowout exception
+			throw new BlowoutException("Blowout hasn't been started yet");
 		}
 		blowoutPool.addTasks(tasks);
 	}

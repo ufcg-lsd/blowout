@@ -294,5 +294,4 @@ public class TaskImpl implements Task {
 		this.resource = resource;
 		
 	}
-	
 }
