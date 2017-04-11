@@ -115,7 +115,7 @@ public abstract class AbstractResource {
 		return state;
 	}
 
-	protected synchronized void setState(ResourceState state) {
+	public synchronized void setState(ResourceState state) {
 		this.state = state;
 	}
 	

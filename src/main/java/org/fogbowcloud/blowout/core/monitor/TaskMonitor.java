@@ -11,7 +11,6 @@ import org.fogbowcloud.blowout.core.model.Task;
 import org.fogbowcloud.blowout.core.model.TaskProcess;
 import org.fogbowcloud.blowout.core.model.TaskProcessImpl;
 import org.fogbowcloud.blowout.core.model.TaskState;
-import org.fogbowcloud.blowout.core.util.ManagerTimer;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 import org.fogbowcloud.blowout.pool.AbstractResource;
 import org.fogbowcloud.blowout.pool.BlowoutPool;
@@ -22,7 +21,6 @@ public class TaskMonitor implements Runnable{
 	
 	private ExecutorService taskExecutor = Executors.newCachedThreadPool();
 
-	private static ManagerTimer executionMonitorTimer = new ManagerTimer(Executors.newScheduledThreadPool(1));
 	private Thread monitoringServiceRunner;
 	
 	private BlowoutPool pool;
@@ -57,13 +55,12 @@ public class TaskMonitor implements Runnable{
 			}
 		}
 	}
-		
-
+	
 	public void procMon() {
 		for (TaskProcess tp : getRunningProcesses()) {
 			if (tp.getStatus().equals(TaskState.FAILED)) {
 				getRunningTasks().remove(getTaskById(tp.getTaskId()));
-				if (tp.getResource()!= null) {
+				if (tp.getResource() != null) {
 					pool.updateResource(tp.getResource(), ResourceState.FAILED);
 				}
 			}
@@ -78,11 +75,15 @@ public class TaskMonitor implements Runnable{
 		}
 	}
 	
-	protected Map<Task, TaskProcess> getRunningTasks(){
+	public Map<Task, TaskProcess> getRunningTasks(){
 		return this.runningTasks;
 	}
 	
-	protected List<TaskProcess> getRunningProcesses(){
+	protected void setRunningTasks(Map<Task, TaskProcess> runningTasks){
+		this.runningTasks = runningTasks;
+	}
+	
+	public List<TaskProcess> getRunningProcesses(){
 		List<TaskProcess> processes = new ArrayList<TaskProcess>();
 		processes.addAll(runningTasks.values());
 		return processes;
@@ -115,7 +116,7 @@ public class TaskMonitor implements Runnable{
 		return tp.getStatus();
 	}
 	
-	protected ExecutorService getExecutorService() {
+	public ExecutorService getExecutorService() {
 		return this.taskExecutor;
 	}
 

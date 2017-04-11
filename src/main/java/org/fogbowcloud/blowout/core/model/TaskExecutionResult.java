@@ -4,7 +4,8 @@ public class TaskExecutionResult {
 
 	public static final int OK = 0;
 	public static final int NOK = 128;
-
+	public static final int TIMEOUT = 124;
+	
 	private boolean taskFinished = false;
 	private int exitValue = -1;
 	

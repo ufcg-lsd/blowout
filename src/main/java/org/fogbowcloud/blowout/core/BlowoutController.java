@@ -24,26 +24,24 @@ public class BlowoutController {
 	private String DEFAULT_IMPLEMENTATION_INFRA_MANAGER = "org.fogbowcloud.blowout.infrastructure.manager.DefaultInfrastructureManager";
 	private String DEFAULT_IMPLEMENTATION_INFRA_PROVIDER = "org.fogbowcloud.blowout.infrastructure.provider.fogbow.FogbowInfrastructureProvider";
 
-	private BlowoutPool blowoutPool;
+	protected BlowoutPool blowoutPool;
 
 	// Scheduler elements
 	private SchedulerInterface schedulerInterface;
 	private TaskMonitor taskMonitor;
 
 	// Infrastructure elements.
-	private InfrastructureProvider infraProvider;
-	private InfrastructureManager infraManager;
-	private ResourceMonitor resourceMonitor;
+	protected InfrastructureProvider infraProvider;
 
-	private boolean started = false;
+	protected InfrastructureManager infraManager;
+	protected ResourceMonitor resourceMonitor;
+
+	protected boolean started = false;
 	private Properties properties;
 
 	public BlowoutController(Properties properties) throws BlowoutException {
 		this.properties = properties;
 		try {
-
-
-
 			if (!this.checkProperties(properties)) {
 				throw new BlowoutException("Error on validate the file ");
 			}
@@ -117,7 +115,7 @@ public class BlowoutController {
 		}
 	}
 
-	private BlowoutPool createBlowoutInstance() throws Exception {
+	public BlowoutPool createBlowoutInstance() throws Exception {
 		String providerClassName = this.properties.getProperty(AppPropertiesConstants.IMPLEMENTATION_BLOWOUT_POOL,
 				DEFAULT_IMPLEMENTATION_BLOWOUT_POOL);
 		Class<?> forName = Class.forName(providerClassName);
@@ -128,7 +126,7 @@ public class BlowoutController {
 		return (BlowoutPool) clazz;
 	}
 
-	private InfrastructureProvider createInfraProviderInstance(boolean removePreviousResouces) throws Exception {
+	public InfrastructureProvider createInfraProviderInstance(boolean removePreviousResouces) throws Exception {
 		String providerClassName = this.properties.getProperty(AppPropertiesConstants.IMPLEMENTATION_INFRA_PROVIDER,
 				DEFAULT_IMPLEMENTATION_INFRA_PROVIDER);
 		Class<?> forName = Class.forName(providerClassName);
@@ -139,7 +137,7 @@ public class BlowoutController {
 		return (InfrastructureProvider) clazz;
 	}
 
-	private InfrastructureManager createInfraManagerInstance() throws Exception {
+	public InfrastructureManager createInfraManagerInstance() throws Exception {
 		String providerClassName = this.properties.getProperty(AppPropertiesConstants.IMPLEMENTATION_INFRA_MANAGER,
 				DEFAULT_IMPLEMENTATION_INFRA_MANAGER);
 		Class<?> forName = Class.forName(providerClassName);
@@ -150,7 +148,7 @@ public class BlowoutController {
 		return (InfrastructureManager) clazz;
 	}
 
-	private SchedulerInterface createSchedulerInstance(TaskMonitor taskMonitor) throws Exception {
+	protected SchedulerInterface createSchedulerInstance(TaskMonitor taskMonitor) throws Exception {
 		String providerClassName = this.properties.getProperty(AppPropertiesConstants.IMPLEMENTATION_SCHEDULER,
 				DEFAULT_IMPLEMENTATION_SCHEDULER);
 		Class<?> forName = Class.forName(providerClassName);
@@ -161,7 +159,7 @@ public class BlowoutController {
 		return (SchedulerInterface) clazz;
 	}
 
-	private static boolean checkProperties(Properties properties) {
+	protected static boolean checkProperties(Properties properties) {
 		if (!properties.containsKey(AppPropertiesConstants.IMPLEMENTATION_INFRA_PROVIDER)) {
 			LOGGER.error("Required property " + AppPropertiesConstants.IMPLEMENTATION_INFRA_PROVIDER + " was not set");
 			return false;
@@ -186,5 +184,61 @@ public class BlowoutController {
 		}
 		LOGGER.debug("All properties are set");
 		return true;
+	}
+	
+	public BlowoutPool getBlowoutPool() {
+		return this.blowoutPool;
+	}
+
+	public void setBlowoutPool(BlowoutPool blowoutPool) {
+		this.blowoutPool = blowoutPool;
+	}
+	
+	public TaskMonitor getTaskMonitor() {
+		return taskMonitor;
+	}
+
+	public void setTaskMonitor(TaskMonitor taskMonitor) {
+		this.taskMonitor = taskMonitor;
+	}
+
+	public SchedulerInterface getSchedulerInterface() {
+		return schedulerInterface;
+	}
+
+	public void setSchedulerInterface(SchedulerInterface schedulerInterface) {
+		this.schedulerInterface = schedulerInterface;
+	}
+
+	public InfrastructureProvider getInfraProvider() {
+		return infraProvider;
+	}
+
+	public void setInfraProvider(InfrastructureProvider infraProvider) {
+		this.infraProvider = infraProvider;
+	}
+
+	public InfrastructureManager getInfraManager() {
+		return infraManager;
+	}
+
+	public void setInfraManager(InfrastructureManager infraManager) {
+		this.infraManager = infraManager;
+	}
+
+	public ResourceMonitor getResourceMonitor() {
+		return resourceMonitor;
+	}
+
+	public void setResourceMonitor(ResourceMonitor resourceMonitor) {
+		this.resourceMonitor = resourceMonitor;
+	}
+
+	public boolean isStarted() {
+		return started;
+	}
+
+	public void setStarted(boolean started) {
+		this.started = started;
 	}
 }

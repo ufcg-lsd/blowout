@@ -73,11 +73,12 @@ public class TestStandardScheduler {
 	
 	@Test
 	public void testActGoldePath() {
+		Specification spec = mock(Specification.class);		
 		List<Task> tasks = new ArrayList<Task>();
-		Task task = new TaskImpl("fakeId", mock(Specification.class));
+		Task task = new TaskImpl("fakeId", spec);
 		tasks.add(task);
 		List<AbstractResource> resources = new ArrayList<AbstractResource>();
-		AbstractResource resource = new FogbowResource("resourceId", "fakeOrderId", mock(Specification.class));
+		AbstractResource resource = new FogbowResource("resourceId", "fakeOrderId", spec);
 		ResourceStateHelper.changeResourceToState(resource, ResourceState.IDLE);
 		resources.add(resource);
 		
