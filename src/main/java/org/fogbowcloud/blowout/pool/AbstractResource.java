@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.fogbowcloud.blowout.core.model.Specification;
+import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 
 public abstract class AbstractResource {
@@ -45,6 +46,7 @@ public abstract class AbstractResource {
 	public AbstractResource(String id, Specification requestedSpec) {
 		this.id = id;
 		this.requestedSpec = requestedSpec;
+		this.localCommandInterpreter = requestedSpec.getRequirementValue(AppPropertiesConstants.LOCAL_COMMAND_INTERPRETER);
 		setState(ResourceState.NOT_READY);
 	}
 

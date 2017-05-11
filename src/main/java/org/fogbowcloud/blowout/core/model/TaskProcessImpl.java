@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.pool.AbstractResource;
+import org.fogbowcloud.manager.occi.model.Token.User;
 
 public class TaskProcessImpl implements TaskProcess {
 
@@ -42,7 +43,9 @@ public class TaskProcessImpl implements TaskProcess {
 	
 	private AbstractResource resource;
 
-	public TaskProcessImpl(String taskId, List<Command> commandList, Specification spec) {
+	private String userIdValue;
+
+	public TaskProcessImpl(String taskId, List<Command> commandList, Specification spec, String UserId) {
 		// check parameters?
 		this.processId = UUID.randomUUID().toString();
 		this.taskId = taskId;
@@ -50,6 +53,7 @@ public class TaskProcessImpl implements TaskProcess {
 		this.spec = spec;
 		this.commandList = commandList;
 		this.userId = UserID;
+		this.userIdValue = UserId;
 
 	}
 
@@ -158,7 +162,7 @@ public class TaskProcessImpl implements TaskProcess {
 	}
 
 	private Process startLocalProcess(String command, Map<String, String> additionalEnvVariables) throws IOException {
-		ProcessBuilder builder = new ProcessBuilder(localCommandInterpreter, this.userId, "9999", command);
+		ProcessBuilder builder = new ProcessBuilder(this.localCommandInterpreter, this.userIdValue, "9999", command);
 		if (additionalEnvVariables == null || additionalEnvVariables.isEmpty()) {
 			return builder.start();
 		}
@@ -167,6 +171,7 @@ public class TaskProcessImpl implements TaskProcess {
 		for (String envVariable : additionalEnvVariables.keySet()) {
 			builder.environment().put(envVariable, additionalEnvVariables.get(envVariable));
 		}
+		LOGGER.debug("Command: " + builder.command().toString());
 		return builder.start();
 	}
 

@@ -25,6 +25,7 @@ import org.junit.Test;
 
 public class TestDefaultBlowoutPool {
 	
+	private static final String FAKE_UUID = "1234";
 	private DefaultBlowoutPool defaultBlowoutPool;
 	private InfrastructureManager infraManager;
 	private StandardScheduler standardScheduler;
@@ -48,8 +49,8 @@ public class TestDefaultBlowoutPool {
 		resourcePool.put(resourceOne.getId(), resourceOne);
 		resourcePool.put(resourceTwo.getId(), resourceTwo);
 		
-		TaskImpl taskOne = new TaskImpl("task-one-id", spec);
-		TaskImpl taskTwo = new TaskImpl("task-two-id", spec);
+		TaskImpl taskOne = new TaskImpl("task-one-id", spec, FAKE_UUID);
+		TaskImpl taskTwo = new TaskImpl("task-two-id", spec, FAKE_UUID);
 		
 		List<Task> taskList = new ArrayList<Task>();
 		taskList.add(taskOne);

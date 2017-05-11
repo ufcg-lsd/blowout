@@ -22,6 +22,7 @@ import org.mockito.Mockito;
 
 public class TestStandardScheduler {
 
+	private static final String FAKE_UUID = "1234";
 	SchedulerInterface sched;
 	TaskMonitor taskMon;
 	
@@ -45,7 +46,7 @@ public class TestStandardScheduler {
 	@Test
 	public void testActOnEmptyResourceList() {
 		List<Task> tasks = new ArrayList<Task>();
-		Task task = new TaskImpl("fakeId", mock(Specification.class));
+		Task task = new TaskImpl("fakeId", mock(Specification.class), FAKE_UUID);
 		tasks.add(task);
 		List<AbstractResource> resources = new ArrayList<AbstractResource>();
 		sched.act(tasks, resources);
@@ -75,7 +76,7 @@ public class TestStandardScheduler {
 	public void testActGoldePath() {
 		Specification spec = mock(Specification.class);		
 		List<Task> tasks = new ArrayList<Task>();
-		Task task = new TaskImpl("fakeId", spec);
+		Task task = new TaskImpl("fakeId", spec, FAKE_UUID);
 		tasks.add(task);
 		List<AbstractResource> resources = new ArrayList<AbstractResource>();
 		AbstractResource resource = new FogbowResource("resourceId", "fakeOrderId", spec);
@@ -93,7 +94,7 @@ public class TestStandardScheduler {
 	@Test
 	public void testActOnFailedResource() {
 		List<Task> tasks = new ArrayList<Task>();
-		Task task = new TaskImpl("fakeId", mock(Specification.class));
+		Task task = new TaskImpl("fakeId", mock(Specification.class), FAKE_UUID);
 		tasks.add(task);
 		
 		List<AbstractResource> resources = new ArrayList<AbstractResource>();
@@ -106,7 +107,7 @@ public class TestStandardScheduler {
 	@Test
 	public void testActOnRemovedTask() {
 		List<Task> tasks = new ArrayList<Task>();
-		Task task = new TaskImpl("fakeId", mock(Specification.class));
+		Task task = new TaskImpl("fakeId", mock(Specification.class), FAKE_UUID);
 		tasks.add(task);
 		List<AbstractResource> resources = new ArrayList<AbstractResource>();
 		sched.act(tasks, resources);
@@ -119,7 +120,7 @@ public class TestStandardScheduler {
 	@Test
 	public void testActOnRemovedResource() {
 		List<Task> tasks = new ArrayList<Task>();
-		Task task = new TaskImpl("fakeId", mock(Specification.class));
+		Task task = new TaskImpl("fakeId", mock(Specification.class), FAKE_UUID);
 		tasks.add(task);
 		List<AbstractResource> resources = new ArrayList<AbstractResource>();
 		sched.act(tasks, resources);

@@ -15,6 +15,7 @@ import org.junit.Test;
 
 public class TestTaskImpl {
 	
+	private static final String FAKE_UUID = "1234";
 	private static final String FAKE_METADATA_VALUE = "fakemetadatavalue";
 	private static final String FAKE_METADATA = "fakemetadata";
 	private static final String TIME_OUT_VALUE_EMPTY = "";
@@ -31,7 +32,7 @@ public class TestTaskImpl {
 	public void setUp(){
 		spec = mock(Specification.class);
 		taskId = FAKE_TASK_ID;
-		task = spy(new TaskImpl(taskId, spec));
+		task = spy(new TaskImpl(taskId, spec, FAKE_UUID));
 	}
 	
 	@Test

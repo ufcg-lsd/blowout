@@ -39,6 +39,7 @@ import org.mockito.Mockito;
 
 public class TestFogbowInfrastructureProvider {
 
+	private static final String FAKE_DATA_FILE = "src/test/java/org/fogbowcloud/blowout/infrastructure/provider/fogbow/userDataMock";
 	private final String FILE_RESPONSE_NO_INSTANCE_ID = "src/test/resources/requestInfoWithoutInstanceId";
 	private final String FILE_RESPONSE_INSTANCE_ID = "src/test/resources/requestInfoWithInstanceId";
 	private final String FILE_RESPONSE_NO_SSH = "src/test/resources/instanceInfoWithoutSshInfo";
@@ -104,7 +105,7 @@ public class TestFogbowInfrastructureProvider {
 			String orderId = "order01";
 			
 			Specification specs = new Specification("imageMock", "UserName",
-					"publicKeyMock", "privateKeyMock", "userDataMock", "userDataType");
+					"publicKeyMock", "privateKeyMock", FAKE_DATA_FILE, "userDataType");
 
 			fogbowInfrastructureProvider.setHttpWrapper(httpWrapperMock);
 			doReturn(true).when(fogbowResourceDsMock).addFogbowResource(Mockito.any(FogbowResource.class));
@@ -156,7 +157,7 @@ public class TestFogbowInfrastructureProvider {
 		String memberIdMock = "member01";
 
 		Specification specs = new Specification("imageMock", "UserName",
-				"publicKeyMock", "privateKeyMock", "userDataMock", "userDataType");
+				"publicKeyMock", "privateKeyMock", FAKE_DATA_FILE, "userDataType");
 
 		//Create Mock behavior for httpWrapperMock
 		//Creating response for request for resource.
@@ -200,7 +201,7 @@ public class TestFogbowInfrastructureProvider {
 		String memberIdMock = "member01";
 
 		Specification specs = new Specification("imageMock", "UserName",
-				"publicKeyMock", "privateKeyMock", "userDataMock", "userDataType");
+				"publicKeyMock", "privateKeyMock", FAKE_DATA_FILE, "userDataType");
 
 		//Create Mock behavior for httpWrapperMock
 		//Creating response for request for resource.
@@ -282,7 +283,7 @@ public class TestFogbowInfrastructureProvider {
 		createDefaulInstanceAttributesResponse(requestIdMock, instanceIdMock, memSizeMock, coreSizeMock, hostMock, portMock);
 
 		Specification specs = new Specification("imageMock", "UserName",
-				"publicKeyMock", "privateKeyMock", "userDataMock", "userDataType");
+				"publicKeyMock", "privateKeyMock", FAKE_DATA_FILE, "userDataType");
 
 		fogbowInfrastructureProvider.setHttpWrapper(httpWrapperMock);
 		fogbowInfrastructureProvider.requestResource(specs);
@@ -319,11 +320,11 @@ public class TestFogbowInfrastructureProvider {
 		createDefaulInstanceAttributesResponseNoShh(requestIdMock, instanceIdMock, memSizeMock, coreSizeMock);
 
 		Specification specs = new Specification("imageMock", "UserName",
-				"publicKeyMock", "privateKeyMock", "userDataMock", "userDataType");
+				"publicKeyMock", "privateKeyMock", FAKE_DATA_FILE, "userDataType");
 
 		fogbowInfrastructureProvider.setHttpWrapper(httpWrapperMock);
 		fogbowInfrastructureProvider.requestResource(specs);
-		
+				
 		FogbowResource resource = mock(FogbowResource.class);
 		doReturn(requestIdMock).when(resource).getId();
 		

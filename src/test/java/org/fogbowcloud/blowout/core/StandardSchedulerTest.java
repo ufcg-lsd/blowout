@@ -18,6 +18,8 @@ import org.mockito.Mockito;
 
 public class StandardSchedulerTest {
 
+	private static final String FAKE_UUID = "1234";
+
 	@Test
 	public void testChooseTaskForRunningNotRunningAndSameSpecification() {
 		TaskMonitor taskMon = Mockito.mock(TaskMonitor.class);
@@ -26,11 +28,11 @@ public class StandardSchedulerTest {
 		List<Task> tasks = new ArrayList<Task>();
 		Specification specA = new Specification("imageA", "usernameA", "publicKeyA", "privateKeyFilePathA");
 		Specification specB = new Specification("imageB", "usernameB", "publicKeyB", "privateKeyFilePathB");
-		TaskImpl taskExcepcted = new TaskImpl("taskThree", specB);
-		tasks.add(new TaskImpl("taskOne", specA));
-		tasks.add(new TaskImpl("taskTwo", specA));
+		TaskImpl taskExcepcted = new TaskImpl("taskThree", specB, FAKE_UUID);
+		tasks.add(new TaskImpl("taskOne", specA, FAKE_UUID));
+		tasks.add(new TaskImpl("taskTwo", specA, FAKE_UUID));
 		tasks.add(taskExcepcted);
-		tasks.add(new TaskImpl("taskFour", specA));
+		tasks.add(new TaskImpl("taskFour", specA, FAKE_UUID));
 		
 		AbstractResource resourceWithSpecB = new FogbowResource("id", "orderId", specB);
 		
@@ -46,11 +48,11 @@ public class StandardSchedulerTest {
 		List<Task> tasks = new ArrayList<Task>();
 		Specification specA = new Specification("imageA", "usernameA", "publicKeyA", "privateKeyFilePathA");
 		Specification specB = new Specification("imageB", "usernameB", "publicKeyB", "privateKeyFilePathB");
-		TaskImpl taskExpected = new TaskImpl("taskFour", specB);
-		TaskImpl taskTwoRunning = new TaskImpl("taskTwo", specB);
-		TaskImpl taskThreeRunning = new TaskImpl("taskThree", specB);
-		TaskImpl taskFiveRunning = new TaskImpl("taskFive", specB);
-		tasks.add(new TaskImpl("taskOne", specA));
+		TaskImpl taskExpected = new TaskImpl("taskFour", specB, FAKE_UUID);
+		TaskImpl taskTwoRunning = new TaskImpl("taskTwo", specB, FAKE_UUID);
+		TaskImpl taskThreeRunning = new TaskImpl("taskThree", specB, FAKE_UUID);
+		TaskImpl taskFiveRunning = new TaskImpl("taskFive", specB, FAKE_UUID);
+		tasks.add(new TaskImpl("taskOne", specA, FAKE_UUID));
 		tasks.add(taskTwoRunning);
 		tasks.add(taskThreeRunning);
 		tasks.add(taskExpected);
@@ -79,11 +81,11 @@ public class StandardSchedulerTest {
 		List<Task> tasks = new ArrayList<Task>();
 		Specification specA = new Specification("imageA", "usernameA", "publicKeyA", "privateKeyFilePathA");
 		Specification specB = new Specification("imageB", "usernameB", "publicKeyB", "privateKeyFilePathB");
-		TaskImpl taskToRunning = new TaskImpl("taskFour", specB);
-		TaskImpl taskTwoRunning = new TaskImpl("taskTwo", specB);
-		TaskImpl taskThreeRunning = new TaskImpl("taskThree", specB);
-		TaskImpl taskFiveRunning = new TaskImpl("taskFive", specB);
-		tasks.add(new TaskImpl("taskOne", specA));
+		TaskImpl taskToRunning = new TaskImpl("taskFour", specB, FAKE_UUID);
+		TaskImpl taskTwoRunning = new TaskImpl("taskTwo", specB, FAKE_UUID);
+		TaskImpl taskThreeRunning = new TaskImpl("taskThree", specB, FAKE_UUID);
+		TaskImpl taskFiveRunning = new TaskImpl("taskFive", specB, FAKE_UUID);
+		tasks.add(new TaskImpl("taskOne", specA, FAKE_UUID));
 		tasks.add(taskTwoRunning);
 		tasks.add(taskThreeRunning);
 		tasks.add(taskToRunning);

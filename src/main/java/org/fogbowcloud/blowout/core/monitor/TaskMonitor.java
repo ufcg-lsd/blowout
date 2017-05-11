@@ -130,7 +130,7 @@ public class TaskMonitor implements Runnable{
 	}
 	
 	protected TaskProcess createProcess(Task task) {
-		TaskProcess tp = new TaskProcessImpl(task.getId(), task.getAllCommands(), task.getSpecification());
+		TaskProcess tp = new TaskProcessImpl(task.getId(), task.getAllCommands(), task.getSpecification(), task.getUUID());
 		return tp;
 	}
 

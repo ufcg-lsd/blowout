@@ -45,11 +45,14 @@ public class TaskImpl implements Task {
 
 	private long startedRunningAt = Long.MAX_VALUE;
 
-	public TaskImpl(String id, Specification spec) {
+	private String uuid;
+
+	public TaskImpl(String id, Specification spec, String uuid) {
 		this.id = id;
 		this.spec = spec;
 		this.state = TaskState.READY;
 		this.resource = null;
+		this.uuid = uuid;
 	}
 	
 	@Override
@@ -70,7 +73,7 @@ public class TaskImpl implements Task {
 	@Override
 	public Task clone() {
 		TaskImpl taskClone = new TaskImpl(UUID.randomUUID().toString() + "_clonedFrom_" + getId(),
-				getSpecification());
+				getSpecification(), getUUID());
 		Map<String, String> allMetadata = getAllMetadata();
 		for (String attribute : allMetadata.keySet()) {
 			taskClone.putMetadata(attribute, allMetadata.get(attribute));
@@ -236,6 +239,7 @@ public class TaskImpl implements Task {
 			task.put("id", this.getId());
 			task.put("spec", this.getSpecification().toJSON());
 			task.put("retries", this.getRetries());
+			task.put("uuid", this.getUUID());
 			JSONArray commands = new JSONArray();
 			for (Command command : this.getAllCommands()) {
 				commands.put(command.toJSON());
@@ -255,7 +259,7 @@ public class TaskImpl implements Task {
 
 	public static Task fromJSON(JSONObject taskJSON) {
 		Specification specification = Specification.fromJSON(taskJSON.optJSONObject("spec"));
-		Task task = new TaskImpl(taskJSON.optString("id"), specification);
+		Task task = new TaskImpl(taskJSON.optString("id"), specification, taskJSON.optString("uuid"));
 		task.setRetries(taskJSON.optInt("retries"));
 		if (taskJSON.optBoolean("isFinished")) {
 			task.finish();
@@ -293,5 +297,10 @@ public class TaskImpl implements Task {
 	public void setResource(AbstractResource resource) {
 		this.resource = resource;
 		
+	}
+
+	@Override
+	public String getUUID() {
+		return this.uuid;
 	}
 }

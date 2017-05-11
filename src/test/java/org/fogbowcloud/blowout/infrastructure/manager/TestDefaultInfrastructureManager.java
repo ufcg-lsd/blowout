@@ -30,6 +30,7 @@ import org.mockito.stubbing.Answer;
 
 public class TestDefaultInfrastructureManager {
 
+	private static final String FAKE_UUID = "1234";
 	private ResourceMonitor resourceMonitor;
 	private InfrastructureProvider infraProvider;
 	private InfrastructureManager defaultInfrastructureManager;
@@ -56,7 +57,7 @@ public class TestDefaultInfrastructureManager {
 		String taskId = "Task01";
 		Specification spec = new Specification("Image", "Fogbow", "myKey", "path");
 
-		Task task = new TaskImpl(taskId, spec);
+		Task task = new TaskImpl(taskId, spec, FAKE_UUID);
 		
 		List<Task> tasks = new ArrayList<Task>();
 		tasks.add(task);
@@ -88,9 +89,9 @@ public class TestDefaultInfrastructureManager {
 		
 		Specification spec = new Specification("Image", "Fogbow", "myKey", "path");
 
-		Task taskA = new TaskImpl(taskIdA, spec);
-		Task taskB = new TaskImpl(taskIdB, spec);
-		Task taskC = new TaskImpl(taskIdC, spec);
+		Task taskA = new TaskImpl(taskIdA, spec, FAKE_UUID);
+		Task taskB = new TaskImpl(taskIdB, spec, FAKE_UUID);
+		Task taskC = new TaskImpl(taskIdC, spec, FAKE_UUID);
 		
 		//These are the resources returned when the InfrastructureManager ask for new resources.
 		AbstractResource newResourceA = new FogbowResource(resourceIdA, orderIdA, spec);
@@ -136,7 +137,7 @@ public class TestDefaultInfrastructureManager {
 		String taskId = "Task01";
 		Specification spec = new Specification("Image", "Fogbow", "myKey", "path");
 
-		Task task = new TaskImpl(taskId, spec);
+		Task task = new TaskImpl(taskId, spec, FAKE_UUID);
 		
 		List<Task> tasks = new ArrayList<Task>();
 		tasks.add(task);
@@ -163,8 +164,8 @@ public class TestDefaultInfrastructureManager {
 		String taskIdB = "Task02";
 		Specification spec = new Specification("Image", "Fogbow", "myKey", "path");
 
-		Task taskA = new TaskImpl(taskIdA, spec);
-		Task taskB = new TaskImpl(taskIdB, spec);
+		Task taskA = new TaskImpl(taskIdA, spec, FAKE_UUID);
+		Task taskB = new TaskImpl(taskIdB, spec, FAKE_UUID);
 		
 		List<Task> tasks = new ArrayList<Task>();
 		tasks.add(taskA);
@@ -194,7 +195,7 @@ public class TestDefaultInfrastructureManager {
 		Specification specA = new Specification("ImageA", "Fogbow", "myKeyA", "path");
 		Specification specB = new Specification("ImageB", "Fogbow", "myKeyB", "path");
 
-		Task taskA = new TaskImpl(taskIdA, specA);
+		Task taskA = new TaskImpl(taskIdA, specA, FAKE_UUID);
 		AbstractResource pendingResource = new FogbowResource(resourceId, orderId, specB);
 		
 		List<Task> tasks = new ArrayList<Task>();
@@ -248,7 +249,7 @@ public class TestDefaultInfrastructureManager {
 		idleResource.putMetadata(FogbowResource.METADATA_DISK_SIZE, diskSize);
 		idleResource.putMetadata(FogbowResource.METADATA_LOCATION, location);
 		
-		Task taskA = new TaskImpl(taskIdA, specA);
+		Task taskA = new TaskImpl(taskIdA, specA, FAKE_UUID);
 		List<Task> tasks = new ArrayList<Task>();
 		tasks.add(taskA);
 		List<AbstractResource> resources = new ArrayList<AbstractResource>();
@@ -273,7 +274,7 @@ public class TestDefaultInfrastructureManager {
 		Specification specA = new Specification("ImageA", "Fogbow", "myKeyA", "path");
 		Specification specB = new Specification("ImageB", "Fogbow", "myKeyB", "path");
 
-		Task taskA = new TaskImpl(taskIdA, specA);
+		Task taskA = new TaskImpl(taskIdA, specA, FAKE_UUID);
 		AbstractResource idleResource = new FogbowResource(resourceId, orderId, specB);
 		ResourceStateHelper.changeResourceToState(idleResource, ResourceState.IDLE);
 		

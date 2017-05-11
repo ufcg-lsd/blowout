@@ -36,6 +36,7 @@ import org.junit.Test;
 
 public class TestTaskMonitor {
 
+	private static final String FAKE_UUID = "1234";
 	private static final String FAKE_ID = "fakeId";
 	public TaskMonitor taskMon;
 	public BlowoutPool pool;
@@ -51,12 +52,12 @@ public class TestTaskMonitor {
 	@Test
 	public void testGetTaskStateCorrect() {
 		// set up
-		TaskImpl taskImpl = new TaskImpl("task-id", spec);
+		TaskImpl taskImpl = new TaskImpl("task-id", spec, FAKE_UUID);
 		taskImpl.setState(TaskState.RUNNING);
 		
 		List<Command> commandListMock = mock(ArrayList.class);
 		
-		TaskProcessImpl taskProcessImpl = new TaskProcessImpl(taskImpl.getId(), commandListMock, spec);
+		TaskProcessImpl taskProcessImpl = new TaskProcessImpl(taskImpl.getId(), commandListMock, spec, FAKE_UUID);
 		taskProcessImpl.setStatus(TaskState.RUNNING);
 		
 		Map<Task, TaskProcess> runningTasks = mock(Map.class);
@@ -76,7 +77,7 @@ public class TestTaskMonitor {
 	@Test
 	public void testGetTaskStateCompleted() {
 		// set up
-		TaskImpl taskImpl = new TaskImpl("task-id", spec);
+		TaskImpl taskImpl = new TaskImpl("task-id", spec, FAKE_UUID);
 		taskImpl.setState(TaskState.FINNISHED);
 		taskImpl.finish();
 		
@@ -97,7 +98,7 @@ public class TestTaskMonitor {
 	@Test
 	public void testGetTaskStateReady() {
 		// set up
-		TaskImpl taskImpl = new TaskImpl("task-id", spec);
+		TaskImpl taskImpl = new TaskImpl("task-id", spec, FAKE_UUID);
 		taskImpl.setState(TaskState.READY);
 		
 		Map<Task, TaskProcess> runningTasks = mock(Map.class);
@@ -123,7 +124,7 @@ public class TestTaskMonitor {
 		DefaultBlowoutPool blowoutPool = new DefaultBlowoutPool();
 		blowoutPool.start(infraManager, standardScheduler);
 
-		TaskImpl taskOne = new TaskImpl("task-one-id", spec);
+		TaskImpl taskOne = new TaskImpl("task-one-id", spec, FAKE_UUID);
 		
 		List<Task> taskList = new ArrayList<Task>();
 		taskList.add(taskOne);
@@ -136,7 +137,7 @@ public class TestTaskMonitor {
 		
 		List<Command> commandListMock = mock(ArrayList.class);
 		
-		TaskProcessImpl taskProcessOne = new TaskProcessImpl(taskOne.getId(), commandListMock, spec);
+		TaskProcessImpl taskProcessOne = new TaskProcessImpl(taskOne.getId(), commandListMock, spec, FAKE_UUID);
 		
 		taskProcessOne.setResource(resourceOne);
 		

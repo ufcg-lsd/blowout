@@ -59,4 +59,6 @@ public interface Task extends Serializable{
 	public void setState(TaskState state);
 
 	public void setResource(AbstractResource resource);
+
+	public String getUUID();
 }

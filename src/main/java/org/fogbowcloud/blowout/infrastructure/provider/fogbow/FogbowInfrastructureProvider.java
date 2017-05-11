@@ -140,7 +140,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 			this.validateSpecification(spec);
 
 			List<Header> headers = (LinkedList<Header>) requestNewInstanceHeaders(spec);
-
+			LOGGER.debug("Headers: " + headers.toString());
 			requestInformation = this.doRequest("post", managerUrl + "/" + OrderConstants.TERM, headers);
 
 		} catch (Exception e) {
@@ -374,7 +374,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 				headers.add(new BasicHeader("X-OCCI-Attribute",
 						OrderAttribute.EXTRA_USER_DATA_CONTENT_TYPE_ATT.getValue() + "=" + specs.getUserDataType()));
 			} catch (IOException e) {
-				LOGGER.debug("User data file not found.");
+				LOGGER.debug("User data file not found.", e);
 				return null;
 			}
 		}
@@ -394,7 +394,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 	}
 
 	@SuppressWarnings("resource")
-	private static String getFileContent(String path) throws IOException {
+	protected static String getFileContent(String path) throws IOException {
 		FileReader reader = new FileReader(path);
 		BufferedReader leitor = new BufferedReader(reader);
 		String fileContent = "";

@@ -16,6 +16,7 @@ import org.junit.Test;
 
 public class TaskProcessImplTest {
 
+	private static final String FAKE_UUID = "1234";
 	private static final String FAKE_TASK_ID = "fakeTaskId";
 	private static final String FAKE_COMMAND = "fakeCommand";
 	private static final String FAKE_COMMAND2 = "fakeCommand2";
@@ -30,7 +31,7 @@ public class TaskProcessImplTest {
 		commandList.add(new Command(FAKE_COMMAND, Command.Type.LOCAL));
 		FogbowResource resource = mock(FogbowResource.class);
 
-		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec));
+		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, FAKE_UUID));
 
 		TaskExecutionResult terSuccess = new TaskExecutionResult();
 		terSuccess.finish(0);
@@ -51,7 +52,7 @@ public class TaskProcessImplTest {
 		commandList.add(new Command(FAKE_COMMAND, Command.Type.LOCAL));
 		FogbowResource resource = mock(FogbowResource.class);
 
-		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec));
+		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, FAKE_UUID));
 
 		TaskExecutionResult terFail = new TaskExecutionResult();
 		terFail.finish(1);
@@ -74,7 +75,7 @@ public class TaskProcessImplTest {
 		commandList.add(new Command(FAKE_COMMAND3, Command.Type.LOCAL));
 		FogbowResource resource = mock(FogbowResource.class);
 
-		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec));
+		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, FAKE_UUID));
 
 		TaskExecutionResult terSuccess = new TaskExecutionResult();
 		terSuccess.finish(0);
@@ -101,7 +102,7 @@ public class TaskProcessImplTest {
 		commandList.add(new Command(FAKE_COMMAND3, Command.Type.LOCAL));
 		FogbowResource resource = mock(FogbowResource.class);
 
-		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec));
+		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, FAKE_UUID));
 		
 		TaskExecutionResult terSuccess = new TaskExecutionResult();
 		terSuccess.finish(0);
@@ -133,7 +134,7 @@ public class TaskProcessImplTest {
 		commandList.add(new Command(FAKE_COMMAND3, Command.Type.LOCAL));
 		FogbowResource resource = mock(FogbowResource.class);
 
-		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec));
+		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, FAKE_UUID));
 
 		doReturn(ter).when(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
 
