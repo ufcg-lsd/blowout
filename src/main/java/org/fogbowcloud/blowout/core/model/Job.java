@@ -47,12 +47,4 @@ public abstract class Job implements Serializable {
 		tasks.addAll(getTaskList().values());
 		return tasks;
 	}
-	
-	public void setUUID(String UUID) {
-		this.UUID = UUID;
-	}
-	
-	public String getUUID() {
-		return this.UUID;
-	}
 }
