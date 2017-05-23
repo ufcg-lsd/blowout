@@ -32,25 +32,27 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 	public synchronized void act(List<AbstractResource> resources, List<Task> tasks) throws Exception {
 
 		Map<Specification, Integer> specsDemand = new HashMap<Specification, Integer>();
-
-		// FIXME: this variable name is incorrect, since the list will not contain only idle resources
-		List<AbstractResource> idleResources = filterResourcesByState(resources, ResourceState.IDLE, 
+		List<AbstractResource> filteredResources = filterResourcesByState(resources, ResourceState.IDLE, 
 				ResourceState.BUSY, ResourceState.FAILED);
+		
 		// Generate demand for tasks
 		for (Task task : tasks) {
-
 			if (!task.isFinished()) {
-
 				boolean resourceResolved = false;
-
-				for (AbstractResource resource : idleResources) {
-
-					if (resource.match(task.getSpecification())) {
+				AbstractResource resourceToRemove = null;
+				for (AbstractResource resource : filteredResources) {
+					if (resource.match(task.getSpecification())
+							&& !resource.getState().equals(ResourceState.BUSY)
+							&& !resource.getState().equals(ResourceState.FAILED)) {
 						resourceResolved = true;
+						resourceToRemove = resource;
 					}
 				}
+				
 				if (!resourceResolved) {
 					incrementDecrementDemand(specsDemand, task.getSpecification(), true);
+				} else {
+					filteredResources.remove(resourceToRemove);
 				}
 			}
 		}
@@ -71,7 +73,6 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 				resourceMonitor.addPendingResource(resourceId, spec);
 
 			}
-
 		}
 	}
 
