@@ -25,3 +25,4 @@ SEBAL-scheduler is a distributed system to gather sattelite imagery, process the
 
 ## monitor
 - doc how to check scheduler, fetcher, crawler statuses
+
