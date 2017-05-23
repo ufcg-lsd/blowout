@@ -38,6 +38,7 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 		Map<Specification, Integer> specsDemand = new HashMap<Specification, Integer>();
 		List<AbstractResource> idleResources = filterResourcesByState(resources, ResourceState.IDLE);
 		LOGGER.debug("idleResources=" + idleResources.size());
+		LOGGER.debug("tasks=" + tasks.size());
 				
 		// Generate demand for tasks
 		for (Task task : tasks) {
@@ -48,6 +49,7 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 					if (resource.match(task.getSpecification())) {
 						resourceResolved = true;
 						resourceToRemove = resource;
+						LOGGER.debug("resourceToRemove=" + resourceToRemove.getId());
 					}
 				}
 				
@@ -56,7 +58,8 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 				} else {
 					idleResources.remove(resourceToRemove);
 				}				
-				LOGGER.debug("resourceResolved=" + resourceResolved + " task=" + task.getId());
+				LOGGER.debug("resourceResolved=" + resourceResolved + " task="
+						+ task.getId());
 			}
 		}
 
@@ -72,6 +75,9 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 		for (Entry<Specification, Integer> entry : specsDemand.entrySet()) {
 			Specification spec = entry.getKey();
 			Integer qty = entry.getValue();
+			
+			LOGGER.debug("qty=" + qty);
+			LOGGER.debug("spec=" + spec.toString());
 			for (int count = 0; count < qty.intValue(); count++) {
 				String resourceId = infraProvider.requestResource(spec);
 				resourceMonitor.addPendingResource(resourceId, spec);
