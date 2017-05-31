@@ -1,6 +1,9 @@
 package org.fogbowcloud.blowout.core.model;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,7 +12,6 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.pool.AbstractResource;
-import org.fogbowcloud.manager.occi.model.Token.User;
 
 public class TaskProcessImpl implements TaskProcess {
 
@@ -40,7 +42,7 @@ public class TaskProcessImpl implements TaskProcess {
 	private String processId;
 
 	private String userId;
-	
+
 	private AbstractResource resource;
 
 	private String userIdValue;
@@ -88,7 +90,7 @@ public class TaskProcessImpl implements TaskProcess {
 			taskExecutionResult = executeCommandString(commandString, command.getType(), resource);
 			LOGGER.debug("Command result: " + taskExecutionResult.getExitValue());
 			if (taskExecutionResult.getExitValue() != TaskExecutionResult.OK) {
-				if(taskExecutionResult.getExitValue() == TaskExecutionResult.TIMEOUT) {
+				if (taskExecutionResult.getExitValue() == TaskExecutionResult.TIMEOUT) {
 					this.setStatus(TaskState.TIMEDOUT);
 					break;
 				}
@@ -107,7 +109,7 @@ public class TaskProcessImpl implements TaskProcess {
 	public void setStatus(TaskState status) {
 		this.status = status;
 	}
-	
+
 	public void setResource(AbstractResource resource) {
 		this.resource = resource;
 	}
@@ -129,20 +131,50 @@ public class TaskProcessImpl implements TaskProcess {
 		Map<String, String> additionalVariables = getAdditionalEnvVariables(resource);
 		try {
 			if (type.equals(Command.Type.LOCAL)) {
-				Process localProc = startLocalProcess(commandString, additionalVariables);
-				returnValue = localProc.waitFor();
-
+				 Process localProc = startLocalProcess(commandString,
+				 additionalVariables);
+				 returnValue = localProc.waitFor();
+//				Process localProc = new ProcessBuilder("scp", "-o", "UserKnownHostsFile=/dev/null", "-o" ,"StrictHostKeyChecking=no", "-P", "10122", "-i", 
+//						"/local/ubuntu/.ssh/id_rsa", "/tmp/arrebol-transfer/fakesim.jdf", "fogbow@150.165.85.18:fakesim.jdf").start();
+//				returnValue = localProc.waitFor();
+				InputStream error = localProc.getErrorStream();
+				InputStreamReader isrerror = new InputStreamReader(error);
+				BufferedReader bre = new BufferedReader(isrerror);
+				String linee = "";
+				while ((linee = bre.readLine()) != null) {
+					LOGGER.debug("Error Stream "+ linee);
+				    }
+			} else if (type.equals(Command.Type.USER_DEPENDANT)) {
+				Process userDepProc = startUserDependantProcess(commandString, additionalVariables);
+				returnValue = userDepProc.waitFor();
 			} else {
 				Process remoteProc = startRemoteProcess(commandString, additionalVariables);
 				returnValue = remoteProc.waitFor();
 
 			}
 		} catch (Exception e) {
-			returnValue = TaskExecutionResult.NOK;
+			// returnValue = TaskExecutionResult.NOK;
+			LOGGER.debug("Error on command ", e);
 		}
 
 		taskExecutionResult.finish(returnValue);
 		return taskExecutionResult;
+	}
+
+	private Process startUserDependantProcess(String commandString, Map<String, String> additionalEnvVariables)
+			throws IOException {
+		ProcessBuilder builder = new ProcessBuilder("sudo", this.localCommandInterpreter, this.userIdValue, "9999",
+				commandString);
+		if (additionalEnvVariables == null || additionalEnvVariables.isEmpty()) {
+			return builder.start();
+		}
+		// adding additional environment variables related to resource and/or
+		// task
+		for (String envVariable : additionalEnvVariables.keySet()) {
+			builder.environment().put(envVariable, additionalEnvVariables.get(envVariable));
+		}
+		LOGGER.debug("Command: " + builder.command().toString());
+		return builder.start();
 	}
 
 	private Process startRemoteProcess(String commandString, Map<String, String> additionalVariables)
@@ -161,8 +193,10 @@ public class TaskProcessImpl implements TaskProcess {
 
 	}
 
+	// ProcessBuilder builder = new ProcessBuilder(this.localCommandInterpreter,
+	// this.userIdValue, "9999", command);
 	private Process startLocalProcess(String command, Map<String, String> additionalEnvVariables) throws IOException {
-		ProcessBuilder builder = new ProcessBuilder(this.localCommandInterpreter, this.userIdValue, "9999", command);
+		ProcessBuilder builder = new ProcessBuilder(command.split(" "));
 		if (additionalEnvVariables == null || additionalEnvVariables.isEmpty()) {
 			return builder.start();
 		}
@@ -172,6 +206,7 @@ public class TaskProcessImpl implements TaskProcess {
 			builder.environment().put(envVariable, additionalEnvVariables.get(envVariable));
 		}
 		LOGGER.debug("Command: " + builder.command().toString());
+		LOGGER.debug("Environmet: " + builder.environment().toString());
 		return builder.start();
 	}
 

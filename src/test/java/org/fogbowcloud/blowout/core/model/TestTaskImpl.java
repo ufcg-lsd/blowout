@@ -97,8 +97,8 @@ public class TestTaskImpl {
 		List<Command> commands = new ArrayList<Command>();
 		Command remoteCommand = new Command("fakeremotecomand", Command.Type.REMOTE);
 		Command prologueCommand = new Command("fakeprologueCommand", Command.Type.LOCAL);
-		Command epilogueCommand = new Command("fakeepilogueCommand", Command.Type.EPILOGUE);
-		Command epilogueCommand2 = new Command("fakeepilogueCommand2", Command.Type.EPILOGUE);
+		Command epilogueCommand = new Command("fakeepilogueCommand", Command.Type.USER_DEPENDANT);
+		Command epilogueCommand2 = new Command("fakeepilogueCommand2", Command.Type.USER_DEPENDANT);
 		commands.add(remoteCommand);
 		commands.add(epilogueCommand);
 		commands.add(epilogueCommand2);
@@ -109,7 +109,7 @@ public class TestTaskImpl {
 		assertEquals(1, remoteCommands.size());
 		assert(remoteCommands.contains(remoteCommand));
 		
-		List<Command> epilogueCommands = (ArrayList<Command>) task.getCommandsByType(Command.Type.EPILOGUE);
+		List<Command> epilogueCommands = (ArrayList<Command>) task.getCommandsByType(Command.Type.USER_DEPENDANT);
 		assertEquals(2, epilogueCommands.size());
 		assert(epilogueCommands.contains(epilogueCommand));
 		assert(epilogueCommands.contains(epilogueCommand2));
