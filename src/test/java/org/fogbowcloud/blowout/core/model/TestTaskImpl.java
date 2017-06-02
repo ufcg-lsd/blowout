@@ -115,4 +115,19 @@ public class TestTaskImpl {
 		assert(epilogueCommands.contains(epilogueCommand2));
 	}
 	
+	@Test
+	public void testEnv(){
+ 		String commandString = "scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -P $SSH_PORT -i $PRIVATE_KEY_FILE /tmp/arrebol-transfer/fakesim.jdf $SSH_USER@$HOST:fakesim.jdf";
+		Map<String, String> addVar = new HashMap<String, String>();
+		addVar.put("SSH_USER","fogbow");
+		addVar.put("HOST", "150.165.85.18");
+		addVar.put("SSH_PORT", "10148");
+		addVar.put("UUID", "UUID");
+		addVar.put("PRIVATE_KEY_FILE", "/local/ubuntu/.ssh/id_rsa");
+
+
+		assertEquals(TaskProcessImpl.parseLocalEnvironVariable(commandString, addVar), "scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -P 10148 -i /local/ubuntu/.ssh/id_rsa /tmp/arrebol-transfer/fakesim.jdf fogbow@150.165.85.18:fakesim.jdf");
+
+	}
+	
 }

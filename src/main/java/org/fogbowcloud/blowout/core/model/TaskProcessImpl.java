@@ -193,26 +193,31 @@ public class TaskProcessImpl implements TaskProcess {
 
 	}
 
+	
+	
 	// ProcessBuilder builder = new ProcessBuilder(this.localCommandInterpreter,
 	// this.userIdValue, "9999", command);
 	private Process startLocalProcess(String command, Map<String, String> additionalEnvVariables) throws IOException {
-		ProcessBuilder builder = new ProcessBuilder(command.split(" "));
-		if (additionalEnvVariables == null || additionalEnvVariables.isEmpty()) {
-			return builder.start();
-		}
-		// adding additional environment variables related to resource and/or
-		// task
-		for (String envVariable : additionalEnvVariables.keySet()) {
-			builder.environment().put(envVariable, additionalEnvVariables.get(envVariable));
-		}
+		String localCommand = "sudo "+ parseLocalEnvironVariable(command, additionalEnvVariables);
+		ProcessBuilder builder = new ProcessBuilder(localCommand.split(" "));
 		LOGGER.debug("Command: " + builder.command().toString());
-		LOGGER.debug("Environmet: " + builder.environment().toString());
 		return builder.start();
+	}
+
+	protected static String parseLocalEnvironVariable(String commandString, Map<String, String> additionalVariables) {
+		
+		for (String envVar : additionalVariables.keySet()) {
+			LOGGER.debug("Variable: " +"$"+envVar + " variable value: "+additionalVariables.get(envVar));
+			
+			commandString = commandString.replace("$"+envVar, additionalVariables.get(envVar));
+		}
+		LOGGER.debug("Command String " + commandString);
+		return commandString;
 	}
 
 	private String parseEnvironVariable(String commandString, Map<String, String> additionalVariables) {
 		for (String envVar : additionalVariables.keySet()) {
-			commandString.replace(envVar, additionalVariables.get(envVar));
+			commandString = commandString.replace(envVar, additionalVariables.get(envVar));
 		}
 		return commandString;
 	}
