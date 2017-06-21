@@ -2,6 +2,9 @@ package org.fogbowcloud.blowout.pool;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.never;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,6 +79,122 @@ public class TestDefaultBlowoutPool {
 		Assert.assertEquals(ResourceState.BUSY, resourceOne.getState());
 		Assert.assertEquals(ResourceState.BUSY, resourceTwo.getState());
 	}
+	
+	@Test
+	public void testAddTask(){
+		// set up
+				
+				Map<String, AbstractResource> resourcePool = new ConcurrentHashMap<String, AbstractResource>();
+				
+				
+				List<Task> taskList = new ArrayList<Task>();
+				
+				defaultBlowoutPool.setResourcePool(resourcePool);
+				defaultBlowoutPool.setTaskPool(taskList);
+				
+				InfrastructureProvider fogbowInfraProvider = mock(InfrastructureProvider.class);
+				ResourceMonitor resourceMonitor = mock(ResourceMonitor.class);
+				
+				TaskMonitor taskMon = new TaskMonitor(defaultBlowoutPool, 3000);
+				
+				infraManager = spy( new DefaultInfrastructureManager(fogbowInfraProvider, resourceMonitor));
+				standardScheduler = spy( new StandardScheduler(taskMon));
+				
+				defaultBlowoutPool.start(infraManager, standardScheduler);
+				
+				// exercise
+				defaultBlowoutPool.callAct();
+				TaskImpl task = new TaskImpl("task-two-id", spec, FAKE_UUID);
+
+				
+				defaultBlowoutPool.putTask(task);
+				verify(resourceMonitor).addPendingResource(any(String.class), any (Specification.class));
+				// expect
+				
+	}
+	
+	@Test
+	public void testAddTaskWithFreeResourceJobs(){
+		// set up
+		FogbowResource resourceOne = new FogbowResource("resource-one-id", "order-one-id", spec);
+		resourceOne.setState(ResourceState.IDLE);
+		
+		Map<String, AbstractResource> resourcePool = new ConcurrentHashMap<String, AbstractResource>();
+		
+		resourcePool.put(resourceOne.getId(), resourceOne);
+		
+		List<Task> taskList = new ArrayList<Task>();
+		
+		defaultBlowoutPool.setResourcePool(resourcePool);
+		defaultBlowoutPool.setTaskPool(taskList);
+		
+		InfrastructureProvider fogbowInfraProvider = mock(InfrastructureProvider.class);
+		ResourceMonitor resourceMonitor = mock(ResourceMonitor.class);
+		
+		TaskMonitor taskMon = new TaskMonitor(defaultBlowoutPool, 3000);
+		
+		infraManager = spy( new DefaultInfrastructureManager(fogbowInfraProvider, resourceMonitor));
+		standardScheduler = spy( new StandardScheduler(taskMon));
+		
+		defaultBlowoutPool.start(infraManager, standardScheduler);
+		
+		// exercise
+		defaultBlowoutPool.callAct();
+		TaskImpl task = new TaskImpl("task-two-id", spec, FAKE_UUID);
+
+		defaultBlowoutPool.putTask(task);
+		
+//		TaskImpl task2 = new TaskImpl("task-two-id2", spec, FAKE_UUID);
+//
+//		defaultBlowoutPool.putTask(task2);
+		
+		verify(resourceMonitor, never()).addPendingResource(any(String.class), any (Specification.class));
+		// expect
+		
+	}
+	
+	@Test
+	public void testAddTaskWithRunningTask(){
+		// set up
+		FogbowResource resourceOne = new FogbowResource("resource-one-id", "order-one-id", spec);
+		resourceOne.setState(ResourceState.BUSY);
+		
+		Map<String, AbstractResource> resourcePool = new ConcurrentHashMap<String, AbstractResource>();
+		
+		resourcePool.put(resourceOne.getId(), resourceOne);
+		
+		List<Task> taskList = new ArrayList<Task>();
+		
+		TaskImpl task = new TaskImpl("task-two-id2", spec, FAKE_UUID);
+		taskList.add(task);
+		defaultBlowoutPool.setResourcePool(resourcePool);
+		defaultBlowoutPool.setTaskPool(taskList);
+		
+		InfrastructureProvider fogbowInfraProvider = mock(InfrastructureProvider.class);
+		ResourceMonitor resourceMonitor = mock(ResourceMonitor.class);
+		
+		TaskMonitor taskMon = new TaskMonitor(defaultBlowoutPool, 3000);
+		
+		infraManager = spy( new DefaultInfrastructureManager(fogbowInfraProvider, resourceMonitor));
+		standardScheduler = spy( new StandardScheduler(taskMon));
+		
+		defaultBlowoutPool.start(infraManager, standardScheduler);
+		
+		// exercise
+		defaultBlowoutPool.callAct();
+		TaskImpl task2 = new TaskImpl("task-two-id", spec, FAKE_UUID);
+
+		defaultBlowoutPool.putTask(task2);
+		
+//		TaskImpl task2 = new TaskImpl("task-two-id2", spec, FAKE_UUID);
+//
+//		defaultBlowoutPool.putTask(task2);
+		
+		verify(resourceMonitor).addPendingResource(any(String.class), any (Specification.class));
+		// expect
+		
+	}
+	
 	
 	@Test
 	public void testUpdateResource() {

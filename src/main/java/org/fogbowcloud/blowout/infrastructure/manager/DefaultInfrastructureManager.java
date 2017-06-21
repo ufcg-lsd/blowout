@@ -47,6 +47,8 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 
 					if (resource.match(task.getSpecification())) {
 						resourceResolved = true;
+						idleResources.remove(resource);
+						break;
 					}
 				}
 				if (!resourceResolved) {
