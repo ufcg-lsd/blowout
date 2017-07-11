@@ -44,7 +44,6 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 				boolean resourceResolved = false;
 
 				for (AbstractResource resource : idleResources) {
-
 					if (resource.match(task.getSpecification())) {
 						resourceResolved = true;
 						idleResources.remove(resource);
@@ -57,16 +56,15 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 			}
 		}
 
-		// Reduce demand by pending resources
-		for (Specification pendingSpec : resourceMonitor.getPendingSpecification()) {
-			incrementDecrementDemand(specsDemand, pendingSpec, false);
-		}
-
 		// Request resources according to the demand.
 		for (Entry<Specification, Integer> entry : specsDemand.entrySet()) {
 
 			Specification spec = entry.getKey();
 			Integer qty = entry.getValue();
+			//Reduce requests by pending resources
+			Integer requested = this.resourceMonitor.getPendingRequests().get(spec);
+			if (requested == null) requested = 0;
+			qty = qty - requested;
 			for (int count = 0; count < qty.intValue(); count++) {
 
 				String resourceId = infraProvider.requestResource(spec);

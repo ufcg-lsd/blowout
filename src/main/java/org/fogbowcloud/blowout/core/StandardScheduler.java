@@ -76,7 +76,6 @@ public class StandardScheduler implements SchedulerInterface {
 
 	@Override
 	public void runTask(Task task, AbstractResource resource) {
-
 		runningTasks.put(resource, task);
 		// submit to task executor
 		// resource.setState(ResourceState.NOT_READY);

@@ -3,8 +3,10 @@ package org.fogbowcloud.blowout.infrastructure.monitor;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -248,6 +250,19 @@ public class ResourceMonitor {
 	
 	public List<Specification> getPendingSpecification() {
 		return new ArrayList<Specification>(pendingResources.values());
+	}
+	
+	public Map<Specification, Integer> getPendingRequests() {
+		Map<Specification, Integer> specCount = new HashMap<Specification, Integer>();
+		for (Entry<String, Specification> e : this.pendingResources.entrySet()) {
+			if (specCount.containsKey(e.getValue())) {
+				specCount.put(e.getValue(), specCount.get(e.getValue()) +1);
+			} else {
+				specCount.put(e.getValue(), 1);
+			}
+		}
+		return specCount;
+		
 	}
 	
 }

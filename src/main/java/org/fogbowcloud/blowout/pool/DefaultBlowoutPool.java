@@ -44,7 +44,6 @@ public class DefaultBlowoutPool implements BlowoutPool {
 
 	@Override
 	public void updateResource(AbstractResource resource, ResourceState state) {
-
 		AbstractResource currentResource = resourcePool.get(resource.getId());
 		if (currentResource != null) {
 			currentResource.setState(state);

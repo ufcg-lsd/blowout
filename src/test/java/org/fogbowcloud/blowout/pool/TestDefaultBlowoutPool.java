@@ -5,6 +5,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.doReturn;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,7 @@ import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 import org.fogbowcloud.blowout.infrastructure.monitor.ResourceMonitor;
 import org.fogbowcloud.blowout.infrastructure.provider.InfrastructureProvider;
+import org.fogbowcloud.blowout.infrastructure.provider.fogbow.FogbowRequirementsHelper;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,20 +39,24 @@ public class TestDefaultBlowoutPool {
 	@Before
 	public void setUp() {
 		defaultBlowoutPool = spy(new DefaultBlowoutPool());
-		spec = mock(Specification.class);
+		spec = new Specification("fakeimage", "fakeusername", "fakepublickey", "fakekeypath");
+		spec.addRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS, "fakeRequirements");
 	}
 	
 	@Test
 	public void testCallAct() {
 		// set up
-		FogbowResource resourceOne = new FogbowResource("resource-one-id", "order-one-id", spec);
+		FogbowResource resourceOne = spy(new FogbowResource("resource-one-id", "order-one-id", spec));
 		resourceOne.setState(ResourceState.IDLE);
-		FogbowResource resourceTwo = new FogbowResource("resource-two-id", "order-two-id", spec);
+		doReturn(true).when(resourceOne).match(spec);
+		
+		FogbowResource resourceTwo = spy( new FogbowResource("resource-two-id", "order-two-id", spec));
 		resourceTwo.setState(ResourceState.IDLE);
+		doReturn(true).when(resourceTwo).match(spec);
 		
 		Map<String, AbstractResource> resourcePool = new ConcurrentHashMap<String, AbstractResource>();
-		resourcePool.put(resourceOne.getId(), resourceOne);
 		resourcePool.put(resourceTwo.getId(), resourceTwo);
+		resourcePool.put(resourceOne.getId(), resourceOne);
 		
 		TaskImpl taskOne = new TaskImpl("task-one-id", spec, FAKE_UUID);
 		TaskImpl taskTwo = new TaskImpl("task-two-id", spec, FAKE_UUID);
@@ -76,8 +82,8 @@ public class TestDefaultBlowoutPool {
 		defaultBlowoutPool.callAct();
 		
 		// expect
-		Assert.assertEquals(ResourceState.BUSY, resourceOne.getState());
-		Assert.assertEquals(ResourceState.BUSY, resourceTwo.getState());
+		Assert.assertEquals(ResourceState.BUSY, defaultBlowoutPool.getResourceById(resourceOne.getId()).getState());
+		Assert.assertEquals(ResourceState.BUSY, defaultBlowoutPool.getResourceById(resourceTwo.getId()).getState());
 	}
 	
 	@Test
@@ -116,7 +122,8 @@ public class TestDefaultBlowoutPool {
 	@Test
 	public void testAddTaskWithFreeResourceJobs(){
 		// set up
-		FogbowResource resourceOne = new FogbowResource("resource-one-id", "order-one-id", spec);
+		FogbowResource resourceOne = spy(new FogbowResource("resource-one-id", "order-one-id", spec));
+		doReturn(true).when(resourceOne).match(spec);
 		resourceOne.setState(ResourceState.IDLE);
 		
 		Map<String, AbstractResource> resourcePool = new ConcurrentHashMap<String, AbstractResource>();
@@ -156,8 +163,9 @@ public class TestDefaultBlowoutPool {
 	@Test
 	public void testAddTaskWithRunningTask(){
 		// set up
-		FogbowResource resourceOne = new FogbowResource("resource-one-id", "order-one-id", spec);
+		FogbowResource resourceOne = spy(new FogbowResource("resource-one-id", "order-one-id", spec));
 		resourceOne.setState(ResourceState.BUSY);
+		doReturn(true).when(resourceOne).match(spec);
 		
 		Map<String, AbstractResource> resourcePool = new ConcurrentHashMap<String, AbstractResource>();
 		
@@ -181,7 +189,6 @@ public class TestDefaultBlowoutPool {
 		defaultBlowoutPool.start(infraManager, standardScheduler);
 		
 		// exercise
-		defaultBlowoutPool.callAct();
 		TaskImpl task2 = new TaskImpl("task-two-id", spec, FAKE_UUID);
 
 		defaultBlowoutPool.putTask(task2);
@@ -189,10 +196,43 @@ public class TestDefaultBlowoutPool {
 //		TaskImpl task2 = new TaskImpl("task-two-id2", spec, FAKE_UUID);
 //
 //		defaultBlowoutPool.putTask(task2);
-		
+		verify(defaultBlowoutPool).callAct();
 		verify(resourceMonitor).addPendingResource(any(String.class), any (Specification.class));
 		// expect
 		
+	}
+	
+	@Test
+	public void testStopTask(){
+		// set up
+				
+				Map<String, AbstractResource> resourcePool = new ConcurrentHashMap<String, AbstractResource>();
+				
+				
+				List<Task> taskList = new ArrayList<Task>();
+				TaskImpl task = new TaskImpl("task-two-id", spec, FAKE_UUID);
+				taskList.add(task);
+				defaultBlowoutPool.setResourcePool(resourcePool);
+				defaultBlowoutPool.setTaskPool(taskList);
+				
+				InfrastructureProvider fogbowInfraProvider = mock(InfrastructureProvider.class);
+				ResourceMonitor resourceMonitor = mock(ResourceMonitor.class);
+				
+				TaskMonitor taskMon = new TaskMonitor(defaultBlowoutPool, 3000);
+				
+				infraManager = spy( new DefaultInfrastructureManager(fogbowInfraProvider, resourceMonitor));
+				standardScheduler = spy( new StandardScheduler(taskMon));
+				
+				defaultBlowoutPool.start(infraManager, standardScheduler);
+				
+				// exercise
+				defaultBlowoutPool.callAct();
+
+				//TODO: Create pending resource remover on monitor
+				defaultBlowoutPool.removeTask(task);
+				verify(resourceMonitor).addPendingResource(any(String.class), any (Specification.class));
+				// expect
+				
 	}
 	
 	
