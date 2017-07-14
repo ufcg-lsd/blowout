@@ -26,8 +26,11 @@ public class TestSpecification {
 		JSONObject jsonObject = spec.toJSON();
 		
 		Specification recoveredSpec = Specification.fromJSON(jsonObject);
+		JSONObject jsonObject2 = recoveredSpec.toJSON();
 		
-		assert(spec.equals(recoveredSpec));
+		Specification recoveredSpec2 = Specification.fromJSON(jsonObject2);
+	    assert(recoveredSpec2.equals(recoveredSpec));
+	    assert(spec.equals(recoveredSpec));
 		assertEquals(spec.getRequirementValue(FIRST_REQUIREMENT), recoveredSpec.getRequirementValue(FIRST_REQUIREMENT));
 		assertEquals(spec.getRequirementValue(SECOND_REQUIREMENTE), recoveredSpec.getRequirementValue(SECOND_REQUIREMENTE));
 	}

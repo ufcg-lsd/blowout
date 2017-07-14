@@ -6,14 +6,15 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.model.Task;
 import org.fogbowcloud.blowout.core.model.TaskImpl;
-import org.fogbowcloud.blowout.core.model.TaskState;
 import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 import org.fogbowcloud.blowout.infrastructure.monitor.ResourceMonitor;
@@ -146,9 +147,12 @@ public class TestDefaultInfrastructureManager {
 		pendingResources.add(resourceId);
 		List<Specification> pendingSpecs = new ArrayList<Specification>();
 		pendingSpecs.add(spec);
+		Map<Specification, Integer> pendingRequests = new HashMap<Specification, Integer>();
+		pendingRequests.put(spec, 1);
 		
 		doReturn(pendingResources).when(resourceMonitor).getPendingResources();
 		doReturn(pendingSpecs).when(resourceMonitor).getPendingSpecification();
+		doReturn(pendingRequests).when(resourceMonitor).getPendingRequests();
 		
 		defaultInfrastructureManager.act(resources, tasks);
 		verify(infraProvider, times(0)).requestResource(spec);
@@ -175,9 +179,12 @@ public class TestDefaultInfrastructureManager {
 		pendingResources.add(resourceId);
 		List<Specification> pendingSpecs = new ArrayList<Specification>();
 		pendingSpecs.add(spec);
+		Map<Specification, Integer> pendingRequests = new HashMap<Specification, Integer>();
+		pendingRequests.put(spec, 1);
 		
 		doReturn(pendingResources).when(resourceMonitor).getPendingResources();
 		doReturn(pendingSpecs).when(resourceMonitor).getPendingSpecification();
+		doReturn(pendingRequests).when(resourceMonitor).getPendingRequests();
 		
 		defaultInfrastructureManager.act(resources, tasks);
 		verify(infraProvider, times(1)).requestResource(spec);
@@ -203,8 +210,11 @@ public class TestDefaultInfrastructureManager {
 		List<AbstractResource> resources = new ArrayList<AbstractResource>();
 		List<AbstractResource> pendingResources = new ArrayList<AbstractResource>();
 		pendingResources.add(pendingResource);
+		Map<Specification, Integer> pendingRequests = new HashMap<Specification, Integer>();
+		pendingRequests.put(specB, 1);
 		
 		doReturn(pendingResources).when(resourceMonitor).getPendingResources();
+		doReturn(pendingRequests).when(resourceMonitor).getPendingRequests();
 		
 		defaultInfrastructureManager.act(resources, tasks);
 		verify(infraProvider, times(1)).requestResource(specA);

@@ -56,7 +56,7 @@ public class Specification implements Serializable {
 	Map<String, String> requirements = new HashMap<String, String>();
 
 	public Specification(String image, String username, String publicKey, String privateKeyFilePath) {
-		this(image, username, publicKey, privateKeyFilePath, null, null);
+		this(image, username, publicKey, privateKeyFilePath, "", "");
 	}
 
 	public Specification(String image, String username, String publicKey, String privateKeyFilePath,
