@@ -3,7 +3,7 @@
 ## What is Blowout?
 Blowout is a tool for receiving job submission, monitoring requests and interacting with the [Fogbow Middleware](http://www.fogbowcloud.org/) to execute the jobs in the federated cloud resources. Blowout abstracts away a complex distributed infra-structure and allows the user to focus on the application requirements.
 
-An example of Blowout job submitter is the [Arrebol](http://arrebol.lsd.ufcg.edu.br/)
+An example of Blowout job submitter is the [Arrebol](http://arrebol.lsd.ufcg.edu.br/).
 
 The main features of the Blowout are:
 - feature 1 -- receive jobs submissions and request resources from the federated cloud for these jobs.
@@ -18,8 +18,6 @@ Blowout has six main components:
 - BlowoutPool: responsável por gerenciar uma pool de tasks e de resources onde ficam armazenados as tasks e resources, respectivamente. É por meio da pool que os componentes do Blowout tem acesso às tasks e resources armazenados.
 
 - Scheduler: responsável por associar e desassociar uma task, que está pronta para ser executada, a um resource que está disponível. Após associar ou desassociar um resource para uma task o Scheduler submete para o Task Monitor a tarefa de criar ou encerrar um processo de execução da task no resource.
-
-Desassociar (ou quando a task não está mais disponível ou quando o resource não está mais disponível).
 
 - Task Monitor: responsável por criar e encerrar um processo para uma task que está pronta para ser executada, além disso, monitora a execução das tasks que estão em estado de running na federated cloud resource.
 
