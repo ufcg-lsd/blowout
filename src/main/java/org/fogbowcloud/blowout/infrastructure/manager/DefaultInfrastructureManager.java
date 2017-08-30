@@ -48,7 +48,7 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 			if (requested == null)
 				requested = 0;
 			int requiredResources = entry.getValue() - requested;
-			;
+			;//FIXME:
 			for (int count = 0; count < requiredResources; count++) {
 
 				String resourceId = infraProvider.requestResource(spec);
@@ -73,7 +73,7 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 
 	}
 
-	private List<Task> filterTasksByState(List<Task> tasks, TaskState taskState) {
+	private List<Task> filterTasksByState(List<Task> tasks, TaskState taskState) { //FIXME: NEVER USED, WHY?
 
 		List<Task> filteredTasks = new ArrayList<Task>();
 		for (Task task : tasks) {
