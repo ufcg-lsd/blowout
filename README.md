@@ -10,7 +10,9 @@
 
 //Others configurations (figure out what is it!!!)
 
-//Infrastructure Monitor Period == Execution Monitor Period
+//Infrastructure Monitor Period == Execution Monitor Period??
+
+//infra_monitor_period == execution_monitor_period??
 
 Blowout is a tool for receiving job submission, monitoring requests and interacting with the [Fogbow Middleware](http://www.fogbowcloud.org/) to execute the jobs in the federated cloud resources. Blowout abstracts away a complex distributed infrastructure and allows the user to focus on the application requirements.
 
@@ -71,34 +73,34 @@ Blowout Pool Class Name | The Blowout Poll **Implementation** class package path
 
 ### Infrastructure Constants
 	infra_is_elastic=true
+	infra_initial_specs_block_creating=true
+	infra_initial_specs_remove_previous_resources=true
+	infra_order_service_time=100000
+	infra_resource_service_time=100000
+	infra_monitor_period=30000
+	execution_monitor_period=60000
 	infra_resource_connection_timeout=20000
 	infra_resource_idle_lifetime=120000
 	max_resource_reuse=4
 	max_resource_connection_retry=4
-	infra_monitor_period=30000
-	execution_monitor_period=60000
 	local_output=/tmp/arrebol
 	local_command_interpreter=/bin/bash
-	infra_order_service_time=100000
-	infra_resource_service_time=100000
-	infra_initial_specs_block_creating=true
-	infra_initial_specs_remove_previous_resources=true
 
 Configuration Field | Description
 -------------------------- | --------------------
 Infrastructure Elasticity | Tells whether the infrastructure will be elastic or not
-Resource Life Time | Time that the resource will be available after your leverage
-Max Resourse Reuse | Maximum amount of use of the resource to execute jobs
-Resource Connection Timeout | Timeout for an attempt to connect to a resource
-Max Resource Connection Retry | Maximum amount of connections retry to a resource
-Infrastructure Monitor Period | Periods of monitoring
-Execution Monitor Period | Periods of monitoring
-Local Output | ??
-Local Command Interpreter | The Resource Job Command Interpreter
+Infrastructure Initial Specification of Block Creating | ??
+Infrastructure Initial Specification of Remove Previous Resource | Tells whether remove or not the previous resources already allocated before Blowout initiation
 Infrastructure Order Service | ??
 Infrastructure Resource Service Time | ??
-Infrastructure Initial Specification of Block Creating | ??
-Infrastructure Initial Specification of Remove Previous Resource | Tells whether remove or not the previous resources already allocated before Blowout initiation 
+Infrastructure Monitor Period | Periods of monitoring
+Execution Monitor Period | Periods of monitoring
+Resource Connection Timeout | Timeout for an attempt to connect to a resource
+Resource Idle Life Time | Time that the resource will be available after your leverage
+Max Resourse Reuse | Maximum amount of use of the resource to execute jobs
+Max Resource Connection Retry | Maximum amount of connections retry to a resource
+Local Output | ??
+Local Command Interpreter | The Resource Job Command Interpreter
 
 
 ### Fogbow Infrastructure Constants
