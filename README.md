@@ -10,7 +10,9 @@ The main Blowout features are:
 - feature 2 -- associate to a particular job a resource that match with the job requeriments and request the execution of these job in the resource.
 - feature 3 -- monitor the execution of the job in the associated resource.
 
-## Blowout architecture
+See the following topics to understand the Blowout **architecture**, how to **deploy and configure it**, and finally, how to use it to **execute** jobs.
+
+## Blowout Architecture
 Blowout works like a scheduler of jobs to the computational resources dispersed among the cloud that are managed by the fogbow middleware.
 
 Blowout has six main components:
@@ -28,11 +30,10 @@ Blowout has six main components:
 - Infrastructure Provider: é quem conversa com o provedor de recursos físicos, sendo responsável por executar os pedidos dos recursos na federated cloud e disponibilizá-los na BlowoutPool.
 
 
-See the following topics to understand the Blowout **architecture**, how to **deploy and configure it**, and finally, how to use it to **execute** jobs.
 
 The fogbow middleware aggregates and manages the computational resources dispersed among the cloud. In this section, we overview of the SEBAL-scheduler components used to execute its workflow and the interaction with the fogbow middleware.
 
-## instalation
+## Installation
 To get the lastest stable version of the Arrebol source code, download it from our repository:
 
     wget https://github.com/fogbow/blowout/archive/master.zip
@@ -41,10 +42,12 @@ Then, decompress it:
 
     unzip master.zip
 
-After unpacking Blowout source code, you can use.
+After unpacking Blowout source code, you can import Blowout to your job submitter and use it.
+
+## How to configure Blowout?
+This is the sample configuration. Change it 
 
 ## use it
-
 - 
  
 ## infra
@@ -67,7 +70,3 @@ put the classes in the file of Properties (blowout..conf.example) see how arrebo
 - SchedulerInterface
 - InfrastructureManager
 - InfrastructureProvider
-- Resource
-- Task
-- TaskProcess
-- AbstractTokenUpdatePlugin
