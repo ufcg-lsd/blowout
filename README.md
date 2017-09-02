@@ -54,7 +54,9 @@ Then, decompress it:
 After unpacking Blowout source code, you can import Blowout to your job submitter and use it.
 
 ## How to configure Blowout?
-[See](https://github.com/fogbow/arrebol/blob/master/sched.conf.example) an example of Blowout configuration file. The following properties show all possible Blowout configurations with a brief description of them. Change it to use your own configuration values.
+[See](https://github.com/fogbow/arrebol/blob/master/sched.conf.example) an example of Blowout configuration file. The following properties show all possible Blowout configurations with a brief description of them. 
+
+Change it and make your own Blowout configuration file.
 
 
 ### Implementation Plugins
@@ -230,7 +232,7 @@ Remove Output | ??
 Public Key | ??
 
 
-After setting your own Blowout configuration, save your file blowout.properties and use it.
+After setting your own Blowout configuration, use Blowout with it.
 
 
 ## Using Blowout
@@ -240,6 +242,7 @@ After setting your own Blowout configuration, save your file blowout.properties 
 
 ### Submitting Tasks
 - how submit tasks
+- type Task?
 
 ### Monitoring Tasks
 - doc how to check scheduler, fetcher, crawler statuses
