@@ -3,9 +3,9 @@
 ## What is Blowout?
 Blowout is a tool for receiving job submission, monitoring requests and interacting with the [Fogbow Middleware](http://www.fogbowcloud.org/) to execute the jobs in the federated cloud resources. Blowout abstracts away a complex distributed infra-structure and allows the user to focus on the application requirements.
 
-An example of Blowout job submitter is the [Arrebol](http://arrebol.lsd.ufcg.edu.br/).
+An example of Blowout job submitter is [Arrebol](http://arrebol.lsd.ufcg.edu.br/).
 
-The main features of the Blowout are:
+The main Blowout features are:
 - feature 1 -- receive jobs submissions and request resources from the federated cloud for these jobs.
 - feature 2 -- associate to a particular job a resource that match with the job requeriments and request the execution of these job in the resource.
 - feature 3 -- monitor the execution of the job in the associated resource.
@@ -33,7 +33,19 @@ See the following topics to understand the Blowout **architecture**, how to **de
 The fogbow middleware aggregates and manages the computational resources dispersed among the cloud. In this section, we overview of the SEBAL-scheduler components used to execute its workflow and the interaction with the fogbow middleware.
 
 ## instalation
-- doc it
+To get the lastest stable version of the Arrebol source code, download it from our repository:
+
+    wget https://github.com/fogbow/blowout/archive/master.zip
+
+Then, decompress it:
+
+    unzip master.zip
+
+After unpacking Blowout source code, you can use.
+
+## use it
+
+- 
  
 ## infra
 - doc infra script
