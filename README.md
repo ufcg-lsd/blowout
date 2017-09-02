@@ -8,14 +8,14 @@
 
 //Reference? Tasks or Jobs?
 
-Blowout is a tool for receiving job submission, monitoring requests and interacting with the [Fogbow Middleware](http://www.fogbowcloud.org/) to execute the jobs in the federated cloud resources. Blowout abstracts away a complex distributed infra-structure and allows the user to focus on the application requirements.
+Blowout is a tool for receiving job submission, monitoring requests and interacting with the [Fogbow Middleware](http://www.fogbowcloud.org/) to execute the jobs in the federated cloud resources. Blowout abstracts away a complex distributed infrastructure and allows the user to focus on the application requirements.
 
 An example of Blowout job submitter is [Arrebol](http://arrebol.lsd.ufcg.edu.br/).
 
 The main Blowout features are:
-- feature 1 -- receive jobs submissions and request resources from the federated cloud for these jobs.
-- feature 2 -- associate to a particular job a resource that match with the job requeriments and request the execution of these job in the resource.
-- feature 3 -- monitor the execution of the job in the associated resource.
+- **Receive and Request**: receive jobs submissions and request resources from the federated cloud for these jobs.
+- **Associate and Execute**: associate to a particular job a resource that match with the job requeriments and request the execution of these job in the resource.
+- **Monitor**: monitor the job execution in the associated resource.
 
 See the following topics to understand the Blowout **architecture**, how to **deploy and configure it**, and finally, how to use it to **execute** jobs.
 
@@ -48,7 +48,8 @@ Then, decompress it:
 After unpacking Blowout source code, you can import Blowout to your job submitter and use it.
 
 ## How to configure Blowout?
-[See](https://github.com/fogbow/arrebol/blob/master/sched.conf.example) an example of Blowout configuration. The following properties show all possible Blowout configurations with a brief description of them, change it to use your own configuration values.
+[See](https://github.com/fogbow/arrebol/blob/master/sched.conf.example) an example of Blowout configuration file. The following properties show all possible Blowout configurations with a brief description of them. Change it to use your own configuration values.
+
 
 ### Implementation Plugins
 	infra_provider_class_name=
@@ -63,6 +64,7 @@ Infrastructure Manager Class Name | The Infrastructure Manager class package pat
 Scheduler Class Name | The Scheduler class package path
 Blowout Pool Class Name | The Blowout Poll class package path
 
+
 ### Infrastructure Constants
 	infra_is_elastic=true
 	infra_resource_connection_timeout=20000
@@ -71,6 +73,10 @@ Blowout Pool Class Name | The Blowout Poll class package path
 	max_resource_connection_retry=4
 	infra_monitor_period=30000
 	local_command_interpreter=/bin/bash
+	infra_order_service_time=100000
+	infra_resource_service_time=100000
+	infra_initial_specs_block_creating=true
+	infra_initial_specs_remove_previous_resources=true
 
 Configuration Field | Description
 -------------------------- | --------------------
@@ -80,6 +86,11 @@ Max Resourse Reuse | Maximum amount of use of the resource to execute jobs
 Resource Connection Timeout | Timeout for an attempt to connect to a resource
 Max Resource Connection Retry | Maximum amount of connections retry to a resource
 Local Command Interpreter | The Resource Job Command Interpreter
+Infrastructure Order Service | ??
+Infrastructure Resource Service Time | ??
+Infrastructure Initial Specification of Block Creating | ??
+Infrastructure Initial Specification of Remove Previous Resource | Tells whether remove or not the previous resources already allocated before Blowout initiation 
+
 
 ### Fogbow Infrastructure Constants
 	infra_fogbow_manager_base_url=
@@ -88,7 +99,18 @@ Local Command Interpreter | The Resource Job Command Interpreter
 Configuration Field | Description
 -------------------------- | --------------------
 Infrastructure Fogbow Manager Base URL | Infrastructure Provider Fogbow Manager Base URL
-Infrastructure Fogbow Token Public Key FIle Path | ??
+Infrastructure Fogbow Token Public Key File Path | ??
+
+
+### Database Constants
+	blowout_datastore_url=blowoutdb.db
+	blowout_rest_server_port=
+
+Configuration Field | Description
+-------------------------- | --------------------
+Blowout Datastore Url | Blowout resource Database URL
+Blowout Rest Server Port | ??
+
 
 ### Token Properties
 	token_update_time=2
@@ -99,25 +121,90 @@ Configuration Field | Description
 Token Update Time | ??
 Token Update Time Unit | ?? use (h - hours, m - minutes, s - seconds)
 
-### DB Constants
-	blowout_datastore_url=blowoutdb.db
-	blowout_rest_server_port=
+
+### Authentication Token Properties - LDAP
+	infra_auth_token_update_plugin=org.fogbowcloud.blowout.infrastructure.token.LDAPTokenUpdatePlugin
+	auth_token_prop_ldap_username=
+	auth_token_prop_ldap_password=
+	auth_token_prop_ldap_auth_url=
+	auth_token_prop_ldap_base=
+	auth_token_prop_ldap_encrypt_type=
+	auth_token_prop_ldap_private_key=
+	auth_token_prop_ldap_public_key=
 
 Configuration Field | Description
 -------------------------- | --------------------
-Blowout Datastore Url | Blowout resource Database URL
-Blowout Rest Server Port | ??
+LDAP Infrastructure Token Update Plugin | ??
+LDAP Username | ??
+LDAP Password | ??
+LDAP Authentication URL | ??
+LDAP Base | ??
+LDAP Encrypt Type | ??
+LDAP Private Key | ??
+LDAP Public Key | ??
+
+
+### Authentication Token Properties - Keystone
+	infra_auth_token_update_plugin=org.fogbowcloud.blowout.infrastructure.token.KeystoneTokenUpdatePlugin
+	auth_token_prop_keystone_username=
+	auth_token_prop_keystone_tenantname=
+	auth_token_prop_keystone_password=
+	auth_token_prop_keystone_auth_url=
+
+Configuration Field | Description
+-------------------------- | --------------------
+Keystone Infrastructure Token Update Plugin | ??
+Keystone Username | ??
+Keystone Tenantname | ??
+Keystone Password | ??
+Keystone Authentication URL | ??
+
+
+### Authentication Token Properties - NAF
+	infra_auth_token_update_plugin=org.fogbowcloud.blowout.infrastructure.token.KeystoneTokenUpdatePlugin
+	auth_token_prop_naf_identity_private_key=
+	auth_token_prop_naf_identity_public_key=
+	auth_token_prop_naf_identity_token_username=
+	auth_token_prop_naf_identity_token_password=
+	auth_token_prop_naf_identity_token_generator_endpoint=
+
+Configuration Field | Description
+-------------------------- | --------------------
+NAF Infrastructure Token Update Plugin | ??
+NAF Identity Private Key | ??
+NAF Identity Public Key | ??
+NAF Identity Token Username | ??
+NAF Identity Token Password | ??
+NAF Identity Token Generator Endpoint | ??
+
+
+### Authentication Token Properties - VOMS
+	infra_auth_token_update_plugin=org.fogbowcloud.blowout.infrastructure.token.KeystoneTokenUpdatePlugin
+	auth_token_prop_voms_certificate_file_path
+	auth_token_prop_voms_certificate_password=
+	auth_token_prop_voms_server=
+
+Configuration Field | Description
+-------------------------- | --------------------
+VOMS Infrastructure Token Update Plugin | ??
+VOMS Cerfiticate File Path | ??
+VOMS Cerfiticate Password | ??
+VOMS Cerfiticate Server | ??
+
 
 ### Others
 	auth_token_prop_=
-	infra_order_service_time=100000
-	infra_resource_service_time=100000
+	X-auth-nonce=
+	X-auth-username=
+	X-auth-hash=
 
 Configuration Field | Description
 -------------------------- | --------------------
 Authentication Token Property | Infrastructure Authentication Token Prefix
-Infrastructure Order Service | ??
-Infrastructure Resource Service Time | ??
+X Authentication Nonce | ??
+X Authentication Username | ??
+X Authentication Hash | ??
+
 
 After setting your own Blowout configuration, save your file blowout.properties and use it.
 
@@ -138,7 +225,9 @@ After setting your own Blowout configuration, save your file blowout.properties 
 ## Submitting Tasks
 
 ## DEPLOY
-put the classes in the file of Properties (blowout..conf.example) see how arrebol do it.
+Implement Interfaces...
+
+Put the classes in the file of Properties (blowout..conf.example) see how arrebol do it.
 
 - BlowoutPool
 - SchedulerInterface
