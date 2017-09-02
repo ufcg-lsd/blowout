@@ -91,7 +91,7 @@ Configuration Field | Description
 Infrastructure Elasticity | Tells whether the infrastructure will be elastic or not
 Infrastructure Initial Specification of Block Creating | ??
 Infrastructure Initial Specification of Remove Previous Resource | Tells whether remove or not the previous resources already allocated before Blowout initiation
-Infrastructure Order Service | ??
+Infrastructure Order Service Time | ??
 Infrastructure Resource Service Time | ??
 Infrastructure Monitor Period | Periods of monitoring
 Execution Monitor Period | Periods of monitoring
@@ -134,7 +134,7 @@ Accounting Datastore URL | ??
 Configuration Field | Description
 -------------------------- | --------------------
 Token Update Time | ??
-Token Update Time Unit | ?? use (h - hours, m - minutes, s - seconds)
+Token Update Time Unit | ?? use (**h** for hours, **m** for minutes, **s** for seconds)
 
 
 ### Authentication Token Properties - LDAP
@@ -235,11 +235,13 @@ After setting your own Blowout configuration, save your file blowout.properties 
 
 ## Using Blowout
 - How to use blowout
+- Really necessary parameters??
+- In the configurations, blowout already knows some defaults configurations in case of they're not setted in your blowout.properties
 
 ### Submitting Tasks
 - how submit tasks
 
-### Monitor
+### Monitoring Tasks
 - doc how to check scheduler, fetcher, crawler statuses
 
 
