@@ -8,6 +8,8 @@
 
 //Reference? Tasks or Jobs?
 
+//Others configurations (figure out what is it!!!)
+
 Blowout is a tool for receiving job submission, monitoring requests and interacting with the [Fogbow Middleware](http://www.fogbowcloud.org/) to execute the jobs in the federated cloud resources. Blowout abstracts away a complex distributed infrastructure and allows the user to focus on the application requirements.
 
 An example of Blowout job submitter is [Arrebol](http://arrebol.lsd.ufcg.edu.br/).
@@ -52,17 +54,17 @@ After unpacking Blowout source code, you can import Blowout to your job submitte
 
 
 ### Implementation Plugins
-	infra_provider_class_name=
-	impl_infra_manager_class_name=
-	impl_scheduler_class_name=
-	impl_blowout_pool_class_name=
+	infra_provider_class_name=org.fogbowcloud.blowout.scheduler.infrastructure.fogbow.FogbowInfrastructureProvider
+	impl_infra_manager_class_name=org.fogbowcloud.blowout.core.StandardScheduler
+	impl_scheduler_class_name=org.fogbowcloud.blowout.infrastructure.manager.DefaultInfrastructureManager
+	impl_blowout_pool_class_name=org.fogbowcloud.blowout.pool.DefaultBlowoutPool
 
 Configuration Field | Description
 -------------------------- | --------------------
-Infrastructure Provider Class Name | The Infrastructure Provider class package path 
-Infrastructure Manager Class Name | The Infrastructure Manager class package path 
-Scheduler Class Name | The Scheduler class package path
-Blowout Pool Class Name | The Blowout Poll class package path
+Infrastructure Provider Class Name | The Infrastructure Provider **Implementation** class package path 
+Infrastructure Manager Class Name | The Infrastructure Manager **Implementation** class package path 
+Scheduler Class Name | The Scheduler **Implementation** class package path
+Blowout Pool Class Name | The Blowout Poll **Implementation** class package path
 
 
 ### Infrastructure Constants
@@ -208,21 +210,15 @@ X Authentication Hash | ??
 
 After setting your own Blowout configuration, save your file blowout.properties and use it.
 
-## use it
+## Use it
 - 
- 
-## infra
-- doc infra script
-- doc spec files
- 
-## task bootstrap
-- doc script
-- doc input file
 
-## monitor
+### Submitting Tasks
+- how submit tasks
+
+### Monitor
 - doc how to check scheduler, fetcher, crawler statuses
 
-## Submitting Tasks
 
 ## DEPLOY
 Implement Interfaces...
@@ -233,3 +229,12 @@ Put the classes in the file of Properties (blowout..conf.example) see how arrebo
 - SchedulerInterface
 - InfrastructureManager
 - InfrastructureProvider
+
+
+## infra
+- doc infra script
+- doc spec files
+ 
+## task bootstrap
+- doc script
+- doc input file
