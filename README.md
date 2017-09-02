@@ -1,6 +1,9 @@
 # Blowout
 
 ## What is Blowout?
+
+//Talk about Blowout usage in a general way or directed to fogbow middleware?
+
 Blowout is a tool for receiving job submission, monitoring requests and interacting with the [Fogbow Middleware](http://www.fogbowcloud.org/) to execute the jobs in the federated cloud resources. Blowout abstracts away a complex distributed infra-structure and allows the user to focus on the application requirements.
 
 An example of Blowout job submitter is [Arrebol](http://arrebol.lsd.ufcg.edu.br/).
@@ -21,13 +24,13 @@ Blowout has six main components:
 
 - Scheduler: responsável por associar e desassociar uma task, que está pronta para ser executada, a um resource que está disponível. Após associar ou desassociar um resource para uma task o Scheduler submete para o Task Monitor a tarefa de criar ou encerrar um processo de execução da task no resource.
 
-- Task Monitor: responsável por criar e encerrar um processo para uma task que está pronta para ser executada, além disso, monitora a execução das tasks que estão em estado de running na federated cloud resource.
-
-- Resource Monitor: responsável por realizar a requisição da alocação dos recursos pendentes ao Infrastructure Provider e monitorar os estados dos recursos que já estão alocados, gerenciando a disponibilidade desses recursos na pool de resources.
-
 - Infrastructure Manager: responsável por pedir e adicionar recursos pendentes com base na demanda das tasks que ainda não foram executadas e na não disponibilidade dos resources já existentes.
 
 - Infrastructure Provider: é quem conversa com o provedor de recursos físicos, sendo responsável por executar os pedidos dos recursos na federated cloud e disponibilizá-los na BlowoutPool.
+
+- Resource Monitor: responsável por realizar a requisição da alocação dos recursos pendentes ao Infrastructure Provider e monitorar os estados dos recursos que já estão alocados, gerenciando a disponibilidade desses recursos na pool de resources.
+
+- Task Monitor: responsável por criar e encerrar um processo para uma task que está pronta para ser executada, além disso, monitora a execução das tasks que estão em estado de running na federated cloud resource.
 
 ## Installation
 To get the lastest stable version of the Arrebol source code, download it from our repository:
@@ -42,6 +45,8 @@ After unpacking Blowout source code, you can import Blowout to your job submitte
 
 ## How to configure Blowout?
 This is a sample of Blowout configuration. Change it to use your own configuration values.
+
+//split it in smalls samples of configurations
 
 		infra_is_elastic=true
 		infra_provider_class_name=org.fogbowcloud.blowout.scheduler.infrastructure.fogbow.FogbowInfrastructureProvider
