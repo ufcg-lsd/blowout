@@ -10,6 +10,8 @@
 
 //Others configurations (figure out what is it!!!)
 
+//Infrastructure Monitor Period == Execution Monitor Period
+
 Blowout is a tool for receiving job submission, monitoring requests and interacting with the [Fogbow Middleware](http://www.fogbowcloud.org/) to execute the jobs in the federated cloud resources. Blowout abstracts away a complex distributed infrastructure and allows the user to focus on the application requirements.
 
 An example of Blowout job submitter is [Arrebol](http://arrebol.lsd.ufcg.edu.br/).
@@ -74,6 +76,8 @@ Blowout Pool Class Name | The Blowout Poll **Implementation** class package path
 	max_resource_reuse=4
 	max_resource_connection_retry=4
 	infra_monitor_period=30000
+	execution_monitor_period=60000
+	local_output=/tmp/arrebol
 	local_command_interpreter=/bin/bash
 	infra_order_service_time=100000
 	infra_resource_service_time=100000
@@ -87,6 +91,9 @@ Resource Life Time | Time that the resource will be available after your leverag
 Max Resourse Reuse | Maximum amount of use of the resource to execute jobs
 Resource Connection Timeout | Timeout for an attempt to connect to a resource
 Max Resource Connection Retry | Maximum amount of connections retry to a resource
+Infrastructure Monitor Period | Periods of monitoring
+Execution Monitor Period | Periods of monitoring
+Local Output | ??
 Local Command Interpreter | The Resource Job Command Interpreter
 Infrastructure Order Service | ??
 Infrastructure Resource Service Time | ??
@@ -97,21 +104,25 @@ Infrastructure Initial Specification of Remove Previous Resource | Tells whether
 ### Fogbow Infrastructure Constants
 	infra_fogbow_manager_base_url=
 	infra_fogbow_token_public_key_filepath=/tmp/x509up_u1350
+	infra_fogbow_token_update_plugin=org.fogbowcloud.blowout.infrastructure.plugin.NAFTokenUpdatePlugin
 
 Configuration Field | Description
 -------------------------- | --------------------
 Infrastructure Fogbow Manager Base URL | Infrastructure Provider Fogbow Manager Base URL
 Infrastructure Fogbow Token Public Key File Path | ??
+Infrastructure Fogbow Token Update Plugin | ??
 
 
 ### Database Constants
 	blowout_datastore_url=blowoutdb.db
 	blowout_rest_server_port=
+	accounting_datastore_url=jdbc:h2:/tmp/sebalsched.orders
 
 Configuration Field | Description
 -------------------------- | --------------------
 Blowout Datastore Url | Blowout resource Database URL
 Blowout Rest Server Port | ??
+Accounting Datastore URL | ??
 
 
 ### Token Properties
@@ -199,6 +210,11 @@ VOMS Cerfiticate Server | ??
 	X-auth-nonce=
 	X-auth-username=
 	X-auth-hash=
+	rest_server_port=44444
+	fogbow_username=fogbow
+	private_key_filepath=/local/keylocation/.ssh/id_rsa
+	remote_output_folder=/tmp
+	public_key=ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDG2U8rz4I31LIyDBPpe01WJdGt0JBowZ0Zq7Nxq7mol3G4cW5OJt9v3aQLRU8zanceXXSagNg8O4v2ppFzROYlIOgg2KN3Zu6Tj7Evmfp++J160dwshnP3aQCSLIDSBnMsZyPRprIbaL2LifVmrKcOfG3QcRQHZx2HRWJp+lty0IqP+FBaobB7nXzF58ibOJ84Fk9QpQmS5JK3AXdwCISmN8bgfcjoUJB2FMB5OU8ilkIyG4HDZmI82z+6hUS2sVd/ss8biIN6qGfRVxEDhVlDw3o+XqL+HQ7udd2Q61oHs8iBa711SWG64Eie6HAm8SIOsL7dvPx1rBfBsp3Dq3gjnIpTZqwluiTE8q9S6rTiDQndCGWvAnSU01BePD51ZnMEckluYTOhNLgCMtNTXZJgYSHPVsLWXa5xdGSffL73a4gIupE36tnZlNyiAQGDJUrWh+ygEc2ALdQfpOVWo+CMkTBswvrHYSJdFC7r1U8ACrOlsLE02/uqqBbp7fTUuuMk77J8t0ocxuz48tVKOlog0ajS5nphPLfPGnP2PVTh7GXNTLOnqGVwMrjFIAHj7ukd+l36wUAIHR7Y4YWKVaIBvTZS/fQNn0cOGon2DnNL3wNAUc6pthhXlNY33aU2ky55mZR4drAdbRGRdEZQF0YHEFnzP0x2GucHwg6ZtMJ2Aw== igorvcs@bobo
 
 Configuration Field | Description
 -------------------------- | --------------------
@@ -206,12 +222,17 @@ Authentication Token Property | Infrastructure Authentication Token Prefix
 X Authentication Nonce | ??
 X Authentication Username | ??
 X Authentication Hash | ??
+Rest Server Port | ??
+Private Key File Path | ??
+Remove Output | ??
+Public Key | ??
 
 
 After setting your own Blowout configuration, save your file blowout.properties and use it.
 
-## Use it
-- 
+
+## Using Blowout
+- How to use blowout
 
 ### Submitting Tasks
 - how submit tasks
@@ -220,7 +241,7 @@ After setting your own Blowout configuration, save your file blowout.properties 
 - doc how to check scheduler, fetcher, crawler statuses
 
 
-## DEPLOY
+## Deploy
 Implement Interfaces...
 
 Put the classes in the file of Properties (blowout..conf.example) see how arrebol do it.
