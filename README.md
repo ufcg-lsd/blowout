@@ -6,6 +6,8 @@
 
 //Contextualize the Infrastructure Provider
 
+//Reference? Tasks or Jobs?
+
 Blowout is a tool for receiving job submission, monitoring requests and interacting with the [Fogbow Middleware](http://www.fogbowcloud.org/) to execute the jobs in the federated cloud resources. Blowout abstracts away a complex distributed infra-structure and allows the user to focus on the application requirements.
 
 An example of Blowout job submitter is [Arrebol](http://arrebol.lsd.ufcg.edu.br/).
@@ -46,23 +48,78 @@ Then, decompress it:
 After unpacking Blowout source code, you can import Blowout to your job submitter and use it.
 
 ## How to configure Blowout?
-[This is](https://github.com/fogbow/arrebol/blob/master/sched.conf.example) a sample of Blowout configuration. Change it to use your own configuration values.
+[See](https://github.com/fogbow/arrebol/blob/master/sched.conf.example) an example of Blowout configuration. The following properties show all possible Blowout configurations with a brief description of them, change it to use your own configuration values.
 
-The following properties show all possible Blowout configurations.
+### Implementation Plugins
+	infra_provider_class_name=
+	impl_infra_manager_class_name=
+	impl_scheduler_class_name=
+	impl_blowout_pool_class_name=
 
-### Implementation Plugin
-		impl_infra_manager_class_name=
-		impl_scheduler_class_name=
-		impl_blowout_pool_class_name=
+Configuration Field | Description
+-------------------------- | --------------------
+Infrastructure Provider Class Name | The Infrastructure Provider class package path 
+Infrastructure Manager Class Name | The Infrastructure Manager class package path 
+Scheduler Class Name | The Scheduler class package path
+Blowout Pool Class Name | The Blowout Poll class package path
+
+### Infrastructure Constants
+	infra_is_elastic=true
+	infra_resource_connection_timeout=20000
+	infra_resource_idle_lifetime=120000
+	max_resource_reuse=4
+	max_resource_connection_retry=4
+	infra_monitor_period=30000
+	local_command_interpreter=/bin/bash
 
 Configuration Field | Description
 -------------------------- | --------------------
 Infrastructure Elasticity | Tells whether the infrastructure will be elastic or not
-Infrastructure Provider Class Name | The Infrastructure Provider class package path 
-Infrastructure Order Service | ??
-Resource Service Time | ??
-Resource Connection Timeout | 
 Resource Life Time | Time that the resource will be available after your leverage
+Max Resourse Reuse | Maximum amount of use of the resource to execute jobs
+Resource Connection Timeout | Timeout for an attempt to connect to a resource
+Max Resource Connection Retry | Maximum amount of connections retry to a resource
+Local Command Interpreter | The Resource Job Command Interpreter
+
+### Fogbow Infrastructure Constants
+	infra_fogbow_manager_base_url=
+	infra_fogbow_token_public_key_filepath=/tmp/x509up_u1350
+
+Configuration Field | Description
+-------------------------- | --------------------
+Infrastructure Fogbow Manager Base URL | Infrastructure Provider Fogbow Manager Base URL
+Infrastructure Fogbow Token Public Key FIle Path | ??
+
+### Token Properties
+	token_update_time=2
+	token_update_time_unit=h
+
+Configuration Field | Description
+-------------------------- | --------------------
+Token Update Time | ??
+Token Update Time Unit | ?? use (h - hours, m - minutes, s - seconds)
+
+### DB Constants
+	blowout_datastore_url=blowoutdb.db
+	blowout_rest_server_port=
+
+Configuration Field | Description
+-------------------------- | --------------------
+Blowout Datastore Url | Blowout resource Database URL
+Blowout Rest Server Port | ??
+
+### Others
+	auth_token_prop_=
+	infra_order_service_time=100000
+	infra_resource_service_time=100000
+
+Configuration Field | Description
+-------------------------- | --------------------
+Authentication Token Property | Infrastructure Authentication Token Prefix
+Infrastructure Order Service | ??
+Infrastructure Resource Service Time | ??
+
+After setting your own Blowout configuration, save your file blowout.properties and use it.
 
 ## use it
 - 
