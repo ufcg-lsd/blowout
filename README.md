@@ -10,9 +10,7 @@
 
 //Others configurations (figure out what is it!!!)
 
-//Infrastructure Monitor Period == Execution Monitor Period??
-
-//infra_monitor_period == execution_monitor_period??
+//Change the name BlowoutController to Blowout.
 
 Blowout is a tool for receiving job submission, monitoring requests and interacting with the [Fogbow Middleware](http://www.fogbowcloud.org/) to execute the jobs in the federated cloud resources. Blowout abstracts away a complex distributed infrastructure and allows the user to focus on the application requirements.
 
@@ -75,150 +73,63 @@ Blowout Pool Class Name | The Blowout Poll **Implementation** class package path
 
 ### Infrastructure Constants
 	infra_is_elastic=true
-	infra_initial_specs_block_creating=true
-	infra_initial_specs_remove_previous_resources=true
-	infra_order_service_time=100000
-	infra_resource_service_time=100000
 	infra_monitor_period=30000
-	execution_monitor_period=60000
 	infra_resource_connection_timeout=20000
 	infra_resource_idle_lifetime=120000
 	max_resource_reuse=4
 	max_resource_connection_retry=4
-	local_output=/tmp/arrebol
 	local_command_interpreter=/bin/bash
+	infra_auth_token_update_plugin=org.fogbowcloud.blowout.infrastructure.token.KeystoneTokenUpdatePlugin
 
 Configuration Field | Description
 -------------------------- | --------------------
 Infrastructure Elasticity | Tells whether the infrastructure will be elastic or not
-Infrastructure Initial Specification of Block Creating | ??
-Infrastructure Initial Specification of Remove Previous Resource | Tells whether remove or not the previous resources already allocated before Blowout initiation
-Infrastructure Order Service Time | ??
-Infrastructure Resource Service Time | ??
 Infrastructure Monitor Period | Periods of monitoring
-Execution Monitor Period | Periods of monitoring
 Resource Connection Timeout | Timeout for an attempt to connect to a resource
 Resource Idle Life Time | Time that the resource will be available after your leverage
 Max Resourse Reuse | Maximum amount of use of the resource to execute jobs
 Max Resource Connection Retry | Maximum amount of connections retry to a resource
-Local Output | ??
 Local Command Interpreter | The Resource Job Command Interpreter
+Infrastructure Authentication Token Update Plugin | ?
 
 
 ### Fogbow Infrastructure Constants
 	infra_fogbow_manager_base_url=
 	infra_fogbow_token_public_key_filepath=/tmp/x509up_u1350
-	infra_fogbow_token_update_plugin=org.fogbowcloud.blowout.infrastructure.plugin.NAFTokenUpdatePlugin
 
 Configuration Field | Description
 -------------------------- | --------------------
 Infrastructure Fogbow Manager Base URL | Infrastructure Provider Fogbow Manager Base URL
 Infrastructure Fogbow Token Public Key File Path | ??
-Infrastructure Fogbow Token Update Plugin | ??
 
 
 ### Database Constants
 	blowout_datastore_url=blowoutdb.db
 	blowout_rest_server_port=
-	accounting_datastore_url=jdbc:h2:/tmp/sebalsched.orders
 
 Configuration Field | Description
 -------------------------- | --------------------
 Blowout Datastore Url | Blowout resource Database URL
 Blowout Rest Server Port | ??
-Accounting Datastore URL | ??
 
 
 ### Token Properties
 	token_update_time=2
-	token_update_time_unit=h
+	token_update_time_unit=H
 
 Configuration Field | Description
 -------------------------- | --------------------
 Token Update Time | ??
-Token Update Time Unit | ?? use (**h** for hours, **m** for minutes, **s** for seconds)
+Token Update Time Unit | ?? use (**H** for hours, **M** for minutes, **S** for seconds and **MS** for miliseconds)
 
 
-### Authentication Token Properties - LDAP
-	infra_auth_token_update_plugin=org.fogbowcloud.blowout.infrastructure.token.LDAPTokenUpdatePlugin
-	auth_token_prop_ldap_username=
-	auth_token_prop_ldap_password=
-	auth_token_prop_ldap_auth_url=
-	auth_token_prop_ldap_base=
-	auth_token_prop_ldap_encrypt_type=
-	auth_token_prop_ldap_private_key=
-	auth_token_prop_ldap_public_key=
-
-Configuration Field | Description
--------------------------- | --------------------
-LDAP Infrastructure Token Update Plugin | ??
-LDAP Username | ??
-LDAP Password | ??
-LDAP Authentication URL | ??
-LDAP Base | ??
-LDAP Encrypt Type | ??
-LDAP Private Key | ??
-LDAP Public Key | ??
-
-
-### Authentication Token Properties - Keystone
-	infra_auth_token_update_plugin=org.fogbowcloud.blowout.infrastructure.token.KeystoneTokenUpdatePlugin
-	auth_token_prop_keystone_username=
-	auth_token_prop_keystone_tenantname=
-	auth_token_prop_keystone_password=
-	auth_token_prop_keystone_auth_url=
-
-Configuration Field | Description
--------------------------- | --------------------
-Keystone Infrastructure Token Update Plugin | ??
-Keystone Username | ??
-Keystone Tenantname | ??
-Keystone Password | ??
-Keystone Authentication URL | ??
-
-
-### Authentication Token Properties - NAF
-	infra_auth_token_update_plugin=org.fogbowcloud.blowout.infrastructure.token.KeystoneTokenUpdatePlugin
-	auth_token_prop_naf_identity_private_key=
-	auth_token_prop_naf_identity_public_key=
-	auth_token_prop_naf_identity_token_username=
-	auth_token_prop_naf_identity_token_password=
-	auth_token_prop_naf_identity_token_generator_endpoint=
-
-Configuration Field | Description
--------------------------- | --------------------
-NAF Infrastructure Token Update Plugin | ??
-NAF Identity Private Key | ??
-NAF Identity Public Key | ??
-NAF Identity Token Username | ??
-NAF Identity Token Password | ??
-NAF Identity Token Generator Endpoint | ??
-
-
-### Authentication Token Properties - VOMS
-	infra_auth_token_update_plugin=org.fogbowcloud.blowout.infrastructure.token.KeystoneTokenUpdatePlugin
-	auth_token_prop_voms_certificate_file_path
-	auth_token_prop_voms_certificate_password=
-	auth_token_prop_voms_server=
-
-Configuration Field | Description
--------------------------- | --------------------
-VOMS Infrastructure Token Update Plugin | ??
-VOMS Cerfiticate File Path | ??
-VOMS Cerfiticate Password | ??
-VOMS Cerfiticate Server | ??
-
-
-### Others
-	auth_token_prop_=
+### Application Headers
 	X-auth-nonce=
 	X-auth-username=
 	X-auth-hash=
-	rest_server_port=44444
-	fogbow_username=fogbow
-	private_key_filepath=/local/keylocation/.ssh/id_rsa
-	remote_output_folder=/tmp
-	public_key=ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDG2U8rz4I31LIyDBPpe01WJdGt0JBowZ0Zq7Nxq7mol3G4cW5OJt9v3aQLRU8zanceXXSagNg8O4v2ppFzROYlIOgg2KN3Zu6Tj7Evmfp++J160dwshnP3aQCSLIDSBnMsZyPRprIbaL2LifVmrKcOfG3QcRQHZx2HRWJp+lty0IqP+FBaobB7nXzF58ibOJ84Fk9QpQmS5JK3AXdwCISmN8bgfcjoUJB2FMB5OU8ilkIyG4HDZmI82z+6hUS2sVd/ss8biIN6qGfRVxEDhVlDw3o+XqL+HQ7udd2Q61oHs8iBa711SWG64Eie6HAm8SIOsL7dvPx1rBfBsp3Dq3gjnIpTZqwluiTE8q9S6rTiDQndCGWvAnSU01BePD51ZnMEckluYTOhNLgCMtNTXZJgYSHPVsLWXa5xdGSffL73a4gIupE36tnZlNyiAQGDJUrWh+ygEc2ALdQfpOVWo+CMkTBswvrHYSJdFC7r1U8ACrOlsLE02/uqqBbp7fTUuuMk77J8t0ocxuz48tVKOlog0ajS5nphPLfPGnP2PVTh7GXNTLOnqGVwMrjFIAHj7ukd+l36wUAIHR7Y4YWKVaIBvTZS/fQNn0cOGon2DnNL3wNAUc6pthhXlNY33aU2ky55mZR4drAdbRGRdEZQF0YHEFnzP0x2GucHwg6ZtMJ2Aw== igorvcs@bobo
+	infra_initial_specs_file_path=
+	infra_provider_class_name=
+	infra_specs_block_creating=true
 
 Configuration Field | Description
 -------------------------- | --------------------
@@ -226,18 +137,46 @@ Authentication Token Property | Infrastructure Authentication Token Prefix
 X Authentication Nonce | ??
 X Authentication Username | ??
 X Authentication Hash | ??
-Rest Server Port | ??
-Private Key File Path | ??
-Remove Output | ??
-Public Key | ??
+Infrastructure Initial Specifications File Path | Initial Specifications File Path of the Infrastructure
+Infrastructure Provider Class Name | Class name of the Infrastructure Provider
+Infrastructure Specifications Block Creating | ??
 
 
-After setting your own Blowout configuration, use Blowout with it.
+After set your own Blowout configuration file, use Blowout with it.
 
 
 ## Using Blowout
+After downloading and setting up the Blowout you can import and add Blowout into your job submitter project. The following example illustrates the Blowout usage.
+	
+		package org.fogbowcloud.app;
+
+		import java.io.File;
+		import java.io.FileInputStream;
+		import java.util.Properties;
+
+		import org.fogbowcloud.blowout.core.BlowoutController;
+
+		public class JobSubmitter {
+			private BlowoutController blowout;
+
+			public JobSubmitter(File blowoutConf) throws Exception {
+				Properties properties = new Properties();
+				properties.load(new FileInputStream(blowoutConf));
+				
+				boolean removePreviousResources = true;
+
+				this.blowout = new BlowoutController(properties);
+
+				this.blowout.start(removePreviousResources);
+
+				this.blowout.stop();
+			}
+		}
+
+
+
 - How to use blowout
-- Really necessary parameters??
+- find and show Really necessary parameters!!!
 - In the configurations, blowout already knows some defaults configurations in case of they're not setted in your blowout.properties
 
 ### Submitting Tasks
