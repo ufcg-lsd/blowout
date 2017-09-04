@@ -12,7 +12,13 @@
 
 //Change the name BlowoutController to Blowout.
 
-Blowout is a tool for receiving job submission, monitoring requests and interacting with the [Fogbow Middleware](http://www.fogbowcloud.org/) to execute the jobs in the federated cloud resources. Blowout abstracts away a complex distributed infrastructure and allows the user to focus on the application requirements.
+//LOCAL_COMMAND_INTERPRETER is required? Because apparently is optional, but doesn't have any default value
+
+//DEFAULT VALUE FOR IDLE_LIFE_TIME: 0???
+
+//Query: Some Blowout properties checks are in Arrebol... Example: INFRA_PROVIDER_CLASS_NAME
+
+Blowout is a tool for receiving job submission, monitoring requests and interacting with the [Fogbow Middleware](http://www.fogbowcloud.org/) to execute the received jobs in the federated cloud resources. Blowout abstracts away a complex distributed infrastructure and allows the user to focus on the application requirements.
 
 An example of Blowout job submitter is [Arrebol](http://arrebol.lsd.ufcg.edu.br/).
 
@@ -58,17 +64,17 @@ Change it and make your own Blowout configuration file.
 
 
 ### Implementation Plugins
-	infra_provider_class_name=org.fogbowcloud.blowout.scheduler.infrastructure.fogbow.FogbowInfrastructureProvider
-	impl_infra_manager_class_name=org.fogbowcloud.blowout.core.StandardScheduler
-	impl_scheduler_class_name=org.fogbowcloud.blowout.infrastructure.manager.DefaultInfrastructureManager
 	impl_blowout_pool_class_name=org.fogbowcloud.blowout.pool.DefaultBlowoutPool
+	impl_scheduler_class_name=org.fogbowcloud.blowout.infrastructure.manager.DefaultInfrastructureManager
+	impl_infra_manager_class_name=org.fogbowcloud.blowout.core.StandardScheduler
+	infra_provider_class_name=org.fogbowcloud.blowout.scheduler.infrastructure.fogbow.FogbowInfrastructureProvider
 
-Configuration Field | Description
--------------------------- | --------------------
-Infrastructure Provider Class Name | The Infrastructure Provider **Implementation** class package path 
-Infrastructure Manager Class Name | The Infrastructure Manager **Implementation** class package path 
-Scheduler Class Name | The Scheduler **Implementation** class package path
-Blowout Pool Class Name | The Blowout Poll **Implementation** class package path
+Configuration Field | Description | Required (Default values in the example)
+-------------------------- | -------------------- | --------
+Blowout Pool Class Name | The Blowout Poll **Implementation** class package path | No
+Scheduler Class Name | The Scheduler **Implementation** class package path | No
+Infrastructure Manager Class Name | The Infrastructure Manager **Implementation** class package path | No
+Infrastructure Provider Class Name | The Infrastructure Provider **Implementation** class package path | No
 
 
 ### Infrastructure Constants
@@ -80,73 +86,70 @@ Blowout Pool Class Name | The Blowout Poll **Implementation** class package path
 	max_resource_connection_retry=4
 	local_command_interpreter=/bin/bash
 	infra_auth_token_update_plugin=org.fogbowcloud.blowout.infrastructure.token.KeystoneTokenUpdatePlugin
+	infra_initial_specs_file_path=
+	infra_provider_class_name=FogbowInfrastructureProvider
+	infra_specs_block_creating=true
 
-Configuration Field | Description
--------------------------- | --------------------
-Infrastructure Elasticity | Tells whether the infrastructure will be elastic or not
-Infrastructure Monitor Period | Periods of monitoring
-Resource Connection Timeout | Timeout for an attempt to connect to a resource
-Resource Idle Life Time | Time that the resource will be available after your leverage
-Max Resourse Reuse | Maximum amount of use of the resource to execute jobs
-Max Resource Connection Retry | Maximum amount of connections retry to a resource
-Local Command Interpreter | The Resource Job Command Interpreter
-Infrastructure Authentication Token Update Plugin | ?
+Configuration Field | Description | Required
+-------------------------- | -------------------- | ----
+Infrastructure Elasticity | Tells whether the infrastructure will be elastic or not | **Yes**
+Infrastructure Monitor Period | Periods of monitoring... (Complete it) | No (Default value: 30000)
+Resource Connection Timeout | Timeout for an attempt to connect to a resource | **Yes**
+Resource Idle Life Time | Time that the resource will be available after your leverage | No (Default value: 0)
+Max Resourse Reuse | Maximum amount of use of the resource to execute jobs | No (Default value: 1)
+Max Resource Connection Retry | Maximum amount of connections retry to a resource | No (Default value: 1)
+Local Command Interpreter | The Resource Job Command Interpreter | **NO**
+Infrastructure Authentication Token Update Plugin | ?? | **Yes**
+Infrastructure Initial Specifications File Path | Initial Specifications File Path of the Infrastructure | **NO**
+Infrastructure Provider Class Name | Class name of the Infrastructure Provider | **NO**
+Infrastructure Specifications Block Creating | ?? | No **(Never used in any code)**
 
 
 ### Fogbow Infrastructure Constants
 	infra_fogbow_manager_base_url=
-	infra_fogbow_token_public_key_filepath=/tmp/x509up_u1350
 
-Configuration Field | Description
--------------------------- | --------------------
-Infrastructure Fogbow Manager Base URL | Infrastructure Provider Fogbow Manager Base URL
-Infrastructure Fogbow Token Public Key File Path | ??
+Configuration Field | Description | Required
+-------------------------- | -------------------- | ------
+Infrastructure Fogbow Manager Base URL | Infrastructure Provider Fogbow Manager Base URL | **NO** (but in the code is)
 
 
 ### Database Constants
 	blowout_datastore_url=blowoutdb.db
 	blowout_rest_server_port=
 
-Configuration Field | Description
--------------------------- | --------------------
-Blowout Datastore Url | Blowout resource Database URL
-Blowout Rest Server Port | ??
+Configuration Field | Description | Required
+-------------------------- | -------------------- | ------
+Blowout Datastore Url | Blowout resource Database URL | **NO** (but in the code is)
+Blowout Rest Server Port | ?? | No **(Never used in any code)**
 
 
 ### Token Properties
 	token_update_time=2
 	token_update_time_unit=H
 
-Configuration Field | Description
--------------------------- | --------------------
-Token Update Time | ??
-Token Update Time Unit | ?? use (**H** for hours, **M** for minutes, **S** for seconds and **MS** for miliseconds)
+Configuration Field | Description | Required
+-------------------------- | -------------------- | -------
+Token Update Time | ?? | No (Default value: 6)
+Token Update Time Unit | Time Unit of Token Update Time, use (**H** for hours, **M** for minutes, **S** for seconds and **MS** for miliseconds) | No (Default value: H)
 
 
 ### Application Headers
 	X-auth-nonce=
 	X-auth-username=
 	X-auth-hash=
-	infra_initial_specs_file_path=
-	infra_provider_class_name=
-	infra_specs_block_creating=true
 
-Configuration Field | Description
--------------------------- | --------------------
-Authentication Token Property | Infrastructure Authentication Token Prefix
-X Authentication Nonce | ??
-X Authentication Username | ??
-X Authentication Hash | ??
-Infrastructure Initial Specifications File Path | Initial Specifications File Path of the Infrastructure
-Infrastructure Provider Class Name | Class name of the Infrastructure Provider
-Infrastructure Specifications Block Creating | ??
+Configuration Field | Description | Required
+-------------------------- | -------------------- | -----
+X Authentication Nonce | ?? | No
+X Authentication Username | ?? | No
+X Authentication Hash | ?? | No
 
 
 After set your own Blowout configuration file, use Blowout with it.
 
 
 ## Using Blowout
-After downloading and setting up the Blowout you can import and add Blowout into your job submitter project. The following example illustrates the Blowout usage.
+After downloading and setting up the Blowout you can import and add Blowout into your federated cloud job submitter project. The following example illustrates the Blowout usage.
 	
 		package org.fogbowcloud.app;
 
@@ -172,7 +175,6 @@ After downloading and setting up the Blowout you can import and add Blowout into
 				this.blowout.stop();
 			}
 		}
-
 
 
 - How to use blowout
