@@ -3,9 +3,7 @@
 ## What is Blowout?
 Blowout is a tool for receiving Bag-of-tasks (BoT) submissions, monitoring requests and interacting with a Infrastructure Provider to execute the received tasks in federated cloud resources. Blowout abstracts away a complex distributed infrastructure and allows the user to focus on the application requirements.
 
-An example of Infrastructure Provider for Blowout is [Fogbow Middleware](http://www.fogbowcloud.org/). 
-
-An example of Task Submitter for Blowout is [Arrebol](http://arrebol.lsd.ufcg.edu.br/).
+An example of Infrastructure Provider and Task Submitter for Blowout are, respectively, [Fogbow Middleware](http://www.fogbowcloud.org/) and [Arrebol](http://arrebol.lsd.ufcg.edu.br/).
 
 The main Blowout features are:
 - **Receive and Request**: receive tasks submissions and request resources from the federated cloud for these tasks.
@@ -32,7 +30,7 @@ Blowout has six main components:
 - **Task Monitor**: responsável por criar e encerrar um processo para uma task que está pronta para ser executada, além disso, monitora a execução das tasks que estão em estado de running na federated cloud resource.
 
 ## Installation
-Before Blowout installation is necessary to get a Blowout dependency: [Fogbow Manager](https://github.com/fogbow/fogbow-manager).
+Before Blowout installation is necessary to get a Blowout dependency, [Fogbow Manager](https://github.com/fogbow/fogbow-manager).
 
 	wget https://github.com/fogbow/fogbow-manager/archive/master.zip
 
@@ -58,7 +56,7 @@ And then, simply use the following command in each project directory:
 	
 	mvn -e install -Dmaven.test.skip=true
 
-After installation, you can add and import Blowout to your job submitter project.
+After installation, you can add and import Blowout to your Task Submitter project.
 
 
 ## Configuring Blowout
@@ -96,9 +94,9 @@ Infrastructure Elasticity | Tells whether the infrastructure will be elastic or 
 Infrastructure Monitor Period | Periods of resources monitoring | No (Default value: 30000)
 Resource Connection Timeout | Timeout for an attempt to connect to a resource | **Yes**
 Resource Idle Life Time | Time that the resource will be available after your leverage | No (Default value: 0)
-Max Resourse Reuse | Maximum amount of use of the resource to execute jobs | No (Default value: 1)
+Max Resourse Reuse | Maximum amount of use of the resource to execute tasks | No (Default value: 1)
 Max Resource Connection Retry | Maximum amount of connections retry to a resource | No (Default value: 1)
-Local Command Interpreter | The Resource Job Command Interpreter | **Yes**
+Local Command Interpreter | The Resource Task Command Interpreter | **Yes**
 
 
 ### Fogbow Infrastructure Constant
@@ -201,13 +199,13 @@ After set your own Blowout configuration file, use Blowout with it.
 
 
 ## Using Blowout
-After installation and configuration, you can import and add Blowout into your federated cloud job submitter project. The following example illustrates the Blowout usage.
+After installation and configuration, you can import and add Blowout into your federated cloud Task Submitter project. The following example illustrates the Blowout usage.
 
 	import org.fogbowcloud.blowout.core.BlowoutController;
 
-	public class JobSubmitter {
+	public class TaskSubmitter {
 
-		public JobSubmitter(File blowoutConf) throws Exception {
+		public TaskSubmitter(File blowoutConf) throws Exception {
 			Properties properties = new Properties();
 			properties.load(new FileInputStream(blowoutConf));
 			
@@ -223,7 +221,7 @@ After installation and configuration, you can import and add Blowout into your f
 
 
 ### Submitting Tasks
-A job in the Blowout is modeled as a Task object. See [Job Description File](http://arrebol.lsd.ufcg.edu.br/use-it.html) and [Arrebol code](https://github.com/fogbow/arrebol/tree/master/src/main/java/org/fogbowcloud/app) to know how construct a Task object from a job description file.
+A task in the Blowout is modeled as a Task object. See [Job Description File](http://arrebol.lsd.ufcg.edu.br/use-it.html) and [Arrebol code](https://github.com/fogbow/arrebol/tree/master/src/main/java/org/fogbowcloud/app) to know how construct a Task object from a job description file.
 
 The example below illustrates how to submit a Task to Blowout:
 
