@@ -1,14 +1,6 @@
 # Blowout
 
 ## What is Blowout?
-//?? Tag, answer
-
-//LOCAL_COMMAND_INTERPRETER is required? Because apparently is optional, but doesn't have any default value
-
-//DEFAULT VALUE FOR IDLE_LIFE_TIME: 0???
-
-//Query: Some Blowout properties checks are in Arrebol... Example: INFRA_PROVIDER_CLASS_NAME
-
 Blowout is a tool for receiving job submission, monitoring requests and interacting with the [Fogbow Middleware](http://www.fogbowcloud.org/) to execute the received jobs in the federated cloud resources. Blowout abstracts away a complex distributed infrastructure and allows the user to focus on the application requirements.
 
 An example of job submitter for Blowout is [Arrebol](http://arrebol.lsd.ufcg.edu.br/).
@@ -299,32 +291,33 @@ Timedout | The Task took timeout
 
 
 ## Deploy
+To ensure the correct Blowout operation with new deployments a series of interfaces have been made available, so it is guaranteed the existence of all the necessary methods in each class that can be deployed.
 
-### BlowoutPool
+### Blowout Pool
 To deploy Blowout Pool is necessary that your new BlowoutPool implements the interface BlowoutPool.
 
-After that, you can set the propertie in the Blowout configuration file:
+After that, you can set the following property in the Blowout configuration file with the class name of your new Blowout Pool:
 
 	impl_blowout_pool_class_name="my_new_blowoutpool_class_name"
 
 ### Scheduler
 To deploy Scheduler is necessary that your new Scheduler implements the interface SchedulerInterface.
 
-After that, you can set the propertie in the Blowout configuration file:
+After that, you can set the following property in the Blowout configuration file with the class name of your new Scheduler:
 
 	impl_scheduler_class_name="my_new_scheduler_class_name"
 
-### InfrastructureManager
+### Infrastructure Manager
 To deploy Infrastructure Manager is necessary that your new InfrastructureManager implements the interface InfraManager.
 
-After that, you can set the propertie in the Blowout configuration file:
+After that, you can set the following property in the Blowout configuration file with the class name of your new Infrastructure Manager:
 
 	impl_infra_manager_class_name="my_new_infra_manager_class_name"
 
-### InfrastructureProvider
+### Infrastructure Provider
 To deploy Infrastructure Provider is necessary that your new InfrastructureProvider implements the interface InfrastructureProvider.
 
-After that, you can set the propertie in the Blowout configuration file:
+After that, you can set the following property in the Blowout configuration file with the class name of your new Infrastructure Provider:
 
 	infra_provider_class_name="my_new_infra_provider_class_name"
 
@@ -339,3 +332,11 @@ After the implementations and configurations set, you can use Blowout with your 
 ## task bootstrap
 - doc script
 - doc input file
+
+## ?? Tag, answer
+
+## LOCAL_COMMAND_INTERPRETER is required? Because apparently is optional, but doesn't have any default value
+
+## DEFAULT VALUE FOR IDLE_LIFE_TIME: 0???
+
+## Query: Some Blowout properties checks are in Arrebol... Example: INFRA_PROVIDER_CLASS_NAME
