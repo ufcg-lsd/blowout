@@ -47,6 +47,14 @@ Blowout has six main components:
 - **Task Monitor**: responsável por criar e encerrar um processo para uma task que está pronta para ser executada, além disso, monitora a execução das tasks que estão em estado de running na federated cloud resource.
 
 ## Installation
+Before Blowout installation is necessary get [Fogbow Manager](https://github.com/fogbow/fogbow-manager) a Blowout dependency.
+
+	wget https://github.com/fogbow/fogbow-manager/archive/develop.zip
+
+Then, decompress it:
+	
+	unzip develop.zip
+
 To get the lastest stable version of Blowout source code, download it from our repository:
 
     wget https://github.com/fogbow/blowout/archive/master.zip
@@ -55,7 +63,18 @@ Then, decompress it:
 
     unzip master.zip
 
-After unpacking Blowout source code, you can add and import Blowout to your federated cloud job submitter project.
+After that, get all projects JAR of Fogbow Manager and Blowout. To achieve that, maven and maven2 must be installed in client's machine with commands:
+
+	apt-get install maven
+
+	apt-get install maven2
+
+And then, simply use the following command in each project directory:
+	
+	mvn -e install -Dmaven.test.skip=true
+
+After installation, you can add and import Blowout to your federated cloud job submitter project.
+
 
 ## Configuring Blowout
 [See](https://github.com/fogbow/arrebol/blob/master/sched.conf.example) an example of Blowout configuration file. The following properties show all possible Blowout configurations with a brief description of them. 
@@ -108,7 +127,7 @@ Infrastructure Specifications Block Creating | ?? | No **(Never used in any code
 
 Configuration Field | Description | Required
 -------------------------- | -------------------- | ------
-Infrastructure Fogbow Manager Base URL | Infrastructure Provider Fogbow Manager Base URL | **NO** (but in the code is)
+Infrastructure Fogbow Manager Base URL | ?? | **NO** (but in the code is)
 
 
 ### Database Constants
@@ -117,7 +136,7 @@ Infrastructure Fogbow Manager Base URL | Infrastructure Provider Fogbow Manager 
 
 Configuration Field | Description | Required
 -------------------------- | -------------------- | ------
-Blowout Datastore Url | Blowout resource Database URL | **NO** (but in the code is)
+Blowout Datastore Url | Blowout resource database URL | **NO** (but in the code is)
 Blowout Rest Server Port | ?? | No **(Never used in any code)**
 
 
@@ -217,7 +236,7 @@ After set your own Blowout configuration file, use Blowout with it.
 
 
 ## Using Blowout
-After downloading and setting up the Blowout you can import and add Blowout into your federated cloud job submitter project. The following example illustrates the Blowout usage.
+After downloading and setting up, you can import and add Blowout into your federated cloud job submitter project. The following example illustrates the Blowout usage.
 
 	import org.fogbowcloud.blowout.core.BlowoutController;
 
@@ -239,40 +258,52 @@ After downloading and setting up the Blowout you can import and add Blowout into
 
 
 ### Submitting Tasks
-O Blowout trata um job como uma entidade Task, onde nela estao inseridos uma serie de comandos que devem ser executados na federated cloud resource e as especificacoes dos recursos necessarios para executa-la. Para conhecer mais sobre a entidade Task do Blowout [veja](http://arrebol.lsd.ufcg.edu.br/use-it.html)
+A job in the Blowout is modeled as a Task object. See [Job Description File](http://arrebol.lsd.ufcg.edu.br/use-it.html) and [Arrebol code](https://github.com/fogbow/arrebol/tree/master/src/main/java/org/fogbowcloud/app) to know how construct a Task object from a job description file.
 
-Depois de iniciar a execucao do Blowout, voce pode comecar a submeter suas Tasks. O exemplo abaixo ilustra como submeter Tasks para o Blowout
+The example below illustrates how to submit a Task to Blowout:
 
-	blowout.start(removePreviousResources);
+	public void submitTask(Task task)
+	{
+		blowout.addTask(task);
+	}
 
-	Task task = new TaskImpl(id, specification, uuid);
+Is possible to submit a list of tasks, see the example below:
 
-	blowout.addTask(task);
+	public void submitTaskList(List<Task> taskList)
+	{
+		blowout.addTaskList(taskList);
+	}
 
-Eh possivel submeter uma Lista de Task, veja o exemplo:
 
-	blowout.start(removePreviousResources);
+#### Removing Task
+Is possible to remove a submitted task:
 
-	Task task = new TaskImpl(id, specification, uuid);
-
-	List<Task>taskList = new ArrayList<Task>();
-	
-	taskList.add(task);
-	
-	blowout.addTaskList(taskList);
-
-#### Removing a Task
-
-	blowout.start(removePreviousResources);
-
-	Task task = new TaskImpl(id, specification, uuid);
-
-	blowout.addTask(task);
-
-	blowout.cleanTask(task);
+	public void removeTask(Task task)
+	{
+		blowout.cleanTask(task);
+	}
 
 
 ### Monitoring Tasks
+You can know the status of a Task that has been submitted to Blowout.
+
+	blowout.addTask(task);
+
+	System.out.println(blowout.getTaskState().getDesc());
+
+The possible states of a Task are presented in the table below.
+
+Task State | Description 
+----------- | -----------
+Ready | The Task is ready to be executed
+Running | The Task is running on the associated resource
+Finished | The Task was finished with sucess
+Completed | The Task was finished with sucess and was taken from the running tasks list
+Failed | Failed to execute one of the Task commands
+Not Created | The Task does not exist in Blowout
+Timedout | The Task took timeout
+
+
 - doc how to check scheduler, fetcher, crawler statuses
 
 
