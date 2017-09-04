@@ -47,7 +47,7 @@ Blowout has six main components:
 - **Task Monitor**: responsável por criar e encerrar um processo para uma task que está pronta para ser executada, além disso, monitora a execução das tasks que estão em estado de running na federated cloud resource.
 
 ## Installation
-To get the lastest stable version of the Arrebol source code, download it from our repository:
+To get the lastest stable version of Blowout source code, download it from our repository:
 
     wget https://github.com/fogbow/blowout/archive/master.zip
 
@@ -55,9 +55,9 @@ Then, decompress it:
 
     unzip master.zip
 
-After unpacking Blowout source code, you can import Blowout to your job submitter and use it.
+After unpacking Blowout source code, you can add and import Blowout to your federated cloud job submitter project.
 
-## How to configure Blowout?
+## Configuring Blowout
 [See](https://github.com/fogbow/arrebol/blob/master/sched.conf.example) an example of Blowout configuration file. The following properties show all possible Blowout configurations with a brief description of them. 
 
 Change it and make your own Blowout configuration file.
@@ -85,7 +85,6 @@ Infrastructure Provider Class Name | The Infrastructure Provider **Implementatio
 	max_resource_reuse=4
 	max_resource_connection_retry=4
 	local_command_interpreter=/bin/bash
-	infra_auth_token_update_plugin=org.fogbowcloud.blowout.infrastructure.token.KeystoneTokenUpdatePlugin
 	infra_initial_specs_file_path=
 	infra_provider_class_name=FogbowInfrastructureProvider
 	infra_specs_block_creating=true
@@ -99,7 +98,6 @@ Resource Idle Life Time | Time that the resource will be available after your le
 Max Resourse Reuse | Maximum amount of use of the resource to execute jobs | No (Default value: 1)
 Max Resource Connection Retry | Maximum amount of connections retry to a resource | No (Default value: 1)
 Local Command Interpreter | The Resource Job Command Interpreter | **NO**
-Infrastructure Authentication Token Update Plugin | ?? | **Yes**
 Infrastructure Initial Specifications File Path | Initial Specifications File Path of the Infrastructure | **NO**
 Infrastructure Provider Class Name | Class name of the Infrastructure Provider | **NO**
 Infrastructure Specifications Block Creating | ?? | No **(Never used in any code)**
@@ -133,6 +131,76 @@ Token Update Time | ?? | No (Default value: 6)
 Token Update Time Unit | Time Unit of Token Update Time, use (**H** for hours, **M** for minutes, **S** for seconds and **MS** for miliseconds) | No (Default value: H)
 
 
+#### Authentication Token Properties - Case LDAP
+	infra_auth_token_update_plugin=org.fogbowcloud.blowout.infrastructure.token.LDAPTokenUpdatePlugin
+	auth_token_prop_ldap_username=
+	auth_token_prop_ldap_password=
+	auth_token_prop_ldap_auth_url=
+	auth_token_prop_ldap_base=
+	auth_token_prop_ldap_encrypt_type=
+	auth_token_prop_ldap_private_key=
+	auth_token_prop_ldap_public_key=
+
+Configuration Field | Description | Required
+-------------------------- | -------------------- | -------
+LDAP Infrastructure Token Update Plugin |	?? | **Yes**
+LDAP Username |	?? | **Yes**
+LDAP Password |	?? | **Yes**
+LDAP Authentication URL |	?? | **Yes**
+LDAP Base |	?? | **Yes**
+LDAP Encrypt Type |	?? | **Yes**
+LDAP Private Key | ?? | **Yes**
+LDAP Public Key |	?? | **Yes**
+
+
+#### Authentication Token Properties - Case Keystone
+	infra_auth_token_update_plugin=org.fogbowcloud.blowout.infrastructure.token.KeystoneTokenUpdatePlugin
+	auth_token_prop_keystone_username=
+	auth_token_prop_keystone_tenantname=
+	auth_token_prop_keystone_password=
+	auth_token_prop_keystone_auth_url=
+
+Configuration Field | Description | Required
+-------------------------- | -------------------- | -------
+Keystone Infrastructure Token Update Plugin |	?? | **Yes**
+Keystone Username	|	?? | **Yes**
+Keystone Tenantname	|	?? | **Yes**
+Keystone Password	|	?? | **Yes**
+Keystone Authentication URL	|	?? | **Yes**
+
+
+#### Authentication Token Properties - Case NAF
+	infra_auth_token_update_plugin=org.fogbowcloud.blowout.infrastructure.token.KeystoneTokenUpdatePlugin
+	auth_token_prop_naf_identity_private_key=
+	auth_token_prop_naf_identity_public_key=
+	auth_token_prop_naf_identity_token_username=
+	auth_token_prop_naf_identity_token_password=
+	auth_token_prop_naf_identity_token_generator_endpoint=
+
+Configuration Field | Description | Required
+-------------------------- | -------------------- | -------
+NAF Infrastructure Token Update Plugin |	?? | **Yes**
+NAF Identity Private Key |	?? | **Yes**
+NAF Identity Public Key	|	?? | **Yes**
+NAF Identity Token Username	|	?? | **Yes**
+NAF Identity Token Password	|	?? | **Yes**
+NAF Identity Token Generator Endpoint	|	?? | **Yes**
+
+
+#### Authentication Token Properties - Case VOMS
+	infra_auth_token_update_plugin=org.fogbowcloud.blowout.infrastructure.token.KeystoneTokenUpdatePlugin
+	auth_token_prop_voms_certificate_file_path
+	auth_token_prop_voms_certificate_password=
+	auth_token_prop_voms_server=
+
+Configuration Field | Description | Required
+-------------------------- | -------------------- | -------
+VOMS Infrastructure Token Update Plugin	|	?? | **Yes**
+VOMS Cerfiticate File Path | ?? | **Yes**
+VOMS Cerfiticate Password	|	?? | **Yes**
+VOMS Cerfiticate Server	|	?? | **Yes**
+
+
 ### Application Headers
 	X-auth-nonce=
 	X-auth-username=
@@ -150,40 +218,59 @@ After set your own Blowout configuration file, use Blowout with it.
 
 ## Using Blowout
 After downloading and setting up the Blowout you can import and add Blowout into your federated cloud job submitter project. The following example illustrates the Blowout usage.
-	
-		package org.fogbowcloud.app;
 
-		import java.io.File;
-		import java.io.FileInputStream;
-		import java.util.Properties;
+	import org.fogbowcloud.blowout.core.BlowoutController;
 
-		import org.fogbowcloud.blowout.core.BlowoutController;
+	public class JobSubmitter {
 
-		public class JobSubmitter {
-			private BlowoutController blowout;
+		public JobSubmitter(File blowoutConf) throws Exception {
+			Properties properties = new Properties();
+			properties.load(new FileInputStream(blowoutConf));
+			
+			boolean removePreviousResources = true;
 
-			public JobSubmitter(File blowoutConf) throws Exception {
-				Properties properties = new Properties();
-				properties.load(new FileInputStream(blowoutConf));
-				
-				boolean removePreviousResources = true;
+			BlowoutController blowout = new BlowoutController(properties);
 
-				this.blowout = new BlowoutController(properties);
+			blowout.start(removePreviousResources);
 
-				this.blowout.start(removePreviousResources);
-
-				this.blowout.stop();
-			}
+			blowout.stop();
 		}
+	}
 
-
-- How to use blowout
-- find and show Really necessary parameters!!!
-- In the configurations, blowout already knows some defaults configurations in case of they're not setted in your blowout.properties
 
 ### Submitting Tasks
-- how submit tasks
-- type Task?
+O Blowout trata um job como uma entidade Task, onde nela estao inseridos uma serie de comandos que devem ser executados na federated cloud resource e as especificacoes dos recursos necessarios para executa-la. Para conhecer mais sobre a entidade Task do Blowout [veja](http://arrebol.lsd.ufcg.edu.br/use-it.html)
+
+Depois de iniciar a execucao do Blowout, voce pode comecar a submeter suas Tasks. O exemplo abaixo ilustra como submeter Tasks para o Blowout
+
+	blowout.start(removePreviousResources);
+
+	Task task = new TaskImpl(id, specification, uuid);
+
+	blowout.addTask(task);
+
+Eh possivel submeter uma Lista de Task, veja o exemplo:
+
+	blowout.start(removePreviousResources);
+
+	Task task = new TaskImpl(id, specification, uuid);
+
+	List<Task>taskList = new ArrayList<Task>();
+	
+	taskList.add(task);
+	
+	blowout.addTaskList(taskList);
+
+#### Removing a Task
+
+	blowout.start(removePreviousResources);
+
+	Task task = new TaskImpl(id, specification, uuid);
+
+	blowout.addTask(task);
+
+	blowout.cleanTask(task);
+
 
 ### Monitoring Tasks
 - doc how to check scheduler, fetcher, crawler statuses
