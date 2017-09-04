@@ -30,7 +30,7 @@ Blowout has six main components:
 - **Task Monitor**: responsável por criar e encerrar um processo para uma task que está pronta para ser executada, além disso, monitora a execução das tasks que estão em estado de running na federated cloud resource.
 
 ## Installation
-Before Blowout installation is necessary get [Fogbow Manager](https://github.com/fogbow/fogbow-manager) a Blowout dependency.
+Before Blowout installation is necessary to get a Blowout dependency [Fogbow Manager](https://github.com/fogbow/fogbow-manager).
 
 	wget https://github.com/fogbow/fogbow-manager/archive/develop.zip
 
@@ -291,14 +291,14 @@ Timedout | The Task took timeout
 
 
 ## Deploy
-To ensure the correct Blowout operation with new deployments a series of interfaces have been made available, so it is guaranteed the existence of all the necessary methods in each class that can be deployed.
+To ensure the correct Blowout operation with new deployments, a series of interfaces have been made available, ensuring the existence of all the necessary methods in each class that can be deployed.
 
 ### Blowout Pool
 To deploy Blowout Pool is necessary that your new BlowoutPool implements the interface BlowoutPool.
 
 After that, you can set the following property in the Blowout configuration file with the class name of your new Blowout Pool:
 
-	impl_blowout_pool_class_name="my_new_blowoutpool_class_name"
+	impl_blowout_pool_class_name="my_new_blowout_pool_class_name"
 
 ### Scheduler
 To deploy Scheduler is necessary that your new Scheduler implements the interface SchedulerInterface.
