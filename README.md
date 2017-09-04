@@ -1,16 +1,7 @@
 # Blowout
 
 ## What is Blowout?
-
-//Talk about Blowout usage in a general way or directed to fogbow middleware?
-
-//Contextualize the Infrastructure Provider
-
-//Reference? Tasks or Jobs?
-
-//Others configurations (figure out what is it!!!)
-
-//Change the name BlowoutController to Blowout.
+//?? Tag, answer
 
 //LOCAL_COMMAND_INTERPRETER is required? Because apparently is optional, but doesn't have any default value
 
@@ -20,7 +11,7 @@
 
 Blowout is a tool for receiving job submission, monitoring requests and interacting with the [Fogbow Middleware](http://www.fogbowcloud.org/) to execute the received jobs in the federated cloud resources. Blowout abstracts away a complex distributed infrastructure and allows the user to focus on the application requirements.
 
-An example of Blowout job submitter is [Arrebol](http://arrebol.lsd.ufcg.edu.br/).
+An example of job submitter for Blowout is [Arrebol](http://arrebol.lsd.ufcg.edu.br/).
 
 The main Blowout features are:
 - **Receive and Request**: receive jobs submissions and request resources from the federated cloud for these jobs.
@@ -63,7 +54,7 @@ Then, decompress it:
 
     unzip master.zip
 
-After that, get all projects JAR of Fogbow Manager and Blowout. To achieve that, maven and maven2 must be installed in client's machine with commands:
+After that, get all projects JAR of Fogbow Manager and Blowout. To achieve that, maven or maven2 must be installed in client's machine with commands:
 
 	apt-get install maven
 
@@ -73,13 +64,13 @@ And then, simply use the following command in each project directory:
 	
 	mvn -e install -Dmaven.test.skip=true
 
-After installation, you can add and import Blowout to your federated cloud job submitter project.
+After installation, you can add and import Blowout to your job submitter project.
 
 
 ## Configuring Blowout
-[See](https://github.com/fogbow/arrebol/blob/master/sched.conf.example) an example of Blowout configuration file. The following properties show all possible Blowout configurations with a brief description of them. 
+[See](https://github.com/fogbow/arrebol/blob/master/sched.conf.example) an example of Blowout configuration file, change it and make your own Blowout configuration file.
 
-Change it and make your own Blowout configuration file.
+The following properties show all possible Blowout configurations with a brief description of them. 
 
 
 ### Implementation Plugins
@@ -236,7 +227,7 @@ After set your own Blowout configuration file, use Blowout with it.
 
 
 ## Using Blowout
-After downloading and setting up, you can import and add Blowout into your federated cloud job submitter project. The following example illustrates the Blowout usage.
+After installation and configuration, you can import and add Blowout into your federated cloud job submitter project. The following example illustrates the Blowout usage.
 
 	import org.fogbowcloud.blowout.core.BlowoutController;
 
@@ -308,14 +299,37 @@ Timedout | The Task took timeout
 
 
 ## Deploy
-Implement Interfaces...
 
-Put the classes in the file of Properties (blowout..conf.example) see how arrebol do it.
+### BlowoutPool
+To deploy Blowout Pool is necessary that your new BlowoutPool implements the interface BlowoutPool.
 
-- BlowoutPool
-- SchedulerInterface
-- InfrastructureManager
-- InfrastructureProvider
+After that, you can set the propertie in the Blowout configuration file:
+
+	impl_blowout_pool_class_name="my_new_blowoutpool_class_name"
+
+### Scheduler
+To deploy Scheduler is necessary that your new Scheduler implements the interface SchedulerInterface.
+
+After that, you can set the propertie in the Blowout configuration file:
+
+	impl_scheduler_class_name="my_new_scheduler_class_name"
+
+### InfrastructureManager
+To deploy Infrastructure Manager is necessary that your new InfrastructureManager implements the interface InfraManager.
+
+After that, you can set the propertie in the Blowout configuration file:
+
+	impl_infra_manager_class_name="my_new_infra_manager_class_name"
+
+### InfrastructureProvider
+To deploy Infrastructure Provider is necessary that your new InfrastructureProvider implements the interface InfrastructureProvider.
+
+After that, you can set the propertie in the Blowout configuration file:
+
+	infra_provider_class_name="my_new_infra_provider_class_name"
+
+
+After the implementations and configurations set, you can use Blowout with your new deployments.
 
 
 ## infra
