@@ -87,8 +87,6 @@ Infrastructure Provider Class Name | The Infrastructure Provider **Implementatio
 	max_resource_reuse=4
 	max_resource_connection_retry=4
 	local_command_interpreter=/bin/bash
-	infra_initial_specs_file_path=
-	infra_provider_class_name=FogbowInfrastructureProvider
 	infra_specs_block_creating=true
 
 Configuration Field | Description | Required
@@ -99,10 +97,8 @@ Resource Connection Timeout | Timeout for an attempt to connect to a resource | 
 Resource Idle Life Time | Time that the resource will be available after your leverage | No (Default value: 0)
 Max Resourse Reuse | Maximum amount of use of the resource to execute jobs | No (Default value: 1)
 Max Resource Connection Retry | Maximum amount of connections retry to a resource | No (Default value: 1)
-Local Command Interpreter | The Resource Job Command Interpreter | **NO**
-Infrastructure Initial Specifications File Path | Initial Specifications File Path of the Infrastructure | **NO**
-Infrastructure Provider Class Name | Class name of the Infrastructure Provider | **NO**
-Infrastructure Specifications Block Creating | ?? | No **(Never used in any code)**
+Local Command Interpreter | The Resource Job Command Interpreter | **Yes**
+Infrastructure Specifications Block Creating | ?? | No
 
 
 ### Fogbow Infrastructure Constants
@@ -110,7 +106,7 @@ Infrastructure Specifications Block Creating | ?? | No **(Never used in any code
 
 Configuration Field | Description | Required
 -------------------------- | -------------------- | ------
-Infrastructure Fogbow Manager Base URL | ?? | **NO** (but in the code is)
+Infrastructure Fogbow Manager Base URL | ?? | **Yes**
 
 
 ### Database Constants
@@ -119,8 +115,8 @@ Infrastructure Fogbow Manager Base URL | ?? | **NO** (but in the code is)
 
 Configuration Field | Description | Required
 -------------------------- | -------------------- | ------
-Blowout Datastore Url | Blowout resource database URL | **NO** (but in the code is)
-Blowout Rest Server Port | ?? | No **(Never used in any code)**
+Blowout Datastore Url | Blowout resource database URL | **Yes**
+Blowout Rest Server Port | ?? | No
 
 
 ### Token Properties
@@ -129,7 +125,7 @@ Blowout Rest Server Port | ?? | No **(Never used in any code)**
 
 Configuration Field | Description | Required
 -------------------------- | -------------------- | -------
-Token Update Time | ?? | No (Default value: 6)
+Token Update Time | Period of time to update the authentication token | No (Default value: 6)
 Token Update Time Unit | Time Unit of Token Update Time, use (**H** for hours, **M** for minutes, **S** for seconds and **MS** for miliseconds) | No (Default value: H)
 
 
@@ -148,7 +144,7 @@ Configuration Field | Description | Required
 LDAP Infrastructure Token Update Plugin |	?? | **Yes**
 LDAP Username |	?? | **Yes**
 LDAP Password |	?? | **Yes**
-LDAP Authentication URL |	?? | **Yes**
+LDAP Authentication URL | ?? | **Yes**
 LDAP Base |	?? | **Yes**
 LDAP Encrypt Type |	?? | **Yes**
 LDAP Private Key | ?? | **Yes**
@@ -201,18 +197,6 @@ VOMS Infrastructure Token Update Plugin	|	?? | **Yes**
 VOMS Cerfiticate File Path | ?? | **Yes**
 VOMS Cerfiticate Password	|	?? | **Yes**
 VOMS Cerfiticate Server	|	?? | **Yes**
-
-
-### Application Headers
-	X-auth-nonce=
-	X-auth-username=
-	X-auth-hash=
-
-Configuration Field | Description | Required
--------------------------- | -------------------- | -----
-X Authentication Nonce | ?? | No
-X Authentication Username | ?? | No
-X Authentication Hash | ?? | No
 
 
 After set your own Blowout configuration file, use Blowout with it.
@@ -282,12 +266,8 @@ Ready | The Task is ready to be executed
 Running | The Task is running on the associated resource
 Finished | The Task was finished with sucess
 Completed | The Task was finished with sucess and was taken from the running tasks list
-Failed | Failed to execute one of the Task commands
 Not Created | The Task does not exist in Blowout
 Timedout | The Task took timeout
-
-
-- doc how to check scheduler, fetcher, crawler statuses
 
 
 ## Deploy
@@ -325,18 +305,4 @@ After that, you can set the following property in the Blowout configuration file
 After the implementations and configurations set, you can use Blowout with your new deployments.
 
 
-## infra
-- doc infra script
-- doc spec files
- 
-## task bootstrap
-- doc script
-- doc input file
-
-## ?? Tag, answer
-
-## LOCAL_COMMAND_INTERPRETER is required? Because apparently is optional, but doesn't have any default value
-
-## DEFAULT VALUE FOR IDLE_LIFE_TIME: 0???
-
-## Query: Some Blowout properties checks are in Arrebol... Example: INFRA_PROVIDER_CLASS_NAME
+### Query: Some Blowout properties checks are in Arrebol... Example: INFRA_PROVIDER_CLASS_NAME
