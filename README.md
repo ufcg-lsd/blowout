@@ -30,7 +30,7 @@ Blowout has six main components:
 - **Task Monitor**: responsável por criar e encerrar um processo para uma task que está pronta para ser executada, além disso, monitora a execução das tasks que estão em estado de running na federated cloud resource.
 
 ## Installation
-Before Blowout installation is necessary to get a Blowout dependency [Fogbow Manager](https://github.com/fogbow/fogbow-manager).
+Before Blowout installation is necessary to get a Blowout dependency: [Fogbow Manager](https://github.com/fogbow/fogbow-manager).
 
 	wget https://github.com/fogbow/fogbow-manager/archive/develop.zip
 
