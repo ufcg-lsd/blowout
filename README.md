@@ -60,7 +60,7 @@ After installation, you can add and import Blowout to your Task Submitter projec
 
 
 ## Configuring Blowout
-[See](https://github.com/fogbow/arrebol/blob/master/sched.conf.example) an example of Blowout configuration file, change it and make your own Blowout configuration file. For more information see [Blowout Configurations](https://github.com/fogbow/blowout/blob/readme/src/main/java/org/fogbowcloud/blowout/CONFIGURATIONS.md).
+[See](https://github.com/fogbow/arrebol/blob/master/sched.conf.example) an example of Blowout configuration file, change it and make your own Blowout configuration file. For more information see [Blowout Configurations](https://github.com/fogbow/blowout/blob/readme/CONF.md).
 
 After set your Blowout configuration file, use Blowout with it.
 
