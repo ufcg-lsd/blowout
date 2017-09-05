@@ -62,9 +62,9 @@ After installation, you can add and import Blowout to your Task Submitter projec
 ## Configuring Blowout
 [See](https://github.com/fogbow/arrebol/blob/master/sched.conf.example) an example of Blowout configuration file, change it and make your own Blowout configuration file.
 
-To know more about Blowout configurations [see](https://github.com/fogbow/blowout/blob/readme/CONF.md).
+To know more about Blowout configurations [see](https://github.com/fogbow/blowout/blob/readme/src/main/java/org/fogbowcloud/blowout/CONFIGURATIONS.md).
 
-After set your own Blowout configuration file, use Blowout with it.
+After set your Blowout configuration file, use Blowout with it.
 
 
 ## Using Blowout
@@ -75,6 +75,7 @@ After installation and configuration, you can import and add Blowout into your f
 	public class TaskSubmitter {
 
 		public TaskSubmitter(File blowoutConf) throws Exception {
+			
 			Properties properties = new Properties();
 			properties.load(new FileInputStream(blowoutConf));
 			
@@ -94,15 +95,15 @@ A task in the Blowout is modeled as a Task object. See [Job Description File](ht
 
 The example below illustrates how to submit a Task to Blowout:
 
-	public void submitTask(Task task)
-	{
+	public void submitTask(Task task) {
+		
 		blowout.addTask(task);
 	}
 
 Is possible to submit a list of tasks, see the example below:
 
-	public void submitTaskList(List<Task> taskList)
-	{
+	public void submitTaskList(List<Task> taskList) {
+		
 		blowout.addTaskList(taskList);
 	}
 
@@ -110,8 +111,8 @@ Is possible to submit a list of tasks, see the example below:
 #### Removing Task
 Is possible to remove a submitted task:
 
-	public void removeTask(Task task)
-	{
+	public void removeTask(Task task) {
+		
 		blowout.cleanTask(task);
 	}
 
