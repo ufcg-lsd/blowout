@@ -138,7 +138,7 @@ Timedout | The Task took timeout
 
 
 ## Customizing Blowout Components
-You can adapt some Blowout components to operate with your needs. For more information see [Customizing Blowout Components](https://github.com/fogbow/blowout/blob/readme/CUSTOM.md)
+You can adapt some Blowout components to operate with your application needs. For more information see [Customizing Blowout Components](https://github.com/fogbow/blowout/blob/readme/CUSTOM.md).
 
-After the implementations and configurations set, you can use Blowout with your new custom components.
+After customizations and configurations sets, you can use Blowout with your new Custom Components.
 
