@@ -29,4 +29,4 @@ After that, you can set the following property in the Blowout configuration file
 
 	infra_provider_class_name="my_new_infra_provider_class_name"
 
-To know more about what should be implemented in each Component method, see the source code.
+To know more about what should be implemented in each component method, see the source code.
