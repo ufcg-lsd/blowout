@@ -54,7 +54,9 @@ Configuration Field | Description | Required
 Blowout Datastore Url | Blowout resource database URL | **Yes**
 
 
-### General Authentication Token Properties
+### Authentication Token Properties
+
+#### General Authentication Token Properties
 	token_update_time=2
 	token_update_time_unit=H
 
