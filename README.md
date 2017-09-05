@@ -60,9 +60,7 @@ After installation, you can add and import Blowout to your Task Submitter projec
 
 
 ## Configuring Blowout
-[See](https://github.com/fogbow/arrebol/blob/master/sched.conf.example) an example of Blowout configuration file, change it and make your own Blowout configuration file.
-
-To know more about Blowout configurations [see](https://github.com/fogbow/blowout/blob/readme/src/main/java/org/fogbowcloud/blowout/CONFIGURATIONS.md).
+[See](https://github.com/fogbow/arrebol/blob/master/sched.conf.example) an example of Blowout configuration file, change it and make your own Blowout configuration file. For more information see [Blowout Configurations](https://github.com/fogbow/blowout/blob/readme/src/main/java/org/fogbowcloud/blowout/CONFIGURATIONS.md).
 
 After set your Blowout configuration file, use Blowout with it.
 
@@ -139,37 +137,8 @@ Not Created | The Task does not exist in Blowout
 Timedout | The Task took timeout
 
 
-## Customizing Blowout Parts
-To ensure the correct Blowout operation with new customized parts, a series of interfaces have been made available, ensuring the existence of all the necessary methods in each class that can be customized.
+## Customizing Blowout Components
+You can adapt some Blowout components to operate with your needs. For more information see [Customizing Blowout Components](https://github.com/fogbow/blowout/blob/readme/CUSTOM.md)
 
-### Blowout Pool
-To customize Blowout Pool is necessary that your new BlowoutPool class implements the interface BlowoutPool.
-
-After that, you can set the following property in the Blowout configuration file with the class name of your new Blowout Pool:
-
-	impl_blowout_pool_class_name="my_new_blowout_pool_class_name"
-
-### Scheduler
-To customize Scheduler is necessary that your new Scheduler class implements the interface SchedulerInterface.
-
-After that, you can set the following property in the Blowout configuration file with the class name of your new Scheduler:
-
-	impl_scheduler_class_name="my_new_scheduler_class_name"
-
-### Infrastructure Manager
-To customize Infrastructure Manager is necessary that your new InfrastructureManager class implements the interface InfraManager.
-
-After that, you can set the following property in the Blowout configuration file with the class name of your new Infrastructure Manager:
-
-	impl_infra_manager_class_name="my_new_infra_manager_class_name"
-
-### Infrastructure Provider
-To customize Infrastructure Provider is necessary that your new InfrastructureProvider class implements the interface InfrastructureProvider.
-
-After that, you can set the following property in the Blowout configuration file with the class name of your new Infrastructure Provider:
-
-	infra_provider_class_name="my_new_infra_provider_class_name"
-
-
-After the implementations and configurations set, you can use Blowout with your new deployments.
+After the implementations and configurations set, you can use Blowout with your new custom components.
 
