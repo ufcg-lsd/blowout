@@ -59,11 +59,13 @@ Blowout Datastore Url | Blowout resource database URL | **Yes**
 #### General Authentication Token Properties
 	token_update_time=2
 	token_update_time_unit=H
+	infra_auth_token_update_plugin=
 
 Configuration Field | Description | Required
 -------------------------- | -------------------- | -------
 Token Update Time | Period of time to update the authentication token | No (Default value: 6)
 Token Update Time Unit | Time Unit of Token Update Time, use (**H** for hours, **M** for minutes, **S** for seconds and **MS** for miliseconds) | No (Default value: H)
+Infrastructure Authentication Token Update Plugin | The package of the Token Update Plugin that will be used | **Yes**
 
 
 #### Authentication Token Properties - Case LDAP
@@ -78,10 +80,9 @@ Token Update Time Unit | Time Unit of Token Update Time, use (**H** for hours, *
 
 Configuration Field | Description | Required
 -------------------------- | -------------------- | -------
-LDAP Infrastructure Token Update Plugin |	?? | **Yes**
-LDAP Username |	?? | **Yes**
-LDAP Password |	?? | **Yes**
-LDAP Authentication URL | ?? | **Yes**
+LDAP Username |	Username credential of LDAP Authentication | **Yes**
+LDAP Password |	User Password of LDAP Authentication | **Yes**
+LDAP Authentication URL | The LDAP Authentication URL | **Yes**
 LDAP Base |	?? | **Yes**
 LDAP Encrypt Type |	?? | **Yes**
 LDAP Private Key | ?? | **Yes**
@@ -97,15 +98,14 @@ LDAP Public Key |	?? | **Yes**
 
 Configuration Field | Description | Required
 -------------------------- | -------------------- | -------
-Keystone Infrastructure Token Update Plugin |	?? | **Yes**
-Keystone Username	|	?? | **Yes**
-Keystone Tenantname	|	?? | **Yes**
-Keystone Password	|	?? | **Yes**
-Keystone Authentication URL	|	?? | **Yes**
+Keystone Username	| Username credential of Keystone Authentication | **Yes**
+Keystone Tenantname	| The Tenant Name credential of Keystone Authentication | **Yes**
+Keystone Password |	The user password of Keystone Authentication | **Yes**
+Keystone Authentication URL	| URL for Keystone Authentication | **Yes**
 
 
 #### Authentication Token Properties - Case NAF
-	infra_auth_token_update_plugin=org.fogbowcloud.blowout.infrastructure.token.KeystoneTokenUpdatePlugin
+	infra_auth_token_update_plugin=org.fogbowcloud.blowout.infrastructure.token.NAFTokenUpdatePlugin
 	auth_token_prop_naf_identity_private_key=
 	auth_token_prop_naf_identity_public_key=
 	auth_token_prop_naf_identity_token_username=
@@ -114,7 +114,6 @@ Keystone Authentication URL	|	?? | **Yes**
 
 Configuration Field | Description | Required
 -------------------------- | -------------------- | -------
-NAF Infrastructure Token Update Plugin |	?? | **Yes**
 NAF Identity Private Key |	?? | **Yes**
 NAF Identity Public Key	|	?? | **Yes**
 NAF Identity Token Username	|	?? | **Yes**
@@ -123,17 +122,16 @@ NAF Identity Token Generator Endpoint	|	?? | **Yes**
 
 
 #### Authentication Token Properties - Case VOMS
-	infra_auth_token_update_plugin=org.fogbowcloud.blowout.infrastructure.token.KeystoneTokenUpdatePlugin
-	auth_token_prop_voms_certificate_file_path
+	infra_auth_token_update_plugin=org.fogbowcloud.blowout.infrastructure.token.VOMSTokenUpdatePlugin
+	auth_token_prop_voms_certificate_file_path=
 	auth_token_prop_voms_certificate_password=
 	auth_token_prop_voms_server=
 
 Configuration Field | Description | Required
 -------------------------- | -------------------- | -------
-VOMS Infrastructure Token Update Plugin	|	?? | **Yes**
-VOMS Cerfiticate File Path | ?? | **Yes**
-VOMS Cerfiticate Password	|	?? | **Yes**
-VOMS Cerfiticate Server	|	?? | **Yes**
+VOMS Cerfiticate File Path | The file path for the VOMS public certificate | **Yes**
+VOMS Cerfiticate Password | The VOMS Certificate password | **Yes**
+VOMS Cerfiticate Server	| ?? | **Yes**
 
 
 After set your own Blowout configuration file, use Blowout with it.
