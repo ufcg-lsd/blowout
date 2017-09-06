@@ -17,17 +17,17 @@ Blowout works like a scheduler of tasks to computational resources dispersed amo
 
 Blowout has six main components:
 
-- **BlowoutPool**: responsável por gerenciar uma pool de tasks e de resources onde ficam armazenados as tasks e resources, respectivamente. É por meio da pool que os componentes do Blowout tem acesso as tasks e resources armazenados.
+- **BlowoutPool**: responsible for managing a pool of tasks and resources. It is through the Blowoutpool that the components have access to the received tasks and resources that were raised by the Infrastructure Provider.
 
-- **Scheduler**: responsável por associar e desassociar uma task, que está pronta para ser executada, a um resource que está disponível. Após associar ou desassociar um resource para uma task o Scheduler submete para o Task Monitor a tarefa de criar ou encerrar um processo de execução da task no resource.
+- **Scheduler**: responsible for associating and disassociating a ready to be executed task to a resource that is available. After associating or disassociating a resource to a task, the Scheduler delegates to Task Monitor the assignment of create or terminate the task execution process in the resource.
 
-- **Infrastructure Manager**: responsável por pedir e adicionar recursos pendentes com base na demanda das tasks que ainda não foram executadas e na não disponibilidade dos resources já existentes.
+- **Infrastructure Manager**: responsible for request and add pending resources based on the demand of tasks that have not yet been executed, the availability and specifications of existing resources.
 
-- **Infrastructure Provider**: é quem interage com o provedor de recursos físicos, sendo responsável por executar os pedidos dos recursos na federated cloud e disponibilizá-los na BlowoutPool.
+- **Infrastructure Provider**: is the one who interacts with the physical resource provider, being responsible for executing the resource requests and making them available in the BlowoutPool.
 
-- **Resource Monitor**: responsável por realizar a requisição da alocação dos recursos pendentes ao Infrastructure Provider e monitorar os estados dos recursos que já estão alocados, gerenciando a disponibilidade desses recursos na pool de resources.
+- **Resource Monitor**: responsible for requesting the allocation of pending resources to the Infrastructure Provider and monitoring the status of resources that are already allocated, managing the availability of these resources in the pool.
 
-- **Task Monitor**: responsável por criar e encerrar um processo para uma task que está pronta para ser executada, além disso, monitora a execução das tasks que estão em estado de running na federated cloud resource.
+- **Task Monitor**: responsible for creating and closing a process for a task that is ready to be executed, in addition, monitors the execution of tasks that are in running state.
 
 ## Installation
 Before Blowout installation is necessary to get a Blowout dependency, [Fogbow Manager](https://github.com/fogbow/fogbow-manager).
