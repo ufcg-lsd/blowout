@@ -85,8 +85,8 @@ LDAP Password |	User Password of LDAP Authentication | **Yes**
 LDAP Authentication URL | The LDAP Authentication URL | **Yes**
 LDAP Base |	?? | **Yes**
 LDAP Encrypt Type |	?? | **Yes**
-LDAP Private Key | ?? | **Yes**
-LDAP Public Key |	?? | **Yes**
+LDAP Private Key | File path of the Private Key | **Yes**
+LDAP Public Key | File path of the Public Key | **Yes**
 
 
 #### Authentication Token Properties - Case Keystone
