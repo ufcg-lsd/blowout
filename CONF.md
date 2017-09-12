@@ -30,12 +30,12 @@ Infrastructure Provider Class Name | The Infrastructure Provider **Implementatio
 Configuration Field | Description | Required
 -------------------------- | -------------------- | ----
 Infrastructure Elasticity | Tells whether the infrastructure will be elastic or not | **Yes**
-Infrastructure Monitor Period | Periods of resources monitoring | No (Default value: 30000)
-Resource Connection Timeout | Timeout for an attempt to connect to a resource | **Yes**
-Resource Idle Life Time | Time that the resource will be available after your leverage | No (Default value: 0)
-Max Resourse Reuse | Maximum amount of use of the resource to execute tasks | No (Default value: 1)
-Max Resource Connection Retry | Maximum amount of connections retry to a resource | No (Default value: 1)
-Local Command Interpreter | The Resource Task Command Interpreter | **Yes**
+Infrastructure Monitor Period | Periods of resources monitoring in milliseconds | No (Default value: 30000)
+Resource Connection Timeout | Timeout for an attempt to connect to a resource in milliseconds | **Yes**
+Resource Idle Life Time | Time that the resource will be available after your leverage in milliseconds | No (Default value: 0)
+Max Resourse Reuse | Maximum use of the resource to execute tasks | No (Default value: 1)
+Max Resource Connection Retry | Maximum connections retry to a resource | No (Default value: 1)
+Local Command Interpreter | The resource command interpreter | **Yes**
 
 
 ### Fogbow Infrastructure Constant
@@ -65,7 +65,7 @@ Configuration Field | Description | Required
 -------------------------- | -------------------- | -------
 Token Update Time | Period of time to update the authentication token | No (Default value: 6)
 Token Update Time Unit | Time Unit of Token Update Time, use (**H** for hours, **M** for minutes, **S** for seconds and **MS** for miliseconds) | No (Default value: H)
-Infrastructure Authentication Token Update Plugin | The package of the Token Update Plugin that will be used | **Yes**
+Infrastructure Authentication Token Update Plugin | The Token Update Plugin class that will be used | **Yes**
 
 
 #### Authentication Token Properties - Case LDAP
