@@ -25,7 +25,7 @@ Blowout has six main components:
 
 - **Infrastructure Provider**: interacts with the physical resource provider, being responsible for executing the resource requests and making them available in the BlowoutPool.
 
-- **Resource Monitor**: requests the allocation of pending resources to the Infrastructure Provider and monitors the status of resources that have already been allocated, managing the availability of these resources in the pool.
+- **Resource Monitor**: monitors the status of resources that have already been allocated and are pending, managing the availability of these resources in the pool.
 
 - **Task Monitor**: creates and closes a process for a task that is ready to be executed, in addition, monitors the execution of tasks that are in running state.
 
