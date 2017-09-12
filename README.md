@@ -7,7 +7,7 @@ An example of Infrastructure Provider and Task Submitter for Blowout are, respec
 
 The main Blowout features are:
 - **Receive and Request**: receive tasks submissions and request resources from the federated cloud for these tasks.
-- **Associate and Execute**: associate to a particular task a resource that match with the task requeriments and request the execution of these task in the resource.
+- **Associate and Execute**: associate to a particular task a resource that match with the task requeriments and request the execution of this task in the resource.
 - **Monitor**: monitor the task execution in the associated resource.
 
 See the following topics to understand the Blowout **architecture**, how to **deploy and configure it**, and finally, how to use it to **execute** tasks.
