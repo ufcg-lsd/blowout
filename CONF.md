@@ -84,7 +84,7 @@ LDAP Username |	Username credential of LDAP Authentication | **Yes**
 LDAP Password |	User Password of LDAP Authentication | **Yes**
 LDAP Authentication URL | The LDAP Authentication URL | **Yes**
 LDAP Base |	?? | **Yes**
-LDAP Encrypt Type |	?? | **Yes**
+LDAP Encrypt Type |	?? | No
 LDAP Private Key | File path of the Private Key | **Yes**
 LDAP Public Key | File path of the Public Key | **Yes**
 
