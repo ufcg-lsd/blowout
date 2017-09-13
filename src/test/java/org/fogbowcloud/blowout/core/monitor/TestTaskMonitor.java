@@ -55,7 +55,7 @@ public class TestTaskMonitor {
 		TaskImpl taskImpl = new TaskImpl("task-id", spec, FAKE_UUID);
 		taskImpl.setState(TaskState.RUNNING);
 		
-		List<Command> commandListMock = (List<Command>)mock(ArrayList.class);
+		List<Command> commandListMock = mock(ArrayList.class);
 		
 		TaskProcessImpl taskProcessImpl = new TaskProcessImpl(taskImpl.getId(), commandListMock, spec, FAKE_UUID);
 		taskProcessImpl.setStatus(TaskState.RUNNING);
