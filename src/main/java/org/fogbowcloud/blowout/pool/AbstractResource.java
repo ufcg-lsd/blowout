@@ -3,7 +3,6 @@ package org.fogbowcloud.blowout.pool;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
@@ -50,16 +49,6 @@ public abstract class AbstractResource {
 		setState(ResourceState.NOT_READY);
 	}
 
-	/**
-	 * This method receives a wanted specification and verifies if this resource
-	 * matches with it. <br>
-	 * Is used to match the Fogbow requirements (VM.Cores >= Specs.Cores,
-	 * VM.MenSize >= Specs.MenSize, VM.DiskSize >= Specs.DiskSize, VM.Location
-	 * >= Specs.Location) and the Image (VM.image == Specs.image)
-	 * 
-	 * @param spec
-	 * @return
-	 */
 	public abstract boolean match(Specification spec);
 
 	protected abstract boolean internalCheckConnectivity();
@@ -95,8 +84,6 @@ public abstract class AbstractResource {
 		this.metadata.putAll(resource.getAllMetadata());
 	}
 
-	// ----------------------------------- GETTERS and SETTERS
-	// -----------------------------------//
 	public String getId() {
 		return id;
 	}

@@ -26,11 +26,9 @@ public class BlowoutController {
 
 	protected BlowoutPool blowoutPool;
 
-	// Scheduler elements
 	private SchedulerInterface schedulerInterface;
 	private TaskMonitor taskMonitor;
 
-	// Infrastructure elements.
 	protected InfrastructureProvider infraProvider;
 
 	protected InfrastructureManager infraManager;
@@ -42,7 +40,7 @@ public class BlowoutController {
 	public BlowoutController(Properties properties) throws BlowoutException {
 		this.properties = properties;
 		try {
-			if (!this.checkProperties(properties)) {
+			if (!BlowoutController.checkProperties(properties)) {
 				throw new BlowoutException("Error on validate the file ");
 			}
 
@@ -97,7 +95,6 @@ public class BlowoutController {
 	}
 
 	public void cleanTask(Task task) {
-		// TODO remove task from the pool.
 		blowoutPool.removeTask(task);
 	}
 

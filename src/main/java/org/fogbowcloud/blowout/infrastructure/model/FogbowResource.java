@@ -2,14 +2,11 @@ package org.fogbowcloud.blowout.infrastructure.model;
 
 import java.util.Scanner;
 
-import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.infrastructure.provider.fogbow.FogbowRequirementsHelper;
 import org.fogbowcloud.blowout.pool.AbstractResource;
 
 public class FogbowResource extends AbstractResource{
-
-	private static final Logger LOGGER = Logger.getLogger(FogbowResource.class);
 
 	private final String orderId;
 	private String instanceId;
@@ -43,8 +40,6 @@ public class FogbowResource extends AbstractResource{
 	}
 
 	protected boolean internalCheckConnectivity() {
-		
-		//TODO Implement SSH Resource ?
 		
 		String host = this.getMetadataValue(METADATA_SSH_HOST);
 		String port = this.getMetadataValue(METADATA_SSH_PORT);

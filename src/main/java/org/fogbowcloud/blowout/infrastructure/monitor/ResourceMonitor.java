@@ -80,7 +80,6 @@ public class ResourceMonitor {
 			while (active) {
 
 				try {
-					//checkIsPaused();
 					monitorProcess();
 					Thread.sleep(infraMonitoringPeriod);
 					
@@ -116,9 +115,9 @@ public class ResourceMonitor {
 				if (ResourceState.IDLE.equals(resource.getState())) {
 					resolveIdleResource(resource);
 				} else if (ResourceState.BUSY.equals(resource.getState())) {
-					idleResources.remove(resource);
+					idleResources.remove(resource.getId());
 				} else if (ResourceState.FAILED.equals(resource.getState())) {
-					idleResources.remove(resource);
+					idleResources.remove(resource.getId());
 					boolean isAlive = this.checkResourceConnectivity(resource);
 					if(isAlive){
 						if(moveResourceToIdle(resource)){
@@ -127,7 +126,7 @@ public class ResourceMonitor {
 					}
 				} else if (ResourceState.TO_REMOVE.equals(resource.getState())) {
 					try {
-						idleResources.remove(resource);
+						idleResources.remove(resource.getId());
 						infraProvider.deleteResource(resource.getId());
 						resourcePool.removeResource(resource);
 					} catch (Exception e) {
@@ -143,7 +142,6 @@ public class ResourceMonitor {
 
 			Long expirationDateTime = idleResources.get(resource.getId());
 
-			// If since == null, resource must go to IDLE list.
 			if (expirationDateTime == null) {
 				moveResourceToIdle(resource);
 			} else {
@@ -152,14 +150,14 @@ public class ResourceMonitor {
 				if (OrderType.ONE_TIME.getValue().equals(requestType)) {
 
 					boolean isAlive = checkResourceConnectivity(resource);
-					// Has expiration time?
+
 					if (isAlive && noExpirationTime.compareTo(expirationDateTime) != 0) {
 						Date expirationDate = new Date(expirationDateTime.longValue());
 						Date currentDate = new Date();
 						if (expirationDate.before(currentDate)) {
 							LOGGER.warn("Removing resource "+resource.getId()+" due Idle time expired.");
 							resourcePool.updateResource(resource, ResourceState.TO_REMOVE);
-							idleResources.remove(resource);
+							idleResources.remove(resource.getId());
 						}
 					}
 				}
