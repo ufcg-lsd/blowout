@@ -148,8 +148,6 @@ public class Specification implements Serializable {
 		}
 	}
 
-	// ----- GETTERS and SETTERS ------ //
-
 	public String getImage() {
 		return image;
 	}

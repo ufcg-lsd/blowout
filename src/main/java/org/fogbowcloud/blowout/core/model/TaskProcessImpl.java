@@ -45,7 +45,6 @@ public class TaskProcessImpl implements TaskProcess {
 	private String userIdValue;
 
 	public TaskProcessImpl(String taskId, List<Command> commandList, Specification spec, String UserId) {
-		// check parameters?
 		this.processId = UUID.randomUUID().toString();
 		this.taskId = taskId;
 		this.status = TaskState.READY;
@@ -165,8 +164,7 @@ public class TaskProcessImpl implements TaskProcess {
 		if (additionalEnvVariables == null || additionalEnvVariables.isEmpty()) {
 			return builder.start();
 		}
-		// adding additional environment variables related to resource and/or
-		// task
+		
 		for (String envVariable : additionalEnvVariables.keySet()) {
 			builder.environment().put(envVariable, additionalEnvVariables.get(envVariable));
 		}

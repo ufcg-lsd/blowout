@@ -38,10 +38,7 @@ public class KeystoneTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
 		this.tenantname = properties.getProperty(FOGBOW_KEYSTONE_TENANTNAME);
 		this.password = properties.getProperty(FOGBOW_KEYSTONE_PASSWORD);
 		this.authUrl = properties.getProperty(FOGBOW_KEYSTONE_AUTH_URL);
-
-		// bash bin/fogbow-cli token --create --type openstack -Dusername=fogbow
-		// -Dpassword=nc3SRPS2
-		// -DauthUrl=http://10.5.0.14:5000-DtenantName=Fogbow
+		
 	}
 
 	@Override

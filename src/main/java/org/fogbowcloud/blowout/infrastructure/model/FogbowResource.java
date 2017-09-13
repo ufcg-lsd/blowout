@@ -41,8 +41,6 @@ public class FogbowResource extends AbstractResource{
 
 	protected boolean internalCheckConnectivity() {
 		
-		//TODO Implement SSH Resource ?
-		
 		String host = this.getMetadataValue(METADATA_SSH_HOST);
 		String port = this.getMetadataValue(METADATA_SSH_PORT);
 

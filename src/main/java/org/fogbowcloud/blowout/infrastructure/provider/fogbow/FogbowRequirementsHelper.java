@@ -18,7 +18,6 @@ public class FogbowRequirementsHelper {
 
 	private static final Logger LOGGER = Logger.getLogger(FogbowRequirementsHelper.class);
 	
-	// ------------------ CONSTANTS ------------------//
 	protected static final String ZERO = "0";
 
 	public static final String METADATA_FOGBOW_RESOURCE_KIND = "compute";

@@ -20,7 +20,6 @@ public class TaskImpl implements Task {
 
 	private static final Logger LOGGER = Logger.getLogger(TaskImpl.class);
 
-	//Environment variables related to task
 	public static final String ENV_LOCAL_OUT_DIR = "";
 
 	public static final String METADATA_REMOTE_OUTPUT_FOLDER = "remote_output_folder";

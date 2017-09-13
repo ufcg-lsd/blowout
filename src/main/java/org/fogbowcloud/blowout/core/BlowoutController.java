@@ -26,11 +26,9 @@ public class BlowoutController {
 
 	protected BlowoutPool blowoutPool;
 
-	// Scheduler elements
 	private SchedulerInterface schedulerInterface;
 	private TaskMonitor taskMonitor;
 
-	// Infrastructure elements.
 	protected InfrastructureProvider infraProvider;
 
 	protected InfrastructureManager infraManager;
@@ -97,7 +95,6 @@ public class BlowoutController {
 	}
 
 	public void cleanTask(Task task) {
-		// TODO remove task from the pool.
 		blowoutPool.removeTask(task);
 	}
 

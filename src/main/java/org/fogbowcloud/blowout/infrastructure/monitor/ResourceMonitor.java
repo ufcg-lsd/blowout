@@ -80,7 +80,6 @@ public class ResourceMonitor {
 			while (active) {
 
 				try {
-					//checkIsPaused();
 					monitorProcess();
 					Thread.sleep(infraMonitoringPeriod);
 					
@@ -143,7 +142,6 @@ public class ResourceMonitor {
 
 			Long expirationDateTime = idleResources.get(resource.getId());
 
-			// If since == null, resource must go to IDLE list.
 			if (expirationDateTime == null) {
 				moveResourceToIdle(resource);
 			} else {
@@ -152,7 +150,7 @@ public class ResourceMonitor {
 				if (OrderType.ONE_TIME.getValue().equals(requestType)) {
 
 					boolean isAlive = checkResourceConnectivity(resource);
-					// Has expiration time?
+
 					if (isAlive && noExpirationTime.compareTo(expirationDateTime) != 0) {
 						Date expirationDate = new Date(expirationDateTime.longValue());
 						Date currentDate = new Date();

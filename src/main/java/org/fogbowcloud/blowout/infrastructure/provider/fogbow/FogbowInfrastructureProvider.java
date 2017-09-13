@@ -43,11 +43,10 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 	private static final int MEMORY_1Gbit = 1024;
 
-	// TODO Colocar no recurso o usuario , token, localCommand
+	// TODO: put in resource the user, token and localCommand
 
 	private static final Logger LOGGER = Logger.getLogger(FogbowInfrastructureProvider.class);
 
-	// ------------------ CONSTANTS ------------------//
 	private static final String NULL_VALUE = "null";
 	private static final String CATEGORY = "Category";
 	private static final String X_OCCI_ATTRIBUTE = "X-OCCI-Attribute";
@@ -60,18 +59,18 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 	public static final String INSTANCE_ATTRIBUTE_EXTRA_PORTS_ATT = "org.fogbowcloud.order.extra-ports";
 	public static final String INSTANCE_ATTRIBUTE_MEMORY_SIZE = "occi.compute.memory";
 	public static final String INSTANCE_ATTRIBUTE_VCORE = "occi.compute.cores";
-	// TODO Alter when fogbow are returning this attribute
+	
+	// TODO: alter when fogbow are returning this attribute
 	public static final String INSTANCE_ATTRIBUTE_DISKSIZE = "TODO-AlterWhenFogbowReturns";
 	public static final String INSTANCE_ATTRIBUTE_REQUEST_TYPE = "org.fogbowcloud.order.type";
 
-	// ------------------ ATTRIBUTES -----------------//
 	private HttpWrapper httpWrapper;
 	private String managerUrl;
 	private Token token;
 	private Properties properties;
 	private AbstractTokenUpdatePlugin tokenUpdatePlugin;
 	private FogbowResourceDatastore frDatastore;
-	// Key is the resource ID
+
 	private Map<String, FogbowResource> resourcesMap = new ConcurrentHashMap<String, FogbowResource>();
 
 	protected FogbowInfrastructureProvider(Properties properties, ScheduledExecutorService handleTokeUpdateExecutor,
@@ -194,25 +193,24 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 		try {
 			LOGGER.debug("Getting request attributes - Retrieve Instace ID.");
-			// Attempt's to get the Instance ID from Fogbow Manager.
+			
 			requestAttributes = getFogbowRequestAttributes(fogbowResource.getOrderId());
 
 			instanceId = requestAttributes.get(OrderAttribute.INSTANCE_ID.getValue());
 
-			// If has Instance ID, then verifies resource's SSH and Other
-			// Informations;
+			
 			if (instanceId != null && !instanceId.isEmpty()) {
 				LOGGER.debug("Instance ID returned: " + instanceId);
 
 				fogbowResource.setInstanceId(instanceId);
 
-				// Recovers Instance's attributes.
+				
 				Map<String, String> instanceAttributes = getFogbowInstanceAttributes(fogbowResource.getInstanceId());
 
 				if (this.validateInstanceAttributes(instanceAttributes)) {
 
 					LOGGER.debug("Getting Instance attributes.");
-					// Putting all metadatas on Resource
+					
 					sshInformation = instanceAttributes.get(INSTANCE_ATTRIBUTE_SSH_PUBLIC_ADDRESS_ATT);
 
 					String[] addressInfo = sshInformation.split(":");
@@ -235,10 +233,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 					fogbowResource.putMetadata(AbstractResource.METADATA_LOCATION,
 							"\"" + requestAttributes.get(REQUEST_ATTRIBUTE_MEMBER_ID) + "\"");
 
-					// TODO Descomentar quando o fogbow estiver retornando este
-					// atributo
-					// newResource.putMetadata(Resource.METADATA_DISK_SIZE,
-					// instanceAttributes.get(INSTANCE_ATTRIBUTE_DISKSIZE));
+					// TODO: Make fogbow return these attributes: newResource.putMetadata(Resource.METADATA_DISK_SIZE and instanceAttributes.get(INSTANCE_ATTRIBUTE_DISKSIZE));
 
 					LOGGER.debug("New Fogbow Resource created - Instace ID: [" + instanceId + "]");
 
@@ -274,11 +269,11 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 		try {
 			if (fogbowResource.getInstanceId() != null) {
-				// Deleting the resource
+				
 				this.doRequest("delete", managerUrl + "/compute/" + fogbowResource.getInstanceId(),
 						new ArrayList<Header>());
 			}
-			// Deleting the order that creates this resource
+			
 			this.doRequest("delete", managerUrl + "/" + OrderConstants.TERM + "/" + fogbowResource.getOrderId(),
 					new ArrayList<Header>());
 			resourcesMap.remove(resourceId);
@@ -289,8 +284,6 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 					e);
 		}
 	}
-
-	// ----------------------- Private methods ----------------------- //
 
 	protected Token createNewTokenFromFile(String certificateFilePath) throws FileNotFoundException, IOException {
 
