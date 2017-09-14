@@ -203,8 +203,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 				LOGGER.debug("Instance ID returned: " + instanceId);
 
 				fogbowResource.setInstanceId(instanceId);
-
-				
+			
 				Map<String, String> instanceAttributes = getFogbowInstanceAttributes(fogbowResource.getInstanceId());
 
 				if (this.validateInstanceAttributes(instanceAttributes)) {
@@ -217,8 +216,8 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 					String host = addressInfo[0];
 					String port = addressInfo[1];
 
-					fogbowResource.setLocalCommandInterpreter(
-							properties.getProperty(AppPropertiesConstants.LOCAL_COMMAND_INTERPRETER));
+					fogbowResource.setLocalCommandInterpreter(properties
+							.getProperty(AppPropertiesConstants.LOCAL_COMMAND_INTERPRETER));
 					fogbowResource.putMetadata(AbstractResource.METADATA_SSH_HOST, host);
 					fogbowResource.putMetadata(AbstractResource.METADATA_SSH_PORT, port);
 					fogbowResource.putMetadata(AbstractResource.METADATA_SSH_USERNAME_ATT,
@@ -227,7 +226,8 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 							instanceAttributes.get(INSTANCE_ATTRIBUTE_EXTRA_PORTS_ATT));
 					fogbowResource.putMetadata(AbstractResource.METADATA_VCPU,
 							instanceAttributes.get(INSTANCE_ATTRIBUTE_VCORE));
-					float menSize = Float.parseFloat(instanceAttributes.get(INSTANCE_ATTRIBUTE_MEMORY_SIZE));
+					float menSize = Float
+							.parseFloat(instanceAttributes.get(INSTANCE_ATTRIBUTE_MEMORY_SIZE));
 					String menSizeFormated = String.valueOf(menSize * MEMORY_1Gbit);
 					fogbowResource.putMetadata(AbstractResource.METADATA_MEN_SIZE, menSizeFormated);
 					fogbowResource.putMetadata(AbstractResource.METADATA_LOCATION,
