@@ -9,7 +9,6 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.pool.AbstractResource;
-import org.fogbowcloud.manager.occi.model.Token.User;
 
 public class TaskProcessImpl implements TaskProcess {
 
@@ -46,7 +45,6 @@ public class TaskProcessImpl implements TaskProcess {
 	private String userIdValue;
 
 	public TaskProcessImpl(String taskId, List<Command> commandList, Specification spec, String UserId) {
-		// check parameters?
 		this.processId = UUID.randomUUID().toString();
 		this.taskId = taskId;
 		this.status = TaskState.READY;
@@ -113,11 +111,7 @@ public class TaskProcessImpl implements TaskProcess {
 	}
 
 	private String getExecutableCommandString(Command command) {
-		if (command.getType().equals(Command.Type.LOCAL)) {
 			return command.getCommand();
-		} else {
-			return command.getCommand();
-		}
 	}
 
 	protected TaskExecutionResult executeCommandString(String commandString, Command.Type type,
@@ -162,12 +156,13 @@ public class TaskProcessImpl implements TaskProcess {
 	}
 
 	private Process startLocalProcess(String command, Map<String, String> additionalEnvVariables) throws IOException {
-		ProcessBuilder builder = new ProcessBuilder(this.localCommandInterpreter, this.userIdValue, "9999", command);
+		//with local command interpreter:
+		//ProcessBuilder builder = new ProcessBuilder(this.localCommandInterpreter, this.userIdValue, "9999", command);
+		ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", command);
 		if (additionalEnvVariables == null || additionalEnvVariables.isEmpty()) {
 			return builder.start();
 		}
-		// adding additional environment variables related to resource and/or
-		// task
+		
 		for (String envVariable : additionalEnvVariables.keySet()) {
 			builder.environment().put(envVariable, additionalEnvVariables.get(envVariable));
 		}
@@ -219,5 +214,5 @@ public class TaskProcessImpl implements TaskProcess {
 	public AbstractResource getResource() {
 		return resource;
 	}
-
+	
 }
