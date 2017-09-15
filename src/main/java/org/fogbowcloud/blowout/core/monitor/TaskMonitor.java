@@ -15,39 +15,37 @@ import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 import org.fogbowcloud.blowout.pool.AbstractResource;
 import org.fogbowcloud.blowout.pool.BlowoutPool;
 
-public class TaskMonitor implements Runnable{
+public class TaskMonitor implements Runnable {
+	
+	private ExecutorService taskExecutor;
+	private Thread monitoringServiceRunner;
+	private BlowoutPool pool;
+	private long timeout;
+	private boolean active;
 
 	Map<Task, TaskProcess> runningTasks = new HashMap<Task, TaskProcess>();
-	
-	private ExecutorService taskExecutor = Executors.newCachedThreadPool();
 
-	private Thread monitoringServiceRunner;
-	
-	private BlowoutPool pool;
-	
-	private long timeout;
-	
-	private boolean active = false;
-	
 	public TaskMonitor(BlowoutPool pool, long timeout) {
 		this.pool = pool;
 		this.timeout = timeout;
+		this.taskExecutor = Executors.newCachedThreadPool();
+		this.active = false;
 	}
-	
+
 	public void start() {
-		active = true;
-		monitoringServiceRunner = new Thread(this);
-		monitoringServiceRunner.start();
+		this.active = true;
+		this.monitoringServiceRunner = new Thread(this);
+		this.monitoringServiceRunner.start();
 	}
-	
-	public void stop(){
-		active = false;
-		monitoringServiceRunner.interrupt();
+
+	public void stop() {
+		this.active = false;
+		this.monitoringServiceRunner.interrupt();
 	}
-	
+
 	@Override
 	public void run() {
-		while(active){
+		while (this.active) {
 			procMon();
 			try {
 				Thread.sleep(timeout);
@@ -55,96 +53,118 @@ public class TaskMonitor implements Runnable{
 			}
 		}
 	}
-	
+
 	public void procMon() {
-		for (TaskProcess tp : getRunningProcesses()) {
-			if (tp.getStatus().equals(TaskState.FAILED)) {
-				getRunningTasks().remove(getTaskById(tp.getTaskId()));
-				if (tp.getResource() != null) {
-					pool.updateResource(tp.getResource(), ResourceState.FAILED);
+		for (TaskProcess taskProcess : this.getRunningProcesses()) {
+			TaskState taskProcessState = taskProcess.getStatus();
+
+			if (taskProcessState.equals(TaskState.FAILED)) {
+				this.removeRunningTask(this.getTaskById(taskProcess.getTaskId()));
+
+				AbstractResource resource = taskProcess.getResource();
+				if (resource != null) {
+					this.updateResource(resource, ResourceState.FAILED);
 				}
 			}
-			if (tp.getStatus().equals(TaskState.FINNISHED)) {
-				Task task = getTaskById(tp.getTaskId());
+			if (taskProcessState.equals(TaskState.FINNISHED)) {
+				Task task = this.getTaskById(taskProcess.getTaskId());
 				task.finish();
-				getRunningTasks().remove(task);
-				if (tp.getResource()!= null) {
-					pool.updateResource(tp.getResource(), ResourceState.IDLE);
+				this.removeRunningTask(task);
+
+				AbstractResource resource = taskProcess.getResource();
+				if (resource != null) {
+					this.updateResource(resource, ResourceState.IDLE);
 				}
 			}
 		}
 	}
-	
-	public Map<Task, TaskProcess> getRunningTasks(){
-		return this.runningTasks;
-	}
-	
-	protected void setRunningTasks(Map<Task, TaskProcess> runningTasks){
-		this.runningTasks = runningTasks;
-	}
-	
-	public List<TaskProcess> getRunningProcesses(){
-		List<TaskProcess> processes = new ArrayList<TaskProcess>();
-		processes.addAll(runningTasks.values());
-		return processes;
-	}
-	
-	public void runTask(Task task,final AbstractResource resource) {
-		final TaskProcess tp = createProcess(task);
-		if (getRunningTasks().get(task) == null) {
-			getRunningTasks().put(task, tp);
-			pool.updateResource(resource, ResourceState.BUSY);
+
+	//FIXME: observation.
+	public void runTask(Task task, final AbstractResource resource) {
+		final TaskProcess taskProcess = createProcess(task);
+		if (this.runningTaskContains(task) == false) {
+			this.putTaskToRunningTasks(task, taskProcess);
+			this.updateResource(resource, ResourceState.BUSY);
 		}
-		getExecutorService().submit(new Runnable() {
-			
+		
+		this.taskExecutor.submit(new Runnable() {
 			@Override
 			public void run() {
-				tp.executeTask(resource);
+				taskProcess.executeTask(resource);
 			}
 		});
 	}
 	
-	public TaskState getTaskState(Task task){
-		
-		TaskProcess tp = runningTasks.get(task);
-		if(tp == null){
-			if(task.isFinished()){
-				return TaskState.COMPLETED;
-			}
-			return TaskState.READY;
-		}
-		return tp.getStatus();
-	}
-	
-	public ExecutorService getExecutorService() {
-		return this.taskExecutor;
-	}
-
-	public Task getTaskById(String taskId) {
-		for (Task task : runningTasks.keySet()) {
-			if (task.getId().equals(taskId)) {
-				return task;
-			}
-		}
-		return null;
-	}
-	
 	protected TaskProcess createProcess(Task task) {
-		TaskProcess tp = new TaskProcessImpl(task.getId(), task.getAllCommands(), task.getSpecification(), task.getUUID());
-		return tp;
+		TaskProcess taskProcess = new TaskProcessImpl(task.getId(), task.getAllCommands(),
+				task.getSpecification(), task.getUUID());
+		return taskProcess;
 	}
 
 	public void stopTask(Task task) {
 		TaskProcess processToHalt = getRunningTasks().get(task);
 		if (processToHalt != null) {
 			if (processToHalt.getResource() != null) {
-				pool.updateResource(processToHalt.getResource(), ResourceState.IDLE);
+				this.updateResource(processToHalt.getResource(), ResourceState.IDLE);
 			}
 		}
-		
 	}
 	
-	public BlowoutPool getBlowoutPool() {
-		return this.pool;
+	public TaskState getTaskState(Task task) {
+		TaskProcess taskProcess = this.getTaskProcess(task);
+		if (taskProcess == null) {
+			if (task.isFinished()) {
+				return TaskState.COMPLETED;
+			}
+			return TaskState.READY;
+		}
+		return taskProcess.getStatus();
+	}
+
+	public Task getTaskById(String taskId) {
+		for (Task task : this.runningTasks.keySet()) {
+			if (task.getId().equals(taskId)) {
+				return task;
+			}
+		}
+		return null;
+	}
+
+	public List<TaskProcess> getRunningProcesses() {
+		List<TaskProcess> processes = new ArrayList<TaskProcess>();
+		processes.addAll(this.runningTasks.values());
+		return processes;
+	}
+	
+	public boolean runningTaskContains(Task task) {
+		return this.runningTasks.containsKey(task);
+	}
+	
+	public Map<Task, TaskProcess> getRunningTasks() {
+		return this.runningTasks;
+	}
+	
+	public ExecutorService getExecutorService() {
+		return this.taskExecutor;
+	}
+	
+	protected void setRunningTasks(Map<Task, TaskProcess> runningTasks) {
+		this.runningTasks = runningTasks;
+	}
+	
+	private void removeRunningTask(Task task) {
+		this.runningTasks.remove(task);
+	}
+	
+	private void putTaskToRunningTasks(Task task, TaskProcess taskProcess) {
+		this.runningTasks.put(task, taskProcess);
+	}
+	
+	private void updateResource(AbstractResource resource, ResourceState resourceState) {
+		this.pool.updateResource(resource, resourceState);
+	}
+	
+	private TaskProcess getTaskProcess(Task task) {
+		return this.runningTasks.get(task);
 	}
 }

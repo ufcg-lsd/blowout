@@ -8,7 +8,6 @@ public class AppPropertiesConstants {
 	public static final String IMPLEMENTATION_INFRA_PROVIDER = "infra_provider_class_name";
 	public static final String BLOWOUT_CONFIG_FILE = "blowout.configuration";
 	public static final String DEFAULT_BLOWOUT_CONFIG_FILE = "blowout.conf";
-	
 
 	public static final String INFRA_IS_STATIC = "infra_is_elastic";
 	public static final String INFRA_RESOURCE_CONNECTION_TIMEOUT = "infra_resource_connection_timeout";
@@ -20,17 +19,13 @@ public class AppPropertiesConstants {
 	public static final String INFRA_AUTH_TOKEN_PREFIX = "auth_token_prop_";
 	public static final String INFRA_AUTH_TOKEN_UPDATE_PLUGIN = "infra_auth_token_update_plugin";
 	
-
 	public static final String INFRA_FOGBOW_MANAGER_BASE_URL = "infra_fogbow_manager_base_url";
-
 	
 	public static final String TOKEN_UPDATE_TIME = "token_update_time";
 	public static final String TOKEN_UPDATE_TIME_UNIT = "token_update_time_unit";
 	
-
 	public static final String DB_DATASTORE_URL = "blowout_datastore_url";
 	public static final String DB_REST_SERVER_PORT = "blowout_rest_server_port";
-
 	
 	public static final String X_AUTH_NONCE = "X-auth-nonce";
 	public static final String X_AUTH_USER = "X-auth-username";
@@ -39,5 +34,4 @@ public class AppPropertiesConstants {
 	public static final String INFRA_PROVIDER_CLASS_NAME = "infra_provider_class_name";
 	public static final String INFRA_SPECS_BLOCK_CREATING = "infra_specs_block_creating";
 
-	
 }
