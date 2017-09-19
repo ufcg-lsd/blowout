@@ -79,7 +79,7 @@ public class StandardScheduler implements SchedulerInterface {
 	@Override
 	public void runTask(Task task, AbstractResource resource) {
 		this.runningTasks.put(resource, task);
-		submitToMonitor(task, resource);
+		this.submitToMonitor(task, resource);
 	}
 
 	public void submitToMonitor(Task task, AbstractResource resource) {
@@ -94,7 +94,7 @@ public class StandardScheduler implements SchedulerInterface {
 
 	@Override
 	public List<Task> getRunningTasks() {
-		return new ArrayList<Task>(runningTasks.values());
+		return new ArrayList<Task>(this.runningTasks.values());
 	}
 
 	protected void setRunningTasks(Map<AbstractResource, Task> runningTasks) {
