@@ -56,7 +56,7 @@ public class FogbowResource extends AbstractResource{
 			scanner = new Scanner(p.getInputStream());
 			if (scanner.hasNext()) {
 				String result = scanner.nextLine();
-				if (result != null && !result.isEmpty()) {
+				if (result != null && !result.trim().isEmpty()) {
 					return true;
 				}
 			}

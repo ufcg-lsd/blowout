@@ -26,50 +26,31 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 	}
 
 	@Override
-	public synchronized void act(List<AbstractResource> resources,
-			List<Task> tasks) throws Exception {
-		
-		Map<Specification, Integer> specsDemand = (HashMap<Specification, Integer>) generateDemandBySpec(
-				tasks, resources);
-		
-		requestResources(specsDemand);
+	public synchronized void act(List<AbstractResource> resources, List<Task> tasks)
+			throws Exception {
+
+		Map<Specification, Integer> specsDemand = this.generateDemandBySpec(tasks, resources);
+
+		this.requestResources(specsDemand);
 	}
 
 	private void requestResources(Map<Specification, Integer> specsDemand)
 			throws RequestResourceException {
-		
+
 		for (Entry<Specification, Integer> entry : specsDemand.entrySet()) {
-
 			Specification spec = entry.getKey();
-			
-			Integer requested = this.resourceMonitor.getPendingRequests().get(
-					spec);
-			if (requested == null)
-				requested = 0;
+
+			Integer requested = this.resourceMonitor.getPendingRequests().get(spec);
+			if (requested == null) {
+				requested = new Integer(0);
+			}
+
 			int requiredResources = entry.getValue() - requested;
-			
 			for (int count = 0; count < requiredResources; count++) {
-
-				String resourceId = infraProvider.requestResource(spec);
-				resourceMonitor.addPendingResource(resourceId, spec);
+				String resourceId = this.infraProvider.requestResource(spec);
+				this.resourceMonitor.addPendingResource(resourceId, spec);
 			}
 		}
-	}
-
-	private List<AbstractResource> filterResourcesByState(
-			List<AbstractResource> resources, ResourceState... resourceStates) {
-
-		List<AbstractResource> filteredResources = new ArrayList<AbstractResource>();
-		for (AbstractResource resource : resources) {
-			for (ResourceState state : resourceStates) {
-				if (state.equals(resource.getState())) {
-					filteredResources.add(resource);
-				}
-			}
-		}
-
-		return filteredResources;
-
 	}
 
 	private Map<Specification, Integer> generateDemandBySpec(List<Task> tasks,
@@ -77,14 +58,11 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 		Map<Specification, Integer> specsDemand = new HashMap<Specification, Integer>();
 
 		// FIXME: this variable name is incorrect, since the list will not
-		List<AbstractResource> currentResources = filterResourcesByState(
-				resources, ResourceState.IDLE, ResourceState.BUSY,
-				ResourceState.FAILED);
-		
+		List<AbstractResource> currentResources = filterResourcesByState(resources,
+				ResourceState.IDLE, ResourceState.BUSY, ResourceState.FAILED);
+
 		for (Task task : tasks) {
-
 			if (!task.isFinished()) {
-
 				boolean resourceResolved = false;
 
 				for (AbstractResource resource : currentResources) {
@@ -95,24 +73,37 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 					}
 				}
 				if (!resourceResolved) {
-					incrementDecrementDemand(specsDemand,
-							task.getSpecification(), true);
+					incrementDemand(specsDemand, task.getSpecification());
 				}
 			}
 		}
 		return specsDemand;
 	}
+	
+	private List<AbstractResource> filterResourcesByState(List<AbstractResource> resources,
+			ResourceState... resourceStates) {
 
-	private void incrementDecrementDemand(
-			Map<Specification, Integer> specsDemand, Specification spec,
-			boolean increment) {
-		Integer zero = new Integer(0);
-		Integer demand = specsDemand.get(spec);
-		if (demand == null) {
-			demand = zero;
+		List<AbstractResource> filteredResources = new ArrayList<AbstractResource>();
+		for (AbstractResource resource : resources) {
+			for (ResourceState state : resourceStates) {
+				if (state.equals(resource.getState())) {
+					filteredResources.add(resource);
+				}
+			}
 		}
-		demand = new Integer(demand.intValue() + (increment ? 1 : -1));
-		specsDemand.put(spec, zero.compareTo(demand) > 0 ? zero : demand);
+		return filteredResources;
 	}
 
+	private void incrementDemand(Map<Specification, Integer> specsDemand, Specification spec) {
+		Integer demand = specsDemand.get(spec);
+		if (demand == null) {
+			demand = new Integer(0);
+		}
+		demand++;
+		if (demand.intValue() < 0) {
+			specsDemand.put(spec, new Integer(0));
+		} else {
+			specsDemand.put(spec, demand);
+		}
+	}
 }
