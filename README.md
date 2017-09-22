@@ -13,13 +13,13 @@ The main Blowout features are:
 See the following topics to understand the Blowout **architecture**, how to **deploy and configure it**, and finally, how to use it to **execute** tasks.
 
 ## Blowout Architecture
-Blowout works like a scheduler of tasks to computational resources dispersed among clouds that are managed by an Infrastructure Provider.
+Blowout works similarly to a scheduler of tasks to computational resources dispersed among clouds that are managed by an Infrastructure Provider.
 
 Blowout has six main components:
 
 - **BlowoutPool**: manages a pool of tasks and resources. It is through the Blowoutpool that the components have access to the received tasks and resources that were raised by the Infrastructure Provider.
 
-- **Scheduler**: associates and disassociates a task that is ready to executed to a resource that is available. After associating or disassociating a resource to a task, the Scheduler delegates to Task Monitor the assignment of create or terminate the task execution process in the resource.
+- **Scheduler**: associates and disassociates a task, that is ready to be executed, to an available resource. After associating or disassociating a resource to a task, the Scheduler delegates to Task Monitor the assignment of creating or terminating the task execution process in the resource.
 
 - **Infrastructure Manager**: requests and adds pending resources based on the demand of ready tasks and the availability and specifications of existing resources.
 
@@ -98,7 +98,7 @@ The example below illustrates how to submit a Task to Blowout:
 		blowout.addTask(task);
 	}
 
-Is possible to submit a list of tasks, see the example below:
+It's possible to submit a list of tasks, see the example below:
 
 	public void submitTaskList(List<Task> taskList) {
 		
@@ -107,14 +107,14 @@ Is possible to submit a list of tasks, see the example below:
 
 
 #### Removing Task
-Is possible to remove a submitted task:
+It's possible to remove a submitted task:
 
 	public void removeTask(Task task) {
 		
 		blowout.cleanTask(task);
 	}
 
-Two Task are equals when they have the same ID and Specifications.
+Two Tasks are equal when they have the same ID and Specifications.
 
 ### Monitoring Tasks
 You can know the status of a Task that has been submitted to Blowout.
