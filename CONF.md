@@ -34,7 +34,7 @@ Infrastructure Monitor Period | Periods of resources monitoring in milliseconds 
 Resource Connection Timeout | Timeout for an attempt to connect to a resource in milliseconds | **Yes**
 Resource Idle Life Time | Time that the resource will be available after your leverage in milliseconds | No (Default value: 0)
 Max Resourse Reuse | Maximum use of the resource to execute tasks | No (Default value: 1)
-Max Resource Connection Retry | Maximum connections retry to a resource | No (Default value: 1)
+Max Resource Connection Retry | Maximum connections retries to a resource | No (Default value: 1)
 Local Command Interpreter | The resource command interpreter | **Yes**
 
 
