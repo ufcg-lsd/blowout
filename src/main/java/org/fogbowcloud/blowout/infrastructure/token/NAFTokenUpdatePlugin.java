@@ -20,7 +20,7 @@ import org.fogbowcloud.manager.core.plugins.identity.naf.NAFIdentityPlugin;
 import org.fogbowcloud.manager.occi.model.Token;
 
 public class NAFTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
-	
+
 	private static final String USERNAME_PARAMETER = "username";
 	private static final String PASSWORD_PARAMETER = "password";
 	public static final String NAF_IDENTITY_PRIVATE_KEY = AppPropertiesConstants.INFRA_AUTH_TOKEN_PREFIX
@@ -35,18 +35,15 @@ public class NAFTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
 			+ "naf_identity_token_generator_endpoint";
 	private static final String HOUR_PARAMETER = "hour";
 
-	private Properties properties;
-
 	public NAFTokenUpdatePlugin(Properties properties) {
 		super(properties);
-		this.properties = properties;
 	}
 
 	@Override
 	public Token generateToken() {
 		try {
-			NAFIdentityPlugin nafIdentityPlugin = new NAFIdentityPlugin(properties);
-			String accessId = requestTokenFromGenerator();
+			NAFIdentityPlugin nafIdentityPlugin = new NAFIdentityPlugin(super.getProperties());
+			String accessId = this.requestTokenFromGenerator();
 			Token token = nafIdentityPlugin.getToken(accessId);
 			return token;
 		} catch (Exception e) {
@@ -54,18 +51,23 @@ public class NAFTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
 		}
 	}
 
-	private String requestTokenFromGenerator() {
+	private String requestTokenFromGenerator() throws Exception {
+		Properties properties = super.getProperties();
+
 		String tokenGeneratorUrl = properties.getProperty(NAF_IDENTITY_TOKEN_GENERATOR_URL);
 		String userName = properties.getProperty(NAF_IDENTITY_TOKEN_USERNAME);
 		String password = properties.getProperty(NAF_IDENTITY_TOKEN_PASSWORD);
-		int hours = getTokenUpdateTimeInHours();
+
+		int hours = this.getTokenUpdateTimeInHours();
 
 		if (userName == null || password == null || tokenGeneratorUrl == null) {
 			return null;
 		}
 
+		CloseableHttpClient httpClient = null;
+		CloseableHttpResponse response = null;
 		try {
-			CloseableHttpClient httpClient = HttpClients.createMinimal();
+			httpClient = HttpClients.createMinimal();
 			HttpPost httpPost = new HttpPost(tokenGeneratorUrl);
 			List<NameValuePair> parameters = new ArrayList<NameValuePair>();
 			parameters.add(new BasicNameValuePair(USERNAME_PARAMETER, userName));
@@ -74,13 +76,19 @@ public class NAFTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
 			UrlEncodedFormEntity formEntity = new UrlEncodedFormEntity(parameters);
 			httpPost.setEntity(formEntity);
 
-			CloseableHttpResponse response = httpClient.execute(httpPost);
+			response = httpClient.execute(httpPost);
 			if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
 				return IOUtils.toString(response.getEntity().getContent());
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
+		} finally {
+			if (httpClient != null) {
+				httpClient.close();
+			}
+			if (response != null) {
+				response.close();
+			}
 		}
+
 		return null;
 	}
 
@@ -103,9 +111,10 @@ public class NAFTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
 		return Math.max(1, updateTime);
 	}
 
-
 	@Override
 	public void validateProperties() throws BlowoutException {
+		Properties properties = super.getProperties();
+
 		if (!properties.containsKey(NAF_IDENTITY_PRIVATE_KEY)) {
 			throw new BlowoutException(
 					"Required property " + NAF_IDENTITY_PRIVATE_KEY + " was not set");
@@ -117,8 +126,8 @@ public class NAFTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
 		}
 
 		if (!properties.containsKey(NAF_IDENTITY_TOKEN_GENERATOR_URL)) {
-			throw new BlowoutException("Required property " + NAF_IDENTITY_TOKEN_GENERATOR_URL
-					+ " was not set");
+			throw new BlowoutException(
+					"Required property " + NAF_IDENTITY_TOKEN_GENERATOR_URL + " was not set");
 		}
 
 		if (!properties.containsKey(NAF_IDENTITY_TOKEN_USERNAME)) {
