@@ -1,5 +1,5 @@
 ## Customizing Blowout Components
-To ensure the correct Blowout operation with new customized parts, a series of interfaces have been made available, ensuring the existence of all the necessary methods in each class that can be customized.
+To ensure the correct Blowout operation with new customized parts, a serie of interfaces have been made available, ensuring the existence of all the necessary methods in each class that can be customized.
 
 ### Blowout Pool
 To customize Blowout Pool is necessary that your new BlowoutPool class implements the interface BlowoutPool.
