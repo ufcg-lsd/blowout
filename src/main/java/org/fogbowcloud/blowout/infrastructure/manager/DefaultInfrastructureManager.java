@@ -73,7 +73,7 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 					}
 				}
 				if (!resourceResolved) {
-					incrementDemand(specsDemand, task.getSpecification());
+					this.incrementDemand(specsDemand, task.getSpecification());
 				}
 			}
 		}

@@ -30,8 +30,7 @@ public class ResourceMonitor {
 
 	private Thread monitoringServiceRunner;
 	private MonitoringService monitoringService;
-	private long infraMonitoringPeriod;
-	private Long noExpirationTime;
+	private Long infraMonitoringPeriod;
 	private Long idleLifeTime;
 	private int maxConnectionTries;
 	private int maxReuse;
@@ -91,10 +90,10 @@ public class ResourceMonitor {
 
 		@Override
 		public void run() {
-			while (active) {
+			while (this.active) {
 				try {
-					monitorProcess();
-					Thread.sleep(infraMonitoringPeriod);
+					this.monitorProcess();
+					Thread.sleep(infraMonitoringPeriod.longValue());
 				} catch (InterruptedException e) {
 					LOGGER.error("Error while executing MonitoringService");
 				}
@@ -102,9 +101,8 @@ public class ResourceMonitor {
 		}
 
 		protected void monitorProcess() throws InterruptedException {
-			List<AbstractResource> resources = resourcePool.getAllResources();
-			monitoringPendingResources();
-			monitoringResources(resources);
+			this.monitoringPendingResources();
+			this.monitoringResources(resourcePool.getAllResources());
 		}
 
 		private void monitoringPendingResources() {
@@ -122,25 +120,30 @@ public class ResourceMonitor {
 			for (AbstractResource resource : resources) {
 
 				if (ResourceState.IDLE.equals(resource.getState())) {
-					resolveIdleResource(resource);
+					
+					this.resolveIdleResource(resource);
+					
 				} else if (ResourceState.BUSY.equals(resource.getState())) {
+					
 					idleResources.remove(resource.getId());
+					
 				} else if (ResourceState.FAILED.equals(resource.getState())) {
+					
 					idleResources.remove(resource.getId());
+					
 					boolean isAlive = this.checkResourceConnectivity(resource);
 					if (isAlive) {
-						if (this.moveResourceToIdle(resource)) {
-							resourcePool.updateResource(resource, ResourceState.IDLE);
-						}
+						Long expirationDate = this.canMoveResourceToIdle(resource);
+						this.moveResourceToIdle(resource, expirationDate);
 					}
+					
 				} else if (ResourceState.TO_REMOVE.equals(resource.getState())) {
 					try {
 						idleResources.remove(resource.getId());
 						infraProvider.deleteResource(resource.getId());
 						resourcePool.removeResource(resource);
 					} catch (Exception e) {
-						LOGGER.error("Error while tring to remove resource " + resource.getId()
-								+ " - " + e.getMessage());
+						LOGGER.error("Error while tring to remove resource " + resource.getId(), e);
 					}
 				}
 			}
@@ -151,28 +154,38 @@ public class ResourceMonitor {
 			Long expirationDateTime = idleResources.get(resource.getId());
 
 			if (expirationDateTime == null) {
-				moveResourceToIdle(resource);
+				Long expirationDate = this.canMoveResourceToIdle(resource);
+				this.moveResourceToIdle(resource, expirationDate);
 			} else {
-				String requestType = resource
-						.getMetadataValue(AbstractResource.METADATA_REQUEST_TYPE);
-				if (OrderType.ONE_TIME.getValue().equals(requestType)) {
-
-					boolean isAlive = checkResourceConnectivity(resource);
-					if (isAlive && noExpirationTime.compareTo(expirationDateTime) != 0) {
+				
+				if (this.isSameRequestType(resource)) {
+					
+					boolean isAlive = this.checkResourceConnectivity(resource);
+					if (isAlive) {
 						Date expirationDate = new Date(expirationDateTime.longValue());
 						Date currentDate = new Date();
+						
 						if (expirationDate.before(currentDate)) {
 							LOGGER.warn("Removing resource " + resource.getId()
 									+ " due Idle time expired.");
-							resourcePool.updateResource(resource, ResourceState.TO_REMOVE);
 							idleResources.remove(resource.getId());
+							resourcePool.updateResource(resource, ResourceState.TO_REMOVE);
 						}
 					}
 				}
 			}
 		}
 
-		private boolean moveResourceToIdle(AbstractResource resource) {
+		private void moveResourceToIdle(AbstractResource resource, Long expirationDate) {
+			if(expirationDate != null) {
+				idleResources.put(resource.getId(), expirationDate);
+				resourcePool.updateResource(resource, ResourceState.IDLE);
+			} else {
+				resourcePool.updateResource(resource, ResourceState.TO_REMOVE);
+			}
+		}
+		
+		private Long canMoveResourceToIdle(AbstractResource resource) {
 			// TODO: Check the following options for maxReuse problem
 			// 1. See if it's viable to only mark resource as TO_REMOVE
 			// if there's no task processes READY or RUNNING
@@ -185,11 +198,9 @@ public class ResourceMonitor {
 				calendar.setTime(new Date());
 				calendar.add(Calendar.MILLISECOND, idleLifeTime.intValue());
 				expirationDate = calendar.getTimeInMillis();
-				idleResources.put(resource.getId(), expirationDate);
-				return true;
+				return expirationDate;
 			} else {
-				resourcePool.updateResource(resource, ResourceState.TO_REMOVE);
-				return false;
+				return null;
 			}
 		}
 
@@ -204,33 +215,39 @@ public class ResourceMonitor {
 			}
 			return true;
 		}
+		
+		private boolean isSameRequestType(AbstractResource resource) {
+			String requestType = resource.getMetadataValue(AbstractResource.METADATA_REQUEST_TYPE);
+			
+			return OrderType.ONE_TIME.getValue().equals(requestType);
+		}
 
 		public void checkIsPaused() throws InterruptedException {
 			synchronized (this) {
-				while (paused) {
-					wait();
+				while (this.paused) {
+					super.wait();
 				}
 			}
 		}
 
 		public synchronized void stop() {
-			if (paused) {
-				resume();
+			if (this.paused) {
+				this.resume();
 			}
-			active = false;
+			this.active = false;
 		}
 
 		public synchronized void pause() {
-			paused = true;
+			this.paused = true;
 		}
 
 		public synchronized void resume() {
-			paused = false;
-			notify();
+			this.paused = false;
+			super.notify();
 		}
 
 		public boolean isPaused() {
-			return paused;
+			return this.paused;
 		}
 	}
 	

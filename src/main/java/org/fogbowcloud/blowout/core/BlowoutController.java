@@ -55,7 +55,8 @@ public class BlowoutController {
 		this.infraProvider = createInfraProviderInstance(removePreviousResouces);
 
 		//FIXME: observation to taskMonitor period.
-		this.taskMonitor = new TaskMonitor(this.blowoutPool, 30000);
+		long taskMonitorPeriod = 30000L;
+		this.taskMonitor = new TaskMonitor(this.blowoutPool, taskMonitorPeriod);
 		this.taskMonitor.start();
 		
 		this.resourceMonitor = new ResourceMonitor(this.infraProvider, this.blowoutPool, this.properties);
@@ -183,7 +184,6 @@ public class BlowoutController {
 		return propertiesContainsAll(properties,
 				AppPropertiesConstants.IMPLEMENTATION_INFRA_PROVIDER,
 				AppPropertiesConstants.INFRA_RESOURCE_IDLE_LIFETIME,
-				AppPropertiesConstants.INFRA_RESOURCE_CONNECTION_TIMEOUT,
 				AppPropertiesConstants.INFRA_IS_STATIC,
 				AppPropertiesConstants.INFRA_AUTH_TOKEN_UPDATE_PLUGIN);
 	}

@@ -75,7 +75,7 @@ public class FogbowResource extends AbstractResource{
 	}
 
 	public String getInstanceId() {
-		return instanceId;
+		return this.instanceId;
 	}
 
 	public void setInstanceId(String instanceId) {
@@ -83,7 +83,7 @@ public class FogbowResource extends AbstractResource{
 	}
 
 	public String getOrderId() {
-		return orderId;
+		return this.orderId;
 	}
 	
 }

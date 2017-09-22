@@ -20,7 +20,7 @@ public enum TaskState {
 				return ts;
 			}
 		}
-		throw new IllegalArgumentException("Invalid task state");
+		return null;
 	}
 	
 }

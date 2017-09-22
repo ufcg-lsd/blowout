@@ -29,13 +29,7 @@ public class HttpWrapper {
 
 		HttpUriRequest request = this.getRequestType(method, endpoint);
 
-		request.addHeader(OCCIHeaders.CONTENT_TYPE, OCCIHeaders.OCCI_CONTENT_TYPE);
-		if (authToken != null) {
-			request.addHeader(OCCIHeaders.X_AUTH_TOKEN, authToken);
-		}
-		for (Header header : additionalHeaders) {
-			request.addHeader(header);
-		}
+		this.addHeaders(authToken, additionalHeaders, request);
 
 		CloseableHttpResponse response = null;
 		try {
@@ -69,6 +63,17 @@ public class HttpWrapper {
 			if(client != null) {
 				client.close();				
 			}
+		}
+	}
+
+	private void addHeaders(String authToken, List<Header> additionalHeaders,
+			HttpUriRequest request) {
+		request.addHeader(OCCIHeaders.CONTENT_TYPE, OCCIHeaders.OCCI_CONTENT_TYPE);
+		if (authToken != null) {
+			request.addHeader(OCCIHeaders.X_AUTH_TOKEN, authToken);
+		}
+		for (Header header : additionalHeaders) {
+			request.addHeader(header);
 		}
 	}
 
