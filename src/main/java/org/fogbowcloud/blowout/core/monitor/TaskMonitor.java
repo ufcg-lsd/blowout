@@ -16,7 +16,7 @@ import org.fogbowcloud.blowout.pool.AbstractResource;
 import org.fogbowcloud.blowout.pool.BlowoutPool;
 
 public class TaskMonitor implements Runnable {
-	
+
 	private ExecutorService taskExecutor;
 	private Thread monitoringServiceRunner;
 	private BlowoutPool pool;
@@ -40,6 +40,7 @@ public class TaskMonitor implements Runnable {
 
 	public void stop() {
 		this.active = false;
+		this.taskExecutor.shutdownNow();
 		this.monitoringServiceRunner.interrupt();
 	}
 
@@ -48,7 +49,7 @@ public class TaskMonitor implements Runnable {
 		while (this.active) {
 			procMon();
 			try {
-				Thread.sleep(timeout);
+				Thread.sleep(this.timeout);
 			} catch (InterruptedException e) {
 			}
 		}
@@ -79,22 +80,26 @@ public class TaskMonitor implements Runnable {
 		}
 	}
 
-	//FIXME: observation.
+	// FIXME: observation.
 	public void runTask(Task task, final AbstractResource resource) {
-		final TaskProcess taskProcess = createProcess(task);
 		if (this.runningTaskContains(task) == false) {
+
+			final TaskProcess taskProcess = this.createProcess(task);
+
 			this.putTaskToRunningTasks(task, taskProcess);
+			task.startedRunning();
+
 			this.updateResource(resource, ResourceState.BUSY);
+
+			this.taskExecutor.submit(new Runnable() {
+				@Override
+				public void run() {
+					taskProcess.executeTask(resource);
+				}
+			});
 		}
-		
-		this.taskExecutor.submit(new Runnable() {
-			@Override
-			public void run() {
-				taskProcess.executeTask(resource);
-			}
-		});
 	}
-	
+
 	protected TaskProcess createProcess(Task task) {
 		TaskProcess taskProcess = new TaskProcessImpl(task.getId(), task.getAllCommands(),
 				task.getSpecification(), task.getUUID());
@@ -109,7 +114,7 @@ public class TaskMonitor implements Runnable {
 			}
 		}
 	}
-	
+
 	public TaskState getTaskState(Task task) {
 		TaskProcess taskProcess = this.getTaskProcess(task);
 		if (taskProcess == null) {
@@ -135,35 +140,35 @@ public class TaskMonitor implements Runnable {
 		processes.addAll(this.runningTasks.values());
 		return processes;
 	}
-	
+
 	public boolean runningTaskContains(Task task) {
 		return this.runningTasks.containsKey(task);
 	}
-	
+
 	public Map<Task, TaskProcess> getRunningTasks() {
 		return this.runningTasks;
 	}
-	
+
 	public ExecutorService getExecutorService() {
 		return this.taskExecutor;
 	}
-	
+
 	protected void setRunningTasks(Map<Task, TaskProcess> runningTasks) {
 		this.runningTasks = runningTasks;
 	}
-	
+
 	private void removeRunningTask(Task task) {
 		this.runningTasks.remove(task);
 	}
-	
+
 	private void putTaskToRunningTasks(Task task, TaskProcess taskProcess) {
 		this.runningTasks.put(task, taskProcess);
 	}
-	
+
 	private void updateResource(AbstractResource resource, ResourceState resourceState) {
 		this.pool.updateResource(resource, resourceState);
 	}
-	
+
 	private TaskProcess getTaskProcess(Task task) {
 		return this.runningTasks.get(task);
 	}

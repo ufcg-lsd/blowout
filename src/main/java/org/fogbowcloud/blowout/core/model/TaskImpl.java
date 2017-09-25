@@ -43,12 +43,13 @@ public class TaskImpl implements Task {
 	private Map<String, String> metadata = new HashMap<String, String>();
 	List<String> processes = new ArrayList<String>();
 
+
 	public TaskImpl(String id, Specification spec, String uuid) {
 		this.id = id;
 		this.spec = spec;
 		this.state = TaskState.READY;
 		this.uuid = uuid;
-		this.retries = 0;
+		this.retries = -1;
 		this.isFinished = false;
 		this.isFailed = false;
 		this.startedRunningAt = Long.MAX_VALUE;
@@ -113,6 +114,7 @@ public class TaskImpl implements Task {
 	@Override
 	public void startedRunning() {
 		this.startedRunningAt = System.currentTimeMillis();
+		this.retries++;
 	}
 
 	@Override

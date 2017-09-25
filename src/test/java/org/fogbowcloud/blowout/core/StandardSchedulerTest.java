@@ -117,5 +117,52 @@ public class StandardSchedulerTest {
 		int addedTaskToRunning = 1;
 		Assert.assertEquals(countRunningTaskBefore + addedTaskToRunning, standardScheduler.getRunningTasks().size());
 	}
+
+	@Test
+	public void testActRetryTask(){
+		TaskMonitor taskMon = Mockito.mock(TaskMonitor.class);
+		Mockito.doNothing().when(taskMon).runTask(Mockito.any(Task.class), Mockito.any(AbstractResource.class));
+		StandardScheduler standardScheduler = new StandardScheduler(taskMon);
+		
+		List<Task> tasks = new ArrayList<Task>();
+		Specification specA = new Specification("imageA", "usernameA", "publicKeyA", "privateKeyFilePathA");
+		Specification specB = new Specification("imageB", "usernameB", "publicKeyB", "privateKeyFilePathB");
+		TaskImpl taskToRunning = new TaskImpl("taskFour", specB, FAKE_UUID);
+		TaskImpl taskTwoRunning = new TaskImpl("taskTwo", specB, FAKE_UUID);
+		TaskImpl taskThreeRunning = new TaskImpl("taskThree", specB, FAKE_UUID);
+		TaskImpl taskFiveRunning = new TaskImpl("taskFive", specB, FAKE_UUID);
+		taskToRunning.setRetries(2);
+		tasks.add(new TaskImpl("taskOne", specA, FAKE_UUID));
+		tasks.add(taskTwoRunning);
+		tasks.add(taskThreeRunning);
+		tasks.add(taskToRunning);
+		tasks.add(taskFiveRunning);
+		
+		AbstractResource resourceTwoRunning = new FogbowResource("idTwo", "orderIdTwo", specB);
+		resourceTwoRunning.setState(ResourceState.BUSY);
+		AbstractResource resourceThreeRunning = new FogbowResource("idThree", "orderIdThree", specB);
+		resourceThreeRunning.setState(ResourceState.BUSY);
+		AbstractResource resourceFourIdle = new FogbowResource("idFour", "orderIdFour", specB);
+		resourceFourIdle.setState(ResourceState.IDLE);
+		AbstractResource resourceFiveRunning = new FogbowResource("idFive", "orderIdFIve", specB);
+		resourceFiveRunning.setState(ResourceState.BUSY);
+		List<AbstractResource> resources = new ArrayList<AbstractResource>();
+		resources.add(resourceTwoRunning);
+		resources.add(resourceThreeRunning);
+		resources.add(resourceFourIdle);
+		resources.add(resourceFiveRunning);
+		
+		standardScheduler.runTask(taskTwoRunning, resourceTwoRunning);
+		standardScheduler.runTask(taskThreeRunning, resourceThreeRunning);
+		standardScheduler.runTask(taskFiveRunning, resourceFiveRunning);
+		int countRunningTaskBefore = 3;
+		
+		Assert.assertEquals(countRunningTaskBefore, standardScheduler.getRunningTasks().size());
+		
+		standardScheduler.act(tasks, resources);
+		
+		int addedTaskToRunning = 1;
+		Assert.assertEquals(countRunningTaskBefore + addedTaskToRunning, standardScheduler.getRunningTasks().size());
+	}
 	
 }

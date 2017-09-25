@@ -34,35 +34,35 @@ public class TaskProcessImpl implements TaskProcess {
 	private String localCommandInterpreter;
 	private String processId;
 	private String userId;
-	private String userIdValue;
 
-	public TaskProcessImpl(String taskId, List<Command> commandList, Specification spec, String UserId) {
+	public TaskProcessImpl(String taskId, List<Command> commandList, Specification spec,
+			String userId) {
 		this.processId = UUID.randomUUID().toString();
 		this.taskId = taskId;
 		this.status = TaskState.READY;
 		this.spec = spec;
 		this.commandList = commandList;
-		this.userId = UserID;
-		this.userIdValue = UserId;
+		this.userId = userId;
 	}
 
 	@Override
 	public TaskExecutionResult executeTask(AbstractResource resource) {
-		this.setResource(resource);
+		this.resource = resource;
 		this.localCommandInterpreter = resource.getLocalCommandInterpreter();
 		this.setStatus(TaskState.RUNNING);
 
 		TaskExecutionResult taskExecutionResult = new TaskExecutionResult();
-		
+
 		for (Command command : this.getCommands()) {
 			// FIXME: avoid multiple related log line when possible
 			LOGGER.debug("Command " + command.getCommand());
 			LOGGER.debug("Command Type " + command.getType());
-			
+
 			String commandString = this.getExecutableCommandString(command);
 
-			taskExecutionResult = this.executeCommandString(commandString, command.getType(), resource);
-			
+			taskExecutionResult = this.executeCommandString(commandString, command.getType(),
+					resource);
+
 			LOGGER.debug("Command result: " + taskExecutionResult.getExitValue());
 			if (taskExecutionResult.getExitValue() != TaskExecutionResult.OK) {
 				if (taskExecutionResult.getExitValue() == TaskExecutionResult.TIMEOUT) {
@@ -81,11 +81,7 @@ public class TaskProcessImpl implements TaskProcess {
 	}
 
 	private String getExecutableCommandString(Command command) {
-		if (command.getType().equals(Command.Type.LOCAL)) {
-			return command.getCommand();
-		} else {
-			return command.getCommand();
-		}
+		return command.getCommand();
 	}
 
 	protected TaskExecutionResult executeCommandString(String commandString, Command.Type type,
@@ -134,10 +130,10 @@ public class TaskProcessImpl implements TaskProcess {
 
 	private Process startLocalProcess(String command, Map<String, String> additionalEnvVariables)
 			throws IOException {
-		//FIXME: Magic number "9999"
-		ProcessBuilder builder = new ProcessBuilder(this.localCommandInterpreter, this.userIdValue,
-				"9999", command);
 		
+		String commandInterpreterTags = "-c";		
+		ProcessBuilder builder = new ProcessBuilder(this.localCommandInterpreter, commandInterpreterTags,
+				command);
 		if (additionalEnvVariables == null || additionalEnvVariables.isEmpty()) {
 			return builder.start();
 		}
@@ -149,7 +145,8 @@ public class TaskProcessImpl implements TaskProcess {
 		return builder.start();
 	}
 
-	private String parseEnvironVariable(String commandString, Map<String, String> additionalVariables) {
+	private String parseEnvironVariable(String commandString,
+			Map<String, String> additionalVariables) {
 		for (String envVar : additionalVariables.keySet()) {
 			commandString.replace(envVar, additionalVariables.get(envVar));
 		}
@@ -159,12 +156,12 @@ public class TaskProcessImpl implements TaskProcess {
 	protected Map<String, String> getAdditionalEnvVariables(AbstractResource resource) {
 
 		Map<String, String> additionalEnvVar = new HashMap<String, String>();
-		
+
 		additionalEnvVar.put(ENV_HOST, resource.getMetadataValue(METADATA_SSH_HOST));
 		additionalEnvVar.put(ENV_SSH_PORT, resource.getMetadataValue(METADATA_SSH_PORT));
-		LOGGER.debug("Env_host:" + resource.getMetadataValue(METADATA_SSH_HOST));
-		LOGGER.debug("Env_ssh_port:" + resource.getMetadataValue(METADATA_SSH_PORT));
-		
+		LOGGER.debug(ENV_HOST + ": " + resource.getMetadataValue(METADATA_SSH_HOST));
+		LOGGER.debug(ENV_SSH_PORT + ": " + resource.getMetadataValue(METADATA_SSH_PORT));
+
 		String envSSHUser = null;
 		if (this.spec.getUsername() != null && !this.spec.getUsername().trim().isEmpty()) {
 			envSSHUser = this.spec.getUsername();
@@ -172,18 +169,17 @@ public class TaskProcessImpl implements TaskProcess {
 			envSSHUser = resource.getMetadataValue(ENV_SSH_USER);
 		}
 		additionalEnvVar.put(ENV_SSH_USER, envSSHUser);
-		LOGGER.debug("Env_ssh_user:" + envSSHUser);
-		
-		additionalEnvVar.put(ENV_PRIVATE_KEY_FILE, spec.getPrivateKeyFilePath());
-		LOGGER.debug("Env_private_key_file:" + spec.getPrivateKeyFilePath());
-		
-		additionalEnvVar.put(UserID, this.userId);
-		
-		//TODO: getEnvVariables from task
+		LOGGER.debug(ENV_SSH_USER + ": " + envSSHUser);
 
+		additionalEnvVar.put(ENV_PRIVATE_KEY_FILE, this.spec.getPrivateKeyFilePath());
+		LOGGER.debug(ENV_PRIVATE_KEY_FILE + ": " + this.spec.getPrivateKeyFilePath());
+
+		additionalEnvVar.put(UserID, this.userId);
+
+		// TODO: getEnvVariables from task
 		return additionalEnvVar;
 	}
-	
+
 	public String getProcessId() {
 		return this.processId;
 	}
@@ -197,20 +193,20 @@ public class TaskProcessImpl implements TaskProcess {
 	public List<Command> getCommands() {
 		return new ArrayList<Command>(this.commandList);
 	}
-	
+
 	@Override
 	public TaskState getStatus() {
 		return this.status;
 	}
-	
+
 	@Override
 	public void setStatus(TaskState status) {
 		this.status = status;
 	}
-	
+
 	@Override
 	public AbstractResource getResource() {
-		return resource;
+		return this.resource;
 	}
 	
 	public void setResource(AbstractResource resource) {
@@ -221,5 +217,5 @@ public class TaskProcessImpl implements TaskProcess {
 	public Specification getSpecification() {
 		return this.spec;
 	}
-
+	
 }

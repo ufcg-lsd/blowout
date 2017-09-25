@@ -12,7 +12,6 @@ import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
 import org.fogbowcloud.blowout.infrastructure.manager.InfrastructureManager;
 import org.fogbowcloud.blowout.infrastructure.monitor.ResourceMonitor;
 import org.fogbowcloud.blowout.infrastructure.provider.InfrastructureProvider;
-import org.fogbowcloud.blowout.pool.AbstractResource;
 import org.fogbowcloud.blowout.pool.BlowoutPool;
 
 public class BlowoutController {
@@ -73,11 +72,7 @@ public class BlowoutController {
 		this.started = true;
 	}
 
-	public void stop() throws Exception {
-		for (AbstractResource resource : this.blowoutPool.getAllResources()) {
-			this.infraProvider.deleteResource(resource.getId());
-		}
-
+	public void stop() {
 		this.taskMonitor.stop();
 		this.resourceMonitor.stop();
 
@@ -257,5 +252,19 @@ public class BlowoutController {
 
 	public void setStarted(boolean started) {
 		this.started = started;
+	}
+
+	public int getTaskRetries(String taskId) {
+		Task task = null;
+		for (Task t : blowoutPool.getAllTasks()) {
+			if (t.getId().equals(taskId)) {
+				task = t;
+			}
+		}
+		if (task == null) {
+			return 0;
+		} else {
+			return task.getRetries();
+		}
 	}
 }
