@@ -222,10 +222,11 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 			LOGGER.debug("Instance ID returned: " + instanceId);
 
 			Map<String, String> instanceAttributes = getFogbowInstanceAttributes(instanceId);
+			
+			fogbowResource.setInstanceId(instanceId);
 
 			if (this.validateInstanceAttributes(instanceAttributes)) {
 
-				fogbowResource.setInstanceId(instanceId);
 
 				LOGGER.debug("Getting Instance attributes.");
 
