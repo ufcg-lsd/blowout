@@ -57,16 +57,19 @@ public class ResourceMonitor {
 
 		this.monitoringService = new MonitoringService();
 		this.monitoringServiceRunner = new Thread(this.monitoringService);
-		List<AbstractResource> previouResources = infraProvider.getAllResources();
-		if (previouResources != null && !previouResources.isEmpty()) {
-			this.resourcePool.addResourceList(previouResources);
-		}
-
 	}
 
 	public void start() {
 		LOGGER.warn("Starting Resource Monitor");
+		this.getPreviousResources();
 		this.monitoringServiceRunner.start();
+	}
+
+	private void getPreviousResources() {
+		List<AbstractResource> previousResources = this.infraProvider.getAllResources();
+		for(AbstractResource resource : previousResources) {
+			this.pendingResources.put(resource.getId(), resource.getRequestedSpec());
+		}
 	}
 
 	public void stop() {

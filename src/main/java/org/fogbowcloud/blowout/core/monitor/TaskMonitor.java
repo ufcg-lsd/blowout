@@ -47,10 +47,11 @@ public class TaskMonitor implements Runnable {
 	@Override
 	public void run() {
 		while (this.active) {
-			procMon();
+			this.procMon();
 			try {
 				Thread.sleep(this.timeout);
 			} catch (InterruptedException e) {
+				
 			}
 		}
 	}

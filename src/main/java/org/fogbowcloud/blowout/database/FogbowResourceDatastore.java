@@ -26,16 +26,13 @@ public class FogbowResourceDatastore {
 
 	protected static final String RESOURCE_ID = "resource_id";
 	protected static final String ORDER_ID = "order_id";
-	protected static final String INSTANCE_ID = "instance_id";
 	protected static final String SPEC = "spec";
 
 	protected static final String MANAGER_DATASTORE_SQLITE_DRIVER = "org.sqlite.JDBC";
 	protected static final String PREFIX_DATASTORE_URL = "jdbc:sqlite:";
 
 	private static final String INSERT_FOGBOW_RESOURCE_SQL = "INSERT INTO "
-			+ FOGBOW_RESOURCE_TABLE_NAME + " VALUES(?,?,?,?)";
-	private static final String UPDATE_FOGBOW_RESOURCE = "UPDATE " + FOGBOW_RESOURCE_TABLE_NAME
-			+ " SET " + ORDER_ID + "=? , " + INSTANCE_ID + "=? WHERE " + RESOURCE_ID + "=?";
+			+ FOGBOW_RESOURCE_TABLE_NAME + " VALUES(?,?,?)";
 	private static final String SELECT_REQUEST_ID = "SELECT * FROM " + FOGBOW_RESOURCE_TABLE_NAME;
 	private static final String DELETE_ALL_CONTENT_SQL = "DELETE FROM "
 			+ FOGBOW_RESOURCE_TABLE_NAME;
@@ -53,7 +50,7 @@ public class FogbowResourceDatastore {
 
 		String SQLCommand = "CREATE TABLE IF NOT EXISTS " + FOGBOW_RESOURCE_TABLE_NAME + "("
 				+ RESOURCE_ID + " VARCHAR(255) PRIMARY KEY," + ORDER_ID + " VARCHAR(255),"
-				+ INSTANCE_ID + " VARCHAR(255)," + SPEC + " TEXT " + ")";
+				+ SPEC + " TEXT " + ")";
 
 		Statement statement = null;
 		Connection connection = null;
@@ -85,12 +82,13 @@ public class FogbowResourceDatastore {
 			statements = this.prepare(connection, INSERT_FOGBOW_RESOURCE_SQL);
 
 			String resourceSpecification = this.getResourceSpecification(fogbowResource);
+
 			this.insertResourceStatements(statements, fogbowResource, resourceSpecification);
 
 			boolean result = statements.execute();
 			connection.commit();
-
 			return result;
+
 		} catch (SQLException e) {
 			LOGGER.error("Couldn't store the current resource id", e);
 			try {
@@ -115,7 +113,7 @@ public class FogbowResourceDatastore {
 			connection = this.getConnection();
 			connection.setAutoCommit(false);
 			statements = this.prepare(connection, INSERT_FOGBOW_RESOURCE_SQL);
-			
+
 			for (FogbowResource fogbowResource : fogbowResources) {
 				String resourceSpecification = this.getResourceSpecification(fogbowResource);
 
@@ -129,45 +127,10 @@ public class FogbowResourceDatastore {
 				return false;
 			}
 			connection.commit();
-			
 			return true;
+
 		} catch (SQLException e) {
 			LOGGER.error("Couldn't store the current resource id", e);
-			try {
-				if (connection != null) {
-					connection.rollback();
-				}
-			} catch (SQLException e1) {
-				LOGGER.error("Couldn't rollback transaction.", e1);
-			}
-			return false;
-		} finally {
-			this.close(statements, connection);
-		}
-	}
-
-	public boolean updateFogbowResource(FogbowResource fogbowResource) {
-		LOGGER.debug("Updating resource id: " + fogbowResource.getId());
-		PreparedStatement statements = null;
-		Connection connection = null;
-		try {
-			connection = this.getConnection();
-			connection.setAutoCommit(false);
-
-			statements = this.prepare(connection, UPDATE_FOGBOW_RESOURCE);
-			statements.setString(1, fogbowResource.getOrderId());
-			statements.setString(2, fogbowResource.getInstanceId());
-			statements.setString(3, fogbowResource.getId());
-
-			boolean result = false;
-			if (statements.executeUpdate() > 0) {
-				result = true;
-			}
-
-			connection.commit();
-			return result;
-		} catch (SQLException e) {
-			LOGGER.error("Couldn't update fogbow resource " + fogbowResource.getId(), e);
 			try {
 				if (connection != null) {
 					connection.rollback();
@@ -220,6 +183,7 @@ public class FogbowResourceDatastore {
 			boolean result = statement.execute();
 			connection.commit();
 			return result;
+
 		} catch (SQLException e) {
 			LOGGER.error("Couldn't delete the resource " + fogbowResource.getId(), e);
 			try {
@@ -230,6 +194,7 @@ public class FogbowResourceDatastore {
 				LOGGER.error("Couldn't rollback transaction.", e1);
 			}
 			return false;
+
 		} finally {
 			this.close(statement, connection);
 		}
@@ -263,7 +228,42 @@ public class FogbowResourceDatastore {
 			this.close(statement, connection);
 		}
 	}
-	
+
+	private FogbowResource createFogbowResource(ResultSet result)
+			throws SQLException, JSONException {
+
+		String id = result.getString(RESOURCE_ID);
+		String orderId = result.getString(ORDER_ID);
+		String specification = result.getString(SPEC);
+
+		JSONObject jsonSpec = new JSONObject(specification);
+		Specification spec = Specification.fromJSON(jsonSpec);
+
+		FogbowResource fogbowResource = new FogbowResource(id, orderId, spec);
+		return fogbowResource;
+	}
+
+	private String getResourceSpecification(FogbowResource fogbowResource) {
+		String spec = null;
+		if (fogbowResource.getRequestedSpec() != null) {
+			JSONObject json = fogbowResource.getRequestedSpec().toJSON();
+			spec = json.toString();
+		}
+		return spec;
+	}
+
+	private void insertResourceStatements(PreparedStatement statements,
+			FogbowResource fogbowResource, String resourceSpecification) throws SQLException {
+
+		statements.setString(1, fogbowResource.getId());
+		statements.setString(2, fogbowResource.getOrderId());
+
+		if (resourceSpecification == null) {
+			statements.setNull(3, Types.LONGVARCHAR);
+		} else {
+			statements.setString(3, resourceSpecification);
+		}
+	}
 
 	public Connection getConnection() throws SQLException {
 		try {
@@ -301,45 +301,9 @@ public class FogbowResourceDatastore {
 		return connection.prepareStatement(statement);
 	}
 
-	private FogbowResource createFogbowResource(ResultSet result)
-			throws SQLException, JSONException {
-		String id = result.getString(RESOURCE_ID);
-		String orderId = result.getString(ORDER_ID);
-		String instanceId = result.getString(INSTANCE_ID);
-		String specification = result.getString(SPEC);
-
-		JSONObject jsonSpec = new JSONObject(specification);
-		Specification spec = Specification.fromJSON(jsonSpec);
-
-		FogbowResource fogbowResource = new FogbowResource(id, orderId, spec);
-		fogbowResource.setInstanceId(instanceId);
-		return fogbowResource;
-	}
-	
-	private String getResourceSpecification(FogbowResource fogbowResource) {
-		String spec = null;
-		if (fogbowResource.getRequestedSpec() != null) {
-			JSONObject json = fogbowResource.getRequestedSpec().toJSON();
-			spec = json.toString();
-		}
-		return spec;
-	}
-	
-	private void insertResourceStatements(PreparedStatement statements,
-			FogbowResource fogbowResource, String resourceSpecification) throws SQLException {
-		statements.setString(1, fogbowResource.getId());
-		statements.setString(2, fogbowResource.getOrderId());
-		statements.setString(3, fogbowResource.getInstanceId());
-		if (resourceSpecification == null) {
-			statements.setNull(4, Types.VARCHAR);
-		} else {
-			statements.setString(4, resourceSpecification);
-		}
-	}
-
 	private boolean hasBatchExecutionError(int[] executeBatch) {
-		for (int i : executeBatch) {
-			if (i == PreparedStatement.EXECUTE_FAILED) {
+		for (int execution : executeBatch) {
+			if (execution == PreparedStatement.EXECUTE_FAILED) {
 				return true;
 			}
 		}

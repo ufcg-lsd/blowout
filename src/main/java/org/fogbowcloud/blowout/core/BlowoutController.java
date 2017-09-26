@@ -9,6 +9,7 @@ import org.fogbowcloud.blowout.core.model.Task;
 import org.fogbowcloud.blowout.core.model.TaskState;
 import org.fogbowcloud.blowout.core.monitor.TaskMonitor;
 import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
+import org.fogbowcloud.blowout.core.util.BlowoutDefaultConstants;
 import org.fogbowcloud.blowout.infrastructure.manager.InfrastructureManager;
 import org.fogbowcloud.blowout.infrastructure.monitor.ResourceMonitor;
 import org.fogbowcloud.blowout.infrastructure.provider.InfrastructureProvider;
@@ -17,12 +18,6 @@ import org.fogbowcloud.blowout.pool.BlowoutPool;
 public class BlowoutController {
 
 	public static final Logger LOGGER = Logger.getLogger(BlowoutController.class);
-
-	private String DEFAULT_IMPLEMENTATION_BLOWOUT_POOL = "org.fogbowcloud.blowout.pool.DefaultBlowoutPool";
-	private String DEFAULT_IMPLEMENTATION_SCHEDULER = "org.fogbowcloud.blowout.core.StandardScheduler";
-	private String DEFAULT_IMPLEMENTATION_INFRA_MANAGER = "org.fogbowcloud.blowout.infrastructure.manager.DefaultInfrastructureManager";
-	private String DEFAULT_IMPLEMENTATION_INFRA_PROVIDER = "org.fogbowcloud.blowout.infrastructure.provider.fogbow.FogbowInfrastructureProvider";
-	private String DEFAULT_TASK_MONITOR_PERIOD = "30000";
 
 	protected BlowoutPool blowoutPool;
 
@@ -50,24 +45,29 @@ public class BlowoutController {
 		this.properties = properties;
 	}
 
-	public void start(boolean removePreviousResouces) throws Exception {
-		this.blowoutPool = createBlowoutInstance();
-		this.infraProvider = createInfraProviderInstance(removePreviousResouces);
+	public void start(boolean removePreviousResources) throws Exception {
 
-		long taskMonitorPeriod = Long.parseLong(this.properties.getProperty(
-				AppPropertiesConstants.TASK_MONITOR_PERIOD, this.DEFAULT_TASK_MONITOR_PERIOD));
+		long taskMonitorPeriod = Long
+				.parseLong(this.properties.getProperty(AppPropertiesConstants.TASK_MONITOR_PERIOD,
+						BlowoutDefaultConstants.TASK_MONITOR_PERIOD));
+
+		this.blowoutPool = this.createBlowoutInstance();
+		this.infraProvider = this.createInfraProviderInstance(removePreviousResources);
 
 		this.taskMonitor = new TaskMonitor(this.blowoutPool, taskMonitorPeriod);
 		this.taskMonitor.start();
 
+		this.schedulerInterface = this.createSchedulerInstance(this.taskMonitor);
+
 		this.resourceMonitor = new ResourceMonitor(this.infraProvider, this.blowoutPool,
 				this.properties);
-		this.resourceMonitor.start();
 
-		this.schedulerInterface = createSchedulerInstance(this.taskMonitor);
-		this.infraManager = createInfraManagerInstance();
+		this.infraManager = this.createInfraManagerInstance(this.infraProvider,
+				this.resourceMonitor);
 
 		this.blowoutPool.start(this.infraManager, this.schedulerInterface);
+
+		this.resourceMonitor.start();
 
 		this.started = true;
 	}
@@ -114,7 +114,7 @@ public class BlowoutController {
 	public BlowoutPool createBlowoutInstance() throws Exception {
 		String blowoutPoolClassName = this.properties.getProperty(
 				AppPropertiesConstants.IMPLEMENTATION_BLOWOUT_POOL,
-				this.DEFAULT_IMPLEMENTATION_BLOWOUT_POOL);
+				BlowoutDefaultConstants.IMPLEMENTATION_BLOWOUT_POOL);
 
 		Class<?> blowoutPoolClass = Class.forName(blowoutPoolClassName);
 
@@ -128,9 +128,10 @@ public class BlowoutController {
 
 	public InfrastructureProvider createInfraProviderInstance(boolean removePreviousResouces)
 			throws Exception {
+
 		String infraProviderClassName = this.properties.getProperty(
 				AppPropertiesConstants.IMPLEMENTATION_INFRA_PROVIDER,
-				this.DEFAULT_IMPLEMENTATION_INFRA_PROVIDER);
+				BlowoutDefaultConstants.IMPLEMENTATION_INFRA_PROVIDER);
 
 		Class<?> infraProviderClass = Class.forName(infraProviderClassName);
 
@@ -144,16 +145,18 @@ public class BlowoutController {
 		return (InfrastructureProvider) infraProvider;
 	}
 
-	public InfrastructureManager createInfraManagerInstance() throws Exception {
+	public InfrastructureManager createInfraManagerInstance(InfrastructureProvider infraProvider,
+			ResourceMonitor resourceMonitor) throws Exception {
+
 		String infraManagerClassName = this.properties.getProperty(
 				AppPropertiesConstants.IMPLEMENTATION_INFRA_MANAGER,
-				this.DEFAULT_IMPLEMENTATION_INFRA_MANAGER);
+				BlowoutDefaultConstants.IMPLEMENTATION_INFRA_MANAGER);
 
 		Class<?> infraManagerClass = Class.forName(infraManagerClassName);
 
 		Object infraManager = infraManagerClass
 				.getConstructor(InfrastructureProvider.class, ResourceMonitor.class)
-				.newInstance(this.infraProvider, this.resourceMonitor);
+				.newInstance(infraProvider, resourceMonitor);
 
 		if (!(infraManager instanceof InfrastructureManager)) {
 			throw new Exception(
@@ -165,7 +168,7 @@ public class BlowoutController {
 	protected SchedulerInterface createSchedulerInstance(TaskMonitor taskMonitor) throws Exception {
 		String schedulerClassName = this.properties.getProperty(
 				AppPropertiesConstants.IMPLEMENTATION_SCHEDULER,
-				this.DEFAULT_IMPLEMENTATION_SCHEDULER);
+				BlowoutDefaultConstants.IMPLEMENTATION_SCHEDULER);
 
 		Class<?> schedulerClass = Class.forName(schedulerClassName);
 

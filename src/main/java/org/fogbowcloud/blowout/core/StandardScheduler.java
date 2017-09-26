@@ -42,9 +42,9 @@ public class StandardScheduler implements SchedulerInterface {
 	protected void actOnResource(AbstractResource resource, List<Task> tasks) {
 		ResourceState resourceState = resource.getState();
 		if (resourceState.equals(ResourceState.IDLE)) {
-			Task task = chooseTaskForRunning(resource, tasks);
+			Task task = this.chooseTaskForRunning(resource, tasks);
 			if (task != null) {
-				runTask(task, resource);
+				this.runTask(task, resource);
 			}
 		}
 

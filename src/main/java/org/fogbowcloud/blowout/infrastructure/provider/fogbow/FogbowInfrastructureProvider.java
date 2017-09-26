@@ -83,6 +83,8 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 			this.resourcesMap.put(fogbowResource.getId(), fogbowResource);
 
+			this.updateResource(fogbowResource);
+
 			if (cleanPrevious) {
 				try {
 					this.deleteResource(fogbowResource.getId());
@@ -92,6 +94,14 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 				}
 			}
 
+		}
+	}
+
+	private void updateResource(FogbowResource fogbowResource) throws Exception {
+		FogbowResource resource = (FogbowResource) this.getResource(fogbowResource.getId());
+		if (resource != null) {
+			fogbowResource = resource;
+			this.resourcesMap.put(fogbowResource.getId(), fogbowResource);
 		}
 	}
 
@@ -208,7 +218,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 		instanceId = requestAttributes.get(OrderAttribute.INSTANCE_ID.getValue());
 
-		if (instanceId != null && !instanceId.trim().isEmpty()) { 
+		if (instanceId != null && !instanceId.trim().isEmpty()) {
 			LOGGER.debug("Instance ID returned: " + instanceId);
 
 			Map<String, String> instanceAttributes = getFogbowInstanceAttributes(instanceId);
@@ -227,7 +237,6 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 				LOGGER.debug("New Fogbow Resource created - Instance ID: [" + instanceId + "]");
 
-				this.frDatastore.updateFogbowResource(fogbowResource);
 				return fogbowResource;
 
 			} else {

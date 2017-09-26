@@ -54,8 +54,8 @@ public class DefaultBlowoutPool implements BlowoutPool {
 
 	protected synchronized void callAct() {
 		try {
-			this.infraManager.act(getAllResources(), getAllTasks());
-			this.schedulerInterface.act(getAllTasks(), getAllResources());
+			this.infraManager.act(this.getAllResources(), this.getAllTasks());
+			this.schedulerInterface.act(this.getAllTasks(), this.getAllResources());
 		} catch (Exception e) {
 			LOGGER.error("Error while calling act", e);
 		}
