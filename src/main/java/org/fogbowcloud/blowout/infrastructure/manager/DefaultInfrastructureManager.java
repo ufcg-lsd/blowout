@@ -5,12 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.model.Task;
-import org.fogbowcloud.blowout.core.model.TaskState;
+import org.fogbowcloud.blowout.infrastructure.exception.RequestResourceException;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 import org.fogbowcloud.blowout.infrastructure.monitor.ResourceMonitor;
 import org.fogbowcloud.blowout.infrastructure.provider.InfrastructureProvider;
@@ -21,77 +19,49 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 	private InfrastructureProvider infraProvider;
 	private ResourceMonitor resourceMonitor;
 
-	// private Map<Task, AbstractResource> allocatedResources = new
-	// ConcurrentHashMap<Task, AbstractResource>();
-	private Map<Task, AbstractResource> taskResourceMap = new ConcurrentHashMap<Task, AbstractResource>();
-	private static final Logger LOGGER = Logger.getLogger(DefaultInfrastructureManager.class);
-
-	public DefaultInfrastructureManager(InfrastructureProvider infraProvider, ResourceMonitor resourceMonitor) {
+	public DefaultInfrastructureManager(InfrastructureProvider infraProvider,
+			ResourceMonitor resourceMonitor) {
 		this.infraProvider = infraProvider;
 		this.resourceMonitor = resourceMonitor;
 	}
 
 	@Override
-	public synchronized void act(List<AbstractResource> resources, List<Task> tasks) throws Exception {
-
-		LOGGER.debug("Calling DefaultInfrastructureManager act");
-		Map<Specification, Integer> specsDemand = new HashMap<Specification, Integer>();
-		List<AbstractResource> idleResources = filterResourcesByState(resources, ResourceState.IDLE);
-		LOGGER.debug("idleResources=" + idleResources.size());
-		LOGGER.debug("tasks=" + tasks.size());
-				
-		// Generate demand for tasks
-		for (Task task : tasks) {
-			if (!task.isFinished()) {
-				boolean resourceResolved = false;
-				AbstractResource resourceToRemove = null;
-				for (AbstractResource resource : idleResources) {
-					if (resource.match(task.getSpecification())) {
-						resourceResolved = true;
-						resourceToRemove = resource;
-						LOGGER.debug("resourceToRemove=" + resourceToRemove.getId());
-					}
-				}
-				
-				if (!resourceResolved) {
-					incrementDecrementDemand(specsDemand, task.getSpecification(), true);
-				} else {
-					idleResources.remove(resourceToRemove);
-				}				
-				LOGGER.debug("resourceResolved=" + resourceResolved + " task="
-						+ task.getId());
-			}
-		}
-
-		// Reduce demand by pending resources
-		for (Specification pendingSpec : resourceMonitor.getPendingSpecification()) {
-			incrementDecrementDemand(specsDemand, pendingSpec, false);
-		}
+	public synchronized void act(List<AbstractResource> resources,
+			List<Task> tasks) throws Exception {
 		
-		LOGGER.debug("specsDemand=" + specsDemand.size());
-		LOGGER.debug("pendingSpecification=" + resourceMonitor.getPendingSpecification().size());
+		Map<Specification, Integer> specsDemand = (HashMap<Specification, Integer>) generateDemandBySpec(
+				tasks, resources);
+		
+		requestResources(specsDemand);
+	}
 
-		// Request resources according to demand.
+	private void requestResources(Map<Specification, Integer> specsDemand)
+			throws RequestResourceException {
+		
 		for (Entry<Specification, Integer> entry : specsDemand.entrySet()) {
+
 			Specification spec = entry.getKey();
-			Integer qty = entry.getValue();
 			
-			LOGGER.debug("qty=" + qty);
-			LOGGER.debug("spec=" + spec.toString());
-			for (int count = 0; count < qty.intValue(); count++) {
+			Integer requested = this.resourceMonitor.getPendingRequests().get(
+					spec);
+			if (requested == null)
+				requested = 0;
+			int requiredResources = entry.getValue() - requested;
+			
+			for (int count = 0; count < requiredResources; count++) {
+
 				String resourceId = infraProvider.requestResource(spec);
 				resourceMonitor.addPendingResource(resourceId, spec);
-				LOGGER.debug("Adding resource " + resourceId + " to pendingSpecification");
 			}
 		}
 	}
 
-	private List<AbstractResource> filterResourcesByState(List<AbstractResource> resources,
-			ResourceState... resourceStates) {
+	protected List<AbstractResource> filterResourcesByState(
+			List<AbstractResource> resources, ResourceState... resourceStates) {
 
 		List<AbstractResource> filteredResources = new ArrayList<AbstractResource>();
 		for (AbstractResource resource : resources) {
-			for(ResourceState state : resourceStates){
+			for (ResourceState state : resourceStates) {
 				if (state.equals(resource.getState())) {
 					filteredResources.add(resource);
 				}
@@ -102,20 +72,39 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 
 	}
 
-	private List<Task> filterTasksByState(List<Task> tasks, TaskState taskState) {
+	protected Map<Specification, Integer> generateDemandBySpec(List<Task> tasks,
+			List<AbstractResource> resources) {
+		Map<Specification, Integer> specsDemand = new HashMap<Specification, Integer>();
 
-		List<Task> filteredTasks = new ArrayList<Task>();
+		// FIXME: this variable name is incorrect, since the list will not
+		List<AbstractResource> currentResources = filterResourcesByState(
+				resources, ResourceState.IDLE, ResourceState.BUSY,
+				ResourceState.FAILED);
+		
 		for (Task task : tasks) {
-			if (taskState.equals(task.getState())) {
-				filteredTasks.add(task);
+
+			if (!task.isFinished()) {
+
+				boolean resourceResolved = false;
+
+				for (AbstractResource resource : currentResources) {
+					if (resource.match(task.getSpecification())) {
+						resourceResolved = true;
+						currentResources.remove(resource);
+						break;
+					}
+				}
+				if (!resourceResolved) {
+					incrementDecrementDemand(specsDemand,
+							task.getSpecification(), true);
+				}
 			}
 		}
-
-		return filteredTasks;
-
+		return specsDemand;
 	}
 
-	private void incrementDecrementDemand(Map<Specification, Integer> specsDemand, Specification spec,
+	private void incrementDecrementDemand(
+			Map<Specification, Integer> specsDemand, Specification spec,
 			boolean increment) {
 		Integer zero = new Integer(0);
 		Integer demand = specsDemand.get(spec);

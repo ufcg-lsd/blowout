@@ -6,8 +6,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 
 import org.fogbowcloud.blowout.core.model.Specification;
@@ -32,7 +34,7 @@ public class TestDefaultInfrastructureManager {
 
 	private ResourceMonitor resourceMonitor;
 	private InfrastructureProvider infraProvider;
-	private InfrastructureManager defaultInfrastructureManager;
+	private DefaultInfrastructureManager defaultInfrastructureManager;
 	
 	@Before
 	public void setUp() throws Exception {
@@ -137,7 +139,7 @@ public class TestDefaultInfrastructureManager {
 		Specification spec = new Specification("Image", "Fogbow", "myKey", "path");
 
 		Task task = new TaskImpl(taskId, spec);
-		
+		Map<Specification, Integer> specsDemand = new HashMap<Specification, Integer>();
 		List<Task> tasks = new ArrayList<Task>();
 		tasks.add(task);
 		List<AbstractResource> resources = new ArrayList<AbstractResource>();
@@ -148,7 +150,7 @@ public class TestDefaultInfrastructureManager {
 		
 		doReturn(pendingResources).when(resourceMonitor).getPendingResources();
 		doReturn(pendingSpecs).when(resourceMonitor).getPendingSpecification();
-		
+		doReturn(specsDemand).when(defaultInfrastructureManager).generateDemandBySpec(tasks, resources);
 		defaultInfrastructureManager.act(resources, tasks);
 		verify(infraProvider, times(0)).requestResource(spec);
 		verify(resourceMonitor, times(0)).addPendingResource(Mockito.any(String.class), Mockito.any(Specification.class));
@@ -165,7 +167,8 @@ public class TestDefaultInfrastructureManager {
 
 		Task taskA = new TaskImpl(taskIdA, spec);
 		Task taskB = new TaskImpl(taskIdB, spec);
-		
+		Map<Specification, Integer> specsDemand = new HashMap<Specification, Integer>();
+		specsDemand.put(spec, 1);
 		List<Task> tasks = new ArrayList<Task>();
 		tasks.add(taskA);
 		tasks.add(taskB);
@@ -174,7 +177,7 @@ public class TestDefaultInfrastructureManager {
 		pendingResources.add(resourceId);
 		List<Specification> pendingSpecs = new ArrayList<Specification>();
 		pendingSpecs.add(spec);
-		
+		doReturn(specsDemand).when(defaultInfrastructureManager).generateDemandBySpec(tasks, resources);
 		doReturn(pendingResources).when(resourceMonitor).getPendingResources();
 		doReturn(pendingSpecs).when(resourceMonitor).getPendingSpecification();
 		
