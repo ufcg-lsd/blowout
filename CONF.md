@@ -83,8 +83,8 @@ Configuration Field | Description | Required
 LDAP Username |	Username credential of LDAP Authentication | **Yes**
 LDAP Password |	User Password of LDAP Authentication | **Yes**
 LDAP Authentication URL | The LDAP Authentication URL | **Yes**
-LDAP Base |	?? | **Yes**
-LDAP Encrypt Type |	?? | No
+LDAP Base | LDAP domain name | **Yes**
+LDAP Encrypt Type | Name of LDAP Encryption algorithm | No
 LDAP Private Key | File path of the Private Key | **Yes**
 LDAP Public Key | File path of the Public Key | **Yes**
 
@@ -114,11 +114,11 @@ Keystone Authentication URL	| URL for Keystone Authentication | **Yes**
 
 Configuration Field | Description | Required
 -------------------------- | -------------------- | -------
-NAF Identity Private Key |	?? | **Yes**
-NAF Identity Public Key	|	?? | **Yes**
-NAF Identity Token Username	|	?? | **Yes**
-NAF Identity Token Password	|	?? | **Yes**
-NAF Identity Token Generator Endpoint	|	?? | **Yes**
+NAF Identity Private Key | File path to private key | **Yes**
+NAF Identity Public Key	| File path to public key | **Yes**
+NAF Identity Token Username	| Username credential of NAF authentication | **Yes**
+NAF Identity Token Password	| Username password of NAF authentication | **Yes**
+NAF Identity Token Generator Endpoint	| URL to the NAF authentication server | **Yes**
 
 
 #### Authentication Token Properties - Case VOMS
@@ -131,7 +131,7 @@ Configuration Field | Description | Required
 -------------------------- | -------------------- | -------
 VOMS Cerfiticate File Path | The file path for the VOMS public certificate | **Yes**
 VOMS Cerfiticate Password | The VOMS Certificate password | **Yes**
-VOMS Cerfiticate Server	| ?? | **Yes**
+VOMS Cerfiticate Server	| URL to the VOMS certificate server | **Yes**
 
 
 After set your own Blowout configuration file, use Blowout with it.
