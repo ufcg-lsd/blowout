@@ -78,6 +78,7 @@ public class StandardScheduler implements SchedulerInterface {
 
 	@Override
 	public void runTask(Task task, AbstractResource resource) {
+		task.setRetries(task.getRetries()+1);
 		this.runningTasks.put(resource, task);
 		this.submitToMonitor(task, resource);
 	}

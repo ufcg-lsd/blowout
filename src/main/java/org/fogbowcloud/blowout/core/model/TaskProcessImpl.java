@@ -130,8 +130,8 @@ public class TaskProcessImpl implements TaskProcess {
 
 	private Process startLocalProcess(String command, Map<String, String> additionalEnvVariables)
 			throws IOException {
-		
-		String commandInterpreterTags = "-c";		
+
+		String commandInterpreterTags = "-c";
 		ProcessBuilder builder = new ProcessBuilder(this.localCommandInterpreter, commandInterpreterTags,
 				command);
 		if (additionalEnvVariables == null || additionalEnvVariables.isEmpty()) {
@@ -208,7 +208,7 @@ public class TaskProcessImpl implements TaskProcess {
 	public AbstractResource getResource() {
 		return this.resource;
 	}
-	
+
 	public void setResource(AbstractResource resource) {
 		this.resource = resource;
 	}
@@ -217,5 +217,5 @@ public class TaskProcessImpl implements TaskProcess {
 	public Specification getSpecification() {
 		return this.spec;
 	}
-	
+
 }

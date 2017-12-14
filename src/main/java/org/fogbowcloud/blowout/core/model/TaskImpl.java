@@ -38,10 +38,13 @@ public class TaskImpl implements Task {
 	private boolean isFailed;
 	private boolean isFinished;
 	private long startedRunningAt;
-	
+
 	private List<Command> commands = new ArrayList<Command>();
 	private Map<String, String> metadata = new HashMap<String, String>();
-	List<String> processes = new ArrayList<String>();
+    List<String> processes = new ArrayList<String>();
+    private boolean isFailed = false;
+	private int retries = -1;
+	private TaskState state;
 
 
 	public TaskImpl(String id, Specification spec, String uuid) {
@@ -74,7 +77,7 @@ public class TaskImpl implements Task {
 			return false;
 		}
 	}
-	
+
 	@Override
 	public boolean mayRetry() {
 		if (this.getMetadata(METADATA_MAX_RESOURCE_CONN_RETRIES) != null) {
@@ -84,7 +87,7 @@ public class TaskImpl implements Task {
 			return false;
 		}
 	}
-	
+
 	@Override
 	public List<Command> getCommandsByType(Type commandType) {
 		List<Command> commandsToReturn = new ArrayList<Command>();
@@ -95,7 +98,7 @@ public class TaskImpl implements Task {
 		}
 		return commandsToReturn;
 	}
-	
+
 	@Override
 	public Task clone() {
 		TaskImpl taskClone = new TaskImpl(UUID.randomUUID().toString() + "_clonedFrom_" + getId(),
@@ -110,7 +113,7 @@ public class TaskImpl implements Task {
 		}
 		return taskClone;
 	}
-	
+
 	@Override
 	public void startedRunning() {
 		this.startedRunningAt = System.currentTimeMillis();
@@ -126,7 +129,7 @@ public class TaskImpl implements Task {
 	public boolean isFinished() {
 		return this.isFinished;
 	}
-	
+
 	@Override
 	public void fail() {
 		this.isFailed = true;
@@ -136,22 +139,22 @@ public class TaskImpl implements Task {
 	public boolean isFailed() {
 		return this.isFailed;
 	}
-	
+
 	@Override
 	public String getId() {
 		return this.id;
 	}
-	
+
 	@Override
 	public void addProcessId(String procId) {
 		this.processes.add(procId);
 	}
 
 	@Override
-	public List<String> getProcessId() {	
+	public List<String> getProcessId() {
 		return this.processes;
 	}
-	
+
 	@Override
 	public TaskState getState() {
 		return this.state;
@@ -171,7 +174,7 @@ public class TaskImpl implements Task {
 	public Specification getSpecification() {
 		return this.spec;
 	}
-	
+
 	@Override
 	public int getRetries() { 
 		return this.retries;
@@ -181,12 +184,12 @@ public class TaskImpl implements Task {
 	public void setRetries(int retries) {
 		this.retries = retries;		
 	}
-	
+
 	@Override
 	public void addCommand(Command command) {
-		this.commands.add(command);		
+		this.commands.add(command);
 	}
-	
+
 	@Override
 	public List<Command> getAllCommands() {
 		return this.commands;
@@ -196,7 +199,7 @@ public class TaskImpl implements Task {
 	public int getNumberOfCommands() {
 		return this.commands.size();
 	}
-	
+
 	@Override
 	public void putMetadata(String attributeName, String value) {
 		this.metadata.put(attributeName, value);
@@ -206,7 +209,7 @@ public class TaskImpl implements Task {
 	public String getMetadata(String attributeName) {
 		return this.metadata.get(attributeName);
 	}
-	
+
 	@Override
 	public Map<String, String> getAllMetadata() {
 		return this.metadata;
@@ -293,5 +296,5 @@ public class TaskImpl implements Task {
 		}
 		return task;
 	}
-	
+
 }

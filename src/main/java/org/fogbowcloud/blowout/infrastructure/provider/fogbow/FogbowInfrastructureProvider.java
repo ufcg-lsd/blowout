@@ -33,7 +33,7 @@ import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
 import org.fogbowcloud.blowout.infrastructure.provider.InfrastructureProvider;
 import org.fogbowcloud.blowout.infrastructure.token.AbstractTokenUpdatePlugin;
 import org.fogbowcloud.blowout.pool.AbstractResource;
-import org.fogbowcloud.manager.core.UserdataUtils;
+import org.fogbowcloud.manager.core.util.UserdataUtils;
 import org.fogbowcloud.manager.occi.model.Token;
 import org.fogbowcloud.manager.occi.model.Token.User;
 import org.fogbowcloud.manager.occi.order.OrderAttribute;
