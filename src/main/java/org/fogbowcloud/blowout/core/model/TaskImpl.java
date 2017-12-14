@@ -20,31 +20,21 @@ public class TaskImpl implements Task {
 
 	private static final Logger LOGGER = Logger.getLogger(TaskImpl.class);
 
-	public static final String ENV_LOCAL_OUT_DIR = "";
-
-	public static final String METADATA_REMOTE_OUTPUT_FOLDER = "remote_output_folder";
-	public static final String METADATA_LOCAL_OUTPUT_FOLDER = "local_output_folder";
-	public static final String METADATA_SANDBOX = "sandbox";
-	public static final String METADATA_REMOTE_COMMAND_EXIT_PATH = "remote_command_exit_path";
-	public static final String METADATA_RESOURCE_ID = "resource_id";
 	public static final String METADATA_TASK_TIMEOUT = "task_timeout";
 	public static final String METADATA_MAX_RESOURCE_CONN_RETRIES = "max_conn_retries";
 
 	private String id;
 	private Specification spec;
-	private TaskState state;
+    private TaskState state;
 	private String uuid;
-	private int retries;
-	private boolean isFailed;
+    private boolean isFailed;
+    private int retries;
 	private boolean isFinished;
 	private long startedRunningAt;
 
-	private List<Command> commands = new ArrayList<Command>();
-	private Map<String, String> metadata = new HashMap<String, String>();
-    List<String> processes = new ArrayList<String>();
-    private boolean isFailed = false;
-	private int retries = -1;
-	private TaskState state;
+	private List<Command> commands = new ArrayList<>();
+	private Map<String, String> metadata = new HashMap<>();
+    private List<String> processes = new ArrayList<>();
 
 
 	public TaskImpl(String id, Specification spec, String uuid) {
@@ -71,26 +61,17 @@ public class TaskImpl implements Task {
 			LOGGER.error("Timeout badly formated, ignoring it: ", e);
 			return false;
 		}
-		if (System.currentTimeMillis() - this.startedRunningAt > timeOut) {
-			return true;
-		} else {
-			return false;
-		}
+        return (System.currentTimeMillis() - this.startedRunningAt) > timeOut;
 	}
 
 	@Override
 	public boolean mayRetry() {
-		if (this.getMetadata(METADATA_MAX_RESOURCE_CONN_RETRIES) != null) {
-			return this.getRetries() <= Integer
-					.parseInt(this.getMetadata(METADATA_MAX_RESOURCE_CONN_RETRIES));
-		} else {
-			return false;
-		}
-	}
+        return this.getMetadata(METADATA_MAX_RESOURCE_CONN_RETRIES) != null && this.getRetries() <= Integer.parseInt(this.getMetadata(METADATA_MAX_RESOURCE_CONN_RETRIES));
+    }
 
 	@Override
 	public List<Command> getCommandsByType(Type commandType) {
-		List<Command> commandsToReturn = new ArrayList<Command>();
+		List<Command> commandsToReturn = new ArrayList<>();
 		for (Command command : getAllCommands()) {
 			if (command.getType().equals(commandType)) {
 				commandsToReturn.add(command);
@@ -239,12 +220,9 @@ public class TaskImpl implements Task {
 		} else if (!id.equals(other.id))
 			return false;
 		if (spec == null) {
-			if (other.spec != null)
-				return false;
-		} else if (!spec.equals(other.spec))
-			return false;
-		return true;
-	}
+            return other.spec == null;
+		} else return spec.equals(other.spec);
+    }
 	
 	public JSONObject toJSON() {
 		try {
