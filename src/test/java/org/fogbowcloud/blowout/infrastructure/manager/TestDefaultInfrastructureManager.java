@@ -34,7 +34,7 @@ public class TestDefaultInfrastructureManager {
 	private static final String FAKE_UUID = "1234";
 	private ResourceMonitor resourceMonitor;
 	private InfrastructureProvider infraProvider;
-	private InfrastructureManager defaultInfrastructureManager;
+	private DefaultInfrastructureManager defaultInfrastructureManager;
 	
 	@Before
 	public void setUp() throws Exception {
@@ -79,7 +79,7 @@ public class TestDefaultInfrastructureManager {
 		String resourceIdA = "Rsource01";
 		String resourceIdB = "Rsource02";
 		String resourceIdC = "Rsource03";
-		
+
 		String taskIdA = "Task01";
 		String taskIdB = "Task02";
 		String taskIdC = "Task03";
@@ -128,8 +128,9 @@ public class TestDefaultInfrastructureManager {
 		String taskId = "Task01";
 		Specification spec = new Specification("Image", "Fogbow", "myKey", "path");
 
-		Task task = new TaskImpl(taskId, spec, FAKE_UUID);
-		
+        Task task = new TaskImpl(taskId, spec, FAKE_UUID);
+        Map<Specification, Integer> specsDemand = new HashMap<Specification, Integer>();
+
 		List<Task> tasks = new ArrayList<Task>();
 		tasks.add(task);
 		List<AbstractResource> resources = new ArrayList<AbstractResource>();
@@ -139,11 +140,12 @@ public class TestDefaultInfrastructureManager {
 		pendingSpecs.add(spec);
 		Map<Specification, Integer> pendingRequests = new HashMap<Specification, Integer>();
 		pendingRequests.put(spec, 1);
-		
+
 		doReturn(pendingResources).when(resourceMonitor).getPendingResources();
 		doReturn(pendingSpecs).when(resourceMonitor).getPendingSpecification();
 		doReturn(pendingRequests).when(resourceMonitor).getPendingRequests();
-		
+
+		doReturn(specsDemand).when(defaultInfrastructureManager).generateDemandBySpec(tasks, resources);
 		defaultInfrastructureManager.act(resources, tasks);
 		verify(infraProvider, times(0)).requestResource(spec);
 		verify(resourceMonitor, times(0)).addPendingResource(Mockito.any(String.class), Mockito.any(Specification.class));
@@ -160,7 +162,9 @@ public class TestDefaultInfrastructureManager {
 
 		Task taskA = new TaskImpl(taskIdA, spec, FAKE_UUID);
 		Task taskB = new TaskImpl(taskIdB, spec, FAKE_UUID);
-		
+		Map<Specification, Integer> specsDemand = new HashMap<Specification, Integer>();
+
+		specsDemand.put(spec, 1);
 		List<Task> tasks = new ArrayList<Task>();
 		tasks.add(taskA);
 		tasks.add(taskB);
@@ -171,11 +175,12 @@ public class TestDefaultInfrastructureManager {
 		pendingSpecs.add(spec);
 		Map<Specification, Integer> pendingRequests = new HashMap<Specification, Integer>();
 		pendingRequests.put(spec, 1);
-		
+
+		doReturn(specsDemand).when(defaultInfrastructureManager).generateDemandBySpec(tasks, resources);
 		doReturn(pendingResources).when(resourceMonitor).getPendingResources();
 		doReturn(pendingSpecs).when(resourceMonitor).getPendingSpecification();
 		doReturn(pendingRequests).when(resourceMonitor).getPendingRequests();
-		
+
 		defaultInfrastructureManager.act(resources, tasks);
 		verify(infraProvider, times(1)).requestResource(spec);
 		verify(resourceMonitor, times(1)).addPendingResource(Mockito.any(String.class), Mockito.any(Specification.class));
@@ -202,10 +207,10 @@ public class TestDefaultInfrastructureManager {
 		pendingResources.add(pendingResource);
 		Map<Specification, Integer> pendingRequests = new HashMap<Specification, Integer>();
 		pendingRequests.put(specB, 1);
-		
+
 		doReturn(pendingResources).when(resourceMonitor).getPendingResources();
 		doReturn(pendingRequests).when(resourceMonitor).getPendingRequests();
-		
+
 		defaultInfrastructureManager.act(resources, tasks);
 		verify(infraProvider, times(1)).requestResource(specA);
 		verify(resourceMonitor, times(1)).addPendingResource(Mockito.any(String.class), Mockito.any(Specification.class));

@@ -79,9 +79,9 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 		}
 		return specsDemand;
 	}
-	
-	private List<AbstractResource> filterResourcesByState(List<AbstractResource> resources,
-			ResourceState... resourceStates) {
+
+	protected List<AbstractResource> filterResourcesByState(
+			List<AbstractResource> resources, ResourceState... resourceStates) {
 
 		List<AbstractResource> filteredResources = new ArrayList<AbstractResource>();
 		for (AbstractResource resource : resources) {
@@ -92,6 +92,38 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 			}
 		}
 		return filteredResources;
+
+	}
+
+	protected Map<Specification, Integer> generateDemandBySpec(List<Task> tasks,
+			List<AbstractResource> resources) {
+		Map<Specification, Integer> specsDemand = new HashMap<Specification, Integer>();
+
+		// FIXME: this variable name is incorrect, since the list will not
+		List<AbstractResource> currentResources = filterResourcesByState(
+				resources, ResourceState.IDLE, ResourceState.BUSY,
+				ResourceState.FAILED);
+
+		for (Task task : tasks) {
+
+			if (!task.isFinished()) {
+
+				boolean resourceResolved = false;
+
+				for (AbstractResource resource : currentResources) {
+					if (resource.match(task.getSpecification())) {
+						resourceResolved = true;
+						currentResources.remove(resource);
+						break;
+					}
+				}
+				if (!resourceResolved) {
+					incrementDecrementDemand(specsDemand,
+							task.getSpecification(), true);
+				}
+			}
+		}
+		return specsDemand;
 	}
 
 	private void incrementDemand(Map<Specification, Integer> specsDemand, Specification spec) {

@@ -1,27 +1,29 @@
 package org.fogbowcloud.blowout.infrastructure.token;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.security.KeyFactory;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.Date;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.log4j.Logger;
+import org.bouncycastle.util.encoders.Base64;
 import org.fogbowcloud.blowout.core.exception.BlowoutException;
 import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
 import org.fogbowcloud.manager.core.plugins.identity.naf.NAFIdentityPlugin;
+import org.fogbowcloud.manager.core.plugins.identity.naf.RSAUtils;
 import org.fogbowcloud.manager.occi.model.Token;
+
+import com.google.gson.JsonObject;
 
 public class NAFTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
 
-	private static final String USERNAME_PARAMETER = "username";
+    private static final Logger LOGGER = Logger.getLogger(NAFTokenUpdatePlugin.class);
+
+    private static final String USERNAME_PARAMETER = "username";
 	private static final String PASSWORD_PARAMETER = "password";
 	public static final String NAF_IDENTITY_PRIVATE_KEY = AppPropertiesConstants.INFRA_AUTH_TOKEN_PREFIX
 			+ "naf_identity_private_key";
@@ -37,10 +39,13 @@ public class NAFTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
 
 	public NAFTokenUpdatePlugin(Properties properties) {
 		super(properties);
+		validateProperties();
 	}
 
 	@Override
 	public Token generateToken() {
+		LOGGER.debug("Creating NAF Token.");
+		Token token = null;
 		try {
 			NAFIdentityPlugin nafIdentityPlugin = new NAFIdentityPlugin(super.getProperties());
 			String accessId = this.requestTokenFromGenerator();
@@ -92,23 +97,46 @@ public class NAFTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
 		return null;
 	}
 
-	private int getTokenUpdateTimeInHours() {
-
-		int hourInMinutes = 60;
-		int hourInSeconds = hourInMinutes * 60;
-		int hourInMiliseconds = hourInSeconds * 1000;
-
-		int updateTime = getUpdateTime();
-		TimeUnit updateTimeUnits = getUpdateTimeUnits();
-		if (updateTimeUnits.equals(TimeUnit.MINUTES)) {
-			updateTime = updateTime / hourInMinutes;
-		} else if (updateTimeUnits.equals(TimeUnit.SECONDS)) {
-			updateTime = updateTime / hourInSeconds;
-		} else if (updateTimeUnits.equals(TimeUnit.MILLISECONDS)) {
-			updateTime = updateTime / hourInMiliseconds;
+	private static String getKey(String filename) throws IOException {
+		// Read key from file
+		String strKeyPEM = "";
+		BufferedReader br = new BufferedReader(new FileReader(filename));
+		String line;
+		while ((line = br.readLine()) != null) {
+			strKeyPEM += line;
 		}
+		br.close();
+		return strKeyPEM;
+	}
 
-		return Math.max(1, updateTime);
+	private static RSAPrivateKey getPrivateKey(String filename) throws Exception {
+		String privateKeyPEM = getKey(filename);
+
+		// Remove the first and last lines
+		privateKeyPEM = privateKeyPEM
+				.replace("-----BEGIN PRIVATE KEY-----", "");
+		privateKeyPEM = privateKeyPEM.replace("-----END PRIVATE KEY-----", "");
+
+		// Base64 decode data
+		byte[] encoded = org.bouncycastle.util.encoders.Base64
+				.decode(privateKeyPEM);
+
+		KeyFactory kf = KeyFactory.getInstance("RSA");
+		RSAPrivateKey privKey = (RSAPrivateKey) kf
+				.generatePrivate(new PKCS8EncodedKeySpec(encoded));
+		return privKey;
+	}
+
+
+	protected String createAccessId() {
+		JsonObject jsonObject = new JsonObject();
+		String name = this.properties.getProperty(TOKEN_PLUGIN_USERNAME);
+		jsonObject.addProperty(NAME_KEY_JSON, name != null ? name: DEFAULT_NAME);
+		long infinitTime = new Date(Long.MAX_VALUE).getTime();
+		jsonObject.addProperty(TOKEN_ETIME_KEY_JSON, String.valueOf(infinitTime));
+		jsonObject.add(SAML_ATTRIBUTES_KEY_JSON, new JsonObject());
+
+		return jsonObject.toString();
 	}
 
 	@Override

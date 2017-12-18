@@ -154,13 +154,9 @@ public class ResourceMonitor {
 					this.resolveIdleResource(resource);
 
 				} else if (ResourceState.BUSY.equals(resource.getState())) {
-
 					idleResources.remove(resource.getId());
-
 				} else if (ResourceState.FAILED.equals(resource.getState())) {
-
 					idleResources.remove(resource.getId());
-
 					boolean isAlive = this.checkResourceConnectivity(resource);
 					if (isAlive) {
 						Long expirationDate = this.canMoveResourceToIdle(resource);
@@ -308,4 +304,18 @@ public class ResourceMonitor {
 	public List<Specification> getPendingSpecification() {
 		return new ArrayList<Specification>(this.pendingResources.values());
 	}
+	
+	public Map<Specification, Integer> getPendingRequests() {
+		Map<Specification, Integer> specCount = new HashMap<Specification, Integer>();
+		for (Entry<String, Specification> e : this.pendingResources.entrySet()) {
+			if (specCount.containsKey(e.getValue())) {
+				specCount.put(e.getValue(), specCount.get(e.getValue()) +1);
+			} else {
+				specCount.put(e.getValue(), 1);
+			}
+		}
+		return specCount;
+
+	}
+
 }

@@ -139,5 +139,29 @@ public class TaskProcessImplTest {
 		assertEquals(tp.getStatus(), TaskState.FAILED);
 	}
 
+	@Test
+	public void testExecThreeCommandsFirstTimedout() {
+		
+		TaskExecutionResult ter = new TaskExecutionResult();
+		ter.finish(124);
+		
+		String taskId = FAKE_TASK_ID;
+		Specification spec = mock(Specification.class);
+		List<Command> commandList = new ArrayList<Command>();
+		commandList.add(new Command(FAKE_COMMAND, Command.Type.LOCAL));
+		commandList.add(new Command(FAKE_COMMAND2, Command.Type.LOCAL));
+		commandList.add(new Command(FAKE_COMMAND3, Command.Type.LOCAL));
+		FogbowResource resource = mock(FogbowResource.class);
 
+		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec));
+
+		doReturn(ter).when(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
+
+		tp.executeTask(resource);
+
+		verify(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
+		verify(tp, never()).executeCommandString(FAKE_COMMAND2, Command.Type.LOCAL, resource);
+		verify(tp, never()).executeCommandString(FAKE_COMMAND3, Command.Type.LOCAL, resource);
+		assertEquals(tp.getStatus(), TaskState.TIMEDOUT);
+	}
 }
