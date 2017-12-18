@@ -144,16 +144,15 @@ public class TaskProcessImplTest {
 		
 		TaskExecutionResult ter = new TaskExecutionResult();
 		ter.finish(124);
-		
-		String taskId = FAKE_TASK_ID;
+
 		Specification spec = mock(Specification.class);
-		List<Command> commandList = new ArrayList<Command>();
+		List<Command> commandList = new ArrayList<>();
 		commandList.add(new Command(FAKE_COMMAND, Command.Type.LOCAL));
 		commandList.add(new Command(FAKE_COMMAND2, Command.Type.LOCAL));
 		commandList.add(new Command(FAKE_COMMAND3, Command.Type.LOCAL));
 		FogbowResource resource = mock(FogbowResource.class);
 
-		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec));
+		TaskProcessImpl tp = spy(new TaskProcessImpl(FAKE_TASK_ID, commandList, spec, FAKE_UUID));
 
 		doReturn(ter).when(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
 

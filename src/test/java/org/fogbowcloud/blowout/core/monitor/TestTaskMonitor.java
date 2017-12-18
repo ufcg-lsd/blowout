@@ -38,9 +38,9 @@ public class TestTaskMonitor {
 
 	private static final String FAKE_UUID = "1234";
 	private static final String FAKE_ID = "fakeId";
-	public TaskMonitor taskMon;
-	public BlowoutPool pool;
-	public Specification spec;
+	private TaskMonitor taskMon;
+	private BlowoutPool pool;
+	private Specification spec;
 	
 	@Before
 	public void setUp(){
@@ -126,7 +126,7 @@ public class TestTaskMonitor {
 
 		TaskImpl taskOne = new TaskImpl("task-one-id", spec, FAKE_UUID);
 		
-		List<Task> taskList = new ArrayList<Task>();
+		List<Task> taskList = new ArrayList<>();
 		taskList.add(taskOne);
 		
 		blowoutPool.addTasks(taskList);
@@ -143,7 +143,7 @@ public class TestTaskMonitor {
 		
 		taskProcessOne.setStatus(TaskState.FINNISHED);
 		
-		Map<Task, TaskProcess> runningTasks = new HashMap<Task, TaskProcess>();
+		Map<Task, TaskProcess> runningTasks = new HashMap<>();
 		runningTasks.put(taskOne, taskProcessOne);
 		
 		TaskMonitor taskMon = new TaskMonitor(blowoutPool, 3000);
@@ -162,7 +162,7 @@ public class TestTaskMonitor {
 		TaskProcess fakeProcess = mock(TaskProcess.class);
 		doReturn(TaskState.RUNNING).when(fakeProcess).getStatus();
 		AbstractResource fakeResource = mock(AbstractResource.class);
-		List<TaskProcess> runningPrc = new ArrayList<TaskProcess>();
+		List<TaskProcess> runningPrc = new ArrayList<>();
 		runningPrc.add(fakeProcess);
 		doReturn(runningPrc).when(this.taskMon).getRunningProcesses();
 		
@@ -182,10 +182,10 @@ public class TestTaskMonitor {
 		doReturn(FAKE_ID).when(fakeProcess).getTaskId();
 		doReturn(fakeTask).when(this.taskMon).getTaskById(FAKE_ID);
 		doReturn(fakeResource).when(fakeProcess).getResource();
-		List<TaskProcess> runningPrc = new ArrayList<TaskProcess>();
+		List<TaskProcess> runningPrc = new ArrayList<>();
 		runningPrc.add(fakeProcess);
 		doReturn(runningPrc).when(this.taskMon).getRunningProcesses();
-		Map<Task, TaskProcess> runningTasks = new HashMap<Task, TaskProcess>();
+		Map<Task, TaskProcess> runningTasks = new HashMap<>();
 		runningTasks.put(fakeTask, fakeProcess);
 		doReturn(runningTasks).when(this.taskMon).getRunningTasks();
 		
@@ -205,10 +205,10 @@ public class TestTaskMonitor {
 		doReturn(FAKE_ID).when(fakeProcess).getTaskId();
 		doReturn(fakeTask).when(this.taskMon).getTaskById(FAKE_ID);
 		doReturn(fakeResource).when(fakeProcess).getResource();
-		List<TaskProcess> runningPrc = new ArrayList<TaskProcess>();
+		List<TaskProcess> runningPrc = new ArrayList<>();
 		runningPrc.add(fakeProcess);
 		doReturn(runningPrc).when(this.taskMon).getRunningProcesses();
-		Map<Task, TaskProcess> runningTasks = new HashMap<Task, TaskProcess>();
+		Map<Task, TaskProcess> runningTasks = new HashMap<>();
 		runningTasks.put(fakeTask, fakeProcess);
 		doReturn(runningTasks).when(this.taskMon).getRunningTasks();
 		
@@ -225,19 +225,18 @@ public class TestTaskMonitor {
 		AbstractResource fakeResource = mock(AbstractResource.class);
 		doReturn(FAKE_ID).when(fakeTask).getId();
 		doReturn(FAKE_ID).when(fakeProcess).getTaskId();
-		List<TaskProcess> runningPrc = new ArrayList<TaskProcess>();
+		List<TaskProcess> runningPrc = new ArrayList<>();
 		runningPrc.add(fakeProcess);
 		doReturn(runningPrc).when(this.taskMon).getRunningProcesses();
 		doNothing().when(pool).updateResource(fakeResource, ResourceState.BUSY);
 		ExecutorService execServ = mock(ExecutorService.class);
 		doReturn(execServ).when(this.taskMon).getExecutorService();
 		doReturn(mock(Future.class)).when(execServ).submit(any(Runnable.class));
-		Map<Task, TaskProcess> runningTasks = new HashMap<Task, TaskProcess>();
+		Map<Task, TaskProcess> runningTasks = new HashMap<>();
 		runningTasks.put(fakeTask, fakeProcess);
 		doReturn(runningTasks).when(this.taskMon).getRunningTasks();
 		
 		this.taskMon.runTask(fakeTask, fakeResource);
-		
 	}
 	
 }

@@ -1,12 +1,5 @@
 package org.fogbowcloud.blowout.core.monitor;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import org.fogbowcloud.blowout.core.model.Task;
 import org.fogbowcloud.blowout.core.model.TaskProcess;
 import org.fogbowcloud.blowout.core.model.TaskProcessImpl;
@@ -14,6 +7,13 @@ import org.fogbowcloud.blowout.core.model.TaskState;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 import org.fogbowcloud.blowout.pool.AbstractResource;
 import org.fogbowcloud.blowout.pool.BlowoutPool;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class TaskMonitor implements Runnable {
 
@@ -23,7 +23,7 @@ public class TaskMonitor implements Runnable {
 	private long timeout;
 	private boolean active;
 
-	Map<Task, TaskProcess> runningTasks = new HashMap<Task, TaskProcess>();
+	private Map<Task, TaskProcess> runningTasks = new HashMap<>();
 
 	public TaskMonitor(BlowoutPool pool, long timeout) {
 		this.pool = pool;
@@ -46,12 +46,12 @@ public class TaskMonitor implements Runnable {
 
 	@Override
 	public void run() {
-		while (this.active) {
-			this.procMon();
+		while (active) {
+			procMon();
 			try {
-				Thread.sleep(this.timeout);
+				Thread.sleep(timeout);
 			} catch (InterruptedException e) {
-
+				// do nothing
 			}
 		}
 	}
@@ -82,29 +82,29 @@ public class TaskMonitor implements Runnable {
 	}
 
 	// FIXME: observation.
-	public void runTask(Task task, final AbstractResource resource) {
-		if (this.runningTaskContains(task) == false) {
+    public void runTask(Task task, final AbstractResource resource) {
+        if (!this.runningTaskContains(task)) {
 
-			final TaskProcess taskProcess = this.createProcess(task);
+            final TaskProcess taskProcess = this.createProcess(task);
 
-			this.putTaskToRunningTasks(task, taskProcess);
-			task.startedRunning();
+            this.putTaskToRunningTasks(task, taskProcess);
+            task.startedRunning();
 
-			this.updateResource(resource, ResourceState.BUSY);
+            this.updateResource(resource, ResourceState.BUSY);
 
-			this.taskExecutor.submit(new Runnable() {
-				@Override
-				public void run() {
-					taskProcess.executeTask(resource);
-				}
-			});
-		}
-	}
+            this.taskExecutor.submit(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            taskProcess.executeTask(resource);
+                        }
+                    }
+            );
+        }
+    }
 
-	protected TaskProcess createProcess(Task task) {
-		TaskProcess taskProcess = new TaskProcessImpl(task.getId(), task.getAllCommands(),
-				task.getSpecification(), task.getUUID());
-		return taskProcess;
+	private TaskProcess createProcess(Task task) {
+        return new TaskProcessImpl(task.getId(), task.getAllCommands(), task.getSpecification(), task.getUUID());
 	}
 
 	public void stopTask(Task task) {
@@ -137,12 +137,10 @@ public class TaskMonitor implements Runnable {
 	}
 
 	public List<TaskProcess> getRunningProcesses() {
-		List<TaskProcess> processes = new ArrayList<TaskProcess>();
-		processes.addAll(this.runningTasks.values());
-		return processes;
+        return new ArrayList<>(this.runningTasks.values());
 	}
 
-	public boolean runningTaskContains(Task task) {
+	private boolean runningTaskContains(Task task) {
 		return this.runningTasks.containsKey(task);
 	}
 

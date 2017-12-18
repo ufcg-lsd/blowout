@@ -123,14 +123,14 @@ public class ResourceMonitor {
 			while (this.active) {
 				try {
 					this.monitorProcess();
-					Thread.sleep(infraMonitoringPeriod.longValue());
+					Thread.sleep(infraMonitoringPeriod);
 				} catch (InterruptedException e) {
-					LOGGER.error("Error while executing MonitoringService");
+					LOGGER.debug("MonitoringService interrupted");
 				}
 			}
 		}
 
-		protected void monitorProcess() throws InterruptedException {
+		protected void monitorProcess() {
 			this.monitoringPendingResources();
 			this.monitoringResources(resourcePool.getAllResources());
 		}
@@ -150,9 +150,7 @@ public class ResourceMonitor {
 			for (AbstractResource resource : resources) {
 
 				if (ResourceState.IDLE.equals(resource.getState())) {
-
 					this.resolveIdleResource(resource);
-
 				} else if (ResourceState.BUSY.equals(resource.getState())) {
 					idleResources.remove(resource.getId());
 				} else if (ResourceState.FAILED.equals(resource.getState())) {
@@ -162,7 +160,6 @@ public class ResourceMonitor {
 						Long expirationDate = this.canMoveResourceToIdle(resource);
 						this.moveResourceToIdle(resource, expirationDate);
 					}
-
 				} else if (ResourceState.TO_REMOVE.equals(resource.getState())) {
 					try {
 						idleResources.remove(resource.getId());
@@ -188,7 +185,7 @@ public class ResourceMonitor {
 
 					boolean isAlive = this.checkResourceConnectivity(resource);
 					if (isAlive) {
-						Date expirationDate = new Date(expirationDateTime.longValue());
+						Date expirationDate = new Date(expirationDateTime);
 						Date currentDate = new Date();
 
 						if (expirationDate.before(currentDate)) {
@@ -218,13 +215,10 @@ public class ResourceMonitor {
 			// 2. Make maxReuse indefinite by default and not one
 			// 3. Always reuse instance
 			if (resource.getReusedTimes() < maxReuse) {
-				Long expirationDate = new Long(0);
-				expirationDate = Long.valueOf(+idleLifeTime);
 				Calendar calendar = Calendar.getInstance();
 				calendar.setTime(new Date());
 				calendar.add(Calendar.MILLISECOND, idleLifeTime.intValue());
-				expirationDate = calendar.getTimeInMillis();
-				return expirationDate;
+				return calendar.getTimeInMillis();
 			} else {
 				return null;
 			}
@@ -278,7 +272,7 @@ public class ResourceMonitor {
 	}
 
 	public Map<Specification, Integer> getPendingRequests() {
-		Map<Specification, Integer> specCount = new HashMap<Specification, Integer>();
+		Map<Specification, Integer> specCount = new HashMap<>();
 		for (Entry<String, Specification> e : this.pendingResources.entrySet()) {
 			if (specCount.containsKey(e.getValue())) {
 				specCount.put(e.getValue(), specCount.get(e.getValue()) + 1);
@@ -298,24 +292,10 @@ public class ResourceMonitor {
 	}
 
 	public List<String> getPendingResources() {
-		return new ArrayList<String>(this.pendingResources.keySet());
+		return new ArrayList<>(this.pendingResources.keySet());
 	}
 
 	public List<Specification> getPendingSpecification() {
-		return new ArrayList<Specification>(this.pendingResources.values());
+		return new ArrayList<>(this.pendingResources.values());
 	}
-	
-	public Map<Specification, Integer> getPendingRequests() {
-		Map<Specification, Integer> specCount = new HashMap<Specification, Integer>();
-		for (Entry<String, Specification> e : this.pendingResources.entrySet()) {
-			if (specCount.containsKey(e.getValue())) {
-				specCount.put(e.getValue(), specCount.get(e.getValue()) +1);
-			} else {
-				specCount.put(e.getValue(), 1);
-			}
-		}
-		return specCount;
-
-	}
-
 }

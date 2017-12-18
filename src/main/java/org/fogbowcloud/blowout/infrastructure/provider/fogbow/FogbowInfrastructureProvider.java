@@ -61,16 +61,15 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 	// TODO: alter when fogbow are returning this attribute
 	public static final String INSTANCE_ATTRIBUTE_DISKSIZE = "TODO-AlterWhenFogbowReturns";
-	public static final String INSTANCE_ATTRIBUTE_REQUEST_TYPE = "org.fogbowcloud.order.type";
 
-	private HttpWrapper httpWrapper;
+    private HttpWrapper httpWrapper;
 	private String managerUrl;
 	private Token token;
 	private Properties properties;
 	private AbstractTokenUpdatePlugin tokenUpdatePlugin;
 	private FogbowResourceDatastore frDatastore;
 
-	private Map<String, FogbowResource> resourcesMap = new ConcurrentHashMap<String, FogbowResource>();
+	private Map<String, FogbowResource> resourcesMap = new ConcurrentHashMap<>();
 
 	protected FogbowInfrastructureProvider(Properties properties,
 			ScheduledExecutorService handleTokeUpdateExecutor, boolean cleanPrevious)
@@ -79,35 +78,12 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		this(properties, handleTokeUpdateExecutor, createTokenUpdatePlugin(properties));
 
 		this.frDatastore = new FogbowResourceDatastore(properties);
-		for (FogbowResource fogbowResource : this.frDatastore.getAllFogbowResources()) {
+        recoverLastSession(cleanPrevious);
+    }
 
-			this.resourcesMap.put(fogbowResource.getId(), fogbowResource);
-
-			this.updateResource(fogbowResource);
-
-			if (cleanPrevious) {
-				try {
-					this.deleteResource(fogbowResource.getId());
-				} catch (Exception e) {
-					LOGGER.error("Error while trying to delete resource on initialization: "
-							+ fogbowResource.getId());
-				}
-			}
-
-		}
-	}
-
-	private void updateResource(FogbowResource fogbowResource) throws Exception {
-		FogbowResource resource = (FogbowResource) this.getResource(fogbowResource.getId());
-		if (resource != null) {
-			fogbowResource = resource;
-			this.resourcesMap.put(fogbowResource.getId(), fogbowResource);
-		}
-	}
-
-	protected FogbowInfrastructureProvider(Properties properties,
-			ScheduledExecutorService handleTokeUpdateExecutor,
-			AbstractTokenUpdatePlugin tokenUpdatePlugin) throws Exception {
+    protected FogbowInfrastructureProvider(Properties properties,
+			ScheduledExecutorService handleTokenUpdateExecutor,
+			AbstractTokenUpdatePlugin tokenUpdatePlugin) {
 
 		this.httpWrapper = new HttpWrapper();
 		this.properties = properties;
@@ -116,7 +92,6 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		this.tokenUpdatePlugin = tokenUpdatePlugin;
 		this.token = tokenUpdatePlugin.generateToken();
 
-		ScheduledExecutorService handleTokenUpdateExecutor = handleTokeUpdateExecutor;
 		this.handleTokenUpdate(handleTokenUpdateExecutor);
 	}
 
@@ -125,6 +100,32 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		this(properties, Executors.newScheduledThreadPool(1), removePrevious);
 	}
 
+    void recoverLastSession(boolean cleanPrevious) {
+	    LOGGER.info("Recovering resources from previous session.");
+        for (FogbowResource fogbowResource : this.frDatastore.getAllFogbowResources()) {
+			this.resourcesMap.put(fogbowResource.getId(), fogbowResource);
+
+            this.updateResource(fogbowResource);
+
+            if (cleanPrevious) {
+                try {
+                    this.deleteResource(fogbowResource.getId());
+                } catch (Exception e) {
+                    LOGGER.error("Error while trying to delete resource on initialization: "
+                            + fogbowResource.getId());
+                }
+            }
+
+        }
+    }
+
+    private void updateResource(FogbowResource fogbowResource) {
+        FogbowResource resource = (FogbowResource) this.getResource(fogbowResource.getId());
+        if (resource != null) {
+            this.resourcesMap.put(resource.getId(), resource);
+        }
+    }
+
 	protected void handleTokenUpdate(ScheduledExecutorService handleTokenUpdateExecutor) {
 		LOGGER.debug("Turning on handle token update.");
 
@@ -132,13 +133,17 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		// InfrastructureManager on its main service thread ?
 		// The main thread could check if the token has expired and so call this
 		// method.
-		handleTokenUpdateExecutor.scheduleWithFixedDelay(new Runnable() {
-			@Override
-			public void run() {
-				setToken(tokenUpdatePlugin.generateToken());
-			}
-		}, this.tokenUpdatePlugin.getUpdateTime(), this.tokenUpdatePlugin.getUpdateTime(),
-				this.tokenUpdatePlugin.getUpdateTimeUnits());
+		handleTokenUpdateExecutor.scheduleWithFixedDelay(
+				new Runnable() {
+				    @Override
+                    public void run() {
+				        setToken(tokenUpdatePlugin.generateToken());
+				    }
+				    },
+                this.tokenUpdatePlugin.getUpdateTime(),
+                this.tokenUpdatePlugin.getUpdateTime(),
+				this.tokenUpdatePlugin.getUpdateTimeUnits()
+        );
 	}
 
 	@Override
@@ -151,7 +156,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		try {
 			this.validateSpecification(spec);
 
-			List<Header> headers = (LinkedList<Header>) this.requestNewInstanceHeaders(spec);
+			List<Header> headers = this.requestNewInstanceHeaders(spec);
 			LOGGER.debug("Headers: " + headers.toString());
 
 			String requestMethod = "post";
@@ -200,7 +205,6 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 	}
 
 	private FogbowResource getFogbowResource(String resourceId) throws Exception {
-
 		LOGGER.debug("Initiating Resource Instanciation - Resource id: [" + resourceId + "]");
 		String instanceId;
 		Map<String, String> requestAttributes;
@@ -226,8 +230,6 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 			fogbowResource.setInstanceId(instanceId);
 
 			if (this.validateInstanceAttributes(instanceAttributes)) {
-
-
 				LOGGER.debug("Getting Instance attributes.");
 
 				this.insertResourceMetadata(fogbowResource, requestAttributes, instanceAttributes);
@@ -239,7 +241,6 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 				LOGGER.debug("New Fogbow Resource created - Instance ID: [" + instanceId + "]");
 
 				return fogbowResource;
-
 			} else {
 				LOGGER.debug(
 						"Instance attributes not yet ready for instance: [" + instanceId + "]");
@@ -305,8 +306,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		String endpoint = this.managerUrl + "/" + OrderConstants.TERM + "/" + orderId;
 		String requestResponse = this.doRequest(requestMethod, endpoint, new ArrayList<Header>());
 
-		Map<String, String> attrs = this.parseRequestAttributes(requestResponse);
-		return attrs;
+        return this.parseRequestAttributes(requestResponse);
 	}
 
 	private Map<String, String> getFogbowInstanceAttributes(String instanceId) throws Exception {
@@ -316,13 +316,11 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		String instanceInformation = this.doRequest(requestMethod, endpoint,
 				new ArrayList<Header>());
 
-		Map<String, String> attrs = this.parseAttributes(instanceInformation);
-		return attrs;
+        return this.parseAttributes(instanceInformation);
 	}
 
 	private void validateSpecification(Specification specification)
 			throws RequestResourceException {
-
 		if (specification.getImage() == null || specification.getImage().trim().isEmpty()) {
 			throw new RequestResourceException("Resource image can not be null or empty");
 		}

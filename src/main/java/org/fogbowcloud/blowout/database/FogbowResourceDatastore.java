@@ -28,9 +28,6 @@ public class FogbowResourceDatastore {
 	protected static final String ORDER_ID = "order_id";
 	protected static final String SPEC = "spec";
 
-	protected static final String MANAGER_DATASTORE_SQLITE_DRIVER = "org.sqlite.JDBC";
-	protected static final String PREFIX_DATASTORE_URL = "jdbc:sqlite:";
-
 	private static final String INSERT_FOGBOW_RESOURCE_SQL = "INSERT INTO "
 			+ FOGBOW_RESOURCE_TABLE_NAME + " VALUES(?,?,?)";
 	private static final String SELECT_REQUEST_ID = "SELECT * FROM " + FOGBOW_RESOURCE_TABLE_NAME;
@@ -145,7 +142,7 @@ public class FogbowResourceDatastore {
 	}
 
 	public List<FogbowResource> getAllFogbowResources() {
-		List<FogbowResource> fogbowResources = new ArrayList<FogbowResource>();
+		List<FogbowResource> fogbowResources = new ArrayList<>();
 		Statement statement = null;
 		Connection connection = null;
 		try {
@@ -239,8 +236,7 @@ public class FogbowResourceDatastore {
 		JSONObject jsonSpec = new JSONObject(specification);
 		Specification spec = Specification.fromJSON(jsonSpec);
 
-		FogbowResource fogbowResource = new FogbowResource(id, orderId, spec);
-		return fogbowResource;
+		return new FogbowResource(id, orderId, spec);
 	}
 
 	private String getResourceSpecification(FogbowResource fogbowResource) {
@@ -265,7 +261,7 @@ public class FogbowResourceDatastore {
 		}
 	}
 
-	public Connection getConnection() throws SQLException {
+	private Connection getConnection() throws SQLException {
 		try {
 			return DriverManager.getConnection(this.dataStoreURL);
 		} catch (SQLException e) {
@@ -296,8 +292,7 @@ public class FogbowResourceDatastore {
 		}
 	}
 
-	protected PreparedStatement prepare(Connection connection, String statement)
-			throws SQLException {
+	private PreparedStatement prepare(Connection connection, String statement) throws SQLException {
 		return connection.prepareStatement(statement);
 	}
 

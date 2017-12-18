@@ -30,22 +30,14 @@ auth_token_prop_keystone_tenantname=
 auth_token_prop_keystone_password=
 auth_token_prop_keystone_auth_url=
 
-##### AUTH TOKEN PROPERTIES - Naf example #####
-#infra_auth_token_update_plugin=org.fogbowcloud.blowout.infrastructure.token.TestNAFTokenUpdatePlugin
+##### AUTH TOKEN PROPERTIES - NAF example #####
+#infra_auth_token_update_plugin=org.fogbowcloud.blowout.infrastructure.token.NAFTokenUpdatePlugin
 auth_token_prop_naf_identity_private_key=
 auth_token_prop_naf_identity_public_key=
 auth_token_prop_naf_username=
 
-##### AUTH TOKEN PROPERTIES - NAF example #####
-#infra_auth_token_update_plugin=org.fogbowcloud.blowout.infrastructure.token.KeystoneTokenUpdatePlugin
-auth_token_prop_naf_identity_private_key=
-auth_token_prop_naf_identity_private_key=
-auth_token_prop_naf_identity_token_username=
-auth_token_prop_naf_identity_token_password=
-auth_token_prop_naf_identity_token_generator_endpoint=
-
 ##### AUTH TOKEN PROPERTIES - VOMS example #####
-#infra_auth_token_update_plugin=org.fogbowcloud.blowout.infrastructure.token.KeystoneTokenUpdatePlugin
+#infra_auth_token_update_plugin=org.fogbowcloud.blowout.infrastructure.token.VomsTokenUpdatePlugin
 auth_token_prop_voms_certificate_file_path
 auth_token_prop_voms_certificate_password=
 auth_token_prop_voms_server=

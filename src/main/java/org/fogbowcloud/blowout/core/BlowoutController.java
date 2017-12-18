@@ -47,9 +47,10 @@ public class BlowoutController {
 
 	public void start(boolean removePreviousResources) throws Exception {
 
-		long taskMonitorPeriod = Long
-				.parseLong(this.properties.getProperty(AppPropertiesConstants.TASK_MONITOR_PERIOD,
-						BlowoutDefaultConstants.TASK_MONITOR_PERIOD));
+		long taskMonitorPeriod = Long.parseLong(
+						this.properties.getProperty(AppPropertiesConstants.TASK_MONITOR_PERIOD,
+						BlowoutDefaultConstants.TASK_MONITOR_PERIOD)
+				);
 
 		this.blowoutPool = this.createBlowoutInstance();
 		this.infraProvider = this.createInfraProviderInstance(removePreviousResources);
@@ -131,7 +132,8 @@ public class BlowoutController {
 
 		String infraProviderClassName = this.properties.getProperty(
 				AppPropertiesConstants.IMPLEMENTATION_INFRA_PROVIDER,
-				BlowoutDefaultConstants.IMPLEMENTATION_INFRA_PROVIDER);
+				BlowoutDefaultConstants.IMPLEMENTATION_INFRA_PROVIDER
+        );
 
 		Class<?> infraProviderClass = Class.forName(infraProviderClassName);
 
