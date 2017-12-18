@@ -1,8 +1,5 @@
 package org.fogbowcloud.blowout.core;
 
-import java.util.List;
-import java.util.Properties;
-
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.exception.BlowoutException;
 import org.fogbowcloud.blowout.core.model.Task;
@@ -15,261 +12,289 @@ import org.fogbowcloud.blowout.infrastructure.monitor.ResourceMonitor;
 import org.fogbowcloud.blowout.infrastructure.provider.InfrastructureProvider;
 import org.fogbowcloud.blowout.pool.BlowoutPool;
 
+import java.util.List;
+import java.util.Properties;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+
 public class BlowoutController {
 
-	public static final Logger LOGGER = Logger.getLogger(BlowoutController.class);
+    public static final Logger LOGGER = Logger.getLogger(BlowoutController.class);
 
-	protected BlowoutPool blowoutPool;
+    private BlowoutPool blowoutPool;
 
-	private SchedulerInterface schedulerInterface;
-	private TaskMonitor taskMonitor;
+    private SchedulerInterface schedulerInterface;
+    private ScheduledExecutorService executorService;
+    private TaskMonitor taskMonitor;
 
-	protected InfrastructureProvider infraProvider;
-	protected InfrastructureManager infraManager;
-	protected ResourceMonitor resourceMonitor;
+    private InfrastructureProvider infraProvider;
+    private InfrastructureManager infraManager;
+    private ResourceMonitor resourceMonitor;
 
-	private Properties properties;
-	protected boolean started;
+    private Properties properties;
+    private boolean started;
 
-	public BlowoutController(Properties properties) throws BlowoutException {
-		this.started = false;
+    public BlowoutController(Properties properties) throws BlowoutException {
+        this.started = false;
 
-		try {
-			if (!BlowoutController.checkProperties(properties)) {
-				throw new BlowoutException("Error on validate the file ");
-			}
-		} catch (Exception e) {
-			throw new BlowoutException("Error while initialize Blowout Controller.", e);
-		}
+        try {
+            if (!BlowoutController.checkProperties(properties)) {
+                throw new BlowoutException("Error on validate the file ");
+            }
+        } catch (Exception e) {
+            throw new BlowoutException("Error while initialize Blowout Controller.", e);
+        }
 
-		this.properties = properties;
-	}
+        this.properties = properties;
+    }
 
-	public void start(boolean removePreviousResources) throws Exception {
-
-		long taskMonitorPeriod = Long.parseLong(
-						this.properties.getProperty(AppPropertiesConstants.TASK_MONITOR_PERIOD,
-						BlowoutDefaultConstants.TASK_MONITOR_PERIOD)
-				);
-
-		this.blowoutPool = this.createBlowoutInstance();
-		this.infraProvider = this.createInfraProviderInstance(removePreviousResources);
-
-		this.taskMonitor = new TaskMonitor(this.blowoutPool, taskMonitorPeriod);
-		this.taskMonitor.start();
-
-		this.schedulerInterface = this.createSchedulerInstance(this.taskMonitor);
-
-		this.resourceMonitor = new ResourceMonitor(this.infraProvider, this.blowoutPool,
-				this.properties);
-
-		this.infraManager = this.createInfraManagerInstance(this.infraProvider,
-				this.resourceMonitor);
-
-		this.blowoutPool.start(this.infraManager, this.schedulerInterface);
-
-		this.resourceMonitor.start();
-
-		this.started = true;
-	}
-
-	public void stop() {
-		this.taskMonitor.stop();
-		this.resourceMonitor.stop();
-
-		this.started = false;
-	}
-
-	public void addTask(Task task) throws BlowoutException {
-		if (!this.started) {
-			throw new BlowoutException("Blowout hasn't been started yet");
-		}
-		this.blowoutPool.putTask(task);
-	}
-
-	public void addTaskList(List<Task> tasks) throws BlowoutException {
-		if (!started) {
-			throw new BlowoutException("Blowout hasn't been started yet");
-		}
-		this.blowoutPool.addTasks(tasks);
-	}
-
-	public void cleanTask(Task task) {
-		this.blowoutPool.removeTask(task);
-	}
-
-	public TaskState getTaskState(String taskId) {
-		Task task = null;
-		for (Task taskInPool : this.blowoutPool.getAllTasks()) {
-			if (taskInPool.getId().equals(taskId)) {
-				task = taskInPool;
-			}
-		}
-		if (task == null) {
-			return TaskState.NOT_CREATED;
-		} else {
-			return this.taskMonitor.getTaskState(task);
-		}
-	}
-
-	public BlowoutPool createBlowoutInstance() throws Exception {
-		String blowoutPoolClassName = this.properties.getProperty(
-				AppPropertiesConstants.IMPLEMENTATION_BLOWOUT_POOL,
-				BlowoutDefaultConstants.IMPLEMENTATION_BLOWOUT_POOL);
-
-		Class<?> blowoutPoolClass = Class.forName(blowoutPoolClassName);
-
-		Object blowoutPool = blowoutPoolClass.getConstructor().newInstance();
-
-		if (!(blowoutPool instanceof BlowoutPool)) {
-			throw new Exception("Blowout Pool Class Name is not a BlowoutPool implementation");
-		}
-		return (BlowoutPool) blowoutPool;
-	}
-
-	public InfrastructureProvider createInfraProviderInstance(boolean removePreviousResouces)
-			throws Exception {
-
-		String infraProviderClassName = this.properties.getProperty(
-				AppPropertiesConstants.IMPLEMENTATION_INFRA_PROVIDER,
-				BlowoutDefaultConstants.IMPLEMENTATION_INFRA_PROVIDER
+    public void start(boolean removePreviousResources) throws Exception {
+        long taskMonitorPeriod = Long.parseLong(
+                this.properties.getProperty(
+                        AppPropertiesConstants.TASK_MONITOR_PERIOD,
+                        BlowoutDefaultConstants.TASK_MONITOR_PERIOD
+                )
         );
 
-		Class<?> infraProviderClass = Class.forName(infraProviderClassName);
+        this.blowoutPool = this.createBlowoutInstance();
+        this.infraProvider = this.createInfraProviderInstance(removePreviousResources);
 
-		Object infraProvider = infraProviderClass.getConstructor(Properties.class, Boolean.TYPE)
-				.newInstance(this.properties, removePreviousResouces);
+        // Requires blowout pool to be created
+        this.taskMonitor = createTaskMonitor(blowoutPool, taskMonitorPeriod);
 
-		if (!(infraProvider instanceof InfrastructureProvider)) {
-			throw new Exception(
-					"Infrastructure Provider Class Name is not a InfrastructureProvider implementation");
-		}
-		return (InfrastructureProvider) infraProvider;
-	}
+        // Requires task monitor to be created
+        this.schedulerInterface = this.createSchedulerInstance(taskMonitor);
 
-	public InfrastructureManager createInfraManagerInstance(InfrastructureProvider infraProvider,
-			ResourceMonitor resourceMonitor) throws Exception {
+        // Requires infrastructure provider, blowout pool, properties
+        this.resourceMonitor = createResourceMonitor(infraProvider, blowoutPool, properties);
 
-		String infraManagerClassName = this.properties.getProperty(
-				AppPropertiesConstants.IMPLEMENTATION_INFRA_MANAGER,
-				BlowoutDefaultConstants.IMPLEMENTATION_INFRA_MANAGER);
+        // Requires infrastructure provider, resource monitor
+        this.infraManager = this.createInfraManagerInstance(
+                this.infraProvider,
+                this.resourceMonitor
+        );
 
-		Class<?> infraManagerClass = Class.forName(infraManagerClassName);
 
-		Object infraManager = infraManagerClass
-				.getConstructor(InfrastructureProvider.class, ResourceMonitor.class)
-				.newInstance(infraProvider, resourceMonitor);
+        this.blowoutPool.start(this.infraManager, this.schedulerInterface);
 
-		if (!(infraManager instanceof InfrastructureManager)) {
-			throw new Exception(
-					"Infrastructure Manager Class Name is not a InfrastructureManager implementation");
-		}
-		return (InfrastructureManager) infraManager;
-	}
+        this.started = true;
+    }
 
-	protected SchedulerInterface createSchedulerInstance(TaskMonitor taskMonitor) throws Exception {
-		String schedulerClassName = this.properties.getProperty(
-				AppPropertiesConstants.IMPLEMENTATION_SCHEDULER,
-				BlowoutDefaultConstants.IMPLEMENTATION_SCHEDULER);
+    public void stop() {
+        executorService.shutdownNow();
+        this.taskMonitor.stop();
+        this.resourceMonitor.stop();
 
-		Class<?> schedulerClass = Class.forName(schedulerClassName);
+        this.started = false;
+    }
 
-		Object scheduler = schedulerClass.getConstructor(TaskMonitor.class)
-				.newInstance(taskMonitor);
+    public void addTask(Task task) throws BlowoutException {
+        if (!this.started) {
+            throw new BlowoutException("Blowout hasn't been started yet");
+        }
+        this.blowoutPool.putTask(task);
+    }
 
-		if (!(scheduler instanceof SchedulerInterface)) {
-			throw new Exception("Scheduler Class Name is not a SchedulerInterface implementation");
-		}
-		return (SchedulerInterface) scheduler;
-	}
+    public void addTaskList(List<Task> tasks) throws BlowoutException {
+        if (!started) {
+            throw new BlowoutException("Blowout hasn't been started yet");
+        }
+        this.blowoutPool.addTasks(tasks);
+    }
 
-	protected static boolean checkProperties(Properties properties) {
-		return propertiesContainsAll(properties,
-				AppPropertiesConstants.IMPLEMENTATION_INFRA_PROVIDER,
-				AppPropertiesConstants.INFRA_RESOURCE_IDLE_LIFETIME,
-				AppPropertiesConstants.INFRA_IS_STATIC,
-				AppPropertiesConstants.INFRA_AUTH_TOKEN_UPDATE_PLUGIN);
-	}
+    public void cleanTask(Task task) {
+        this.blowoutPool.removeTask(task);
+    }
 
-	private static boolean propertiesContainsAll(Properties properties,
-			String... wantedProperties) {
-		for (String property : wantedProperties) {
-			if (!properties.containsKey(property)) {
-				LOGGER.error("Required property " + property + " was not set");
-				return false;
-			}
-		}
-		LOGGER.debug("All properties are set");
-		return true;
-	}
+    public TaskState getTaskState(String taskId) {
+        Task task = null;
+        for (Task taskInPool : this.blowoutPool.getAllTasks()) {
+            if (taskInPool.getId().equals(taskId)) {
+                task = taskInPool;
+            }
+        }
+        if (task == null) {
+            return TaskState.NOT_CREATED;
+        } else {
+            return this.taskMonitor.getTaskState(task);
+        }
+    }
 
-	public BlowoutPool getBlowoutPool() {
-		return this.blowoutPool;
-	}
+    public BlowoutPool createBlowoutInstance() throws Exception {
+        String blowoutPoolClassName = this.properties.getProperty(
+                AppPropertiesConstants.IMPLEMENTATION_BLOWOUT_POOL,
+                BlowoutDefaultConstants.IMPLEMENTATION_BLOWOUT_POOL);
 
-	public void setBlowoutPool(BlowoutPool blowoutPool) {
-		this.blowoutPool = blowoutPool;
-	}
+        Class<?> blowoutPoolClass = Class.forName(blowoutPoolClassName);
 
-	public TaskMonitor getTaskMonitor() {
-		return taskMonitor;
-	}
+        Object blowoutPool = blowoutPoolClass.getConstructor().newInstance();
 
-	public void setTaskMonitor(TaskMonitor taskMonitor) {
-		this.taskMonitor = taskMonitor;
-	}
+        if (!(blowoutPool instanceof BlowoutPool)) {
+            throw new Exception("Blowout Pool Class Name is not a BlowoutPool implementation");
+        }
+        return (BlowoutPool) blowoutPool;
+    }
 
-	public SchedulerInterface getSchedulerInterface() {
-		return schedulerInterface;
-	}
+    public InfrastructureProvider createInfraProviderInstance(boolean removePreviousResouces)
+            throws Exception {
 
-	public void setSchedulerInterface(SchedulerInterface schedulerInterface) {
-		this.schedulerInterface = schedulerInterface;
-	}
+        String infraProviderClassName = this.properties.getProperty(
+                AppPropertiesConstants.IMPLEMENTATION_INFRA_PROVIDER,
+                BlowoutDefaultConstants.IMPLEMENTATION_INFRA_PROVIDER
+        );
 
-	public InfrastructureProvider getInfraProvider() {
-		return infraProvider;
-	}
+        Class<?> infraProviderClass = Class.forName(infraProviderClassName);
 
-	public void setInfraProvider(InfrastructureProvider infraProvider) {
-		this.infraProvider = infraProvider;
-	}
+        executorService = Executors.newScheduledThreadPool(1);
+        Object infraProvider = infraProviderClass.getConstructor(Properties.class, Boolean.TYPE)
+                .newInstance(this.properties, executorService, removePreviousResouces);
 
-	public InfrastructureManager getInfraManager() {
-		return infraManager;
-	}
+        if (!(infraProvider instanceof InfrastructureProvider)) {
+            throw new Exception(
+                    "Infrastructure Provider Class Name is not a InfrastructureProvider implementation");
+        }
+        return (InfrastructureProvider) infraProvider;
+    }
 
-	public void setInfraManager(InfrastructureManager infraManager) {
-		this.infraManager = infraManager;
-	}
+    public InfrastructureManager createInfraManagerInstance(InfrastructureProvider infraProvider,
+                                                            ResourceMonitor resourceMonitor) throws Exception {
 
-	public ResourceMonitor getResourceMonitor() {
-		return resourceMonitor;
-	}
+        String infraManagerClassName = this.properties.getProperty(
+                AppPropertiesConstants.IMPLEMENTATION_INFRA_MANAGER,
+                BlowoutDefaultConstants.IMPLEMENTATION_INFRA_MANAGER);
 
-	public void setResourceMonitor(ResourceMonitor resourceMonitor) {
-		this.resourceMonitor = resourceMonitor;
-	}
+        Class<?> infraManagerClass = Class.forName(infraManagerClassName);
 
-	public boolean isStarted() {
-		return started;
-	}
+        Object infraManager = infraManagerClass
+                .getConstructor(InfrastructureProvider.class, ResourceMonitor.class)
+                .newInstance(infraProvider, resourceMonitor);
 
-	public void setStarted(boolean started) {
-		this.started = started;
-	}
+        if (!(infraManager instanceof InfrastructureManager)) {
+            throw new Exception(
+                    "Infrastructure Manager Class Name is not a InfrastructureManager implementation");
+        }
+        return (InfrastructureManager) infraManager;
+    }
 
-	public int getTaskRetries(String taskId) {
-		Task task = null;
-		for (Task t : blowoutPool.getAllTasks()) {
-			if (t.getId().equals(taskId)) {
-				task = t;
-			}
-		}
-		if (task == null) {
-			return 0;
-		} else {
-			return task.getRetries();
-		}
-	}
+    private SchedulerInterface createSchedulerInstance(TaskMonitor taskMonitor) throws Exception {
+        String schedulerClassName = this.properties.getProperty(
+                AppPropertiesConstants.IMPLEMENTATION_SCHEDULER,
+                BlowoutDefaultConstants.IMPLEMENTATION_SCHEDULER);
+
+        Class<?> schedulerClass = Class.forName(schedulerClassName);
+
+        Object scheduler = schedulerClass.getConstructor(TaskMonitor.class)
+                .newInstance(taskMonitor);
+
+        if (!(scheduler instanceof SchedulerInterface)) {
+            throw new Exception("Scheduler Class Name is not a SchedulerInterface implementation");
+        }
+        return (SchedulerInterface) scheduler;
+    }
+
+    private static boolean checkProperties(Properties properties) {
+        return propertiesContainsAll(properties,
+                AppPropertiesConstants.IMPLEMENTATION_INFRA_PROVIDER,
+                AppPropertiesConstants.INFRA_RESOURCE_IDLE_LIFETIME,
+                AppPropertiesConstants.INFRA_IS_STATIC,
+                AppPropertiesConstants.INFRA_AUTH_TOKEN_UPDATE_PLUGIN);
+    }
+
+    private static boolean propertiesContainsAll(Properties properties,
+                                                 String... wantedProperties) {
+        for (String property : wantedProperties) {
+            if (!properties.containsKey(property)) {
+                LOGGER.error("Required property " + property + " was not set");
+                return false;
+            }
+        }
+        LOGGER.debug("All properties are set");
+        return true;
+    }
+
+    public BlowoutPool getBlowoutPool() {
+        return this.blowoutPool;
+    }
+
+    public void setBlowoutPool(BlowoutPool blowoutPool) {
+        this.blowoutPool = blowoutPool;
+    }
+
+    public TaskMonitor getTaskMonitor() {
+        return taskMonitor;
+    }
+
+    public void setTaskMonitor(TaskMonitor taskMonitor) {
+        this.taskMonitor = taskMonitor;
+    }
+
+    public SchedulerInterface getSchedulerInterface() {
+        return schedulerInterface;
+    }
+
+    public void setSchedulerInterface(SchedulerInterface schedulerInterface) {
+        this.schedulerInterface = schedulerInterface;
+    }
+
+    public InfrastructureProvider getInfraProvider() {
+        return infraProvider;
+    }
+
+    public void setInfraProvider(InfrastructureProvider infraProvider) {
+        this.infraProvider = infraProvider;
+    }
+
+    public InfrastructureManager getInfraManager() {
+        return infraManager;
+    }
+
+    public void setInfraManager(InfrastructureManager infraManager) {
+        this.infraManager = infraManager;
+    }
+
+    public ResourceMonitor getResourceMonitor() {
+        return resourceMonitor;
+    }
+
+    public void setResourceMonitor(ResourceMonitor resourceMonitor) {
+        this.resourceMonitor = resourceMonitor;
+    }
+
+    public boolean isStarted() {
+        return started;
+    }
+
+    public void setStarted(boolean started) {
+        this.started = started;
+    }
+
+    public int getTaskRetries(String taskId) {
+        Task task = null;
+        for (Task t : blowoutPool.getAllTasks()) {
+            if (t.getId().equals(taskId)) {
+                task = t;
+            }
+        }
+        if (task == null) {
+            return 0;
+        } else {
+            return task.getRetries();
+        }
+    }
+
+    TaskMonitor createTaskMonitor(BlowoutPool blowoutPool, long taskMonitorPeriod) {
+        TaskMonitor taskMonitor = new TaskMonitor(blowoutPool, taskMonitorPeriod);
+        taskMonitor.start();
+        return taskMonitor;
+    }
+
+    ResourceMonitor createResourceMonitor(InfrastructureProvider infraProvider, BlowoutPool blowoutPool, Properties properties) {
+        ResourceMonitor resourceMonitor = new ResourceMonitor(
+                infraProvider,
+                blowoutPool,
+                properties
+        );
+        resourceMonitor.start();
+        return resourceMonitor;
+    }
 }

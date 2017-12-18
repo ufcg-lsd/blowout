@@ -1,5 +1,6 @@
 package org.fogbowcloud.blowout.core.monitor;
 
+import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.model.Task;
 import org.fogbowcloud.blowout.core.model.TaskProcess;
 import org.fogbowcloud.blowout.core.model.TaskProcessImpl;
@@ -16,6 +17,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class TaskMonitor implements Runnable {
+
+    private static final Logger LOGGER = Logger.getLogger(TaskMonitor.class);
 
 	private ExecutorService taskExecutor;
 	private Thread monitoringServiceRunner;
@@ -34,11 +37,17 @@ public class TaskMonitor implements Runnable {
 
 	public void start() {
 		this.active = true;
-		this.monitoringServiceRunner = new Thread(this);
-		this.monitoringServiceRunner.start();
+		this.monitoringServiceRunner = startRunner();
 	}
 
-	public void stop() {
+    private Thread startRunner() {
+        Thread t = new Thread(this);
+        t.start();
+        return t;
+    }
+
+    public void stop() {
+        LOGGER.info("Stopping Task Monitor");
 		this.active = false;
 		this.taskExecutor.shutdownNow();
 		this.monitoringServiceRunner.interrupt();
@@ -46,12 +55,13 @@ public class TaskMonitor implements Runnable {
 
 	@Override
 	public void run() {
+	    LOGGER.info("Starting task monitor");
 		while (active) {
 			procMon();
 			try {
 				Thread.sleep(timeout);
 			} catch (InterruptedException e) {
-				// do nothing
+			    LOGGER.debug("Task monitor was interrupted");
 			}
 		}
 	}
@@ -68,7 +78,7 @@ public class TaskMonitor implements Runnable {
 					this.updateResource(resource, ResourceState.FAILED);
 				}
 			}
-			if (taskProcessState.equals(TaskState.FINNISHED)) {
+			if (taskProcessState.equals(TaskState.FINISHED)) {
 				Task task = this.getTaskById(taskProcess.getTaskId());
 				task.finish();
 				this.removeRunningTask(task);
@@ -171,4 +181,8 @@ public class TaskMonitor implements Runnable {
 	private TaskProcess getTaskProcess(Task task) {
 		return this.runningTasks.get(task);
 	}
+
+    public boolean isRunning() {
+        return monitoringServiceRunner != null && monitoringServiceRunner.isAlive();
+    }
 }

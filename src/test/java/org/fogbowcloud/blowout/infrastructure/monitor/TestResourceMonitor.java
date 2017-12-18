@@ -16,8 +16,10 @@ import org.fogbowcloud.blowout.infrastructure.provider.InfrastructureProvider;
 import org.fogbowcloud.blowout.pool.AbstractResource;
 import org.fogbowcloud.blowout.pool.BlowoutPool;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 public class TestResourceMonitor {
@@ -27,7 +29,7 @@ public class TestResourceMonitor {
 	private BlowoutPool resourcePool;
 	
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
 		
 		infraProvider = Mockito.mock(InfrastructureProvider.class);
 		resourcePool = Mockito.mock(BlowoutPool.class);
@@ -40,14 +42,14 @@ public class TestResourceMonitor {
 	}
 
 	@After
-	public void setDown() throws Exception {
+	public void setDown() {
 
 	}
 
 	@Test
-	public void testProcessPendingResource() throws Exception {
+	public void testProcessPendingResource() {
 
-		List<AbstractResource> resources = new ArrayList<AbstractResource>();
+		List<AbstractResource> resources = new ArrayList<>();
 		
 		String resourceId = "resourceA";
 		String orderId = "orderA";
@@ -60,7 +62,7 @@ public class TestResourceMonitor {
 		doReturn(resource).when(infraProvider).getResource(resourceId);
 		
 		resourceMonitor.addPendingResource(resourceId, specA);
-		resourceMonitor.getMonitoringService().monitorProcess();
+		resourceMonitor.monitorProcess();
 		
 		verify(resourcePool, times(1)).addResource(resource);
 		assertTrue(resourceMonitor.getPendingResources().isEmpty());
@@ -68,9 +70,9 @@ public class TestResourceMonitor {
 	}
 	
 	@Test
-	public void testProcessTwoPendingResourceOnReady() throws Exception {
+	public void testProcessTwoPendingResourceOnReady() {
 
-		List<AbstractResource> resources = new ArrayList<AbstractResource>();
+		List<AbstractResource> resources = new ArrayList<>();
 		
 		String resourceIdA = "resourceA";
 		String orderIdA = "orderA";
@@ -87,13 +89,23 @@ public class TestResourceMonitor {
 		
 		resourceMonitor.addPendingResource(resourceIdA, spec);
 		resourceMonitor.addPendingResource(resourceIdB, spec);
-		resourceMonitor.getMonitoringService().monitorProcess();
+		resourceMonitor.monitorProcess();
 		
 		verify(resourcePool, times(1)).addResource(resource);
 		assertEquals(1, resourceMonitor.getPendingResources().size());
 
 	}
-	
-	
-	
+
+	@Test
+	public void testStopThread() throws InterruptedException {
+		Mockito.doNothing().when(resourceMonitor).getPreviousResources();
+		Mockito.doNothing().when(resourceMonitor).monitorProcess();
+		Assert.assertFalse("Task monitor shouldn't have started yet", resourceMonitor.isRunning());
+		resourceMonitor.start();
+		Thread.yield();
+		Assert.assertTrue("Task monitor should have started yet", resourceMonitor.isRunning());
+		resourceMonitor.stop();
+		Thread.sleep(100);
+		Assert.assertFalse("Task monitor should have stopped", resourceMonitor.isRunning());
+	}
 }

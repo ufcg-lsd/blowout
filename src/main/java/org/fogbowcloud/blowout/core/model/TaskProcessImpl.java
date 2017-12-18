@@ -14,17 +14,15 @@ public class TaskProcessImpl implements TaskProcess {
 
 	private static final Logger LOGGER = Logger.getLogger(TaskProcessImpl.class);
 
-	public static final String ENV_HOST = "HOST";
-	public static final String ENV_SSH_PORT = "SSH_PORT";
-	public static final String ENV_SSH_USER = "SSH_USER";
-	public static final String ENV_PRIVATE_KEY_FILE = "PRIVATE_KEY_FILE";
+	private static final String ENV_HOST = "HOST";
+	private static final String ENV_SSH_PORT = "SSH_PORT";
+	private static final String ENV_SSH_USER = "SSH_USER";
+	private static final String ENV_PRIVATE_KEY_FILE = "PRIVATE_KEY_FILE";
 
-	public static final String METADATA_SSH_HOST = "metadataSSHHost";
-	public static final String METADATA_SSH_PORT = "metadataSSHPort";
-	public static final String METADATA_SSH_USERNAME_ATT = "metadateSshUsername";
-	public static final String METADATA_EXTRA_PORTS_ATT = "metadateExtraPorts";
+	private static final String METADATA_SSH_HOST = "metadataSSHHost";
+	private static final String METADATA_SSH_PORT = "metadataSSHPort";
 
-	public static final String UserID = "UUID";
+	private static final String UserID = "UUID";
 
 	private final String taskId;
 	private TaskState status;
@@ -75,7 +73,7 @@ public class TaskProcessImpl implements TaskProcess {
 		}
 		if (!this.getStatus().equals(TaskState.FAILED)
 				&& !this.getStatus().equals(TaskState.TIMEDOUT)) {
-			this.setStatus(TaskState.FINNISHED);
+			this.setStatus(TaskState.FINISHED);
 		}
 
 		return taskExecutionResult;
@@ -89,7 +87,7 @@ public class TaskProcessImpl implements TaskProcess {
 			AbstractResource resource) {
 
 		TaskExecutionResult taskExecutionResult = new TaskExecutionResult();
-		int returnValue = TaskExecutionResult.NOK;
+		int returnValue;
 
 		Map<String, String> additionalVariables = getAdditionalEnvVariables(resource);
 		try {
@@ -155,15 +153,14 @@ public class TaskProcessImpl implements TaskProcess {
 	}
 
 	protected Map<String, String> getAdditionalEnvVariables(AbstractResource resource) {
-
-		Map<String, String> additionalEnvVar = new HashMap<String, String>();
+		Map<String, String> additionalEnvVar = new HashMap<>();
 
 		additionalEnvVar.put(ENV_HOST, resource.getMetadataValue(METADATA_SSH_HOST));
 		additionalEnvVar.put(ENV_SSH_PORT, resource.getMetadataValue(METADATA_SSH_PORT));
 		LOGGER.debug(ENV_HOST + ": " + resource.getMetadataValue(METADATA_SSH_HOST));
 		LOGGER.debug(ENV_SSH_PORT + ": " + resource.getMetadataValue(METADATA_SSH_PORT));
 
-		String envSSHUser = null;
+		String envSSHUser;
 		if (this.spec.getUsername() != null && !this.spec.getUsername().trim().isEmpty()) {
 			envSSHUser = this.spec.getUsername();
 		} else {
@@ -192,7 +189,7 @@ public class TaskProcessImpl implements TaskProcess {
 
 	@Override
 	public List<Command> getCommands() {
-		return new ArrayList<Command>(this.commandList);
+		return new ArrayList<>(this.commandList);
 	}
 
 	@Override

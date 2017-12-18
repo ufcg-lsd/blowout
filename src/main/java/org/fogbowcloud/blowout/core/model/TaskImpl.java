@@ -20,8 +20,14 @@ public class TaskImpl implements Task {
 
 	private static final Logger LOGGER = Logger.getLogger(TaskImpl.class);
 
-	public static final String METADATA_TASK_TIMEOUT = "task_timeout";
-	public static final String METADATA_MAX_RESOURCE_CONN_RETRIES = "max_conn_retries";
+    public static final String METADATA_TASK_TIMEOUT = "task_timeout";
+    public static final String METADATA_MAX_RESOURCE_CONN_RETRIES = "max_conn_retries";
+    // The constants below are used on Arrebol
+    // TODO? move them into arrebol
+	public static final String METADATA_REMOTE_OUTPUT_FOLDER = "remote_output_folder";
+	public static final String METADATA_LOCAL_OUTPUT_FOLDER = "local_output_folder";
+	public static final String METADATA_SANDBOX = "sandbox";
+	public static final String METADATA_REMOTE_COMMAND_EXIT_PATH = "remote_command_exit_path";
 
 	private String id;
 	private Specification spec;

@@ -15,8 +15,8 @@ public class DefaultBlowoutPool implements BlowoutPool {
 
 	public static final Logger LOGGER = Logger.getLogger(DefaultBlowoutPool.class);
 
-	private Map<String, AbstractResource> resourcePool = new ConcurrentHashMap<String, AbstractResource>();
-	private List<Task> taskPool = new ArrayList<Task>();
+	private Map<String, AbstractResource> resourcePool = new ConcurrentHashMap<>();
+	private List<Task> taskPool = new ArrayList<>();
 	private InfrastructureManager infraManager;
 	private SchedulerInterface schedulerInterface;
 
@@ -92,7 +92,7 @@ public class DefaultBlowoutPool implements BlowoutPool {
 
 	@Override
 	public List<Task> getAllTasks() {
-		return new ArrayList<Task>(this.taskPool);
+		return new ArrayList<>(this.taskPool);
 	}
 
 	@Override

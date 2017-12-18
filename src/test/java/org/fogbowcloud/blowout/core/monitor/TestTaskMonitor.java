@@ -32,6 +32,7 @@ import org.fogbowcloud.blowout.pool.DefaultBlowoutPool;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 
 public class TestTaskMonitor {
@@ -45,7 +46,7 @@ public class TestTaskMonitor {
 	@Before
 	public void setUp(){
 		pool = mock(BlowoutPool.class);
-		this.taskMon = spy(new TaskMonitor(pool, 0));
+		this.taskMon = spy(new TaskMonitor(pool, 100));
 		spec = mock(Specification.class);
 	}
 	
@@ -78,7 +79,7 @@ public class TestTaskMonitor {
 	public void testGetTaskStateCompleted() {
 		// set up
 		TaskImpl taskImpl = new TaskImpl("task-id", spec, FAKE_UUID);
-		taskImpl.setState(TaskState.FINNISHED);
+		taskImpl.setState(TaskState.FINISHED);
 		taskImpl.finish();
 		
 		Map<Task, TaskProcess> runningTasks = mock(Map.class);
@@ -141,7 +142,7 @@ public class TestTaskMonitor {
 		
 		taskProcessOne.setResource(resourceOne);
 		
-		taskProcessOne.setStatus(TaskState.FINNISHED);
+		taskProcessOne.setStatus(TaskState.FINISHED);
 		
 		Map<Task, TaskProcess> runningTasks = new HashMap<>();
 		runningTasks.put(taskOne, taskProcessOne);
@@ -199,7 +200,7 @@ public class TestTaskMonitor {
 	public void testProcMonProcFinnished() {
 		Task fakeTask = mock(Task.class);
 		TaskProcess fakeProcess = mock(TaskProcess.class);
-		doReturn(TaskState.FINNISHED).when(fakeProcess).getStatus();
+		doReturn(TaskState.FINISHED).when(fakeProcess).getStatus();
 		AbstractResource fakeResource = mock(AbstractResource.class);
 		doReturn(FAKE_ID).when(fakeTask).getId();
 		doReturn(FAKE_ID).when(fakeProcess).getTaskId();
@@ -237,6 +238,18 @@ public class TestTaskMonitor {
 		doReturn(runningTasks).when(this.taskMon).getRunningTasks();
 		
 		this.taskMon.runTask(fakeTask, fakeResource);
+	}
+
+	@Test
+	public void testStopThread() throws InterruptedException {
+        Mockito.doNothing().when(taskMon).procMon();
+        Assert.assertFalse("Task monitor shouldn't have started yet", taskMon.isRunning());
+        taskMon.start();
+        Thread.yield();
+        Assert.assertTrue("Task monitor should have started yet", taskMon.isRunning());
+        taskMon.stop();
+        Thread.sleep(100);
+        Assert.assertFalse("Task monitor should have stopped", taskMon.isRunning());
 	}
 	
 }

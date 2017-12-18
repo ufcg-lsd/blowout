@@ -1,15 +1,5 @@
 package org.fogbowcloud.blowout.infrastructure.monitor;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
@@ -19,283 +9,275 @@ import org.fogbowcloud.blowout.pool.AbstractResource;
 import org.fogbowcloud.blowout.pool.BlowoutPool;
 import org.fogbowcloud.manager.occi.order.OrderType;
 
-public class ResourceMonitor {
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
-	private static final Logger LOGGER = Logger.getLogger(ResourceMonitor.class);
+public class ResourceMonitor implements Runnable {
 
-	private InfrastructureProvider infraProvider;
-	private BlowoutPool resourcePool;
-	private Map<String, Long> idleResources = new ConcurrentHashMap<String, Long>();
-	private Map<String, Specification> pendingResources = new ConcurrentHashMap<String, Specification>();
+    private static final Logger LOGGER = Logger.getLogger(ResourceMonitor.class);
 
-	private MonitoringService monitoringService;
-	private Thread monitoringServiceRunner;
-	private Long infraMonitoringPeriod;
-	private Long idleLifeTime;
-	private int maxConnectionTries;
-	private int maxReuse;
+    private InfrastructureProvider infraProvider;
+    private BlowoutPool resourcePool;
+    private Map<String, Long> idleResources = new ConcurrentHashMap<>();
+    private Map<String, Specification> pendingResources = new ConcurrentHashMap<>();
 
-	public ResourceMonitor(InfrastructureProvider infraProvider, BlowoutPool blowoutPool,
-			Properties properties) {
+    private Thread monitoringServiceRunner;
+    private Long infraMonitoringPeriod;
+    private Long idleLifeTime;
+    private int maxConnectionTries;
+    private int maxReuse;
 
-		this.infraProvider = infraProvider;
-		this.resourcePool = blowoutPool;
+    private boolean paused = false;
+    private boolean active = true;
 
-		String defaultInfraMonitorPeriod = "30000";
-		String defaultIdleLifeTime = "0";
-		String defaultMaxConnectTries = "1";
-		String defaultMaxReuse = "1";
+    public ResourceMonitor(InfrastructureProvider infraProvider, BlowoutPool blowoutPool,
+                           Properties properties) {
 
-		this.infraMonitoringPeriod = Long.parseLong(properties.getProperty(
-				AppPropertiesConstants.INFRA_MONITOR_PERIOD, defaultInfraMonitorPeriod));
-		this.idleLifeTime = Long.parseLong(properties.getProperty(
-				AppPropertiesConstants.INFRA_RESOURCE_IDLE_LIFETIME, defaultIdleLifeTime));
-		this.maxConnectionTries = Integer.parseInt(properties.getProperty(
-				AppPropertiesConstants.INFRA_RESOURCE_CONNECTION_RETRY, defaultMaxConnectTries));
-		this.maxReuse = Integer.parseInt(properties
-				.getProperty(AppPropertiesConstants.INFRA_RESOURCE_REUSE_TIMES, defaultMaxReuse));
+        this.infraProvider = infraProvider;
+        this.resourcePool = blowoutPool;
 
-		this.monitoringService = new MonitoringService();
-		this.monitoringServiceRunner = new Thread(this.monitoringService);
-	}
+        String defaultInfraMonitorPeriod = "30000";
+        String defaultIdleLifeTime = "0";
+        String defaultMaxConnectTries = "1";
+        String defaultMaxReuse = "1";
 
-	public void start() {
-		LOGGER.warn("Starting Resource Monitor");
-		this.getPreviousResources();
-		this.monitoringServiceRunner.start();
-	}
+        this.infraMonitoringPeriod = Long.parseLong(properties.getProperty(
+                AppPropertiesConstants.INFRA_MONITOR_PERIOD, defaultInfraMonitorPeriod));
+        this.idleLifeTime = Long.parseLong(properties.getProperty(
+                AppPropertiesConstants.INFRA_RESOURCE_IDLE_LIFETIME, defaultIdleLifeTime));
+        this.maxConnectionTries = Integer.parseInt(properties.getProperty(
+                AppPropertiesConstants.INFRA_RESOURCE_CONNECTION_RETRY, defaultMaxConnectTries));
+        this.maxReuse = Integer.parseInt(properties
+                .getProperty(AppPropertiesConstants.INFRA_RESOURCE_REUSE_TIMES, defaultMaxReuse));
+    }
 
-	private void getPreviousResources() {
-		List<AbstractResource> previousResources = this.infraProvider.getAllResources();
-		for(AbstractResource resource : previousResources) {
-			this.pendingResources.put(resource.getId(), resource.getRequestedSpec());
-		}
-	}
+    public void start() {
+        LOGGER.info("Starting Resource Monitor");
+        this.getPreviousResources();
+        this.monitoringServiceRunner = startRunner();
+    }
 
-	public void stop() {
-		LOGGER.warn("Stopping Resource Monitor");
-		if (this.monitoringService.isPaused()) {
-			this.monitoringService.resume();
-		}
-		this.monitoringService.stop();
-		this.monitoringServiceRunner.interrupt();
+    private Thread startRunner() {
+        Thread t = new Thread(this);
+        t.start();
+        return t;
+    }
 
-		this.deletePendingResources();
-		this.deleteAllocatedResources();
-	}
+    public void getPreviousResources() {
+        List<AbstractResource> previousResources = this.infraProvider.getAllResources();
+        for (AbstractResource resource : previousResources) {
+            this.pendingResources.put(resource.getId(), resource.getRequestedSpec());
+        }
+    }
 
-	private void deletePendingResources() {
-		for (String pendingResourceId : this.pendingResources.keySet()) {
-			try {
-				this.infraProvider.deleteResource(pendingResourceId);
-			} catch (Exception e) {
-				LOGGER.error("Was not possible delete the pending resource [" + pendingResourceId
-						+ "], see the Fogbow Dashboard to delete manually", e);
-			}
-		}
-	}
+    public void stop() {
+        LOGGER.info("Stopping Resource Monitor");
+        active = false;
+        resume();
 
-	private void deleteAllocatedResources() {
-		for (AbstractResource resource : this.resourcePool.getAllResources()) {
-			try {
-				this.infraProvider.deleteResource(resource.getId());
-			} catch (Exception e) {
-				LOGGER.error("Was not possible delete the allocated resources [" + resource.getId()
-						+ "], see the Fogbow Dashboard to delete manually", e);
-			}
-		}
-	}
+        this.monitoringServiceRunner.interrupt();
 
-	public void addPendingResource(String resourceId, Specification spec) {
-		this.pendingResources.put(resourceId, spec);
-		if (this.monitoringService.isPaused()) {
-			this.monitoringService.resume();
-		}
-	}
 
-	protected class MonitoringService implements Runnable {
+        this.deletePendingResources();
+        this.deleteAllocatedResources();
+    }
 
-		private boolean paused = false;
-		private boolean active = true;
+    private void deletePendingResources() {
+        for (String pendingResourceId : this.pendingResources.keySet()) {
+            try {
+                this.infraProvider.deleteResource(pendingResourceId);
+            } catch (Exception e) {
+                LOGGER.error("Was not possible delete the pending resource [" + pendingResourceId
+                        + "], see the Fogbow Dashboard to delete manually", e);
+            }
+        }
+    }
 
-		@Override
-		public void run() {
-			while (this.active) {
-				try {
-					this.monitorProcess();
-					Thread.sleep(infraMonitoringPeriod);
-				} catch (InterruptedException e) {
-					LOGGER.debug("MonitoringService interrupted");
-				}
-			}
-		}
+    private void deleteAllocatedResources() {
+        for (AbstractResource resource : this.resourcePool.getAllResources()) {
+            try {
+                this.infraProvider.deleteResource(resource.getId());
+            } catch (Exception e) {
+                LOGGER.error("Was not possible delete the allocated resources [" + resource.getId()
+                        + "], see the Fogbow Dashboard to delete manually", e);
+            }
+        }
+    }
 
-		protected void monitorProcess() {
-			this.monitoringPendingResources();
-			this.monitoringResources(resourcePool.getAllResources());
-		}
+    public void addPendingResource(String resourceId, Specification spec) {
+        this.pendingResources.put(resourceId, spec);
+        if (this.isPaused()) {
+            this.resume();
+        }
+    }
 
-		private void monitoringPendingResources() {
-			for (String resourceId : getPendingResources()) {
-				AbstractResource resource = infraProvider.getResource(resourceId);
-				if (resource != null) {
-					pendingResources.remove(resourceId);
-					resourcePool.addResource(resource);
-				}
-			}
-		}
+    @Override
+    public void run() {
+        while (this.active) {
+            try {
+                this.monitorProcess();
+                Thread.sleep(infraMonitoringPeriod);
+            } catch (InterruptedException e) {
+                LOGGER.debug("MonitoringService interrupted");
+            }
+        }
+    }
 
-		private void monitoringResources(List<AbstractResource> resources) {
+    public void monitorProcess() {
+        this.monitoringPendingResources();
+        this.monitoringResources(resourcePool.getAllResources());
+    }
 
-			for (AbstractResource resource : resources) {
+    private void monitoringPendingResources() {
+        for (String resourceId : getPendingResources()) {
+            AbstractResource resource = infraProvider.getResource(resourceId);
+            if (resource != null) {
+                pendingResources.remove(resourceId);
+                resourcePool.addResource(resource);
+            }
+        }
+    }
 
-				if (ResourceState.IDLE.equals(resource.getState())) {
-					this.resolveIdleResource(resource);
-				} else if (ResourceState.BUSY.equals(resource.getState())) {
-					idleResources.remove(resource.getId());
-				} else if (ResourceState.FAILED.equals(resource.getState())) {
-					idleResources.remove(resource.getId());
-					boolean isAlive = this.checkResourceConnectivity(resource);
-					if (isAlive) {
-						Long expirationDate = this.canMoveResourceToIdle(resource);
-						this.moveResourceToIdle(resource, expirationDate);
-					}
-				} else if (ResourceState.TO_REMOVE.equals(resource.getState())) {
-					try {
-						idleResources.remove(resource.getId());
-						infraProvider.deleteResource(resource.getId());
-						resourcePool.removeResource(resource);
-					} catch (Exception e) {
-						LOGGER.error("Error while tring to remove resource " + resource.getId(), e);
-					}
-				}
-			}
-		}
+    private void monitoringResources(List<AbstractResource> resources) {
 
-		private void resolveIdleResource(AbstractResource resource) {
+        for (AbstractResource resource : resources) {
 
-			Long expirationDateTime = idleResources.get(resource.getId());
+            if (ResourceState.IDLE.equals(resource.getState())) {
+                this.resolveIdleResource(resource);
+            } else if (ResourceState.BUSY.equals(resource.getState())) {
+                idleResources.remove(resource.getId());
+            } else if (ResourceState.FAILED.equals(resource.getState())) {
+                idleResources.remove(resource.getId());
+                boolean isAlive = this.checkResourceConnectivity(resource);
+                if (isAlive) {
+                    Long expirationDate = this.canMoveResourceToIdle(resource);
+                    this.moveResourceToIdle(resource, expirationDate);
+                }
+            } else if (ResourceState.TO_REMOVE.equals(resource.getState())) {
+                try {
+                    idleResources.remove(resource.getId());
+                    infraProvider.deleteResource(resource.getId());
+                    resourcePool.removeResource(resource);
+                } catch (Exception e) {
+                    LOGGER.error("Error while tring to remove resource " + resource.getId(), e);
+                }
+            }
+        }
+    }
 
-			if (expirationDateTime == null) {
-				Long expirationDate = this.canMoveResourceToIdle(resource);
-				this.moveResourceToIdle(resource, expirationDate);
-			} else {
+    private void resolveIdleResource(AbstractResource resource) {
 
-				if (this.isSameRequestType(resource)) {
+        Long expirationDateTime = idleResources.get(resource.getId());
 
-					boolean isAlive = this.checkResourceConnectivity(resource);
-					if (isAlive) {
-						Date expirationDate = new Date(expirationDateTime);
-						Date currentDate = new Date();
+        if (expirationDateTime == null) {
+            Long expirationDate = this.canMoveResourceToIdle(resource);
+            this.moveResourceToIdle(resource, expirationDate);
+        } else {
 
-						if (expirationDate.before(currentDate)) {
-							LOGGER.warn("Removing resource " + resource.getId()
-									+ " due Idle time expired.");
-							idleResources.remove(resource.getId());
-							resourcePool.updateResource(resource, ResourceState.TO_REMOVE);
-						}
-					}
-				}
-			}
-		}
+            if (this.isSameRequestType(resource)) {
 
-		private void moveResourceToIdle(AbstractResource resource, Long expirationDate) {
-			if (expirationDate != null) {
-				idleResources.put(resource.getId(), expirationDate);
-				resourcePool.updateResource(resource, ResourceState.IDLE);
-			} else {
-				resourcePool.updateResource(resource, ResourceState.TO_REMOVE);
-			}
-		}
+                boolean isAlive = this.checkResourceConnectivity(resource);
+                if (isAlive) {
+                    Date expirationDate = new Date(expirationDateTime);
+                    Date currentDate = new Date();
 
-		private Long canMoveResourceToIdle(AbstractResource resource) {
-			// TODO: Check the following options for maxReuse problem
-			// 1. See if it's viable to only mark resource as TO_REMOVE
-			// if there's no task processes READY or RUNNING
-			// 2. Make maxReuse indefinite by default and not one
-			// 3. Always reuse instance
-			if (resource.getReusedTimes() < maxReuse) {
-				Calendar calendar = Calendar.getInstance();
-				calendar.setTime(new Date());
-				calendar.add(Calendar.MILLISECOND, idleLifeTime.intValue());
-				return calendar.getTimeInMillis();
-			} else {
-				return null;
-			}
-		}
+                    if (expirationDate.before(currentDate)) {
+                        LOGGER.warn("Removing resource " + resource.getId()
+                                + " due Idle time expired.");
+                        idleResources.remove(resource.getId());
+                        resourcePool.updateResource(resource, ResourceState.TO_REMOVE);
+                    }
+                }
+            }
+        }
+    }
 
-		private boolean checkResourceConnectivity(AbstractResource resource) {
-			if (!resource.checkConnectivity()) {
-				if (resource.getConnectionFailTries() >= maxConnectionTries) {
-					resourcePool.updateResource(resource, ResourceState.TO_REMOVE);
-				} else {
-					resourcePool.updateResource(resource, ResourceState.FAILED);
-				}
-				return false;
-			}
-			return true;
-		}
+    private void moveResourceToIdle(AbstractResource resource, Long expirationDate) {
+        if (expirationDate != null) {
+            idleResources.put(resource.getId(), expirationDate);
+            resourcePool.updateResource(resource, ResourceState.IDLE);
+        } else {
+            resourcePool.updateResource(resource, ResourceState.TO_REMOVE);
+        }
+    }
 
-		private boolean isSameRequestType(AbstractResource resource) {
-			String requestType = resource.getMetadataValue(AbstractResource.METADATA_REQUEST_TYPE);
+    private Long canMoveResourceToIdle(AbstractResource resource) {
+        // TODO: Check the following options for maxReuse problem
+        // 1. See if it's viable to only mark resource as TO_REMOVE
+        // if there's no task processes READY or RUNNING
+        // 2. Make maxReuse indefinite by default and not one
+        // 3. Always reuse instance
+        if (resource.getReusedTimes() < maxReuse) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(new Date());
+            calendar.add(Calendar.MILLISECOND, idleLifeTime.intValue());
+            return calendar.getTimeInMillis();
+        } else {
+            return null;
+        }
+    }
 
-			return OrderType.ONE_TIME.getValue().equals(requestType);
-		}
+    private boolean checkResourceConnectivity(AbstractResource resource) {
+        if (!resource.checkConnectivity()) {
+            if (resource.getConnectionFailTries() >= maxConnectionTries) {
+                resourcePool.updateResource(resource, ResourceState.TO_REMOVE);
+            } else {
+                resourcePool.updateResource(resource, ResourceState.FAILED);
+            }
+            return false;
+        }
+        return true;
+    }
 
-		public void checkIsPaused() throws InterruptedException {
-			synchronized (this) {
-				while (this.paused) {
-					super.wait();
-				}
-			}
-		}
+    private boolean isSameRequestType(AbstractResource resource) {
+        String requestType = resource.getMetadataValue(AbstractResource.METADATA_REQUEST_TYPE);
 
-		public synchronized void stop() {
-			if (this.paused) {
-				this.resume();
-			}
-			this.active = false;
-		}
+        return OrderType.ONE_TIME.getValue().equals(requestType);
+    }
 
-		public synchronized void pause() {
-			this.paused = true;
-		}
+    public void checkIsPaused() throws InterruptedException {
+        synchronized (this) {
+            while (this.paused) {
+                super.wait();
+            }
+        }
+    }
 
-		public synchronized void resume() {
-			this.paused = false;
-			super.notify();
-		}
+    public synchronized void pause() {
+        this.paused = true;
+    }
 
-		public boolean isPaused() {
-			return this.paused;
-		}
-	}
+    private synchronized void resume() {
+        this.paused = false;
+        super.notify();
+    }
 
-	public Map<Specification, Integer> getPendingRequests() {
-		Map<Specification, Integer> specCount = new HashMap<>();
-		for (Entry<String, Specification> e : this.pendingResources.entrySet()) {
-			if (specCount.containsKey(e.getValue())) {
-				specCount.put(e.getValue(), specCount.get(e.getValue()) + 1);
-			} else {
-				specCount.put(e.getValue(), 1);
-			}
-		}
-		return specCount;
-	}
+    public boolean isPaused() {
+        return this.paused;
+    }
 
-	protected void setMonitoringService(MonitoringService monitoringService) {
-		this.monitoringService = monitoringService;
-	}
+    public Map<Specification, Integer> getPendingRequests() {
+        Map<Specification, Integer> specCount = new HashMap<>();
+        for (Entry<String, Specification> e : this.pendingResources.entrySet()) {
+            if (specCount.containsKey(e.getValue())) {
+                specCount.put(e.getValue(), specCount.get(e.getValue()) + 1);
+            } else {
+                specCount.put(e.getValue(), 1);
+            }
+        }
+        return specCount;
+    }
 
-	protected MonitoringService getMonitoringService() {
-		return this.monitoringService;
-	}
+    public List<String> getPendingResources() {
+        return new ArrayList<>(this.pendingResources.keySet());
+    }
 
-	public List<String> getPendingResources() {
-		return new ArrayList<>(this.pendingResources.keySet());
-	}
+    public List<Specification> getPendingSpecification() {
+        return new ArrayList<>(this.pendingResources.values());
+    }
 
-	public List<Specification> getPendingSpecification() {
-		return new ArrayList<>(this.pendingResources.values());
-	}
+    public boolean isRunning() {
+        return monitoringServiceRunner != null && monitoringServiceRunner.isAlive();
+    }
 }

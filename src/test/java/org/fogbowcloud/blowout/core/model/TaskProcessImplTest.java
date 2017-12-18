@@ -38,7 +38,7 @@ public class TaskProcessImplTest {
 		tp.executeTask(resource);
 
 		verify(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
-		assertEquals(tp.getStatus(), TaskState.FINNISHED);
+		assertEquals(tp.getStatus(), TaskState.FINISHED);
 	}
 
 	@Test
@@ -84,7 +84,7 @@ public class TaskProcessImplTest {
 		verify(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
 		verify(tp).executeCommandString(FAKE_COMMAND2, Command.Type.LOCAL, resource);
 		verify(tp).executeCommandString(FAKE_COMMAND3, Command.Type.LOCAL, resource);
-		assertEquals(tp.getStatus(), TaskState.FINNISHED);
+		assertEquals(tp.getStatus(), TaskState.FINISHED);
 	}
 
 	@Test
