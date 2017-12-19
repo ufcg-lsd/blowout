@@ -78,14 +78,12 @@ public class DefaultBlowoutPool implements BlowoutPool {
 
 	@Override
 	public void putTask(Task task) {
-
 		this.taskPool.add(task);
 		this.callAct();
 	}
 
 	@Override
 	public void addTasks(List<Task> tasks) {
-
 		this.taskPool.addAll(tasks);
 		this.callAct();
 	}

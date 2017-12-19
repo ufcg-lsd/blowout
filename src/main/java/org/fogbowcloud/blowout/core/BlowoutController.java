@@ -24,7 +24,6 @@ public class BlowoutController {
     private BlowoutPool blowoutPool;
 
     private SchedulerInterface schedulerInterface;
-    private ScheduledExecutorService executorService;
     private TaskMonitor taskMonitor;
 
     private InfrastructureProvider infraProvider;
@@ -81,7 +80,6 @@ public class BlowoutController {
     }
 
     public void stop() {
-        executorService.shutdownNow();
         this.taskMonitor.stop();
         this.resourceMonitor.stop();
 
@@ -145,9 +143,8 @@ public class BlowoutController {
 
         Class<?> infraProviderClass = Class.forName(infraProviderClassName);
 
-        executorService = Executors.newScheduledThreadPool(1);
         Object infraProvider = infraProviderClass.getConstructor(Properties.class, Boolean.TYPE)
-                .newInstance(this.properties, executorService, removePreviousResouces);
+                .newInstance(this.properties, removePreviousResouces);
 
         if (!(infraProvider instanceof InfrastructureProvider)) {
             throw new Exception(
@@ -282,13 +279,13 @@ public class BlowoutController {
         }
     }
 
-    TaskMonitor createTaskMonitor(BlowoutPool blowoutPool, long taskMonitorPeriod) {
+    private TaskMonitor createTaskMonitor(BlowoutPool blowoutPool, long taskMonitorPeriod) {
         TaskMonitor taskMonitor = new TaskMonitor(blowoutPool, taskMonitorPeriod);
         taskMonitor.start();
         return taskMonitor;
     }
 
-    ResourceMonitor createResourceMonitor(InfrastructureProvider infraProvider, BlowoutPool blowoutPool, Properties properties) {
+    private ResourceMonitor createResourceMonitor(InfrastructureProvider infraProvider, BlowoutPool blowoutPool, Properties properties) {
         ResourceMonitor resourceMonitor = new ResourceMonitor(
                 infraProvider,
                 blowoutPool,

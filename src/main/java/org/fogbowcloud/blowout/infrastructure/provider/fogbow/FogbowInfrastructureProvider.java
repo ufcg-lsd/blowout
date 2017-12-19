@@ -85,6 +85,10 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
         this.handleTokenUpdate(handleTokenUpdateExecutor);
     }
 
+    public FogbowInfrastructureProvider(Properties properties, boolean cleanPrevious) throws Exception {
+        this(properties, Executors.newScheduledThreadPool(1), cleanPrevious);
+    }
+
     private void recoverLastSession(boolean cleanPrevious) {
         LOGGER.info("Recovering resources from previous session.");
         for (FogbowResource fogbowResource : this.frDatastore.getAllFogbowResources()) {
