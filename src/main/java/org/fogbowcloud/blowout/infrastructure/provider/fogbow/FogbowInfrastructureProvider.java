@@ -275,12 +275,6 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
                         this.managerUrl + "/compute/" + instanceId,
                         new ArrayList<Header>());
             }
-
-            LOGGER.debug("Removing resource [" + resourceId + "] from blowout database");
-            this.resourcesMap.remove(resourceId);
-            this.frDatastore.deleteFogbowResourceById(resourceId);
-
-            LOGGER.debug("Resource " + fogbowResource.getId() + " deleted successfully");
         } catch (Exception e) {
             if (e.getMessage() != null && e.getMessage().contains("Not Found")) {
                 LOGGER.debug("Resource [" + resourceId + "] was no longer available on manager at the time of the deletion request");
@@ -288,7 +282,13 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
                 throw new InfrastructureException(
                         "Error when trying to delete resource id[" + fogbowResource.getId() + "]", e);
             }
+        } finally {
+            LOGGER.debug("Removing resource [" + resourceId + "] from blowout database");
+            this.resourcesMap.remove(resourceId);
+            this.frDatastore.deleteFogbowResourceById(resourceId);
         }
+
+        LOGGER.debug("Resource " + fogbowResource.getId() + " deleted successfully");
     }
 
     protected Token createNewTokenFromFile(String certificateFilePath)

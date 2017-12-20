@@ -174,7 +174,8 @@ public class ResourceMonitor implements Runnable {
                     Long expirationDate = this.canMoveResourceToIdle(resource);
                     this.moveResourceToIdle(resource, expirationDate);
                 }
-            } else if (ResourceState.TO_REMOVE.equals(resource.getState())) {
+            }
+            if (ResourceState.TO_REMOVE.equals(resource.getState())) {
                 try {
                     idleResources.remove(resource.getId());
                     resourcePool.removeResource(resource);
