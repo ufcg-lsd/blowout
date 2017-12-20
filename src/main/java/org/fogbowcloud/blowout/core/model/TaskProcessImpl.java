@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.blowout.pool.AbstractResource;
+import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
 
 public class TaskProcessImpl implements TaskProcess {
 
@@ -53,15 +53,14 @@ public class TaskProcessImpl implements TaskProcess {
 
 		for (Command command : this.getCommands()) {
 			// FIXME: avoid multiple related log line when possible
-			LOGGER.debug("Command " + command.getCommand());
-			LOGGER.debug("Command Type " + command.getType());
+			LOGGER.trace("Command " + command.getCommand());
+			LOGGER.trace("Command Type " + command.getType());
 
 			String commandString = this.getExecutableCommandString(command);
 
-			taskExecutionResult = this.executeCommandString(commandString, command.getType(),
-					resource);
+			taskExecutionResult = this.executeCommandString(commandString, command.getType(), resource);
 
-			LOGGER.debug("Command result: " + taskExecutionResult.getExitValue());
+			LOGGER.trace("Command result: " + taskExecutionResult.getExitValue());
 			if (taskExecutionResult.getExitValue() != TaskExecutionResult.OK) {
 				if (taskExecutionResult.getExitValue() == TaskExecutionResult.TIMEOUT) {
 					this.setStatus(TaskState.TIMEDOUT);
@@ -215,5 +214,4 @@ public class TaskProcessImpl implements TaskProcess {
 	public Specification getSpecification() {
 		return this.spec;
 	}
-
 }

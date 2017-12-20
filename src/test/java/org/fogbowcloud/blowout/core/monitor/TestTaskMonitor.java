@@ -26,7 +26,7 @@ import org.fogbowcloud.blowout.core.model.TaskState;
 import org.fogbowcloud.blowout.infrastructure.manager.DefaultInfrastructureManager;
 import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
-import org.fogbowcloud.blowout.pool.AbstractResource;
+import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
 import org.fogbowcloud.blowout.pool.BlowoutPool;
 import org.fogbowcloud.blowout.pool.DefaultBlowoutPool;
 import org.junit.Assert;

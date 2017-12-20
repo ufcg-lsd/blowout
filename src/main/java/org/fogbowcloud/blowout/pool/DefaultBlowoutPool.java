@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.SchedulerInterface;
 import org.fogbowcloud.blowout.core.model.Task;
 import org.fogbowcloud.blowout.infrastructure.manager.InfrastructureManager;
+import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 
 public class DefaultBlowoutPool implements BlowoutPool {
@@ -63,7 +64,7 @@ public class DefaultBlowoutPool implements BlowoutPool {
 
 	@Override
 	public List<AbstractResource> getAllResources() {
-		return new ArrayList<AbstractResource>(this.resourcePool.values());
+		return new ArrayList<>(this.resourcePool.values());
 	}
 
 	@Override

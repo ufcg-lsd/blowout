@@ -6,7 +6,7 @@ import org.fogbowcloud.blowout.core.model.TaskProcess;
 import org.fogbowcloud.blowout.core.model.TaskProcessImpl;
 import org.fogbowcloud.blowout.core.model.TaskState;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
-import org.fogbowcloud.blowout.pool.AbstractResource;
+import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
 import org.fogbowcloud.blowout.pool.BlowoutPool;
 
 import java.util.ArrayList;
@@ -67,6 +67,7 @@ public class TaskMonitor implements Runnable {
 	}
 
 	public void procMon() {
+		LOGGER.debug("Task Monitor process");
 		for (TaskProcess taskProcess : this.getRunningProcesses()) {
 			TaskState taskProcessState = taskProcess.getStatus();
 

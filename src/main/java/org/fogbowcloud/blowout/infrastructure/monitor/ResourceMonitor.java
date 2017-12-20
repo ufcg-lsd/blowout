@@ -3,10 +3,12 @@ package org.fogbowcloud.blowout.infrastructure.monitor;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
+import org.fogbowcloud.blowout.infrastructure.exception.RequestResourceException;
+import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 import org.fogbowcloud.blowout.infrastructure.provider.InfrastructureProvider;
-import org.fogbowcloud.blowout.pool.AbstractResource;
 import org.fogbowcloud.blowout.pool.BlowoutPool;
+import org.fogbowcloud.manager.occi.order.OrderAttribute;
 import org.fogbowcloud.manager.occi.order.OrderType;
 
 import java.util.*;
@@ -125,24 +127,42 @@ public class ResourceMonitor implements Runnable {
     }
 
     public void monitorProcess() {
+        LOGGER.debug("Resource Monitor process");
         this.monitoringPendingResources();
         this.monitoringResources(resourcePool.getAllResources());
     }
 
     private void monitoringPendingResources() {
         for (String resourceId : getPendingResources()) {
-            AbstractResource resource = infraProvider.getResource(resourceId);
-            if (resource != null) {
+            try {
+                AbstractResource resource = infraProvider.getResource(resourceId);
+                if (resource != null) {
+                    pendingResources.remove(resourceId);
+                    resourcePool.addResource(resource);
+                }
+            } catch (RequestResourceException e) {
                 pendingResources.remove(resourceId);
-                resourcePool.addResource(resource);
+                // hack to call method callAct on pool
+                resourcePool.addResourceList(new ArrayList<AbstractResource>());
             }
         }
     }
 
     private void monitoringResources(List<AbstractResource> resources) {
-
         for (AbstractResource resource : resources) {
-
+            AbstractResource updatedResource = null;
+            try {
+                updatedResource = infraProvider.getResource(resource.getId());
+            } catch (RequestResourceException e) {
+                LOGGER.debug("No resource with given ID was found.");
+                resourcePool.updateResource(resource, ResourceState.TO_REMOVE);
+            }
+            if (updatedResource == null) {
+                LOGGER.debug("No resource with given ID was found.");
+                resourcePool.updateResource(resource, ResourceState.TO_REMOVE);
+            } else {
+                resource = updatedResource;
+            }
             if (ResourceState.IDLE.equals(resource.getState())) {
                 this.resolveIdleResource(resource);
             } else if (ResourceState.BUSY.equals(resource.getState())) {
@@ -157,8 +177,8 @@ public class ResourceMonitor implements Runnable {
             } else if (ResourceState.TO_REMOVE.equals(resource.getState())) {
                 try {
                     idleResources.remove(resource.getId());
-                    infraProvider.deleteResource(resource.getId());
                     resourcePool.removeResource(resource);
+                    infraProvider.deleteResource(resource.getId());
                 } catch (Exception e) {
                     LOGGER.error("Error while tring to remove resource " + resource.getId(), e);
                 }

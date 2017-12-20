@@ -12,7 +12,7 @@ import org.fogbowcloud.blowout.infrastructure.exception.RequestResourceException
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 import org.fogbowcloud.blowout.infrastructure.monitor.ResourceMonitor;
 import org.fogbowcloud.blowout.infrastructure.provider.InfrastructureProvider;
-import org.fogbowcloud.blowout.pool.AbstractResource;
+import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
 
 public class DefaultInfrastructureManager implements InfrastructureManager {
     private InfrastructureProvider infraProvider;

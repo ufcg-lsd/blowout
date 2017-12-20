@@ -17,10 +17,11 @@ import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
 import org.fogbowcloud.blowout.database.FogbowResourceDatastore;
 import org.fogbowcloud.blowout.infrastructure.exception.InfrastructureException;
+import org.fogbowcloud.blowout.infrastructure.exception.RequestResourceException;
 import org.fogbowcloud.blowout.infrastructure.http.HttpWrapper;
 import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
 import org.fogbowcloud.blowout.infrastructure.token.AbstractTokenUpdatePlugin;
-import org.fogbowcloud.blowout.pool.AbstractResource;
+import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
 import org.fogbowcloud.manager.occi.model.Token;
 import org.fogbowcloud.manager.occi.order.OrderConstants;
 import org.fogbowcloud.manager.occi.order.OrderState;
@@ -103,7 +104,7 @@ public class TestFogbowInfrastructureProvider {
 	}
 
 	@Test
-	public void getResourceTestSucess() {
+	public void getResourceTestSucess() throws RequestResourceException {
 		//Attributes
 		String requestIdMock = "request01";
 
@@ -228,10 +229,12 @@ public class TestFogbowInfrastructureProvider {
 		resourceMap.put(resource.getId(), resource);
 		
 		fogbowInfrastructureProvider.setResourcesMap(resourceMap);
-		
-		AbstractResource newResource = fogbowInfrastructureProvider.getResource(requestIdMock);
 
-		assertNull(newResource);
+		try {
+            fogbowInfrastructureProvider.getResource(requestIdMock);
+        } catch (RequestResourceException e) {
+		    // thrown correctly
+        }
 	}
 
 	@Test
@@ -264,10 +267,12 @@ public class TestFogbowInfrastructureProvider {
 		resourceMap.put(resource.getId(), resource);
 		
 		fogbowInfrastructureProvider.setResourcesMap(resourceMap);
-		
-		AbstractResource newResource = fogbowInfrastructureProvider.getResource(requestIdMock);
 
-		assertNull(newResource);
+		try {
+            fogbowInfrastructureProvider.getResource(requestIdMock);
+        } catch (RequestResourceException e) {
+		    // thrown correctly
+        }
 	}
 
 	@Test
@@ -298,14 +303,16 @@ public class TestFogbowInfrastructureProvider {
 		FogbowResource resource = mock(FogbowResource.class);
 		doReturn(requestIdMock).when(resource).getId();
 
-		Map<String, FogbowResource> resourceMap = new HashMap<String, FogbowResource>();
+		Map<String, FogbowResource> resourceMap = new HashMap<>();
 		resourceMap.put(resource.getId(), resource);
 
 		fogbowInfrastructureProvider.setResourcesMap(resourceMap);
 
-		AbstractResource newResource = fogbowInfrastructureProvider.getResource(requestIdMock);
-
-		assertNull(newResource);
+		try {
+		    fogbowInfrastructureProvider.getResource(requestIdMock);
+        } catch (RequestResourceException e) {
+		    // thrown correctly
+        }
 	}
 
 
@@ -325,7 +332,7 @@ public class TestFogbowInfrastructureProvider {
 				Mockito.any(String.class), Mockito.any(List.class));
 		doReturn(true).when(fogbowResourceDsMock).deleteFogbowResourceById(resource);
 
-		Map<String, FogbowResource> resourceMap = new HashMap<String, FogbowResource>();
+		Map<String, FogbowResource> resourceMap = new HashMap<>();
 		resourceMap.put(resource.getId(), resource);
 		
 		fogbowInfrastructureProvider.setHttpWrapper(httpWrapperMock);
@@ -397,7 +404,7 @@ public class TestFogbowInfrastructureProvider {
 		String urlEndpointRequestInformations = properties.getProperty(AppPropertiesConstants.INFRA_FOGBOW_MANAGER_BASE_URL)
 				+ "/" + OrderConstants.TERM + "/"+ requestIdMock;
 
-		Map<String, String> params = new HashMap<String, String>();
+		Map<String, String> params = new HashMap<>();
 		params.put(FogbowInfrastructureTestUtils.REQUEST_ID_TAG, requestIdMock);
         String FILE_RESPONSE_NO_INSTANCE_ID = "src/test/resources/requestInfoWithoutInstanceId";
         String fogbowResponse = FogbowInfrastructureTestUtils.createHttpWrapperResponseFromFile(FILE_RESPONSE_NO_INSTANCE_ID, params);

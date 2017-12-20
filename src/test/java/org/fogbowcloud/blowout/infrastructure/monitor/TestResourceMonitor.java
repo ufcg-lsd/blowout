@@ -11,15 +11,15 @@ import java.util.Properties;
 
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
+import org.fogbowcloud.blowout.infrastructure.exception.RequestResourceException;
 import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
 import org.fogbowcloud.blowout.infrastructure.provider.InfrastructureProvider;
-import org.fogbowcloud.blowout.pool.AbstractResource;
+import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
 import org.fogbowcloud.blowout.pool.BlowoutPool;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 
 public class TestResourceMonitor {
@@ -47,7 +47,7 @@ public class TestResourceMonitor {
 	}
 
 	@Test
-	public void testProcessPendingResource() {
+	public void testProcessPendingResource() throws RequestResourceException {
 
 		List<AbstractResource> resources = new ArrayList<>();
 		
@@ -70,7 +70,7 @@ public class TestResourceMonitor {
 	}
 	
 	@Test
-	public void testProcessTwoPendingResourceOnReady() {
+	public void testProcessTwoPendingResourceOnReady() throws RequestResourceException {
 
 		List<AbstractResource> resources = new ArrayList<>();
 		
@@ -108,4 +108,9 @@ public class TestResourceMonitor {
 		Thread.sleep(100);
 		Assert.assertFalse("Task monitor should have stopped", resourceMonitor.isRunning());
 	}
+
+	@Test
+	public void testResourceWithNoConnectivity() {
+
+    }
 }

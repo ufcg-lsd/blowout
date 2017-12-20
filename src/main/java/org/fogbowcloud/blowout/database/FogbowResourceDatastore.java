@@ -166,7 +166,12 @@ public class FogbowResourceDatastore {
 	}
 
 	public boolean deleteFogbowResourceById(FogbowResource fogbowResource) {
-		LOGGER.debug("Deleting resource id: " + fogbowResource.getId());
+		return deleteFogbowResourceById(fogbowResource.getId());
+	}
+
+
+	public boolean deleteFogbowResourceById(String fgbowResourceId) {
+		LOGGER.debug("Deleting resource id: " + fgbowResourceId);
 
 		PreparedStatement statement = null;
 		Connection connection = null;
@@ -175,14 +180,14 @@ public class FogbowResourceDatastore {
 			connection.setAutoCommit(false);
 
 			statement = this.prepare(connection, DELETE_BY_RESOURCE_ID_SQL);
-			statement.setString(1, fogbowResource.getId());
+			statement.setString(1, fgbowResourceId);
 
 			boolean result = statement.execute();
 			connection.commit();
 			return result;
 
 		} catch (SQLException e) {
-			LOGGER.error("Couldn't delete the resource " + fogbowResource.getId(), e);
+			LOGGER.error("Couldn't delete the resource " + fgbowResourceId, e);
 			try {
 				if (connection != null) {
 					connection.rollback();
