@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -331,6 +332,7 @@ public class TestFogbowInfrastructureProvider {
 		doReturn("OK").when(httpWrapperMock).doRequest(Mockito.eq("delete"), Mockito.eq(urlEndpointInstanceDelete), 
 				Mockito.any(String.class), Mockito.any(List.class));
 		doReturn(true).when(fogbowResourceDsMock).deleteFogbowResourceById(resource);
+		doReturn(new HashMap<String, String>()).when(fogbowInfrastructureProvider).getFogbowRequestAttributes(anyString());
 
 		Map<String, FogbowResource> resourceMap = new HashMap<>();
 		resourceMap.put(resource.getId(), resource);

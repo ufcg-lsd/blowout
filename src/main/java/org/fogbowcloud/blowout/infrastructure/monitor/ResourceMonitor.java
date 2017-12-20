@@ -80,7 +80,7 @@ public class ResourceMonitor implements Runnable {
 
         this.monitoringServiceRunner.interrupt();
 
-
+        LOGGER.debug("Removing all resources to shutdown");
         this.deletePendingResources();
         this.deleteAllocatedResources();
     }

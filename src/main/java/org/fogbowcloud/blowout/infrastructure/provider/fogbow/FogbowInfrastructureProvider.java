@@ -94,7 +94,13 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
         for (FogbowResource fogbowResource : this.frDatastore.getAllFogbowResources()) {
             this.resourcesMap.put(fogbowResource.getId(), fogbowResource);
 
-            this.updateResource(fogbowResource);
+            try {
+                this.updateResource(fogbowResource);
+            } catch (RequestResourceException e) {
+                LOGGER.debug("A resource from the previous session no longer exists. It will be removed.");
+                resourcesMap.remove(fogbowResource.getId());
+                frDatastore.deleteFogbowResourceById(fogbowResource);
+            }
 
             if (cleanPrevious) {
                 try {
@@ -108,13 +114,9 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
         }
     }
 
-    private void updateResource(FogbowResource fogbowResource) {
-        try {
-            FogbowResource resource = (FogbowResource) this.getResource(fogbowResource.getId());
-            this.resourcesMap.put(resource.getId(), resource);
-        } catch (RequestResourceException e) {
-            resourcesMap.remove(fogbowResource.getId());
-        }
+    private void updateResource(FogbowResource fogbowResource) throws RequestResourceException {
+        FogbowResource resource = (FogbowResource) this.getResource(fogbowResource.getId());
+        this.resourcesMap.put(resource.getId(), resource);
     }
 
     protected void handleTokenUpdate(ScheduledExecutorService handleTokenUpdateExecutor) {
@@ -176,7 +178,6 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
     @Override
     public AbstractResource getResource(String resourceId) throws RequestResourceException {
-
         LOGGER.debug("Getting resource from request id: [" + resourceId + "]");
         try {
             FogbowResource resource = this.getFogbowResource(resourceId);
@@ -248,12 +249,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
     @Override
     public void deleteResource(String resourceId) throws InfrastructureException {
-
         FogbowResource fogbowResource = this.resourcesMap.get(resourceId);
-
-        LOGGER.debug("Removing resource [" + resourceId + "] from blowout database");
-        this.resourcesMap.remove(resourceId);
-        this.frDatastore.deleteFogbowResourceById(resourceId);
 
         if (fogbowResource == null) {
             throw new InfrastructureException(
@@ -266,19 +262,27 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
             String requestMethod = "delete";
 
             LOGGER.debug("Requesting removal of resource [" + resourceId + "] from fogbow manager");
-            if (fogbowResource.getInstanceId() != null) {
-                this.doRequest(requestMethod,
-                        this.managerUrl + "/compute/" + fogbowResource.getInstanceId(),
-                        new ArrayList<Header>());
-            }
-
             this.doRequest(requestMethod,
                     this.managerUrl + "/" + OrderConstants.TERM + "/" + fogbowResource.getOrderId(),
                     new ArrayList<Header>());
 
+
+            Map<String, String> requestAttributes = this.getFogbowRequestAttributes(fogbowResource.getOrderId());
+            String instanceId = requestAttributes.get(OrderAttribute.INSTANCE_ID.getValue());
+
+            if (instanceId != null && !instanceId.isEmpty()) {
+                this.doRequest(requestMethod,
+                        this.managerUrl + "/compute/" + instanceId,
+                        new ArrayList<Header>());
+            }
+
+            LOGGER.debug("Removing resource [" + resourceId + "] from blowout database");
+            this.resourcesMap.remove(resourceId);
+            this.frDatastore.deleteFogbowResourceById(resourceId);
+
             LOGGER.debug("Resource " + fogbowResource.getId() + " deleted successfully");
         } catch (Exception e) {
-            if (e.getMessage().contains("Not Found")) {
+            if (e.getMessage() != null && e.getMessage().contains("Not Found")) {
                 LOGGER.debug("Resource [" + resourceId + "] was no longer available on manager at the time of the deletion request");
             } else {
                 throw new InfrastructureException(
@@ -297,7 +301,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
         return new Token(certificate, DEFAULT_USER, date, new HashMap<String, String>());
     }
 
-    private Map<String, String> getFogbowRequestAttributes(String orderId) throws Exception {
+    Map<String, String> getFogbowRequestAttributes(String orderId) throws Exception {
 
         String requestMethod = "get";
         String endpoint = this.managerUrl + "/" + OrderConstants.TERM + "/" + orderId;
