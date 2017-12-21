@@ -40,7 +40,7 @@ public class ResourceMonitor implements Runnable {
         this.resourcePool = blowoutPool;
 
         String defaultInfraMonitorPeriod = "30000";
-        String defaultIdleLifeTime = "0";
+        String defaultIdleLifeTime = "120000";
         String defaultMaxConnectTries = "1";
         String defaultMaxReuse = "1";
 
