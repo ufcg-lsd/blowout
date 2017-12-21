@@ -156,7 +156,7 @@ public class BlowoutController {
 		return (SchedulerInterface) clazz;
 	}
 
-	protected static boolean checkProperties(Properties properties) {
+	protected static boolean checkProperties(Properties properties) {//FIXME: MAKE IT IN A GENERAL WAY.
 		if (!properties.containsKey(AppPropertiesConstants.IMPLEMENTATION_INFRA_PROVIDER)) {
 			LOGGER.error("Required property " + AppPropertiesConstants.IMPLEMENTATION_INFRA_PROVIDER + " was not set");
 			return false;

@@ -85,7 +85,7 @@ public class StandardScheduler implements SchedulerInterface {
 		taskMon.runTask(task, resource);
 	}
 
-	protected TaskProcess createProcess(Task task) {
+	protected TaskProcess createProcess(Task task) {//FIXME: IS NOT USED
 		TaskProcess tp = new TaskProcessImpl(task.getId(), task.getAllCommands(), task.getSpecification(), task.getUUID());
 		return tp;
 	}
