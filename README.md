@@ -60,7 +60,7 @@ After installation, you can add and import Blowout to your Task Submitter projec
 
 
 ## Configuring Blowout
-[See](https://github.com/fogbow/arrebol/blob/master/sched.conf.example) an example of Blowout configuration file, change it and make your own Blowout configuration file. For more information see [Blowout Configurations](https://github.com/fogbow/blowout/blob/readme/CONF.md).
+[See](https://github.com/fogbow/arrebol/blob/master/sched.conf.example) an example of Blowout configuration file, change it and make your own Blowout configuration file. For more information see [Blowout Configurations](CONF.md).
 
 After set your Blowout configuration file, use Blowout with it.
 
@@ -138,7 +138,7 @@ Timedout | The Task took timeout
 
 
 ## Customizing Blowout Components
-You can adapt some Blowout components to operate with your application needs. For more information see [Customizing Blowout Components](https://github.com/fogbow/blowout/blob/readme/CUSTOM.md).
+You can adapt some Blowout components to operate with your application needs. For more information see [Customizing Blowout Components](CUSTOM.md).
 
 After customizations and configurations sets, you can use Blowout with your new Custom Components.
 
