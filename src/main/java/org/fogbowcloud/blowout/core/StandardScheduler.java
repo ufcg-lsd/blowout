@@ -39,14 +39,13 @@ public class StandardScheduler implements SchedulerInterface {
 	}
 
 	protected void actOnResource(AbstractResource resource, List<Task> tasks) {
-		// if resource idle
 		if (resource.getState().equals(ResourceState.IDLE)) {
 			Task task = chooseTaskForRunning(resource, tasks);
 			if (task != null) {
 				runTask(task, resource);
 			}
 		}
-		// if resource is to be removed
+		
 		if (resource.getState().equals(ResourceState.TO_REMOVE)) {
 			runningTasks.remove(resource);
 		}
@@ -76,11 +75,10 @@ public class StandardScheduler implements SchedulerInterface {
 
 	@Override
 	public void runTask(Task task, AbstractResource resource) {
+		task.setRetries(task.getRetries()+1);
 		runningTasks.put(resource, task);
-		// submit to task executor
-		// resource.setState(ResourceState.NOT_READY);
-		submitToMonitor(task, resource);
 
+		submitToMonitor(task, resource);
 	}
 
 	public void submitToMonitor(Task task, AbstractResource resource) {

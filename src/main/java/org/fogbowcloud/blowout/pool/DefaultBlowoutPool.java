@@ -92,7 +92,6 @@ public class DefaultBlowoutPool implements BlowoutPool {
 
 	@Override
 	public List<Task> getAllTasks() {
-		// TODO Auto-generated method stub
 		return new ArrayList<Task>(taskPool);
 	}
 

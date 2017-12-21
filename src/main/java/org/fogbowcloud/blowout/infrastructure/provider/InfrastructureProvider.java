@@ -8,11 +8,6 @@ import org.fogbowcloud.blowout.pool.AbstractResource;
 
 public interface InfrastructureProvider {
 
-	/**
-	 * Creates new Request for resource and return the Request ID
-	 * @param specification
-	 * @return The requested resource
-	 */
 	String requestResource(Specification specification) throws RequestResourceException;
 	
 	List<AbstractResource> getAllResources();

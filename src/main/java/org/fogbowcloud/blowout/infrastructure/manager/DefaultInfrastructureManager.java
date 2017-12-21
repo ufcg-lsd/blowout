@@ -29,26 +29,26 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 	@Override
 	public synchronized void act(List<AbstractResource> resources,
 			List<Task> tasks) throws Exception {
-		//Get all resource requests that were not addressed yet
+		
 		Map<Specification, Integer> specsDemand = (HashMap<Specification, Integer>) generateDemandBySpec(
 				tasks, resources);
-		//request enough resources to address the demands (excluding the pending requests)
+		
 		requestResources(specsDemand);
 	}
 
 	private void requestResources(Map<Specification, Integer> specsDemand)
 			throws RequestResourceException {
-		// Request resources according to the demand.
+		
 		for (Entry<Specification, Integer> entry : specsDemand.entrySet()) {
 
 			Specification spec = entry.getKey();
-			// Reduce requests by pending resources
+			
 			Integer requested = this.resourceMonitor.getPendingRequests().get(
 					spec);
 			if (requested == null)
 				requested = 0;
 			int requiredResources = entry.getValue() - requested;
-			;//FIXME:
+
 			for (int count = 0; count < requiredResources; count++) {
 
 				String resourceId = infraProvider.requestResource(spec);
@@ -73,7 +73,7 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 
 	}
 
-	private List<Task> filterTasksByState(List<Task> tasks, TaskState taskState) { //FIXME: NEVER USED, WHY?
+	private List<Task> filterTasksByState(List<Task> tasks, TaskState taskState) {
 
 		List<Task> filteredTasks = new ArrayList<Task>();
 		for (Task task : tasks) {
@@ -91,11 +91,10 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 		Map<Specification, Integer> specsDemand = new HashMap<Specification, Integer>();
 
 		// FIXME: this variable name is incorrect, since the list will not
-		// contain only idle resources
 		List<AbstractResource> currentResources = filterResourcesByState(
 				resources, ResourceState.IDLE, ResourceState.BUSY,
 				ResourceState.FAILED);
-		// Generate demand for tasks
+		
 		for (Task task : tasks) {
 
 			if (!task.isFinished()) {

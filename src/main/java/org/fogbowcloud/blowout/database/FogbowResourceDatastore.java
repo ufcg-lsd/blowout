@@ -33,7 +33,6 @@ public class FogbowResourceDatastore {
 
 	protected static final String PREFIX_DATASTORE_URL = "jdbc:sqlite:";
 
-	// SQLs
 	private static final String INSERT_FOGBOW_RESOURCE_SQL = "INSERT INTO " + FOGBOW_RESOURCE_TABLE_NAME
 			+ " VALUES(?,?,?,?)";
 	private static final String UPDATE_FOGBOW_RESOURCE = "UPDATE " + FOGBOW_RESOURCE_TABLE_NAME + " SET " + ORDER_ID

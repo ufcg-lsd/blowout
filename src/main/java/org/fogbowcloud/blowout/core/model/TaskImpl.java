@@ -10,7 +10,6 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.model.Command.Type;
-import org.fogbowcloud.blowout.pool.AbstractResource;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,7 +20,6 @@ public class TaskImpl implements Task {
 
 	private static final Logger LOGGER = Logger.getLogger(TaskImpl.class);
 
-	//Environment variables related to task
 	public static final String ENV_LOCAL_OUT_DIR = "";
 
 	public static final String METADATA_REMOTE_OUTPUT_FOLDER = "remote_output_folder";
@@ -39,19 +37,18 @@ public class TaskImpl implements Task {
 	List<String> processes = new ArrayList<String>();
 	private Map<String, String> metadata = new HashMap<String, String>();
 	private boolean isFailed = false;
-	private int retries = 0;
+	private int retries = -1;
 	private TaskState state;
-	private AbstractResource resource;
 
 	private long startedRunningAt = Long.MAX_VALUE;
 
 	private String uuid;
 
+
 	public TaskImpl(String id, Specification spec, String uuid) {
 		this.id = id;
 		this.spec = spec;
 		this.state = TaskState.READY;
-		this.resource = null;
 		this.uuid = uuid;
 	}
 	
@@ -290,12 +287,6 @@ public class TaskImpl implements Task {
 	@Override
 	public void setState(TaskState state) {
 		this.state = state;
-		
-	}
-
-	@Override
-	public void setResource(AbstractResource resource) {
-		this.resource = resource;
 		
 	}
 
