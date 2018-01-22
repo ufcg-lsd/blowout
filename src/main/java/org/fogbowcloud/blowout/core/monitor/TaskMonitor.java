@@ -186,4 +186,8 @@ public class TaskMonitor implements Runnable {
     public boolean isRunning() {
         return monitoringServiceRunner != null && monitoringServiceRunner.isAlive();
     }
+
+    public BlowoutPool getBlowoutPool() {
+		return this.pool;
+	}
 }
