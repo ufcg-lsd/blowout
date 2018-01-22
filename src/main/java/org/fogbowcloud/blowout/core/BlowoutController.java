@@ -173,7 +173,8 @@ public class BlowoutController {
         return (InfrastructureManager) infraManager;
     }
 
-    private SchedulerInterface createSchedulerInstance(TaskMonitor taskMonitor) throws Exception {
+    // Method used in saps engine
+    protected SchedulerInterface createSchedulerInstance(TaskMonitor taskMonitor) throws Exception {
         String schedulerClassName = this.properties.getProperty(
                 AppPropertiesConstants.IMPLEMENTATION_SCHEDULER,
                 BlowoutDefaultConstants.IMPLEMENTATION_SCHEDULER);
