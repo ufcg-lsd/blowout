@@ -14,8 +14,6 @@ import org.fogbowcloud.blowout.pool.BlowoutPool;
 
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 public class BlowoutController {
 
@@ -31,7 +29,7 @@ public class BlowoutController {
     private ResourceMonitor resourceMonitor;
 
     private Properties properties;
-    private boolean started;
+    protected boolean started;
 
     public BlowoutController(Properties properties) throws BlowoutException {
         this.started = false;

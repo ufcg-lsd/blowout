@@ -163,7 +163,7 @@ public class TaskMonitor implements Runnable {
 		return this.taskExecutor;
 	}
 
-	protected void setRunningTasks(Map<Task, TaskProcess> runningTasks) {
+	public void setRunningTasks(Map<Task, TaskProcess> runningTasks) {
 		this.runningTasks = runningTasks;
 	}
 
