@@ -8,7 +8,6 @@ import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 import org.fogbowcloud.blowout.infrastructure.provider.InfrastructureProvider;
 import org.fogbowcloud.blowout.pool.BlowoutPool;
-import org.fogbowcloud.manager.occi.order.OrderAttribute;
 import org.fogbowcloud.manager.occi.order.OrderType;
 
 import java.util.*;
@@ -91,7 +90,7 @@ public class ResourceMonitor implements Runnable {
                 this.infraProvider.deleteResource(pendingResourceId);
             } catch (Exception e) {
                 LOGGER.error("Was not possible delete the pending resource [" + pendingResourceId
-                        + "], see the Fogbow Dashboard to delete manually", e);
+                        + "], delete manually", e);
             }
         }
     }
@@ -102,7 +101,7 @@ public class ResourceMonitor implements Runnable {
                 this.infraProvider.deleteResource(resource.getId());
             } catch (Exception e) {
                 LOGGER.error("Was not possible delete the allocated resources [" + resource.getId()
-                        + "], see the Fogbow Dashboard to delete manually", e);
+                        + "], delete manually", e);
             }
         }
     }

@@ -16,7 +16,6 @@ import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
 import org.fogbowcloud.blowout.infrastructure.provider.InfrastructureProvider;
 import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
 import org.fogbowcloud.blowout.pool.BlowoutPool;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,11 +38,6 @@ public class TestResourceMonitor {
 		properties.setProperty(AppPropertiesConstants.INFRA_RESOURCE_CONNECTION_RETRY, "3");
 		
 		resourceMonitor = Mockito.spy(new ResourceMonitor(infraProvider, resourcePool, properties));
-	}
-
-	@After
-	public void setDown() {
-
 	}
 
 	@Test
@@ -108,9 +102,5 @@ public class TestResourceMonitor {
 		Thread.sleep(100);
 		Assert.assertFalse("Task monitor should have stopped", resourceMonitor.isRunning());
 	}
-
-	@Test
-	public void testResourceWithNoConnectivity() {
-
-    }
+	
 }
