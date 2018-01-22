@@ -116,7 +116,11 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
     private void updateResource(FogbowResource fogbowResource) throws RequestResourceException {
         FogbowResource resource = (FogbowResource) this.getResource(fogbowResource.getId());
-        this.resourcesMap.put(resource.getId(), resource);
+        if(resource == null) {
+        	this.resourcesMap.put(fogbowResource.getId(), fogbowResource);
+        } else {
+        	this.resourcesMap.put(resource.getId(), resource);
+        }
     }
 
     protected void handleTokenUpdate(ScheduledExecutorService handleTokenUpdateExecutor) {
