@@ -57,7 +57,6 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
     private Properties properties;
     private AbstractTokenUpdatePlugin tokenUpdatePlugin;
     private FogbowResourceDatastore frDatastore;
-    private ScheduledExecutorService executorService;
 
     private Map<String, FogbowResource> resourcesMap = new ConcurrentHashMap<>();
 
@@ -81,7 +80,6 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
         this.tokenUpdatePlugin = tokenUpdatePlugin;
         this.token = tokenUpdatePlugin.generateToken();
 
-        executorService = handleTokenUpdateExecutor;
         this.handleTokenUpdate(handleTokenUpdateExecutor);
     }
 
@@ -89,7 +87,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
         this(properties, Executors.newScheduledThreadPool(1), cleanPrevious);
     }
 
-    private void recoverLastSession(boolean cleanPrevious) {
+    protected void recoverLastSession(boolean cleanPrevious) {
         LOGGER.info("Recovering resources from previous session.");
         for (FogbowResource fogbowResource : this.frDatastore.getAllFogbowResources()) {
             this.resourcesMap.put(fogbowResource.getId(), fogbowResource);
@@ -110,11 +108,10 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
                             + fogbowResource.getId(), e);
                 }
             }
-
         }
     }
 
-    private void updateResource(FogbowResource fogbowResource) throws RequestResourceException {
+    protected void updateResource(FogbowResource fogbowResource) throws RequestResourceException {
         FogbowResource resource = (FogbowResource) this.getResource(fogbowResource.getId());
         if(resource == null) {
         	this.resourcesMap.put(fogbowResource.getId(), fogbowResource);

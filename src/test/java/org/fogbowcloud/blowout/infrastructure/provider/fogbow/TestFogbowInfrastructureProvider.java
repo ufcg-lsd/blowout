@@ -1,15 +1,13 @@
 package org.fogbowcloud.blowout.infrastructure.provider.fogbow;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.doNothing;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -32,6 +30,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
+
 
 
 public class TestFogbowInfrastructureProvider {
@@ -362,6 +361,92 @@ public class TestFogbowInfrastructureProvider {
 		fogbowInfrastructureProvider.setHttpWrapper(httpWrapperMock);
 		fogbowInfrastructureProvider.deleteResource(resource.getId());
 	}
+	
+	@Test
+	public void testRecoverLastSession() throws RequestResourceException {
+		Specification specs = new Specification("imageMock", "UserName", "publicKeyMock",
+				"privateKeyMock", FAKE_DATA_FILE, "userDataType");
+		List<FogbowResource> frList = new ArrayList<FogbowResource>();
+		frList.add(new FogbowResource("fakeid-01", "fakeorder-01", specs));
+		frList.add(new FogbowResource("fakeid-02", "fakeorder-02", specs));
+		doReturn(frList).when(this.fogbowResourceDsMock).getAllFogbowResources();
+
+		doNothing().when(this.fogbowInfrastructureProvider)
+				.updateResource(Mockito.any(FogbowResource.class));
+		
+		this.fogbowInfrastructureProvider.recoverLastSession(false);
+		
+		assertEquals(this.fogbowInfrastructureProvider.getResourcesMap().size(), 2);
+	}
+	
+	@Test
+	public void testRecoverLastSessionRemoving() throws RequestResourceException {
+		Specification specs = new Specification("imageMock", "UserName", "publicKeyMock",
+				"privateKeyMock", FAKE_DATA_FILE, "userDataType");
+		List<FogbowResource> frList = new ArrayList<FogbowResource>();
+		frList.add(new FogbowResource("fakeid-01", "fakeorder-01", specs));
+		frList.add(new FogbowResource("fakeid-02", "fakeorder-02", specs));
+		doReturn(frList).when(this.fogbowResourceDsMock).getAllFogbowResources();
+
+		doNothing().when(this.fogbowInfrastructureProvider)
+				.updateResource(Mockito.any(FogbowResource.class));
+		
+		this.fogbowInfrastructureProvider.recoverLastSession(true);
+		
+		assertEquals(this.fogbowInfrastructureProvider.getResourcesMap().size(), 0);
+	}
+	
+	@Test
+	public void testRecoverLastSessionResourcesNotFound() throws RequestResourceException {
+		Specification specs = new Specification("imageMock", "UserName", "publicKeyMock",
+				"privateKeyMock", FAKE_DATA_FILE, "userDataType");
+		List<FogbowResource> frList = new ArrayList<FogbowResource>();
+		frList.add(new FogbowResource("fakeid-01", "fakeorder-01", specs));
+		frList.add(new FogbowResource("fakeid-02", "fakeorder-02", specs));
+		doReturn(frList).when(this.fogbowResourceDsMock).getAllFogbowResources();
+		doReturn(true).when(this.fogbowResourceDsMock).deleteFogbowResourceById(Mockito.anyString());
+
+		doThrow(new RequestResourceException("FAKE-ERROR")).when(this.fogbowInfrastructureProvider)
+				.updateResource(Mockito.any(FogbowResource.class));
+
+		this.fogbowInfrastructureProvider.recoverLastSession(false);
+
+		assertEquals(this.fogbowInfrastructureProvider.getResourcesMap().size(), 0);
+	}
+
+	@Test
+	public void testUpdateResource() throws RequestResourceException {
+		Specification specs = new Specification("imageMock", "UserName", "publicKeyMock",
+				"privateKeyMock", FAKE_DATA_FILE, "userDataType");
+		FogbowResource resource = new FogbowResource("fakeid-01", "fakeorder-01", specs);
+		FogbowResource resourceInstaciated = new FogbowResource("fakeid-01", "fakeorder-01", specs);
+		resourceInstaciated.setInstanceId("fakeinstance-01");
+
+		doReturn(resourceInstaciated).when(this.fogbowInfrastructureProvider)
+				.getResource(Mockito.anyString());
+
+		this.fogbowInfrastructureProvider.updateResource(resource);
+
+		assertEquals(resourceInstaciated.getInstanceId(), this.fogbowInfrastructureProvider
+				.getResourcesMap().get(resource.getId()).getInstanceId());
+	}
+
+	@Test
+	public void testUpdateResourceNull() throws RequestResourceException {
+		Specification specs = new Specification("imageMock", "UserName", "publicKeyMock",
+				"privateKeyMock", FAKE_DATA_FILE, "userDataType");
+		FogbowResource resource = new FogbowResource("fakeid-01", "fakeorder-01", specs);
+		FogbowResource resourceInstaciated = new FogbowResource("fakeid-01", "fakeorder-01", specs);
+		resourceInstaciated.setInstanceId("fakeinstance-01");
+
+		doReturn(null).when(this.fogbowInfrastructureProvider)
+				.getResource(Mockito.anyString());
+
+		this.fogbowInfrastructureProvider.updateResource(resource);
+
+		assertNull(this.fogbowInfrastructureProvider.getResourcesMap().get(resource.getId())
+				.getInstanceId());
+	}
 
 	private void createDefaultRequestResponse(String requestIdMokc) throws Exception {
 
@@ -479,5 +564,5 @@ public class TestFogbowInfrastructureProvider {
 		properties.setProperty("fogbow.voms.server", "server");
 		properties.setProperty("fogbow.voms.certificate.password", "password");
 	}
-
+	
 }
