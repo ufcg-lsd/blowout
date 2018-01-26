@@ -16,7 +16,7 @@ public class AppPropertiesConstants {
 	public static final String INFRA_RESOURCE_CONNECTION_RETRY = "max_resource_connection_retry";
 	public static final String INFRA_MONITOR_PERIOD = "infra_monitor_period";
 	public static final String TASK_MONITOR_PERIOD = "task_monitor_period";
-	public static final String LOCAL_COMMAND_INTERPRETER = "local_command_interpreter";
+	public static final String SU_COMMAND_PATH = "su_command_path";
 	public static final String INFRA_AUTH_TOKEN_PREFIX = "auth_token_prop_";
 	public static final String INFRA_AUTH_TOKEN_UPDATE_PLUGIN = "infra_auth_token_update_plugin";
 	

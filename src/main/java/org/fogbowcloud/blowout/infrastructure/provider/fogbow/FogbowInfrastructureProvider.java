@@ -538,7 +538,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
         String port = addressInfo[1];
 
         fogbowResource.setLocalCommandInterpreter(
-                this.properties.getProperty(AppPropertiesConstants.LOCAL_COMMAND_INTERPRETER));
+                this.properties.getProperty(AppPropertiesConstants.SU_COMMAND_PATH));
         fogbowResource.putMetadata(AbstractResource.METADATA_SSH_HOST, host);
         fogbowResource.putMetadata(AbstractResource.METADATA_SSH_PORT, port);
         fogbowResource.putMetadata(AbstractResource.METADATA_SSH_USERNAME_ATT,

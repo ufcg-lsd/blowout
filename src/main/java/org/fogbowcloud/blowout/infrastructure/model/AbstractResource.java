@@ -15,7 +15,7 @@ public abstract class AbstractResource {
 	public static final String ENV_PRIVATE_KEY_FILE = "PRIVATE_KEY_FILE";
 
 	public static final String METADATA_TOKEN_USER = "tokenUser";
-	public static final String METADATA_LOCAL_COMMAND_INTERPRETER = "metadataLocalCommandInterpreter";
+	public static final String METADATA_SU_COMMAND_PATH = "metadataSuCommandPath";
 
 	public static final String METADATA_SSH_HOST = "metadataSSHHost";
 	public static final String METADATA_SSH_PORT = "metadataSSHPort";
@@ -47,7 +47,7 @@ public abstract class AbstractResource {
 		this.connectionFailTries = 0;
 		this.requestedSpec = requestedSpec;
 		this.localCommandInterpreter = requestedSpec
-				.getRequirementValue(AppPropertiesConstants.LOCAL_COMMAND_INTERPRETER);
+				.getRequirementValue(AppPropertiesConstants.SU_COMMAND_PATH);
 		this.setState(ResourceState.NOT_READY);
 	}
 
