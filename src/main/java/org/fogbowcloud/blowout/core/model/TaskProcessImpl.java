@@ -89,15 +89,14 @@ public class TaskProcessImpl implements TaskProcess {
 		int returnValue;
 
 		Map<String, String> additionalVariables = getAdditionalEnvVariables(resource);
+		
 		try {
 			if (type.equals(Command.Type.LOCAL)) {
 				Process localProc = startLocalProcess(commandString, additionalVariables);
 				returnValue = localProc.waitFor();
-
 			} else {
 				Process remoteProc = startRemoteProcess(commandString, additionalVariables);
 				returnValue = remoteProc.waitFor();
-
 			}
 		} catch (Exception e) {
 			returnValue = TaskExecutionResult.NOK;
@@ -128,10 +127,10 @@ public class TaskProcessImpl implements TaskProcess {
 
 	private Process startLocalProcess(String command, Map<String, String> additionalEnvVariables)
 			throws IOException {
-
-		String commandInterpreterTags = "-c";
-		ProcessBuilder builder = new ProcessBuilder(this.localCommandInterpreter, commandInterpreterTags,
-				command);
+		String GID = "9999"; 
+		ProcessBuilder builder = new ProcessBuilder(localCommandInterpreter, TaskProcessImpl.UserID,
+				GID, command);
+		
 		if (additionalEnvVariables == null || additionalEnvVariables.isEmpty()) {
 			return builder.start();
 		}
