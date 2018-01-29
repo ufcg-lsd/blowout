@@ -3,6 +3,7 @@ package org.fogbowcloud.blowout.core.model;
 public class TaskExecutionResult {
 
 	public static final int OK = 0;
+	public static final int SU_COMMAND_BAD_ARGUMENTS = 17;
 	public static final int NOK = 128;
 	public static final int TIMEOUT = 124;
 

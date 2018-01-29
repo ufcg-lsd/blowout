@@ -52,18 +52,22 @@ public class TaskProcessImpl implements TaskProcess {
 		TaskExecutionResult taskExecutionResult = new TaskExecutionResult();
 
 		for (Command command : this.getCommands()) {
-			// FIXME: avoid multiple related log line when possible
 			LOGGER.trace("Command " + command.getCommand());
 			LOGGER.trace("Command Type " + command.getType());
 
 			String commandString = this.getExecutableCommandString(command);
 
-			taskExecutionResult = this.executeCommandString(commandString, command.getType(), resource);
+			taskExecutionResult = this.executeCommandString(commandString, command.getType(),
+					resource);
 
 			LOGGER.trace("Command result: " + taskExecutionResult.getExitValue());
 			if (taskExecutionResult.getExitValue() != TaskExecutionResult.OK) {
 				if (taskExecutionResult.getExitValue() == TaskExecutionResult.TIMEOUT) {
 					this.setStatus(TaskState.TIMEDOUT);
+				} else if (taskExecutionResult
+						.getExitValue() == TaskExecutionResult.SU_COMMAND_BAD_ARGUMENTS) {
+					LOGGER.error("Bad arguments to script su_command.c");
+					this.setStatus(TaskState.FAILED);
 				} else {
 					this.setStatus(TaskState.FAILED);
 				}
