@@ -71,7 +71,6 @@ public class BlowoutController {
                 this.resourceMonitor
         );
 
-
         this.blowoutPool.start(this.infraManager, this.schedulerInterface);
 
         this.started = true;
