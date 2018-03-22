@@ -64,7 +64,7 @@ public class TaskMonitor implements Runnable{
 					pool.updateResource(tp.getResource(), ResourceState.FAILED);
 				}
 			}
-			if (tp.getStatus().equals(TaskState.FINNISHED)) {
+			if (tp.getStatus().equals(TaskState.FINISHED)) {
 				Task task = getTaskById(tp.getTaskId());
 				task.finish();
 				getRunningTasks().remove(task);

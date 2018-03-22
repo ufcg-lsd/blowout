@@ -78,7 +78,7 @@ public class TestTaskMonitor {
 	public void testGetTaskStateCompleted() {
 		// set up
 		TaskImpl taskImpl = new TaskImpl("task-id", spec, FAKE_UUID);
-		taskImpl.setState(TaskState.FINNISHED);
+		taskImpl.setState(TaskState.FINISHED);
 		taskImpl.finish();
 		
 		Map<Task, TaskProcess> runningTasks = mock(Map.class);
@@ -141,7 +141,7 @@ public class TestTaskMonitor {
 		
 		taskProcessOne.setResource(resourceOne);
 		
-		taskProcessOne.setStatus(TaskState.FINNISHED);
+		taskProcessOne.setStatus(TaskState.FINISHED);
 		
 		Map<Task, TaskProcess> runningTasks = new HashMap<Task, TaskProcess>();
 		runningTasks.put(taskOne, taskProcessOne);
@@ -199,7 +199,7 @@ public class TestTaskMonitor {
 	public void testProcMonProcFinnished() {
 		Task fakeTask = mock(Task.class);
 		TaskProcess fakeProcess = mock(TaskProcess.class);
-		doReturn(TaskState.FINNISHED).when(fakeProcess).getStatus();
+		doReturn(TaskState.FINISHED).when(fakeProcess).getStatus();
 		AbstractResource fakeResource = mock(AbstractResource.class);
 		doReturn(FAKE_ID).when(fakeTask).getId();
 		doReturn(FAKE_ID).when(fakeProcess).getTaskId();
