@@ -46,11 +46,9 @@ Then, decompress it:
 
     unzip master.zip
 
-After that, get all projects JAR of Fogbow Manager and Blowout. To achieve that, maven or maven2 must be installed in client's machine with commands:
+After that, get all projects JAR of Fogbow Manager and Blowout. To achieve that, maven must be installed in client's machine with commands:
 
 	apt-get install maven
-
-	apt-get install maven2
 
 And then, simply use the following command in each project directory:
 	
