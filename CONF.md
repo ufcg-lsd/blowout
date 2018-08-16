@@ -8,7 +8,7 @@ The following properties show all possible Blowout configurations with a brief d
 	impl_blowout_pool_class_name=org.fogbowcloud.blowout.pool.DefaultBlowoutPool
 	impl_scheduler_class_name=org.fogbowcloud.blowout.infrastructure.manager.DefaultInfrastructureManager
 	impl_infra_manager_class_name=org.fogbowcloud.blowout.core.StandardScheduler
-	infra_provider_class_name=org.fogbowcloud.blowout.scheduler.infrastructure.fogbow.FogbowInfrastructureProvider
+	infra_provider_class_name=org.fogbowcloud.blowout.infrastructure.provider.fogbow.FogbowInfrastructureProvider
 
 Configuration Field | Description | Required (Default values in the example)
 -------------------------- | -------------------- | --------
