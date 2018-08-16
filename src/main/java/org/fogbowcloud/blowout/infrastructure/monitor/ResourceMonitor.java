@@ -110,7 +110,11 @@ public class ResourceMonitor {
 		
 		private void monitoringResources(List<AbstractResource> resources) {
 
+			LOGGER.debug("Monitoring resources.");
+
 			for (AbstractResource resource : resources) {
+
+                LOGGER.debug("Monitoring resource of id " + resource.getId() + " and state " + resource.getState());
 
 				if (ResourceState.IDLE.equals(resource.getState())) {
 					resolveIdleResource(resource);
@@ -139,6 +143,8 @@ public class ResourceMonitor {
 		}
 
 		private void resolveIdleResource(AbstractResource resource) {
+
+			LOGGER.debug("Resolving idle resource [id: " + resource.getId() + "].");
 
 			Long expirationDateTime = idleResources.get(resource.getId());
 

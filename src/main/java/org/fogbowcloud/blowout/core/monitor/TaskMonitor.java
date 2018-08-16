@@ -7,15 +7,19 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.model.Task;
 import org.fogbowcloud.blowout.core.model.TaskProcess;
 import org.fogbowcloud.blowout.core.model.TaskProcessImpl;
 import org.fogbowcloud.blowout.core.model.TaskState;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
+import org.fogbowcloud.blowout.infrastructure.monitor.ResourceMonitor;
 import org.fogbowcloud.blowout.pool.AbstractResource;
 import org.fogbowcloud.blowout.pool.BlowoutPool;
 
-public class TaskMonitor implements Runnable{
+public class TaskMonitor implements Runnable {
+
+	private static final Logger LOGGER = Logger.getLogger(TaskMonitor.class);
 
 	Map<Task, TaskProcess> runningTasks = new HashMap<Task, TaskProcess>();
 	
@@ -90,9 +94,13 @@ public class TaskMonitor implements Runnable{
 	}
 	
 	public void runTask(Task task,final AbstractResource resource) {
+		LOGGER.debug("Starting to run task of id " + task.getId());
+
 		final TaskProcess tp = createProcess(task);
 		if (getRunningTasks().get(task) == null) {
 			getRunningTasks().put(task, tp);
+
+			LOGGER.debug("Setting state of resource [id: " + resource.getId() + "] to busy.");
 			pool.updateResource(resource, ResourceState.BUSY);
 		}
 		getExecutorService().submit(new Runnable() {

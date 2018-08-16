@@ -7,7 +7,7 @@ import org.fogbowcloud.blowout.core.model.Task;
 import org.fogbowcloud.blowout.infrastructure.manager.InfrastructureManager;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 
-public interface BlowoutPool{
+public interface BlowoutPool {
 	
 	void start(InfrastructureManager infraManager, SchedulerInterface schedulerInterface);
 	
@@ -32,6 +32,5 @@ public interface BlowoutPool{
 	Task getTaskById(String taskId);
 	
 	void removeTask(Task task);
-
 
 }

@@ -188,23 +188,22 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		FogbowResource fogbowResource = resourcesMap.get(resourceId);
 
 		if (fogbowResource == null) {
-			throw new InfrastructureException("The resource is not a valid. Was never requested or is already deleted");
+			String errorMsg = "The resource is not a valid. Was never requested or is already deleted";
+			LOGGER.error(errorMsg);
+			throw new InfrastructureException(errorMsg);
 		}
 
 		try {
 			LOGGER.debug("Getting request attributes - Retrieve Instace ID.");
 			
 			requestAttributes = getFogbowRequestAttributes(fogbowResource.getOrderId());
-
 			instanceId = requestAttributes.get(OrderAttribute.INSTANCE_ID.getValue());
 
-			
 			if (instanceId != null && !instanceId.isEmpty()) {
 				LOGGER.debug("Instance ID returned: " + instanceId);
 
 				fogbowResource.setInstanceId(instanceId);
 
-				
 				Map<String, String> instanceAttributes = getFogbowInstanceAttributes(fogbowResource.getInstanceId());
 
 				if (this.validateInstanceAttributes(instanceAttributes)) {

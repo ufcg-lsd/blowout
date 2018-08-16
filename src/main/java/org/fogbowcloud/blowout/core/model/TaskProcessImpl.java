@@ -132,6 +132,8 @@ public class TaskProcessImpl implements TaskProcess {
 
 			}
 		} catch (Exception e) {
+			LOGGER.debug("Failed to execute command in resource of id " + resource.getId());
+			e.printStackTrace();
 			returnValue = TaskExecutionResult.NOK;
 		}
 
