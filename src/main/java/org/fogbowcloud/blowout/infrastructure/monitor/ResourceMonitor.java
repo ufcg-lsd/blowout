@@ -32,27 +32,33 @@ public class ResourceMonitor {
 	private MonitoringService monitoringService;
 	private long infraMonitoringPeriod;
 	private Long noExpirationTime = new Long(0);
-	private Long idleLifeTime = new Long(0);
+	private Long idleLifeTime;
 	private int maxConnectionTries;
 	private int maxReuse;
 	
 	public ResourceMonitor(InfrastructureProvider infraProvider, BlowoutPool blowoutPool, Properties properties) {
 		this.infraProvider = infraProvider;
 		this.resourcePool = blowoutPool;
-		infraMonitoringPeriod = Long
-				.parseLong(properties.getProperty(AppPropertiesConstants.INFRA_MONITOR_PERIOD, "30000"));
-		this.idleLifeTime = Long
-				.parseLong(properties.getProperty(AppPropertiesConstants.INFRA_RESOURCE_IDLE_LIFETIME, "0"));
-		this.maxConnectionTries = Integer
-				.parseInt(properties.getProperty(AppPropertiesConstants.INFRA_RESOURCE_CONNECTION_RETRY, "1"));
-		this.maxReuse = Integer
-				.parseInt(properties.getProperty(AppPropertiesConstants.INFRA_RESOURCE_REUSE_TIMES, "1"));
-		
-		monitoringService = new MonitoringService();
-		monitoringServiceRunner = new Thread(monitoringService);
+
+		String defaultInfraMonitorPeriod = "30000";
+		String defaultIdleLifeTime = "120000";
+		String defaultMaxConnectTries = "1";
+		String defaultMaxReuse = "1";
+
+		this.infraMonitoringPeriod = Long.parseLong(properties.getProperty(
+				AppPropertiesConstants.INFRA_MONITOR_PERIOD, defaultInfraMonitorPeriod));
+		this.idleLifeTime = Long.parseLong(properties.getProperty(
+				AppPropertiesConstants.INFRA_RESOURCE_IDLE_LIFETIME, defaultIdleLifeTime));
+		this.maxConnectionTries = Integer.parseInt(properties.getProperty(
+				AppPropertiesConstants.INFRA_RESOURCE_CONNECTION_RETRY, defaultMaxConnectTries));
+		this.maxReuse = Integer.parseInt(properties
+				.getProperty(AppPropertiesConstants.INFRA_RESOURCE_REUSE_TIMES, defaultMaxReuse));
+
+		this.monitoringService = new MonitoringService();
+		this.monitoringServiceRunner = new Thread(this.monitoringService);
 		List<AbstractResource> previouResources = infraProvider.getAllResources();
 		if (previouResources != null && !previouResources.isEmpty()) {
-			resourcePool.addResourceList(previouResources);
+			this.resourcePool.addResourceList(previouResources);
 		}
 		
 	}
