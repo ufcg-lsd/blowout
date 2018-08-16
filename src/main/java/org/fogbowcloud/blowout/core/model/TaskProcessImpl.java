@@ -189,9 +189,12 @@ public class TaskProcessImpl implements TaskProcess {
 		if (this.spec.getUsername() != null && !this.spec.getUsername().isEmpty()) {
 			additionalEnvVar.put(ENV_SSH_USER, this.spec.getUsername());
 			LOGGER.debug("Env_ssh_user:" + this.spec.getUsername());
-		} else {
+		} else if (resource.getMetadataValue(ENV_SSH_USER) != null && !resource.getMetadataValue(ENV_SSH_USER).isEmpty()) {
 			additionalEnvVar.put(ENV_SSH_USER, resource.getMetadataValue(ENV_SSH_USER));
 			LOGGER.debug("Env_ssh_user:" + resource.getMetadataValue(ENV_SSH_USER));
+		}  else {
+			additionalEnvVar.put(ENV_SSH_USER, resource.getMetadataValue(AbstractResource.METADATA_SSH_USERNAME_ATT));
+			LOGGER.debug("Env_ssh_user:" + resource.getMetadataValue(AbstractResource.METADATA_SSH_USERNAME_ATT));
 		}
 		additionalEnvVar.put(ENV_PRIVATE_KEY_FILE, spec.getPrivateKeyFilePath());
 
