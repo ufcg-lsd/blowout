@@ -101,6 +101,7 @@ public class TaskImpl implements Task {
 	@Override
 	public void finish(){
 		this.isFinished = true;
+		setState(TaskState.COMPLETED);
 	}
 
 	@Override
@@ -237,6 +238,7 @@ public class TaskImpl implements Task {
 			task.put("spec", this.getSpecification().toJSON());
 			task.put("retries", this.getRetries());
 			task.put("uuid", this.getUUID());
+			task.put("state", this.state.getDesc());
 			JSONArray commands = new JSONArray();
 			for (Command command : this.getAllCommands()) {
 				commands.put(command.toJSON());
