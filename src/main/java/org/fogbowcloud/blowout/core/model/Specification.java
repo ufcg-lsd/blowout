@@ -50,6 +50,11 @@ public class Specification implements Serializable {
 	String contextScript;
 	String userDataFile;
 	String userDataType;
+	String vCPU;
+	String memory;
+	String disk;
+	String requestingMember;
+	String providingMember;
 
 	Map<String, String> requirements = new HashMap<String, String>();
 
@@ -65,6 +70,21 @@ public class Specification implements Serializable {
 		this.privateKeyFilePath = privateKeyFilePath;
 		this.userDataFile = userDataFile;
 		this.userDataType = userDataType;
+	}
+
+	public Specification(String image, String username, String publicKey, String privateKeyFilePath,
+			String userDataFile, String userDataType, String vCPU, String memory, String disk, String requestingMember, String providingMember) {
+		this.image = image;
+		this.username = username;
+		this.publicKey = publicKey;
+		this.privateKeyFilePath = privateKeyFilePath;
+		this.userDataFile = userDataFile;
+		this.userDataType = userDataType;
+		this.vCPU = vCPU;
+		this.memory = memory;
+		this.disk = disk;
+		this.requestingMember = requestingMember;
+		this.providingMember = providingMember;
 	}
 
 	public void addRequirement(String key, String value) {
@@ -317,7 +337,6 @@ public class Specification implements Serializable {
 		return specification;
 	}
 
-
 	public static Map<String, String> toMap(String jsonStr) {
 		Map<String, String> newMap = new HashMap<String, String>();
 		jsonStr = jsonStr.replace("{", "").replace("}", "");
@@ -333,5 +352,45 @@ public class Specification implements Serializable {
 			newMap.put(key, value);
 		}
 		return newMap;
+	}
+
+	public String getvCPU() {
+		return vCPU;
+	}
+
+	public void setvCPU(String vCPU) {
+		this.vCPU = vCPU;
+	}
+
+	public String getMemory() {
+		return memory;
+	}
+
+	public void setMemory(String memory) {
+		this.memory = memory;
+	}
+
+	public String getDisk() {
+		return disk;
+	}
+
+	public void setDisk(String disk) {
+		this.disk = disk;
+	}
+
+	public String getRequestingMember() {
+		return requestingMember;
+	}
+
+	public void setRequestingMember(String requestingMember) {
+		this.requestingMember = requestingMember;
+	}
+
+	public String getProvidingMember() {
+		return providingMember;
+	}
+
+	public void setProvidingMember(String providingMember) {
+		this.providingMember = providingMember;
 	}
 }
