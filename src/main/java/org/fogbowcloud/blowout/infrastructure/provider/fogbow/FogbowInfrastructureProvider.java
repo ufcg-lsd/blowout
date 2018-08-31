@@ -314,25 +314,13 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 	private void validateSpecification(Specification specification) throws RequestResourceException {
 
-		if (specification.getImage() == null || specification.getImage().isEmpty()) {
+		if (specification.getImage() == null || specification.getImage().isEmpty() ||
+                specification.getProvidingMember() == null || specification.getProvidingMember().isEmpty() ||
+                specification.getRequestingMember() == null || specification.getRequestingMember().isEmpty() ||
+                specification.getPublicKey() == null || specification.getPublicKey().isEmpty() ) {
 
 			throw new RequestResourceException("");
 		}
-		if (specification.getPublicKey() == null || specification.getPublicKey().isEmpty()) {
-
-			throw new RequestResourceException("");
-		}
-
-		String fogbowRequirements = specification
-				.getRequirementValue(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS);
-
-		if (!FogbowRequirementsHelper.validateFogbowRequirementsSyntax(fogbowRequirements)) {
-			LOGGER.debug("FogbowRequirements [" + fogbowRequirements
-					+ "] is not in valid format. e.g: [Glue2vCPU >= 1 && Glue2RAM >= 1024 && Glue2disk >= 20 && Glue2CloudComputeManagerID ==\"servers.your.domain\"]");
-			throw new RequestResourceException("FogbowRequirements [" + fogbowRequirements
-					+ "] is not in valid format. e.g: [Glue2vCPU >= 1 && Glue2RAM >= 1024 && Glue2disk >= 20 && Glue2CloudComputeManagerID ==\"servers.your.domain\"]");
-		}
-
 	}
 
 	private List<Header> requestNewInstanceHeaders(Specification specs) {
