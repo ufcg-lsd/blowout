@@ -138,7 +138,8 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 			List<Header> headers = (LinkedList<Header>) requestNewInstanceHeaders(spec);
 			LOGGER.debug("Headers: " + headers.toString());
-			requestInformation = this.doRequest("post", managerUrl + "/" + OrderConstants.TERM, headers);
+			String computeEndpoint = "computes"; // TODO: move to constant
+			requestInformation = this.doRequest("post", managerUrl + "/" + computeEndpoint, headers);
 
 		} catch (Exception e) {
 			LOGGER.error("Error while requesting resource on Fogbow", e);
