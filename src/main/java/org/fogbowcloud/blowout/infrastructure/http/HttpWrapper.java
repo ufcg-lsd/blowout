@@ -41,7 +41,8 @@ public class HttpWrapper {
         request.addHeader(OCCIHeaders.CONTENT_TYPE, OCCIHeaders.OCCI_CONTENT_TYPE);
         
         if (authToken != null) {
-            request.addHeader(OCCIHeaders.X_AUTH_TOKEN, authToken);
+            String FEDERATION_TOKEN_VALUE_HEADER_KEY = "federationTokenValue"; // TODO: move to constant
+            request.addHeader(FEDERATION_TOKEN_VALUE_HEADER_KEY, authToken);
         }
         for (Header header : additionalHeaders) {
             request.addHeader(header);
