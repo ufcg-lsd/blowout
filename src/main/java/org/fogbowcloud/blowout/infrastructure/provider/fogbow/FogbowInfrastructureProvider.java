@@ -136,7 +136,8 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 			this.validateSpecification(spec);
 
-			List<Header> headers = (LinkedList<Header>) requestNewInstanceHeaders(spec);
+			List<Header> headers = new LinkedList<Header>();
+
 			LOGGER.debug("Headers: " + headers.toString());
 			String computeEndpoint = "computes"; // TODO: move to constant
 			requestInformation = this.doRequest("post", managerUrl + "/" + computeEndpoint, headers);
