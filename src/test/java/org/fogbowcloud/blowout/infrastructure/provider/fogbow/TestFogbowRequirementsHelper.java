@@ -58,6 +58,7 @@ public class TestFogbowRequirementsHelper {
 		properties = null;
 	}
 
+	// TODO: delete this test
 	@Test
 	public void validateFogbowRequirementsSyntaxSucessTest() {
 

@@ -156,6 +156,9 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		fogbowResource.putMetadata(AbstractResource.METADATA_REQUEST_TYPE, requestType);
 		fogbowResource.putMetadata(AbstractResource.METADATA_IMAGE, spec.getImage());
 		fogbowResource.putMetadata(AbstractResource.METADATA_PUBLIC_KEY, spec.getPublicKey());
+		fogbowResource.putMetadata(AbstractResource.METADATA_VCPU, spec.getvCPU());
+		fogbowResource.putMetadata(AbstractResource.METADATA_MEN_SIZE, spec.getMemory());
+		fogbowResource.putMetadata(AbstractResource.METADATA_DISK_SIZE, spec.getDisk());
 
 		resourcesMap.put(resourceId, fogbowResource);
 		frDatastore.addFogbowResource(fogbowResource);

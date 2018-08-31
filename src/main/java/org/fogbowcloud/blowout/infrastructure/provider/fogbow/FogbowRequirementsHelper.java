@@ -27,7 +27,15 @@ public class FogbowRequirementsHelper {
 	public static final String METADATA_FOGBOW_REQUIREMENTS_Glue2disk = "Glue2disk";
 	public static final String METADATA_FOGBOW_REQUIREMENTS_1Glue2CloudComputeManagerID = "Glue2CloudComputeManagerID";
 	public static final String METADATA_FOGBOW_REQUEST_TYPE = "RequestType";
-	
+	public static final String HEADER_FOGBOW_REQUIREMENTS_VCPU = "vCPU";
+	public static final String HEADER_FOGBOW_REQUIREMENTS_MEMORY = "memory";
+	public static final String HEADER_FOGBOW_REQUIREMENTS_DISK = "disk";
+	public static final String HEADER_FOGBOW_REQUIREMENTS_IMAGE_NAME = "imageName";
+	public static final String HEADER_FOGBOW_REQUIREMENTS_REQUESTING_MEMBER = "requestingMember";
+	public static final String HEADER_FOGBOW_REQUIREMENTS_PROVIDING_MEMBER = "providingMember";
+	public static final String HEADER_FOGBOW_REQUIREMENTS_PUBLIC_KEY = "publicKey";
+
+	// TODO: this delete this method
 	public static boolean validateFogbowRequirementsSyntax(String requirementsString) {
 		
 		LOGGER.debug("Validating Fogbow Requirements ["+requirementsString+"]");
@@ -80,7 +88,8 @@ public class FogbowRequirementsHelper {
 				List<ValueAndOperator> findValuesInRequiremets = findValuesInRequiremets(expr, attr);
 				
 				if (findValuesInRequiremets.size() > 0) {
-					
+
+					// TODO: Check if you need to refact this
 					if (attr.equals(METADATA_FOGBOW_REQUIREMENTS_Glue2vCPU)) {
 						listAttrSearched.add(attr);
 						value = resource.getMetadataValue(AbstractResource.METADATA_VCPU);
