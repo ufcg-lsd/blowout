@@ -1,7 +1,10 @@
 package org.fogbowcloud.blowout.infrastructure.http;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
+import com.amazonaws.util.json.JSONException;
+import com.amazonaws.util.json.JSONObject;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -11,8 +14,12 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
+import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.manager.occi.model.HeaderUtils;
 import org.fogbowcloud.manager.occi.model.OCCIHeaders;
 import org.fogbowcloud.manager.occi.order.OrderConstants;
@@ -27,7 +34,11 @@ public class HttpWrapper {
     }
 
     public String doRequest(String method, String endpoint, String authToken, List<Header> additionalHeaders) throws Exception {
-        
+        return doRequest(method, endpoint, authToken, additionalHeaders, null);
+    }
+
+    public String doRequest(String method, String endpoint, String authToken, List<Header> additionalHeaders, StringEntity bodyJsonStringEntity) throws Exception {
+
     	HttpUriRequest request = null;
         
     	if (method.equals("get")) {
@@ -36,10 +47,11 @@ public class HttpWrapper {
             request = new HttpDelete(endpoint);
         } else if (method.equals("post")) {
             request = new HttpPost(endpoint);
+            ((HttpPost) request).setEntity(bodyJsonStringEntity);
         }
     	
         request.addHeader(OCCIHeaders.CONTENT_TYPE, OCCIHeaders.OCCI_CONTENT_TYPE);
-        
+
         if (authToken != null) {
             String FEDERATION_TOKEN_VALUE_HEADER_KEY = "federationTokenValue"; // TODO: move to constant
             request.addHeader(FEDERATION_TOKEN_VALUE_HEADER_KEY, authToken);
@@ -47,7 +59,7 @@ public class HttpWrapper {
         for (Header header : additionalHeaders) {
             request.addHeader(header);
         }
-        
+
         HttpResponse response = createHttpClient().execute(request);
         HttpEntity entity = null;
         
