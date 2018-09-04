@@ -65,6 +65,8 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 	public static final String INSTANCE_ATTRIBUTE_DISKSIZE = "TODO-AlterWhenFogbowReturns";
 	public static final String INSTANCE_ATTRIBUTE_REQUEST_TYPE = "org.fogbowcloud.order.type";
 
+	public static final String FOGBOW_RAS_COMPUTE_ENDPOINT = "computes";
+
 	private HttpWrapper httpWrapper;
 	private String managerUrl;
 	private Token token;
@@ -138,8 +140,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 			StringEntity bodyRequest = this.httpWrapper.makeBodyJson(spec);
 
 			LOGGER.debug("Headers: " + headers.toString());
-			String computeEndpoint = "computes"; // TODO: move to constant
-			requestInformation = this.doRequest("post", managerUrl + "/" + computeEndpoint, headers, bodyRequest);
+			requestInformation = this.doRequest("post", managerUrl + "/" + FOGBOW_RAS_COMPUTE_ENDPOINT, headers, bodyRequest);
 
 		} catch (Exception e) {
 			LOGGER.error("Error while requesting resource on Fogbow", e);
