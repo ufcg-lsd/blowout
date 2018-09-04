@@ -53,8 +53,6 @@ public class Specification implements Serializable {
 	String vCPU;
 	String memory;
 	String disk;
-	String requestingMember;
-	String providingMember;
 
 	Map<String, String> requirements = new HashMap<String, String>();
 
@@ -73,7 +71,7 @@ public class Specification implements Serializable {
 	}
 
 	public Specification(String image, String username, String publicKey, String privateKeyFilePath,
-			String userDataFile, String userDataType, String vCPU, String memory, String disk, String requestingMember, String providingMember) {
+			String userDataFile, String userDataType, String vCPU, String memory, String disk) {
 		this.image = image;
 		this.username = username;
 		this.publicKey = publicKey;
@@ -83,8 +81,6 @@ public class Specification implements Serializable {
 		this.vCPU = vCPU;
 		this.memory = memory;
 		this.disk = disk;
-		this.requestingMember = requestingMember;
-		this.providingMember = providingMember;
 	}
 
 	public void addRequirement(String key, String value) {
@@ -376,21 +372,5 @@ public class Specification implements Serializable {
 
 	public void setDisk(String disk) {
 		this.disk = disk;
-	}
-
-	public String getRequestingMember() {
-		return requestingMember;
-	}
-
-	public void setRequestingMember(String requestingMember) {
-		this.requestingMember = requestingMember;
-	}
-
-	public String getProvidingMember() {
-		return providingMember;
-	}
-
-	public void setProvidingMember(String providingMember) {
-		this.providingMember = providingMember;
 	}
 }
