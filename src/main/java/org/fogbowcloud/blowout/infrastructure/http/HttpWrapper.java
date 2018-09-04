@@ -29,6 +29,8 @@ public class HttpWrapper {
     private static final int SERVER_SIDE_ERRO_MAX = 505;
 	private static final int CLIENT_SIDE_CODE_ERRO_INIT = 400;
 
+	public static final String HTTP_CONTENT_JSON = "application/json";
+
     private static HttpClient createHttpClient() {
 		return HttpClients.createMinimal();
     }
@@ -113,5 +115,34 @@ public class HttpWrapper {
             response += HeaderUtils.X_OCCI_LOCATION_PREFIX + location + "\n";
         }
         return response.trim();
+    }
+
+    public StringEntity makeBodyJson(Specification spec) throws JSONException, UnsupportedEncodingException {
+        JSONObject json = new JSONObject();
+
+        if (spec.getPublicKey() != null || !spec.getPublicKey().isEmpty()) {
+            json.put("publicKey", spec.getPublicKey());
+        }
+
+        if (spec.getvCPU() != null || !spec.getvCPU().isEmpty()) {
+            json.put("vCPU", spec.getvCPU());
+        }
+
+        if (spec.getMemory() != null || !spec.getMemory().isEmpty()) {
+            json.put("memory", spec.getMemory());
+        }
+
+        if (spec.getDisk() != null || !spec.getDisk().isEmpty()) {
+            json.put("disk", spec.getDisk());
+        }
+
+        if (spec.getImage() != null || !spec.getImage().isEmpty()) {
+            json.put("imageName", spec.getImage());
+        }
+
+        StringEntity se = new StringEntity(json.toString());
+        se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, HTTP_CONTENT_JSON));
+
+        return se;
     }
 }
