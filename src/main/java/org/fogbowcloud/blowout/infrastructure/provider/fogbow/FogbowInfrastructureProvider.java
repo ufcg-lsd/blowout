@@ -136,11 +136,8 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		String requestInformation;
 
 		try {
-			List<Header> headers = new LinkedList<Header>();
 			StringEntity bodyRequest = this.httpWrapper.makeBodyJson(spec);
-
-			LOGGER.debug("Headers: " + headers.toString());
-			requestInformation = this.doRequest("post", managerUrl + "/" + FOGBOW_RAS_COMPUTE_ENDPOINT, headers, bodyRequest);
+			requestInformation = this.doRequest("post", managerUrl + "/" + FOGBOW_RAS_COMPUTE_ENDPOINT, new LinkedList<Header>(), bodyRequest);
 
 		} catch (Exception e) {
 			LOGGER.error("Error while requesting resource on Fogbow", e);
@@ -273,13 +270,9 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 		try {
 			if (fogbowResource.getInstanceId() != null) {
-				
-				this.doRequest("delete", managerUrl + "/compute/" + fogbowResource.getInstanceId(),
+				this.doRequest("delete", managerUrl + "/" + FOGBOW_RAS_COMPUTE_ENDPOINT + "/" + fogbowResource.getInstanceId(),
 						new ArrayList<Header>());
 			}
-			
-			this.doRequest("delete", managerUrl + "/" + OrderConstants.TERM + "/" + fogbowResource.getOrderId(),
-					new ArrayList<Header>());
 			resourcesMap.remove(resourceId);
 			frDatastore.deleteFogbowResourceById(fogbowResource);
 			LOGGER.debug("Resource " + fogbowResource.getId() + " deleted successfully");
