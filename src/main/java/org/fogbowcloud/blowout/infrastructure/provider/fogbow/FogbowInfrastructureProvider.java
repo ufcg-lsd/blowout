@@ -20,6 +20,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHeader;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.model.Specification;
@@ -134,10 +135,11 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 		try {
 			List<Header> headers = new LinkedList<Header>();
+			StringEntity bodyRequest = this.httpWrapper.makeBodyJson(spec);
 
 			LOGGER.debug("Headers: " + headers.toString());
 			String computeEndpoint = "computes"; // TODO: move to constant
-			requestInformation = this.doRequest("post", managerUrl + "/" + computeEndpoint, headers);
+			requestInformation = this.doRequest("post", managerUrl + "/" + computeEndpoint, headers, bodyRequest);
 
 		} catch (Exception e) {
 			LOGGER.error("Error while requesting resource on Fogbow", e);
@@ -375,6 +377,10 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 			fileContent += linha + "\n";
 		}
 		return fileContent.trim();
+	}
+
+	private String doRequest(String method, String endpoint, List<Header> headers, StringEntity bodyJson) throws Exception {
+		return httpWrapper.doRequest(method, endpoint, token.getAccessId(), headers, bodyJson);
 	}
 
 	private String doRequest(String method, String endpoint, List<Header> headers) throws Exception {
