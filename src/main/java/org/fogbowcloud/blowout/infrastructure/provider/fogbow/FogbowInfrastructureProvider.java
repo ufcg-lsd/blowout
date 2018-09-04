@@ -133,9 +133,6 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		String requestInformation;
 
 		try {
-
-			this.validateSpecification(spec);
-
 			List<Header> headers = new LinkedList<Header>();
 
 			LOGGER.debug("Headers: " + headers.toString());
@@ -313,17 +310,6 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 		Map<String, String> attrs = parseAttributes(instanceInformation);
 		return attrs;
-	}
-
-	private void validateSpecification(Specification specification) throws RequestResourceException {
-
-		if (specification.getImage() == null || specification.getImage().isEmpty() ||
-                specification.getProvidingMember() == null || specification.getProvidingMember().isEmpty() ||
-                specification.getRequestingMember() == null || specification.getRequestingMember().isEmpty() ||
-                specification.getPublicKey() == null || specification.getPublicKey().isEmpty() ) {
-
-			throw new RequestResourceException("");
-		}
 	}
 
 	private List<Header> requestNewInstanceHeaders(Specification specs) {
