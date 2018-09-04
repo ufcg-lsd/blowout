@@ -58,9 +58,11 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 	public static final String INSTANCE_ATTRIBUTE_SSH_PUBLIC_ADDRESS_ATT = "org.fogbowcloud.order.ssh-public-address";
 	public static final String INSTANCE_ATTRIBUTE_SSH_USERNAME_ATT = "org.fogbowcloud.order.ssh-username";
 	public static final String INSTANCE_ATTRIBUTE_EXTRA_PORTS_ATT = "org.fogbowcloud.order.extra-ports";
-	public static final String INSTANCE_ATTRIBUTE_MEMORY_SIZE = "occi.compute.memory";
-	public static final String INSTANCE_ATTRIBUTE_VCORE = "occi.compute.cores";
-	
+//	public static final String INSTANCE_ATTRIBUTE_MEMORY_SIZE = "occi.compute.memory";
+	public static final String INSTANCE_ATTRIBUTE_MEMORY_SIZE = "ram";
+//	public static final String INSTANCE_ATTRIBUTE_VCORE = "occi.compute.cores";
+	public static final String INSTANCE_ATTRIBUTE_VCORE = "vCPU";
+
 	// TODO: alter when fogbow are returning this attribute
 	public static final String INSTANCE_ATTRIBUTE_DISKSIZE = "TODO-AlterWhenFogbowReturns";
 	public static final String INSTANCE_ATTRIBUTE_REQUEST_TYPE = "org.fogbowcloud.order.type";
@@ -185,7 +187,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		LOGGER.debug("Initiating Resource Instanciation - Resource id: [" + resourceId + "]");
 		String instanceId;
 		String sshInformation;
-		Map<String, String> requestAttributes;
+		Map<String, String> instanceAttributes;
 
 		FogbowResource fogbowResource = resourcesMap.get(resourceId);
 
@@ -197,16 +199,14 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 		try {
 			LOGGER.debug("Getting request attributes - Retrieve Instace ID.");
-			
-			requestAttributes = getFogbowRequestAttributes(fogbowResource.getOrderId());
-			instanceId = requestAttributes.get(OrderAttribute.INSTANCE_ID.getValue());
+
+			instanceAttributes = getFogbowInstanceAttributes(fogbowResource.getOrderId());
+			instanceId = instanceAttributes.get(OrderAttribute.INSTANCE_ID.getValue());
 
 			if (instanceId != null && !instanceId.isEmpty()) {
 				LOGGER.debug("Instance ID returned: " + instanceId);
 
 				fogbowResource.setInstanceId(instanceId);
-
-				Map<String, String> instanceAttributes = getFogbowInstanceAttributes(fogbowResource.getInstanceId());
 
 				if (this.validateInstanceAttributes(instanceAttributes)) {
 
@@ -220,19 +220,21 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 					fogbowResource.setLocalCommandInterpreter(
 							properties.getProperty(AppPropertiesConstants.LOCAL_COMMAND_INTERPRETER));
-					fogbowResource.putMetadata(AbstractResource.METADATA_SSH_HOST, host);
-					fogbowResource.putMetadata(AbstractResource.METADATA_SSH_PORT, port);
-					fogbowResource.putMetadata(AbstractResource.METADATA_SSH_USERNAME_ATT,
-							instanceAttributes.get(INSTANCE_ATTRIBUTE_SSH_USERNAME_ATT));
-					fogbowResource.putMetadata(AbstractResource.METADATA_EXTRA_PORTS_ATT,
-							instanceAttributes.get(INSTANCE_ATTRIBUTE_EXTRA_PORTS_ATT));
+//					fogbowResource.putMetadata(AbstractResource.METADATA_SSH_HOST, host); TODO: these following line are commented
+//					fogbowResource.putMetadata(AbstractResource.METADATA_SSH_PORT, port); TODO: because fogbow-RAS do not provide
+//					fogbowResource.putMetadata(AbstractResource.METADATA_SSH_USERNAME_ATT, TODO: this information
+//							instanceAttributes.get(INSTANCE_ATTRIBUTE_SSH_USERNAME_ATT));
+//					fogbowResource.putMetadata(AbstractResource.METADATA_EXTRA_PORTS_ATT,
+//							instanceAttributes.get(INSTANCE_ATTRIBUTE_EXTRA_PORTS_ATT));
+//					fogbowResource.putMetadata(AbstractResource.METADATA_LOCATION,
+//							"\"" + instanceAttributes.get(REQUEST_ATTRIBUTE_MEMBER_ID) + "\"");
 					fogbowResource.putMetadata(AbstractResource.METADATA_VCPU,
 							instanceAttributes.get(INSTANCE_ATTRIBUTE_VCORE));
 					float menSize = Float.parseFloat(instanceAttributes.get(INSTANCE_ATTRIBUTE_MEMORY_SIZE));
 					String menSizeFormated = String.valueOf(menSize * MEMORY_1Gbit);
 					fogbowResource.putMetadata(AbstractResource.METADATA_MEN_SIZE, menSizeFormated);
-					fogbowResource.putMetadata(AbstractResource.METADATA_LOCATION,
-							"\"" + requestAttributes.get(REQUEST_ATTRIBUTE_MEMBER_ID) + "\"");
+					fogbowResource.putMetadata(AbstractResource.METADATA_DISK_SIZE,
+							instanceAttributes.get(INSTANCE_ATTRIBUTE_MEMORY_SIZE));
 
 					// TODO: Make fogbow return these attributes: newResource.putMetadata(Resource.METADATA_DISK_SIZE and instanceAttributes.get(INSTANCE_ATTRIBUTE_DISKSIZE));
 
@@ -291,7 +293,6 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 	}
 
 	private Map<String, String> getFogbowRequestAttributes(String orderId) throws Exception {
-
 		String endpoint = managerUrl + "/" + OrderConstants.TERM + "/" + orderId;
 		String requestResponse = doRequest("get", endpoint, new ArrayList<Header>());
 
@@ -299,9 +300,8 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		return attrs;
 	}
 
-	private Map<String, String> getFogbowInstanceAttributes(String instanceId) throws Exception {
-
-		String endpoint = managerUrl + "/compute/" + instanceId;
+	private Map<String, String> getFogbowInstanceAttributes(String orderId) throws Exception {
+		String endpoint = managerUrl + "/" +  FOGBOW_RAS_COMPUTE_ENDPOINT + "/" + orderId;
 		String instanceInformation = doRequest("get", endpoint, new ArrayList<Header>());
 
 		Map<String, String> attrs = parseAttributes(instanceInformation);
