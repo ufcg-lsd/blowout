@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.fogbowcloud.blowout.infrastructure.provider.fogbow.FogbowRequirementsHelper;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -50,9 +51,6 @@ public class Specification implements Serializable {
 	String contextScript;
 	String userDataFile;
 	String userDataType;
-	String vCPU;
-	String memory;
-	String disk;
 
 	Map<String, String> requirements = new HashMap<String, String>();
 
@@ -78,9 +76,6 @@ public class Specification implements Serializable {
 		this.privateKeyFilePath = privateKeyFilePath;
 		this.userDataFile = userDataFile;
 		this.userDataType = userDataType;
-		this.vCPU = vCPU;
-		this.memory = memory;
-		this.disk = disk;
 	}
 
 	public void addRequirement(String key, String value) {
@@ -351,26 +346,113 @@ public class Specification implements Serializable {
 	}
 
 	public String getvCPU() {
+		String fogbowRequirements = getRequirementValue(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS);
+
+		if (fogbowRequirements == null) {
+			return null;
+		}
+
+		Boolean found = fogbowRequirements.contains(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS_Glue2vCPU);
+
+		String vCPU = "";
+		if (found) {
+			String[] parts = fogbowRequirements.split(" ");
+			String currentItemKey, currentItemOperator, currentItemValue;
+
+			for (int i = 0; i < parts.length; i++) {
+
+				currentItemKey = parts[i];
+				currentItemOperator = parts[i+1];
+				currentItemValue = parts[i+2];
+
+				if (currentItemKey.equals(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS_Glue2vCPU)) {
+					switch (currentItemOperator) {
+						case "<=":
+						case "==":
+						case ">=":
+							vCPU = currentItemValue;
+							break;
+						default:
+							break;
+					}
+					break;
+				}
+			}
+		}
 		return vCPU;
 	}
 
-	public void setvCPU(String vCPU) {
-		this.vCPU = vCPU;
-	}
-
 	public String getMemory() {
+		String fogbowRequirements = getRequirementValue(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS);
+
+		if (fogbowRequirements == null) {
+			return null;
+		}
+
+		Boolean found = fogbowRequirements.contains(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS_Glue2RAM);
+
+		String memory = "";
+		if (found) {
+			String[] parts = fogbowRequirements.split(" ");
+			String currentItemKey, currentItemOperator, currentItemValue;
+
+			for (int i = 0; i < parts.length; i++) {
+
+				currentItemKey = parts[i];
+				currentItemOperator = parts[i+1];
+				currentItemValue = parts[i+2];
+
+				if (currentItemKey.equals(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS_Glue2RAM)) {
+					switch (currentItemOperator) {
+						case "<=":
+						case "==":
+						case ">=":
+							memory = currentItemValue;
+							break;
+						default:
+							break;
+					}
+					break;
+				}
+			}
+		}
 		return memory;
 	}
 
-	public void setMemory(String memory) {
-		this.memory = memory;
-	}
-
 	public String getDisk() {
-		return disk;
-	}
+		String fogbowRequirements = getRequirementValue(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS);
 
-	public void setDisk(String disk) {
-		this.disk = disk;
+		if (fogbowRequirements == null) {
+			return null;
+		}
+
+		Boolean found = fogbowRequirements.contains(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS_Glue2disk);
+
+		String disk = "";
+		if (found) {
+			String[] parts = fogbowRequirements.split(" ");
+			String currentItemKey, currentItemOperator, currentItemValue;
+
+			for (int i = 0; i < parts.length; i++) {
+
+				currentItemKey = parts[i];
+				currentItemOperator = parts[i+1];
+				currentItemValue = parts[i+2];
+
+				if (currentItemKey.equals(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS_Glue2disk)) {
+					switch (currentItemOperator) {
+						case "<=":
+						case "==":
+						case ">=":
+							disk = currentItemValue;
+							break;
+						default:
+							break;
+					}
+					break;
+				}
+			}
+		}
+		return disk;
 	}
 }

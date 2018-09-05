@@ -154,9 +154,6 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		fogbowResource.putMetadata(AbstractResource.METADATA_REQUEST_TYPE, requestType);
 		fogbowResource.putMetadata(AbstractResource.METADATA_IMAGE, spec.getImage());
 		fogbowResource.putMetadata(AbstractResource.METADATA_PUBLIC_KEY, spec.getPublicKey());
-		fogbowResource.putMetadata(AbstractResource.METADATA_VCPU, spec.getvCPU());
-		fogbowResource.putMetadata(AbstractResource.METADATA_MEN_SIZE, spec.getMemory());
-		fogbowResource.putMetadata(AbstractResource.METADATA_DISK_SIZE, spec.getDisk());
 
 		resourcesMap.put(resourceId, fogbowResource);
 		frDatastore.addFogbowResource(fogbowResource);
@@ -511,23 +508,23 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		JSONObject json = new JSONObject();
 
 		if (spec.getPublicKey() != null || !spec.getPublicKey().isEmpty()) {
-			json.put("publicKey", spec.getPublicKey());
+			json.put(FogbowRequirementsHelper.HEADER_FOGBOW_REQUIREMENTS_PUBLIC_KEY, spec.getPublicKey());
 		}
 
 		if (spec.getvCPU() != null || !spec.getvCPU().isEmpty()) {
-			json.put("vCPU", spec.getvCPU());
+			json.put(FogbowRequirementsHelper.HEADER_FOGBOW_REQUIREMENTS_VCPU, spec.getvCPU());
 		}
 
 		if (spec.getMemory() != null || !spec.getMemory().isEmpty()) {
-			json.put("memory", spec.getMemory());
+			json.put(FogbowRequirementsHelper.HEADER_FOGBOW_REQUIREMENTS_MEMORY, spec.getMemory());
 		}
 
 		if (spec.getDisk() != null || !spec.getDisk().isEmpty()) {
-			json.put("disk", spec.getDisk());
+			json.put(FogbowRequirementsHelper.HEADER_FOGBOW_REQUIREMENTS_DISK, spec.getDisk());
 		}
 
 		if (spec.getImage() != null || !spec.getImage().isEmpty()) {
-			json.put("imageName", spec.getImage());
+			json.put(FogbowRequirementsHelper.HEADER_FOGBOW_REQUIREMENTS_IMAGE_NAME, spec.getImage());
 		}
 
 		StringEntity se = new StringEntity(json.toString());

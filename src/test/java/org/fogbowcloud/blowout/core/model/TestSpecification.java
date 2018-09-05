@@ -2,8 +2,12 @@ package org.fogbowcloud.blowout.core.model;
 
 import static org.junit.Assert.*;
 
+import org.fogbowcloud.blowout.infrastructure.provider.fogbow.FogbowRequirementsHelper;
 import org.json.JSONObject;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class TestSpecification {
