@@ -1,10 +1,6 @@
 package org.fogbowcloud.blowout.infrastructure.provider.fogbow;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -17,11 +13,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
+import com.amazonaws.util.json.JSONException;
+import com.amazonaws.util.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHeader;
+import org.apache.http.protocol.HTTP;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
@@ -138,7 +137,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		String requestInformation;
 
 		try {
-			StringEntity bodyRequest = this.httpWrapper.makeBodyJson(spec);
+			StringEntity bodyRequest = makeBodyJson(spec);
 			requestInformation = this.doRequest("post", managerUrl + "/" + FOGBOW_RAS_COMPUTE_ENDPOINT, new LinkedList<Header>(), bodyRequest);
 
 		} catch (Exception e) {
@@ -381,7 +380,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		return httpWrapper.doRequest(method, endpoint, token.getAccessId(), headers);
 	}
 
-	protected String getOrderId(String requestInformation) {
+	protected String getOrderId(String requestInformation) { // TODO: check if this method is still up with new fogbow response
 		String[] requestRes = requestInformation.split(":");
 		String[] requestId = requestRes[requestRes.length - 1].split("/");
 		return requestId[requestId.length - 1];
@@ -440,6 +439,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		return atts;
 	}
 
+	// TODO: change to adapt to new response pattern
 	private Map<String, String> parseAttributes(String response) {
 		Map<String, String> atts = new HashMap<String, String>();
 		for (String responseLine : response.split("\n")) {
@@ -505,6 +505,35 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 	protected void setFrDatastore(FogbowResourceDatastore frDatastore) {
 		this.frDatastore = frDatastore;
+	}
+
+	public StringEntity makeBodyJson(Specification spec) throws JSONException, UnsupportedEncodingException {
+		JSONObject json = new JSONObject();
+
+		if (spec.getPublicKey() != null || !spec.getPublicKey().isEmpty()) {
+			json.put("publicKey", spec.getPublicKey());
+		}
+
+		if (spec.getvCPU() != null || !spec.getvCPU().isEmpty()) {
+			json.put("vCPU", spec.getvCPU());
+		}
+
+		if (spec.getMemory() != null || !spec.getMemory().isEmpty()) {
+			json.put("memory", spec.getMemory());
+		}
+
+		if (spec.getDisk() != null || !spec.getDisk().isEmpty()) {
+			json.put("disk", spec.getDisk());
+		}
+
+		if (spec.getImage() != null || !spec.getImage().isEmpty()) {
+			json.put("imageName", spec.getImage());
+		}
+
+		StringEntity se = new StringEntity(json.toString());
+		se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, HttpWrapper.HTTP_CONTENT_JSON));
+
+		return se;
 	}
 
 }

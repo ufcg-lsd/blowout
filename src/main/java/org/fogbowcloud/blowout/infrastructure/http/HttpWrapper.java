@@ -117,32 +117,4 @@ public class HttpWrapper {
         return response.trim();
     }
 
-    public StringEntity makeBodyJson(Specification spec) throws JSONException, UnsupportedEncodingException {
-        JSONObject json = new JSONObject();
-
-        if (spec.getPublicKey() != null || !spec.getPublicKey().isEmpty()) {
-            json.put("publicKey", spec.getPublicKey());
-        }
-
-        if (spec.getvCPU() != null || !spec.getvCPU().isEmpty()) {
-            json.put("vCPU", spec.getvCPU());
-        }
-
-        if (spec.getMemory() != null || !spec.getMemory().isEmpty()) {
-            json.put("memory", spec.getMemory());
-        }
-
-        if (spec.getDisk() != null || !spec.getDisk().isEmpty()) {
-            json.put("disk", spec.getDisk());
-        }
-
-        if (spec.getImage() != null || !spec.getImage().isEmpty()) {
-            json.put("imageName", spec.getImage());
-        }
-
-        StringEntity se = new StringEntity(json.toString());
-        se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, HTTP_CONTENT_JSON));
-
-        return se;
-    }
 }
