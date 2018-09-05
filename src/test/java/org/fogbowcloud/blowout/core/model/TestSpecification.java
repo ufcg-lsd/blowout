@@ -21,6 +21,13 @@ public class TestSpecification {
 	private static final String THIS_VALUE = "thisValue";
 	private static final String FIRST_REQUIREMENT = "firstRequirement";
 
+    public final static String FOGBOW_REQUIREMENT_A = "Glue2vCPU == 1 && Glue2RAM >= 1024 ";
+    public final static String FOGBOW_REQUIREMENT_B = "Glue2vCPU >= 1 && Glue2RAM >= 1024 && Glue2disk <= 20 ";
+    public final static String FOGBOW_REQUIREMENT_C = "Glue2vCPU <= 1 && Glue2RAM >= 1024 && Glue2disk >= 20 && Glue2CloudComputeManagerID ==\"servers.your.domain\"";
+    public final static String FOGBOW_REQUIREMENT_D = "Glue2vCPU >= 1 && Glue2RAM == 1024 || Glue2RAM == 2048 && Glue2disk == 20 && Glue2CloudComputeManagerID ==\"servers.your.domain\"";
+    public final static String FOGBOW_REQUIREMENT_E = "";
+    public final static String FOGBOW_REQUIREMENT_F = null;
+
 	@Test
 	public void testToAndFromJSon() {
 		Specification spec = new Specification(IMAGE, USERNAME, PUBLIC_KEY, PRIVATE_KEY_PATH);
@@ -39,4 +46,77 @@ public class TestSpecification {
 		assertEquals(spec.getRequirementValue(SECOND_REQUIREMENTE), recoveredSpec.getRequirementValue(SECOND_REQUIREMENTE));
 	}
 
+	@Test
+	public void testgetVCPU() {
+		List<String> fogbowRequirements = new ArrayList<>();
+		fogbowRequirements.add(FOGBOW_REQUIREMENT_A);
+		fogbowRequirements.add(FOGBOW_REQUIREMENT_B);
+		fogbowRequirements.add(FOGBOW_REQUIREMENT_C);
+		fogbowRequirements.add(FOGBOW_REQUIREMENT_D);
+
+		Specification spec;
+		for (String fogbowRequirement: fogbowRequirements) {
+			spec = new Specification(IMAGE, USERNAME, PUBLIC_KEY, PRIVATE_KEY_PATH);
+			spec.addRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
+
+			assertEquals("1", spec.getvCPU());
+		}
+
+        spec = new Specification(IMAGE, USERNAME, PUBLIC_KEY, PRIVATE_KEY_PATH);
+        spec.addRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_E);
+        assertEquals("", spec.getvCPU());
+
+        spec = new Specification(IMAGE, USERNAME, PUBLIC_KEY, PRIVATE_KEY_PATH);
+        spec.addRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_F);
+        assertEquals(null, spec.getvCPU());
+	}
+
+    @Test
+    public void testgetMemory() {
+        List<String> fogbowRequirements = new ArrayList<>();
+        fogbowRequirements.add(FOGBOW_REQUIREMENT_A);
+        fogbowRequirements.add(FOGBOW_REQUIREMENT_B);
+        fogbowRequirements.add(FOGBOW_REQUIREMENT_C);
+        fogbowRequirements.add(FOGBOW_REQUIREMENT_D);
+
+        Specification spec;
+        for (String fogbowRequirement: fogbowRequirements) {
+            spec = new Specification(IMAGE, USERNAME, PUBLIC_KEY, PRIVATE_KEY_PATH);
+            spec.addRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
+
+            assertEquals("1024", spec.getMemory());
+        }
+
+        spec = new Specification(IMAGE, USERNAME, PUBLIC_KEY, PRIVATE_KEY_PATH);
+        spec.addRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_E);
+        assertEquals("", spec.getMemory());
+
+        spec = new Specification(IMAGE, USERNAME, PUBLIC_KEY, PRIVATE_KEY_PATH);
+        spec.addRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_F);
+        assertEquals(null, spec.getMemory());
+    }
+
+    @Test
+    public void testgetDisk() {
+        List<String> fogbowRequirements = new ArrayList<>();
+        fogbowRequirements.add(FOGBOW_REQUIREMENT_B);
+        fogbowRequirements.add(FOGBOW_REQUIREMENT_C);
+        fogbowRequirements.add(FOGBOW_REQUIREMENT_D);
+
+        Specification spec;
+        for (String fogbowRequirement: fogbowRequirements) {
+            spec = new Specification(IMAGE, USERNAME, PUBLIC_KEY, PRIVATE_KEY_PATH);
+            spec.addRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
+
+            assertEquals("20", spec.getDisk());
+        }
+
+        spec = new Specification(IMAGE, USERNAME, PUBLIC_KEY, PRIVATE_KEY_PATH);
+        spec.addRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_E);
+        assertEquals("", spec.getDisk());
+
+        spec = new Specification(IMAGE, USERNAME, PUBLIC_KEY, PRIVATE_KEY_PATH);
+        spec.addRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_F);
+        assertEquals(null, spec.getDisk());
+    }
 }
