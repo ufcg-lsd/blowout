@@ -346,105 +346,45 @@ public class Specification implements Serializable {
 	}
 
 	public String getvCPU() {
-		String fogbowRequirements = getRequirementValue(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS);
-
-		if (fogbowRequirements == null) {
-			return null;
-		}
-
-		Boolean found = fogbowRequirements.contains(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS_Glue2vCPU);
-
-		String vCPU = "";
-		if (found) {
-			String[] parts = fogbowRequirements.split(" ");
-			String currentItemKey, currentItemOperator, currentItemValue;
-
-			for (int i = 0; i < parts.length; i++) {
-
-				currentItemKey = parts[i];
-				currentItemOperator = parts[i+1];
-				currentItemValue = parts[i+2];
-
-				if (currentItemKey.equals(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS_Glue2vCPU)) {
-					switch (currentItemOperator) {
-						case "<=":
-						case "==":
-						case ">=":
-							vCPU = currentItemValue;
-							break;
-						default:
-							break;
-					}
-					break;
-				}
-			}
-		}
-		return vCPU;
+		return getFogbowRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS_Glue2vCPU);
 	}
 
 	public String getMemory() {
-		String fogbowRequirements = getRequirementValue(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS);
-
-		if (fogbowRequirements == null) {
-			return null;
-		}
-
-		Boolean found = fogbowRequirements.contains(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS_Glue2RAM);
-
-		String memory = "";
-		if (found) {
-			String[] parts = fogbowRequirements.split(" ");
-			String currentItemKey, currentItemOperator, currentItemValue;
-
-			for (int i = 0; i < parts.length; i++) {
-
-				currentItemKey = parts[i];
-				currentItemOperator = parts[i+1];
-				currentItemValue = parts[i+2];
-
-				if (currentItemKey.equals(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS_Glue2RAM)) {
-					switch (currentItemOperator) {
-						case "<=":
-						case "==":
-						case ">=":
-							memory = currentItemValue;
-							break;
-						default:
-							break;
-					}
-					break;
-				}
-			}
-		}
-		return memory;
+		return getFogbowRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS_Glue2RAM);
 	}
 
 	public String getDisk() {
+		return getFogbowRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS_Glue2disk);
+	}
+
+	private String getFogbowRequirement(String fogbowRequirementKey) {
 		String fogbowRequirements = getRequirementValue(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS);
 
 		if (fogbowRequirements == null) {
 			return null;
 		}
 
-		Boolean found = fogbowRequirements.contains(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS_Glue2disk);
+		fogbowRequirements = fogbowRequirements.trim().replaceAll(" +", " ");
 
-		String disk = "";
+		boolean found = fogbowRequirements.contains(fogbowRequirementKey);
+
+		String fogbowRequirementValue = "";
 		if (found) {
-			String[] parts = fogbowRequirements.split(" ");
+			String[] strAsArray = fogbowRequirements.split(" ");
 			String currentItemKey, currentItemOperator, currentItemValue;
 
-			for (int i = 0; i < parts.length; i++) {
+			for (int i = 0; i < strAsArray.length; i++) {
 
-				currentItemKey = parts[i];
-				currentItemOperator = parts[i+1];
-				currentItemValue = parts[i+2];
+				currentItemKey = strAsArray[i];
+				currentItemOperator = strAsArray[i+1];
+				currentItemValue = strAsArray[i+2];
 
-				if (currentItemKey.equals(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS_Glue2disk)) {
+				if (currentItemKey.equals(fogbowRequirementKey)) {
 					switch (currentItemOperator) {
 						case "<=":
 						case "==":
 						case ">=":
-							disk = currentItemValue;
+							fogbowRequirementValue = currentItemValue;
 							break;
 						default:
 							break;
@@ -453,6 +393,6 @@ public class Specification implements Serializable {
 				}
 			}
 		}
-		return disk;
+		return fogbowRequirementValue;
 	}
 }

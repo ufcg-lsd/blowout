@@ -21,10 +21,10 @@ public class TestSpecification {
 	private static final String THIS_VALUE = "thisValue";
 	private static final String FIRST_REQUIREMENT = "firstRequirement";
 
-    public final static String FOGBOW_REQUIREMENT_A = "Glue2vCPU == 1 && Glue2RAM >= 1024 ";
-    public final static String FOGBOW_REQUIREMENT_B = "Glue2vCPU >= 1 && Glue2RAM >= 1024 && Glue2disk <= 20 ";
+    public final static String FOGBOW_REQUIREMENT_A = "Glue2vCPU  == 1 && Glue2RAM >= 1024 ";
+    public final static String FOGBOW_REQUIREMENT_B = "Glue2vCPU >= 1 &&  Glue2RAM >= 1024 && Glue2disk <= 20 ";
     public final static String FOGBOW_REQUIREMENT_C = "Glue2vCPU <= 1 && Glue2RAM >= 1024 && Glue2disk >= 20 && Glue2CloudComputeManagerID ==\"servers.your.domain\"";
-    public final static String FOGBOW_REQUIREMENT_D = "Glue2vCPU >= 1 && Glue2RAM == 1024 || Glue2RAM == 2048 && Glue2disk == 20 && Glue2CloudComputeManagerID ==\"servers.your.domain\"";
+    public final static String FOGBOW_REQUIREMENT_D = "Glue2vCPU >= 1  && Glue2RAM == 1024 || Glue2RAM == 2048 && Glue2disk == 20 && Glue2CloudComputeManagerID ==\"servers.your.domain\"";
     public final static String FOGBOW_REQUIREMENT_E = "";
     public final static String FOGBOW_REQUIREMENT_F = null;
 
