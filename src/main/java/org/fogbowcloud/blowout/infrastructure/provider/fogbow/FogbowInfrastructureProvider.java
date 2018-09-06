@@ -528,26 +528,26 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		this.frDatastore = frDatastore;
 	}
 
-	public StringEntity makeBodyJson(Specification spec) throws JSONException, UnsupportedEncodingException {
+	protected StringEntity makeBodyJson(Specification spec) throws JSONException, UnsupportedEncodingException {
 		JSONObject json = new JSONObject();
 
-		if (spec.getPublicKey() != null || !spec.getPublicKey().isEmpty()) {
+		if (spec.getPublicKey() != null && !spec.getPublicKey().isEmpty()) {
 			json.put(FogbowRequirementsHelper.HEADER_FOGBOW_REQUIREMENTS_PUBLIC_KEY, spec.getPublicKey());
 		}
 
-		if (spec.getvCPU() != null || !spec.getvCPU().isEmpty()) {
+		if (spec.getvCPU() != null && !spec.getvCPU().isEmpty()) {
 			json.put(FogbowRequirementsHelper.HEADER_FOGBOW_REQUIREMENTS_VCPU, spec.getvCPU());
 		}
 
-		if (spec.getMemory() != null || !spec.getMemory().isEmpty()) {
+		if (spec.getMemory() != null && !spec.getMemory().isEmpty()) {
 			json.put(FogbowRequirementsHelper.HEADER_FOGBOW_REQUIREMENTS_MEMORY, spec.getMemory());
 		}
 
-		if (spec.getDisk() != null || !spec.getDisk().isEmpty()) {
+		if (spec.getDisk() != null && !spec.getDisk().isEmpty()) {
 			json.put(FogbowRequirementsHelper.HEADER_FOGBOW_REQUIREMENTS_DISK, spec.getDisk());
 		}
 
-		if (spec.getImage() != null || !spec.getImage().isEmpty()) {
+		if (spec.getImage() != null && !spec.getImage().isEmpty()) {
 			json.put(FogbowRequirementsHelper.HEADER_FOGBOW_REQUIREMENTS_IMAGE_NAME, spec.getImage());
 		}
 
