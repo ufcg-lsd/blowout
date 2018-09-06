@@ -1,9 +1,6 @@
 package org.fogbowcloud.blowout.infrastructure.provider.fogbow;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -12,12 +9,17 @@ import static org.mockito.Mockito.verify;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
+import com.amazonaws.util.json.JSONException;
+import org.apache.http.entity.EntityTemplate;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.util.EntityUtils;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
 import org.fogbowcloud.blowout.database.FogbowResourceDatastore;
@@ -28,10 +30,7 @@ import org.fogbowcloud.blowout.infrastructure.token.AbstractTokenUpdatePlugin;
 import org.fogbowcloud.manager.occi.model.Token;
 import org.fogbowcloud.manager.occi.order.OrderConstants;
 import org.fogbowcloud.manager.occi.order.OrderState;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
 
@@ -92,21 +91,43 @@ public class TestFogbowInfrastructureProvider {
 		verify(fogbowInfrastructureProvider).setToken(token);
 	}
 
+	@Test
+	public void testMakeBodyJasonToComputeRequest() throws Exception {
+		FogbowInfrastructureProvider fogbowInfrastructureProvider = new FogbowInfrastructureProvider(properties, exec, tokenUpdatePluginMock);
+		Specification specs = new Specification("imageMock", "UserName",
+				"publicKeyMock", "privateKeyMock", FAKE_DATA_FILE, "userDataType");
+
+		try {
+			StringEntity bodyJson = fogbowInfrastructureProvider.makeBodyJson(specs);
+			String bodyJsonString = EntityUtils.toString(bodyJson);
+
+			assertTrue(bodyJsonString.contains(FogbowRequirementsHelper.HEADER_FOGBOW_REQUIREMENTS_PUBLIC_KEY));
+			assertTrue(bodyJsonString.contains(FogbowRequirementsHelper.HEADER_FOGBOW_REQUIREMENTS_IMAGE_NAME));
+			assertTrue(!bodyJsonString.contains(FogbowRequirementsHelper.HEADER_FOGBOW_REQUIREMENTS_VCPU));
+			assertTrue(!bodyJsonString.contains(FogbowRequirementsHelper.HEADER_FOGBOW_REQUIREMENTS_DISK));
+			assertTrue(!bodyJsonString.contains(FogbowRequirementsHelper.HEADER_FOGBOW_REQUIREMENTS_MEMORY));
+		} catch (JSONException e) {
+			Assert.fail();
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+
+	}
 
 	@Test
 	public void requestResourceGetRequestIdTestSucess(){
-
 		try {
-			
 			String orderId = "order01";
 			
 			Specification specs = new Specification("imageMock", "UserName",
 					"publicKeyMock", "privateKeyMock", FAKE_DATA_FILE, "userDataType");
 
+			doReturn(orderId).when(httpWrapperMock).doRequest(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
+					Mockito.anyList(), Mockito.any(StringEntity.class));
+
 			fogbowInfrastructureProvider.setHttpWrapper(httpWrapperMock);
 			doReturn(true).when(fogbowResourceDsMock).addFogbowResource(Mockito.any(FogbowResource.class));
-			doReturn(orderId).when(fogbowInfrastructureProvider).getOrderId(Mockito.anyString());
-			
+
 			String resourceId = fogbowInfrastructureProvider.requestResource(specs);
 			assertNotNull(resourceId);
 
@@ -114,7 +135,6 @@ public class TestFogbowInfrastructureProvider {
 			e.printStackTrace();
 			fail();
 		}
-
 	}
 
 	@Test

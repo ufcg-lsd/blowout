@@ -2,10 +2,17 @@ package org.fogbowcloud.blowout.core.model;
 
 import static org.junit.Assert.*;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.fogbowcloud.blowout.infrastructure.provider.fogbow.FogbowRequirementsHelper;
 import org.json.JSONObject;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -118,5 +125,11 @@ public class TestSpecification {
         spec = new Specification(IMAGE, USERNAME, PUBLIC_KEY, PRIVATE_KEY_PATH);
         spec.addRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_F);
         assertEquals(null, spec.getDisk());
+    }
+
+    @Test
+    public void testGetFogbowRequirementValueWhenNoParam() {
+        Specification spec = new Specification(IMAGE, USERNAME, PUBLIC_KEY, PRIVATE_KEY_PATH);
+        assertNull(spec.getvCPU());
     }
 }
