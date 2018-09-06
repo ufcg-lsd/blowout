@@ -72,7 +72,9 @@ public class HttpWrapper {
             int statusCode = response.getStatusLine().getStatusCode();
             
             if (statusCode == HttpStatus.SC_OK || statusCode == HttpStatus.SC_CREATED) {
-            	
+
+                // TODO: check if this part of code is still up with new fogbow response
+                // Does it make sense to check the location header still? Does Fogbow RAS return it?
                 Header locationHeader = getLocationHeader(response.getAllHeaders());
                 
                 if (locationHeader != null && locationHeader.getValue().contains(OrderConstants.TERM)) {

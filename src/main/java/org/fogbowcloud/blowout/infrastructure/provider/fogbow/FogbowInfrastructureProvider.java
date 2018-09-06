@@ -134,13 +134,13 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 		LOGGER.debug("Requesting resource on Fogbow with specifications: " + spec.toString());
 
-		String requestInformation;
+		String orderId;
 
 		try {
 			this.validateSpecification(spec);
 
 			StringEntity bodyRequest = makeBodyJson(spec);
-			requestInformation = this.doRequest("post", managerUrl + "/" + FOGBOW_RAS_COMPUTE_ENDPOINT, new LinkedList<Header>(), bodyRequest);
+			orderId = this.doRequest("post", managerUrl + "/" + FOGBOW_RAS_COMPUTE_ENDPOINT, new LinkedList<Header>(), bodyRequest);
 
 		} catch (Exception e) {
 			LOGGER.error("Error while requesting resource on Fogbow", e);
@@ -148,7 +148,6 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 			throw new RequestResourceException("Request for Fogbow Resource has FAILED: " + e.getMessage(), e);
 		}
 
-		String orderId = getOrderId(requestInformation);
 		String resourceId = String.valueOf(UUID.randomUUID());
 
 		FogbowResource fogbowResource = new FogbowResource(resourceId, orderId, spec);
