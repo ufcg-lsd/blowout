@@ -15,6 +15,7 @@ import java.util.concurrent.ScheduledExecutorService;
 
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
@@ -463,14 +464,11 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 	// TODO: change to adapt to new response pattern
 	private Map<String, String> parseAttributes(String response) {
 		Map<String, String> atts = new HashMap<String, String>();
-		for (String responseLine : response.split("\n")) {
-			if (responseLine.contains(X_OCCI_ATTRIBUTE + ": ")) {
-				String[] responseLineSplit = responseLine.substring((X_OCCI_ATTRIBUTE + ": ").length()).split("=");
-				String valueStr = responseLineSplit[1].trim().replace("\"", "");
-				if (!valueStr.equals(NULL_VALUE)) {
-					atts.put(responseLineSplit[0].trim(), valueStr);
-				}
-			}
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			atts = mapper.readValue(response, HashMap.class);
+		} catch (IOException e) {
+			LOGGER.debug("String reponse is not valid.");
 		}
 		return atts;
 	}

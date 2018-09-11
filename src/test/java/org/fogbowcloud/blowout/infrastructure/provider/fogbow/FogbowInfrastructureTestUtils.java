@@ -40,6 +40,6 @@ public class FogbowInfrastructureTestUtils {
 			fis.close();
 		}
 	}
-	
+
 	
 }
