@@ -101,11 +101,11 @@ public class TestFogbowInfrastructureProvider {
 			StringEntity bodyJson = fogbowInfrastructureProvider.makeBodyJson(specs);
 			String bodyJsonString = EntityUtils.toString(bodyJson);
 
-			assertTrue(bodyJsonString.contains(FogbowRequirementsHelper.HEADER_FOGBOW_REQUIREMENTS_PUBLIC_KEY));
-			assertTrue(bodyJsonString.contains(FogbowRequirementsHelper.HEADER_FOGBOW_REQUIREMENTS_IMAGE_NAME));
-			assertTrue(!bodyJsonString.contains(FogbowRequirementsHelper.HEADER_FOGBOW_REQUIREMENTS_VCPU));
-			assertTrue(!bodyJsonString.contains(FogbowRequirementsHelper.HEADER_FOGBOW_REQUIREMENTS_DISK));
-			assertTrue(!bodyJsonString.contains(FogbowRequirementsHelper.HEADER_FOGBOW_REQUIREMENTS_MEMORY));
+			assertTrue(bodyJsonString.contains(FogbowRequirementsHelper.JSON_KEY_FOGBOW_REQUIREMENTS_PUBLIC_KEY));
+			assertTrue(bodyJsonString.contains(FogbowRequirementsHelper.JSON_KEY_FOGBOW_REQUIREMENTS_IMAGE_NAME));
+			assertTrue(!bodyJsonString.contains(FogbowRequirementsHelper.JSON_KEY_FOGBOW_REQUIREMENTS_VCPU));
+			assertTrue(!bodyJsonString.contains(FogbowRequirementsHelper.JSON_KEY_FOGBOW_REQUIREMENTS_DISK));
+			assertTrue(!bodyJsonString.contains(FogbowRequirementsHelper.JSON_KEY_FOGBOW_REQUIREMENTS_MEMORY));
 		} catch (JSONException e) {
 			Assert.fail();
 		} catch (UnsupportedEncodingException e) {

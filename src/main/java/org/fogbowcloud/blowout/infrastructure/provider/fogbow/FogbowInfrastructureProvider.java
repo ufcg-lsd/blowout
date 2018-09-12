@@ -530,19 +530,19 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		JSONObject json = new JSONObject();
 
 		if (spec.getPublicKey() != null && !spec.getPublicKey().isEmpty()) {
-			json.put(FogbowRequirementsHelper.HEADER_FOGBOW_REQUIREMENTS_PUBLIC_KEY, spec.getPublicKey());
+			json.put(FogbowRequirementsHelper.JSON_KEY_FOGBOW_REQUIREMENTS_PUBLIC_KEY, spec.getPublicKey());
 		}
 
 		if (spec.getvCPU() != null && !spec.getvCPU().isEmpty()) {
-			json.put(FogbowRequirementsHelper.HEADER_FOGBOW_REQUIREMENTS_VCPU, spec.getvCPU());
+			json.put(FogbowRequirementsHelper.JSON_KEY_FOGBOW_REQUIREMENTS_VCPU, spec.getvCPU());
 		}
 
 		if (spec.getMemory() != null && !spec.getMemory().isEmpty()) {
-			json.put(FogbowRequirementsHelper.HEADER_FOGBOW_REQUIREMENTS_MEMORY, spec.getMemory());
+			json.put(FogbowRequirementsHelper.JSON_KEY_FOGBOW_REQUIREMENTS_MEMORY, spec.getMemory());
 		}
 
 		if (spec.getDisk() != null && !spec.getDisk().isEmpty()) {
-			json.put(FogbowRequirementsHelper.HEADER_FOGBOW_REQUIREMENTS_DISK, spec.getDisk());
+			json.put(FogbowRequirementsHelper.JSON_KEY_FOGBOW_REQUIREMENTS_DISK, spec.getDisk());
 		}
 
 		if (spec.getImage() != null && !spec.getImage().isEmpty()) {
