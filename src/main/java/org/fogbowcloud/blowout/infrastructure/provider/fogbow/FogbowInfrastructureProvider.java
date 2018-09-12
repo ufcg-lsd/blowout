@@ -60,14 +60,21 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 	public static final String INSTANCE_ATTRIBUTE_EXTRA_PORTS_ATT = "org.fogbowcloud.order.extra-ports";
 //	public static final String INSTANCE_ATTRIBUTE_MEMORY_SIZE = "occi.compute.memory";
 	public static final String INSTANCE_ATTRIBUTE_MEMORY_SIZE = "ram";
+	public static final String INSTANCE_ATTRIBUTE_DISK_SIZE = "disk";
 //	public static final String INSTANCE_ATTRIBUTE_VCORE = "occi.compute.cores";
 	public static final String INSTANCE_ATTRIBUTE_VCORE = "vCPU";
+	public static final String INSTANCE_ATTRIBUTE_HOSTNAME = "hostName";
+	public static final String INSTANCE_ATTRIBUTE_PUBLIC_IP = "ip";
+	public static final String INSTANCE_ATTRIBUTE_STATE = "state";
+	public static final String INSTANCE_ATTRIBUTE_PROVIDER = "provider";
+	public static final String DEFAULT_INSTANCE_USERNAME = "fogbow";
 
 	// TODO: alter when fogbow are returning this attribute
 	public static final String INSTANCE_ATTRIBUTE_DISKSIZE = "TODO-AlterWhenFogbowReturns";
 	public static final String INSTANCE_ATTRIBUTE_REQUEST_TYPE = "org.fogbowcloud.order.type";
 
 	public static final String FOGBOW_RAS_COMPUTE_ENDPOINT = "computes";
+	public static final String FOGBOW_RAS_PUBLIC_ID_ENDPOINT = "publicIps";
 
 	private HttpWrapper httpWrapper;
 	private String managerUrl;
@@ -184,7 +191,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 		LOGGER.debug("Initiating Resource Instanciation - Resource id: [" + resourceId + "]");
 		String instanceId;
-		String sshInformation;
+		String fogbowPublicIpOrderId;
 		Map<String, String> instanceAttributes;
 
 		FogbowResource fogbowResource = resourcesMap.get(resourceId);
@@ -199,7 +206,12 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 			LOGGER.debug("Getting request attributes - Retrieve Instace ID.");
 
 			instanceAttributes = getFogbowInstanceAttributes(fogbowResource.getOrderId());
-			instanceId = instanceAttributes.get(OrderAttribute.INSTANCE_ID.getValue());
+			instanceId = instanceAttributes.get(INSTANCE_ATTRIBUTE_HOSTNAME);
+
+			fogbowPublicIpOrderId = requestInstancePublicIp(fogbowResource.getOrderId());
+			Map<String, String> sshInfo = getInstancePublicIp(fogbowPublicIpOrderId);
+
+			sshInfo.forEach(instanceAttributes::putIfAbsent);
 
 			if (instanceId != null && !instanceId.isEmpty()) {
 				LOGGER.debug("Instance ID returned: " + instanceId);
@@ -209,32 +221,23 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 				if (this.validateInstanceAttributes(instanceAttributes)) {
 
 					LOGGER.debug("Getting Instance attributes.");
-					
-					sshInformation = instanceAttributes.get(INSTANCE_ATTRIBUTE_SSH_PUBLIC_ADDRESS_ATT);
-
-					String[] addressInfo = sshInformation.split(":");
-					String host = addressInfo[0];
-					String port = addressInfo[1];
 
 					fogbowResource.setLocalCommandInterpreter(
 							properties.getProperty(AppPropertiesConstants.LOCAL_COMMAND_INTERPRETER));
-//					fogbowResource.putMetadata(AbstractResource.METADATA_SSH_HOST, host); TODO: these following line are commented
-//					fogbowResource.putMetadata(AbstractResource.METADATA_SSH_PORT, port); TODO: because fogbow-RAS do not provide
-//					fogbowResource.putMetadata(AbstractResource.METADATA_SSH_USERNAME_ATT, TODO: this information
-//							instanceAttributes.get(INSTANCE_ATTRIBUTE_SSH_USERNAME_ATT));
-//					fogbowResource.putMetadata(AbstractResource.METADATA_EXTRA_PORTS_ATT,
-//							instanceAttributes.get(INSTANCE_ATTRIBUTE_EXTRA_PORTS_ATT));
-//					fogbowResource.putMetadata(AbstractResource.METADATA_LOCATION,
-//							"\"" + instanceAttributes.get(REQUEST_ATTRIBUTE_MEMBER_ID) + "\"");
+
+					fogbowResource.putMetadata(AbstractResource.METADATA_SSH_HOST,
+							instanceAttributes.get(INSTANCE_ATTRIBUTE_PUBLIC_IP));
+					fogbowResource.putMetadata(AbstractResource.METADATA_SSH_USERNAME_ATT,
+							instanceAttributes.get(INSTANCE_ATTRIBUTE_SSH_USERNAME_ATT));
+
 					fogbowResource.putMetadata(AbstractResource.METADATA_VCPU,
 							instanceAttributes.get(INSTANCE_ATTRIBUTE_VCORE));
-					float menSize = Float.parseFloat(instanceAttributes.get(INSTANCE_ATTRIBUTE_MEMORY_SIZE));
-					String menSizeFormated = String.valueOf(menSize * MEMORY_1Gbit);
-					fogbowResource.putMetadata(AbstractResource.METADATA_MEN_SIZE, menSizeFormated);
+//					float menSize = Float.parseFloat(instanceAttributes.get(INSTANCE_ATTRIBUTE_MEMORY_SIZE));
+//					String menSizeFormated = String.valueOf(menSize * MEMORY_1Gbit);
+					fogbowResource.putMetadata(AbstractResource.METADATA_MEN_SIZE,
+							instanceAttributes.get(INSTANCE_ATTRIBUTE_MEMORY_SIZE));
 					fogbowResource.putMetadata(AbstractResource.METADATA_DISK_SIZE,
 							instanceAttributes.get(INSTANCE_ATTRIBUTE_MEMORY_SIZE));
-
-					// TODO: Make fogbow return these attributes: newResource.putMetadata(Resource.METADATA_DISK_SIZE and instanceAttributes.get(INSTANCE_ATTRIBUTE_DISKSIZE));
 
 					LOGGER.debug("New Fogbow Resource created - Instace ID: [" + instanceId + "]");
 
@@ -270,7 +273,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 		try {
 			if (fogbowResource.getInstanceId() != null) {
-				this.doRequest("delete", managerUrl + "/" + FOGBOW_RAS_COMPUTE_ENDPOINT + "/" + fogbowResource.getInstanceId(),
+				this.doRequest(HttpWrapper.HTTP_METHOD_DELETE, managerUrl + "/" + FOGBOW_RAS_COMPUTE_ENDPOINT + "/" + fogbowResource.getInstanceId(),
 						new ArrayList<Header>());
 			}
 			resourcesMap.remove(resourceId);
@@ -292,7 +295,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 	private Map<String, String> getFogbowRequestAttributes(String orderId) throws Exception {
 		String endpoint = managerUrl + "/" + OrderConstants.TERM + "/" + orderId;
-		String requestResponse = doRequest("get", endpoint, new ArrayList<Header>());
+		String requestResponse = doRequest(HttpWrapper.HTTP_METHOD_GET, endpoint, new ArrayList<Header>());
 
 		Map<String, String> attrs = parseRequestAttributes(requestResponse);
 		return attrs;
@@ -300,7 +303,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 	private Map<String, String> getFogbowInstanceAttributes(String orderId) throws Exception {
 		String endpoint = managerUrl + "/" +  FOGBOW_RAS_COMPUTE_ENDPOINT + "/" + orderId;
-		String instanceInformation = doRequest("get", endpoint, new ArrayList<Header>());
+		String instanceInformation = doRequest(HttpWrapper.HTTP_METHOD_GET, endpoint, new ArrayList<Header>());
 
 		Map<String, String> attrs = parseAttributes(instanceInformation);
 		return attrs;
@@ -416,7 +419,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 		if (instanceAttributes != null && !instanceAttributes.isEmpty()) {
 
-			String sshInformation = instanceAttributes.get(INSTANCE_ATTRIBUTE_SSH_PUBLIC_ADDRESS_ATT);
+			String sshInformation = instanceAttributes.get(INSTANCE_ATTRIBUTE_PUBLIC_IP);
 			String vcore = instanceAttributes.get(INSTANCE_ATTRIBUTE_VCORE);
 			String memorySize = instanceAttributes.get(INSTANCE_ATTRIBUTE_MEMORY_SIZE);
 
@@ -428,17 +431,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 				LOGGER.debug("Instance attributes invalids.");
 				return false;
 			}
-
-			String[] addressInfo = sshInformation.split(":");
-			if (addressInfo != null && addressInfo.length > 1) {
-				String host = addressInfo[0];
-				String port = addressInfo[1];
-				isValid = !AppUtil.isStringEmpty(host, port);
-			} else {
-				LOGGER.debug("Instance attributes invalids.");
-				isValid = false;
-			}
-
+			
 		} else {
 			LOGGER.debug("Instance attributes invalids.");
 			isValid = false;
@@ -461,9 +454,8 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		return atts;
 	}
 
-	// TODO: change to adapt to new response pattern
 	private Map<String, String> parseAttributes(String response) {
-		Map<String, String> atts = new HashMap<String, String>();
+		Map<String, String> atts = new HashMap<>();
 		try {
 			ObjectMapper mapper = new ObjectMapper();
 			atts = mapper.readValue(response, HashMap.class);
@@ -546,13 +538,60 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		}
 
 		if (spec.getImage() != null && !spec.getImage().isEmpty()) {
-			json.put(FogbowRequirementsHelper.HEADER_FOGBOW_REQUIREMENTS_IMAGE_NAME, spec.getImage());
+			json.put(FogbowRequirementsHelper.JSON_KEY_FOGBOW_REQUIREMENTS_IMAGE_NAME, spec.getImage());
 		}
 
 		StringEntity se = new StringEntity(json.toString());
 		se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, HttpWrapper.HTTP_CONTENT_JSON));
 
 		return se;
+	}
+
+	protected StringEntity makeRequestBodyJson(Map<String, String> bodyRequestAttrs) throws UnsupportedEncodingException, JSONException {
+		JSONObject json = new JSONObject();
+
+		for (String jsonKey : bodyRequestAttrs.keySet()) {
+			String jsonValue = bodyRequestAttrs.get(jsonKey);
+			json.put(jsonKey, jsonValue);
+		}
+
+		StringEntity se = new StringEntity(json.toString());
+		se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, HttpWrapper.HTTP_CONTENT_JSON));
+
+		return se;
+	}
+
+	protected String requestInstancePublicIp(String computeOrderId) {
+		String publicOrderID = null;
+		String requestUrl = managerUrl + "/" + FOGBOW_RAS_PUBLIC_ID_ENDPOINT;
+
+		Map<String, String> bodyRequestAttrs = new HashMap<>();
+		if (computeOrderId != null && !computeOrderId.isEmpty()) {
+			bodyRequestAttrs.put(FogbowRequirementsHelper.JSON_KEY_FOGBOW_PUBLICIP_COMPUTER_ORDER_ID, computeOrderId);
+		}
+
+		try {
+			StringEntity bodyRequest = makeRequestBodyJson(bodyRequestAttrs);
+			publicOrderID = this.doRequest(HttpWrapper.HTTP_METHOD_POST, requestUrl, new LinkedList<Header>(), bodyRequest);
+		} catch (Exception e) {
+			LOGGER.error("Error while getting public ip for computer order of id " + computeOrderId, e);
+		}
+		return publicOrderID;
+	}
+
+	protected Map<String, String> getInstancePublicIp(String publicIpOrderId) {
+		String publicOrderStringResponse;
+		Map<String, String> sshInfo = new HashMap<>();
+		String requestUrl = managerUrl + "/" + FOGBOW_RAS_PUBLIC_ID_ENDPOINT + "/" + publicIpOrderId;
+
+		try {
+			publicOrderStringResponse = this.doRequest(HttpWrapper.HTTP_METHOD_GET, requestUrl, new LinkedList<Header>());
+			sshInfo = parseAttributes(publicOrderStringResponse);
+		} catch (Exception e) {
+			LOGGER.error("Error while getting info about public instance of order with id " + publicIpOrderId, e);
+		}
+
+		return sshInfo;
 	}
 
 }

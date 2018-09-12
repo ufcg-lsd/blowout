@@ -17,8 +17,6 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import com.amazonaws.util.json.JSONException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.http.entity.EntityTemplate;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 import org.fogbowcloud.blowout.core.model.Specification;

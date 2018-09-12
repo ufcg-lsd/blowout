@@ -34,8 +34,9 @@ public class FogbowRequirementsHelper {
 	public static final String JSON_KEY_FOGBOW_REQUIREMENTS_REQUESTING_MEMBER = "requestingMember";
 	public static final String JSON_KEY_FOGBOW_REQUIREMENTS_PROVIDING_MEMBER = "providingMember";
 	public static final String JSON_KEY_FOGBOW_REQUIREMENTS_PUBLIC_KEY = "publicKey";
+	public static final String JSON_KEY_FOGBOW_PUBLICIP_COMPUTER_ORDER_ID = "computeOrderId";
 
-	// TODO: this delete this method
+	// TODO: delete this method
 	public static boolean validateFogbowRequirementsSyntax(String requirementsString) {
 		
 		LOGGER.debug("Validating Fogbow Requirements ["+requirementsString+"]");

@@ -31,6 +31,10 @@ public class HttpWrapper {
 
 	public static final String HTTP_CONTENT_JSON = "application/json";
 
+	public static final String HTTP_METHOD_POST = HttpPost.METHOD_NAME;
+	public static final String HTTP_METHOD_GET = HttpGet.METHOD_NAME;
+	public static final String HTTP_METHOD_DELETE = HttpDelete.METHOD_NAME;
+
     private static HttpClient createHttpClient() {
 		return HttpClients.createMinimal();
     }
@@ -43,11 +47,11 @@ public class HttpWrapper {
 
     	HttpUriRequest request = null;
         
-    	if (method.equals("get")) {
+    	if (method.equals(HTTP_METHOD_GET)) {
             request = new HttpGet(endpoint);
-        } else if (method.equals("delete")) {
+        } else if (method.equals(HTTP_METHOD_DELETE)) {
             request = new HttpDelete(endpoint);
-        } else if (method.equals("post")) {
+        } else if (method.equals(HTTP_METHOD_POST)) {
             request = new HttpPost(endpoint);
             ((HttpPost) request).setEntity(bodyJsonStringEntity);
         }
