@@ -67,7 +67,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 	public static final String INSTANCE_ATTRIBUTE_PUBLIC_IP = "ip";
 	public static final String INSTANCE_ATTRIBUTE_STATE = "state";
 	public static final String INSTANCE_ATTRIBUTE_PROVIDER = "provider";
-	public static final String DEFAULT_INSTANCE_USERNAME = "fogbow";
+	public static final String DEFAULT_INSTANCE_ATTRIBUTE_SHH_USERNAME = "fogbow";
 
 	// TODO: alter when fogbow are returning this attribute
 	public static final String INSTANCE_ATTRIBUTE_DISKSIZE = "TODO-AlterWhenFogbowReturns";
@@ -228,7 +228,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 					fogbowResource.putMetadata(AbstractResource.METADATA_SSH_HOST,
 							instanceAttributes.get(INSTANCE_ATTRIBUTE_PUBLIC_IP));
 					fogbowResource.putMetadata(AbstractResource.METADATA_SSH_USERNAME_ATT,
-							instanceAttributes.get(INSTANCE_ATTRIBUTE_SSH_USERNAME_ATT));
+							DEFAULT_INSTANCE_ATTRIBUTE_SHH_USERNAME);
 
 					fogbowResource.putMetadata(AbstractResource.METADATA_VCPU,
 							instanceAttributes.get(INSTANCE_ATTRIBUTE_VCORE));
@@ -431,7 +431,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 				LOGGER.debug("Instance attributes invalids.");
 				return false;
 			}
-			
+
 		} else {
 			LOGGER.debug("Instance attributes invalids.");
 			isValid = false;

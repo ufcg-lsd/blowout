@@ -168,6 +168,10 @@ public class TestFogbowInfrastructureProvider {
 		String hostMock = "10.0.1.10";
 		String portMock = "8989";
 		String hostNameMock = "fake-hostname";
+		String publicOrderId = "publicOrderId01";
+		String ip = "fake-ip";
+		String state = "fake-state";
+		String provider = "fake-provider";
 
 		Specification specs = new Specification("imageMock", "UserName",
 				"publicKeyMock", "privateKeyMock", FAKE_DATA_FILE, "userDataType");
@@ -179,6 +183,8 @@ public class TestFogbowInfrastructureProvider {
 //		createDefaulInstanceIdResponse(returnedOrderId, vCPUMock, ramSizeMock, diskMock, OrderState.FULFILLED, hostNameMock);
 		//Creating response for request for Instance Attributes
 		createDefaulInstanceAttributesResponse(returnedOrderId, vCPUMock, ramSizeMock, diskMock, OrderState.FULFILLED, hostNameMock);
+		createDefaultPublicIpResponsePostRequest(publicOrderId);
+		createDefaultPublicIpResponseGetRequest(publicOrderId, ip, state, provider);
 
 		fogbowInfrastructureProvider.setHttpWrapper(httpWrapperMock);
 		String resourceId = fogbowInfrastructureProvider.requestResource(specs);
@@ -418,7 +424,6 @@ public class TestFogbowInfrastructureProvider {
 				+ "\"disk\":\"" + disk + "\", "
 				+ "\"state\":\"" +  requestState.toString() + "\", "
 				+ "\"hostName\":\"" + hostName + "\"}";
-		// TODO: add ssh informations after add dependency with floating ip service
 
 		doReturn(fogbowResponse).when(httpWrapperMock).doRequest(Mockito.any(String.class), Mockito.eq(urlEndpointRequestInformations),
 				Mockito.any(String.class), Mockito.any(List.class));
@@ -452,6 +457,27 @@ public class TestFogbowInfrastructureProvider {
 		properties.setProperty("fogbow.voms.server", "server");
 		properties.setProperty("fogbow.voms.certificate.password", "password");
 
+	}
+
+	private void createDefaultPublicIpResponsePostRequest(String publicOrderId) throws Exception {
+		String urlEndpointRequestInformations = properties.getProperty(AppPropertiesConstants.INFRA_FOGBOW_MANAGER_BASE_URL)
+				+ "/" + FogbowInfrastructureProvider.FOGBOW_RAS_PUBLIC_ID_ENDPOINT;
+
+		doReturn(publicOrderId).when(httpWrapperMock).doRequest(Mockito.any(String.class), Mockito.eq(urlEndpointRequestInformations),
+				Mockito.any(String.class), Mockito.any(List.class), Mockito.any(StringEntity.class));
+	}
+
+	private void createDefaultPublicIpResponseGetRequest(String publicOrderId, String ip, String state, String provider) throws Exception {
+		String urlEndpointRequestInformations = properties.getProperty(AppPropertiesConstants.INFRA_FOGBOW_MANAGER_BASE_URL)
+				+ "/" + FogbowInfrastructureProvider.FOGBOW_RAS_PUBLIC_ID_ENDPOINT + "/"+ publicOrderId;
+
+		String fogbowResponse = "{"
+				+ "\"" + FogbowInfrastructureProvider.INSTANCE_ATTRIBUTE_PUBLIC_IP + "\":\"" + ip + "\", "
+				+ "\"" + FogbowInfrastructureProvider.INSTANCE_ATTRIBUTE_STATE + "\":\"" +  state + "\", "
+				+ "\"" + FogbowInfrastructureProvider.INSTANCE_ATTRIBUTE_PROVIDER + "\":\"" + provider + "\"}";
+
+		doReturn(fogbowResponse).when(httpWrapperMock).doRequest(Mockito.any(String.class), Mockito.eq(urlEndpointRequestInformations),
+				Mockito.any(String.class), Mockito.any(List.class));
 	}
 
 }
