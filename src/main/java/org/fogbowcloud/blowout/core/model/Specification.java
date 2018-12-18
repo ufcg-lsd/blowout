@@ -22,6 +22,9 @@ import org.json.JSONObject;
 import com.google.gson.Gson;
 
 public class Specification implements Serializable {
+
+	private static final long serialVersionUID = 5255295548723927267L;
+
 	private static final String REQUIREMENTS_MAP_STR = "requirementsMap";
 
 	private static final String USER_DATA_TYPE_STR = "userDataType";
@@ -40,19 +43,15 @@ public class Specification implements Serializable {
 
 	private static final Logger LOGGER = Logger.getLogger(Specification.class);
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 5255295548723927267L;
-	String image;
-	String username;
-	String privateKeyFilePath;
-	String publicKey;
-	String contextScript;
-	String userDataFile;
-	String userDataType;
+	private String image;
+	private String username;
+	private String privateKeyFilePath;
+	private String publicKey;
+	private String contextScript;
+	private String userDataFile;
+	private String userDataType;
 
-	Map<String, String> requirements = new HashMap<String, String>();
+	private Map<String, String> requirements = new HashMap<String, String>();
 
 	public Specification(String image, String username, String publicKey, String privateKeyFilePath) {
 		this(image, username, publicKey, privateKeyFilePath, "", "");
@@ -79,11 +78,11 @@ public class Specification implements Serializable {
 	}
 
 	public void addRequirement(String key, String value) {
-		requirements.put(key, value);
+		this.requirements.put(key, value);
 	}
 
 	public String getRequirementValue(String key) {
-		return requirements.get(key);
+		return this.requirements.get(key);
 	}
 
 	public void putAllRequirements(Map<String, String> requirements) {
@@ -94,11 +93,11 @@ public class Specification implements Serializable {
 	}
 
 	public Map<String, String> getAllRequirements() {
-		return requirements;
+		return this.requirements;
 	}
 
 	public void removeAllRequirements() {
-		requirements = new HashMap<String, String>();
+		this.requirements = new HashMap<String, String>();
 	}
 
 	public static List<Specification> getSpecificationsFromJSonFile(String jsonFilePath) throws IOException {
@@ -160,19 +159,19 @@ public class Specification implements Serializable {
 	}
 
 	public String getImage() {
-		return image;
+		return this.image;
 	}
 
 	public String getUsername() {
-		return username;
+		return this.username;
 	}
 
 	public String getPrivateKeyFilePath() {
-		return privateKeyFilePath;
+		return this.privateKeyFilePath;
 	}
 
 	public String getPublicKey() {
-		return publicKey;
+		return this.publicKey;
 	}
 
 	public void setPublicKey(String publicKey) {
@@ -180,7 +179,7 @@ public class Specification implements Serializable {
 	}
 
 	public String getContextScript() {
-		return contextScript;
+		return this.contextScript;
 	}
 
 	public void setContextScript(String contextScript) {
@@ -188,7 +187,7 @@ public class Specification implements Serializable {
 	}
 
 	public String getUserDataFile() {
-		return userDataFile;
+		return this.userDataFile;
 	}
 
 	public void setUserDataFile(String userDataFile) {
@@ -196,7 +195,7 @@ public class Specification implements Serializable {
 	}
 
 	public String getUserDataType() {
-		return userDataType;
+		return this.userDataType;
 	}
 
 	public void setUserDataType(String userDataType) {
@@ -206,20 +205,20 @@ public class Specification implements Serializable {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("Image: " + image);
-		sb.append(" PublicKey: " + publicKey);
-		if (contextScript != null && !contextScript.isEmpty()) {
+		sb.append("Image: " + this.image);
+		sb.append(" PublicKey: " + this.publicKey);
+		if ((this.contextScript != null) && !this.contextScript.isEmpty()) {
 			sb.append("\nContextScript: " + contextScript);
 		}
-		if (userDataFile != null && !userDataFile.isEmpty()) {
-			sb.append("\nUserDataFile:" + userDataFile);
+		if ((this.userDataFile != null) && !this.userDataFile.isEmpty()) {
+			sb.append("\nUserDataFile:" + this.userDataFile);
 		}
-		if (userDataType != null && !userDataType.isEmpty()) {
-			sb.append("\nUserDataType:" + userDataType);
+		if ((this.userDataType != null) && !this.userDataType.isEmpty()) {
+			sb.append("\nUserDataType:" + this.userDataType);
 		}
-		if (requirements != null && !requirements.isEmpty()) {
+		if ((this.requirements != null) && !this.requirements.isEmpty()) {
 			sb.append("\nRequirements:{");
-			for (Entry<String, String> entry : requirements.entrySet()) {
+			for (Entry<String, String> entry : this.requirements.entrySet()) {
 				sb.append("\n\t" + entry.getKey() + ": " + entry.getValue());
 			}
 			sb.append("\n}");

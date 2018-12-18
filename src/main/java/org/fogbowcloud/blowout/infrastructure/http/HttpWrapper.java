@@ -24,6 +24,7 @@ public class HttpWrapper {
 	private static final int CLIENT_SIDE_CODE_ERRO_INIT = 400;
 
 	public static final String HTTP_CONTENT_JSON = "application/json";
+	public static final String FEDERATION_TOKEN_VALUE_HEADER_KEY = "federationTokenValue";
 
 	public static final String HTTP_METHOD_POST = HttpPost.METHOD_NAME;
 	public static final String HTTP_METHOD_GET = HttpGet.METHOD_NAME;
@@ -53,7 +54,6 @@ public class HttpWrapper {
         request.addHeader(OCCIHeaders.CONTENT_TYPE, OCCIHeaders.OCCI_CONTENT_TYPE);
 
         if (authToken != null) {
-            String FEDERATION_TOKEN_VALUE_HEADER_KEY = "federationTokenValue"; // TODO: move to constant
             request.addHeader(FEDERATION_TOKEN_VALUE_HEADER_KEY, authToken);
         }
         for (Header header : additionalHeaders) {
@@ -81,9 +81,9 @@ public class HttpWrapper {
                     return EntityUtils.toString(response.getEntity());
                 }
                 
-            }else if(statusCode >= CLIENT_SIDE_CODE_ERRO_INIT && statusCode <= SERVER_SIDE_ERRO_MAX){
+            } else if(statusCode >= CLIENT_SIDE_CODE_ERRO_INIT && statusCode <= SERVER_SIDE_ERRO_MAX) {
             	throw new Exception("Erro on request - Method ["+method+"] Endpoit: ["+endpoint+"] - Status: "+statusCode+" -  Msg: "+response.getStatusLine().toString());
-            }else {
+            } else {
                 return response.getStatusLine().toString();
             }
             
@@ -99,9 +99,13 @@ public class HttpWrapper {
     }
 
     protected static Header getLocationHeader(Header[] headers) {
+        return getSpecifHeader(headers, "Location");
+    }
+
+    protected static Header getSpecifHeader(Header[] headers, String headerName) {
         Header locationHeader = null;
         for (Header header : headers) {
-            if (header.getName().equals("Location")) {
+            if (header.getName().equals(headerName)) {
                 locationHeader = header;
             }
         }

@@ -138,6 +138,7 @@ public class TaskImpl implements Task {
 	@Override
 	public boolean checkTimeOuted() {
 		String timeOutRaw = getMetadata(METADATA_TASK_TIMEOUT);
+
 		if (timeOutRaw == null || timeOutRaw.isEmpty()){
 			return false;
 		}

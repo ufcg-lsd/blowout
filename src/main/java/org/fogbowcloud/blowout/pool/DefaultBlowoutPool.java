@@ -102,7 +102,6 @@ public class DefaultBlowoutPool implements BlowoutPool {
 				return taskPool.get(i);
 			}
 		}
-		
 		return null;
 	}
 
