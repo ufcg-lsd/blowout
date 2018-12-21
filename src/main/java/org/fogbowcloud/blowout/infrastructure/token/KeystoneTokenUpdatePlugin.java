@@ -14,13 +14,13 @@ public class KeystoneTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
 	private static final Logger LOGGER = Logger.getLogger(KeystoneTokenUpdatePlugin.class);
 
 	private static final String FOGBOW_KEYSTONE_USERNAME = AppPropertiesConstants.INFRA_AUTH_TOKEN_PREFIX
-			+ "keystone_username";
+			+ AppPropertiesConstants.INFRA_AUTH_PROP_USERNAME;
 	private static final String FOGBOW_KEYSTONE_TENANTNAME = AppPropertiesConstants.INFRA_AUTH_TOKEN_PREFIX
-			+ "keystone_tenantname";
+			+ AppPropertiesConstants.INFRA_AUTH_PROP_PROJECT_NAME;
 	private static final String FOGBOW_KEYSTONE_PASSWORD = AppPropertiesConstants.INFRA_AUTH_TOKEN_PREFIX
-			+ "keystone_password";
+			+ AppPropertiesConstants.INFRA_AUTH_PROP_PASSWORD;
 	private static final String FOGBOW_KEYSTONE_AUTH_URL = AppPropertiesConstants.INFRA_AUTH_TOKEN_PREFIX
-			+ "keystone_auth_url";
+			+ AppPropertiesConstants.INFRA_AUTH_PROP_AUTH_URL;
 
 	private final String username;
 	private final String tenantname;

@@ -19,6 +19,11 @@ public class AppPropertiesConstants {
 	public static final String LOCAL_COMMAND_INTERPRETER = "local_command_interpreter";
 	public static final String INFRA_AUTH_TOKEN_PREFIX = "auth_token_prop_";
 	public static final String INFRA_AUTH_TOKEN_UPDATE_PLUGIN = "infra_auth_token_update_plugin";
+	public static final String INFRA_AUTH_PROP_USERNAME = "keystone_username";
+	public static final String INFRA_AUTH_PROP_PROJECT_NAME = "keystone_tenantname";
+	public static final String INFRA_AUTH_PROP_PASSWORD = "keystone_password";
+	public static final String INFRA_AUTH_PROP_AUTH_URL = "keystone_auth_url";
+	public static final String INFRA_AUTH_PROP_DOMAIN = "keystone_domain";
 	
 
 	public static final String INFRA_FOGBOW_MANAGER_BASE_URL = "infra_fogbow_manager_base_url";

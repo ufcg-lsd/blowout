@@ -52,7 +52,7 @@ public class HttpWrapper {
 
         }
     	
-        request.addHeader(OCCIHeaders.CONTENT_TYPE, OCCIHeaders.OCCI_CONTENT_TYPE);
+//        request.addHeader(OCCIHeaders.CONTENT_TYPE, OCCIHeaders.OCCI_CONTENT_TYPE);
 
         if (authToken != null) {
             request.addHeader(FEDERATION_TOKEN_VALUE_HEADER_KEY, authToken);

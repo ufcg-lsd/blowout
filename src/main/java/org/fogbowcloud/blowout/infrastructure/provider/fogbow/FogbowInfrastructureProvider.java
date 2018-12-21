@@ -54,6 +54,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 	private static final User DEFAULT_USER = new Token.User("9999", "User");
 
 	public static final String REQUEST_ATTRIBUTE_MEMBER_ID = "org.fogbowcloud.order.providing-member";
+	public static final String DEFAULT_PROVIDING_MEMBER = "Fake-UFCG";
 
 	public static final String INSTANCE_ATTRIBUTE_SSH_PUBLIC_ADDRESS_ATT = "org.fogbowcloud.order.ssh-public-address";
 	public static final String INSTANCE_ATTRIBUTE_SSH_USERNAME_ATT = "org.fogbowcloud.order.ssh-username";
@@ -68,6 +69,8 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 	public static final String INSTANCE_ATTRIBUTE_STATE = "state";
 	public static final String INSTANCE_ATTRIBUTE_PROVIDER = "provider";
 	public static final String DEFAULT_INSTANCE_ATTRIBUTE_SHH_USERNAME = "fogbow";
+
+	private static final String TOKEN_TEST = "";
 
 	// TODO: alter when fogbow are returning this attribute
 	public static final String INSTANCE_ATTRIBUTE_REQUEST_TYPE = "org.fogbowcloud.order.type";
@@ -151,7 +154,11 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 			this.validateSpecification(spec);
 
 			StringEntity bodyRequest = makeBodyJson(spec);
+			bodyRequest.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, HttpWrapper.HTTP_CONTENT_JSON));
+
 			orderId = this.doRequest("post", managerUrl + "/" + FOGBOW_RAS_COMPUTE_ENDPOINT, new LinkedList<Header>(), bodyRequest);
+
+
 
 		} catch (Exception e) {
 			LOGGER.error("Error while requesting resource on Fogbow", e);
@@ -403,11 +410,11 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 	}
 
 	private String doRequest(String method, String endpoint, List<Header> headers, StringEntity bodyJson) throws Exception {
-		return httpWrapper.doRequest(method, endpoint, token.getAccessId(), headers, bodyJson);
+		return httpWrapper.doRequest(method, endpoint, TOKEN_TEST, headers, bodyJson);
 	}
 
 	private String doRequest(String method, String endpoint, List<Header> headers) throws Exception {
-		return httpWrapper.doRequest(method, endpoint, token.getAccessId(), headers);
+		return httpWrapper.doRequest(method, endpoint, TOKEN_TEST, headers);
 	}
 
 	protected String getOrderId(String requestInformation) { // TODO: check if this method is still up with new fogbow response
@@ -549,8 +556,6 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		}
 
 		StringEntity se = new StringEntity(json.toString());
-		se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, HttpWrapper.HTTP_CONTENT_JSON));
-
 		return se;
 	}
 
