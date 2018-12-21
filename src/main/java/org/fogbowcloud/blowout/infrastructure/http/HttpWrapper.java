@@ -42,13 +42,14 @@ public class HttpWrapper {
 
     	HttpUriRequest request = null;
         
-    	if (method.equals(HTTP_METHOD_GET)) {
+    	if (method.equalsIgnoreCase(HTTP_METHOD_GET)) {
             request = new HttpGet(endpoint);
-        } else if (method.equals(HTTP_METHOD_DELETE)) {
+        } else if (method.equalsIgnoreCase(HTTP_METHOD_DELETE)) {
             request = new HttpDelete(endpoint);
-        } else if (method.equals(HTTP_METHOD_POST)) {
+        } else if (method.equalsIgnoreCase(HTTP_METHOD_POST)) {
             request = new HttpPost(endpoint);
             ((HttpPost) request).setEntity(bodyJsonStringEntity);
+
         }
     	
         request.addHeader(OCCIHeaders.CONTENT_TYPE, OCCIHeaders.OCCI_CONTENT_TYPE);
@@ -82,7 +83,7 @@ public class HttpWrapper {
                 }
                 
             } else if(statusCode >= CLIENT_SIDE_CODE_ERRO_INIT && statusCode <= SERVER_SIDE_ERRO_MAX) {
-            	throw new Exception("Erro on request - Method ["+method+"] Endpoit: ["+endpoint+"] - Status: "+statusCode+" -  Msg: "+response.getStatusLine().toString());
+            	throw new Exception("Erro on request - Method ["+method+"] Endpoint: ["+endpoint+"] - Status: "+statusCode+" -  Msg: "+response.getStatusLine().toString());
             } else {
                 return response.getStatusLine().toString();
             }

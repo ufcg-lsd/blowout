@@ -164,7 +164,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		FogbowResource fogbowResource = new FogbowResource(resourceId, orderId, spec);
 		String requestType = spec.getRequirementValue(FogbowRequirementsHelper.METADATA_FOGBOW_REQUEST_TYPE);
 		fogbowResource.putMetadata(AbstractResource.METADATA_REQUEST_TYPE, requestType);
-		fogbowResource.putMetadata(AbstractResource.METADATA_IMAGE, spec.getImage());
+		fogbowResource.putMetadata(AbstractResource.METADATA_IMAGE, spec.getImageId());
 		fogbowResource.putMetadata(AbstractResource.METADATA_PUBLIC_KEY, spec.getPublicKey());
 
 		resourcesMap.put(resourceId, fogbowResource);
@@ -318,13 +318,13 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 	private void validateSpecification(Specification specification) throws RequestResourceException {
 
-		if (specification.getImage() == null || specification.getImage().isEmpty()) {
+		if (specification.getImageId() == null || specification.getImageId().isEmpty()) {
 
-			throw new RequestResourceException("");
+			throw new RequestResourceException();
 		}
 		if (specification.getPublicKey() == null || specification.getPublicKey().isEmpty()) {
 
-			throw new RequestResourceException("");
+			throw new RequestResourceException();
 		}
 
 		String fogbowRequirements = specification
@@ -339,7 +339,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 	}
 
 	private List<Header> requestNewInstanceHeaders(Specification specs) {
-		String fogbowImage = specs.getImage();
+		String fogbowImage = specs.getImageId();
 		String fogbowRequirements = specs.getRequirementValue(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS);
 		String fogbowRequestType = specs.getRequirementValue(FogbowRequirementsHelper.METADATA_FOGBOW_REQUEST_TYPE);
 
@@ -523,15 +523,13 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		this.frDatastore = frDatastore;
 	}
 
+
+	// ToDo Do this in a generic way
 	protected StringEntity makeBodyJson(Specification spec) throws JSONException, UnsupportedEncodingException {
 		JSONObject json = new JSONObject();
 
 		if (spec.getPublicKey() != null && !spec.getPublicKey().isEmpty()) {
 			json.put(FogbowRequirementsHelper.JSON_KEY_FOGBOW_REQUIREMENTS_PUBLIC_KEY, spec.getPublicKey());
-		}
-
-		if (spec.getvCPU() != null && !spec.getvCPU().isEmpty()) {
-			json.put(FogbowRequirementsHelper.JSON_KEY_FOGBOW_REQUIREMENTS_VCPU, spec.getvCPU());
 		}
 
 		if (spec.getMemory() != null && !spec.getMemory().isEmpty()) {
@@ -542,8 +540,12 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 			json.put(FogbowRequirementsHelper.JSON_KEY_FOGBOW_REQUIREMENTS_DISK, spec.getDisk());
 		}
 
-		if (spec.getImage() != null && !spec.getImage().isEmpty()) {
-			json.put(FogbowRequirementsHelper.JSON_KEY_FOGBOW_REQUIREMENTS_IMAGE_NAME, spec.getImage());
+		if (spec.getImageId() != null && !spec.getImageId().isEmpty()) {
+			json.put(FogbowRequirementsHelper.JSON_KEY_FOGBOW_REQUIREMENTS_IMAGE_ID, spec.getImageId());
+		}
+
+		if (spec.getvCPU() != null && !spec.getvCPU().isEmpty()) {
+			json.put(FogbowRequirementsHelper.JSON_KEY_FOGBOW_REQUIREMENTS_VCPU, spec.getvCPU());
 		}
 
 		StringEntity se = new StringEntity(json.toString());

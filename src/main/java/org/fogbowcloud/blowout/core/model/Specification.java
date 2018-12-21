@@ -26,24 +26,16 @@ public class Specification implements Serializable {
 	private static final long serialVersionUID = 5255295548723927267L;
 
 	private static final String REQUIREMENTS_MAP_STR = "requirementsMap";
-
 	private static final String USER_DATA_TYPE_STR = "userDataType";
-
 	private static final String USER_DATA_FILE_STR = "userDataFile";
-
 	private static final String CONTEXT_SCRIPT_STR = "contextScript";
-
 	private static final String PRIVATE_KEY_FILE_PATH_STR = "privateKeyFilePath";
-
 	private static final String PUBLIC_KEY_STR = "publicKey";
-
 	private static final String USERNAME_STR = "username";
-
 	private static final String IMAGE_STR = "image";
-
 	private static final Logger LOGGER = Logger.getLogger(Specification.class);
 
-	private String image;
+	private String imageId;
 	private String username;
 	private String privateKeyFilePath;
 	private String publicKey;
@@ -51,30 +43,26 @@ public class Specification implements Serializable {
 	private String userDataFile;
 	private String userDataType;
 
-	private Map<String, String> requirements = new HashMap<String, String>();
+	private Map<String, String> requirements;
 
-	public Specification(String image, String username, String publicKey, String privateKeyFilePath) {
-		this(image, username, publicKey, privateKeyFilePath, "", "");
-	}
-
-	public Specification(String image, String username, String publicKey, String privateKeyFilePath,
-			String userDataFile, String userDataType) {
-		this.image = image;
+	public Specification(String imageId, String username, String publicKey, String privateKeyFilePath) {
+		this.imageId = imageId;
 		this.username = username;
 		this.publicKey = publicKey;
 		this.privateKeyFilePath = privateKeyFilePath;
+		this.requirements = new HashMap<>();
+	}
+
+	public Specification(String imageId, String username, String publicKey, String privateKeyFilePath,
+						 String userDataFile, String userDataType) {
+		this(imageId, username, publicKey, privateKeyFilePath);
 		this.userDataFile = userDataFile;
 		this.userDataType = userDataType;
 	}
 
-	public Specification(String image, String username, String publicKey, String privateKeyFilePath,
-			String userDataFile, String userDataType, String vCPU, String memory, String disk) {
-		this.image = image;
-		this.username = username;
-		this.publicKey = publicKey;
-		this.privateKeyFilePath = privateKeyFilePath;
-		this.userDataFile = userDataFile;
-		this.userDataType = userDataType;
+	public Specification(String imageId, String username, String publicKey, String privateKeyFilePath,
+						 String userDataFile, String userDataType, String vCPU, String memory, String disk) {
+		this(imageId, username, publicKey, privateKeyFilePath, userDataFile, userDataType);
 	}
 
 	public void addRequirement(String key, String value) {
@@ -122,11 +110,10 @@ public class Specification implements Serializable {
 						sb.append(line);
 					}
 					spec.setPublicKey(sb.toString());
-					
+
 					brSpec.close();
 				}
 			}
-
 		}
 		return specifications;
 	}
@@ -158,8 +145,8 @@ public class Specification implements Serializable {
 		}
 	}
 
-	public String getImage() {
-		return this.image;
+	public String getImageId() {
+		return this.imageId;
 	}
 
 	public String getUsername() {
@@ -205,7 +192,7 @@ public class Specification implements Serializable {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("Image: " + this.image);
+		sb.append("Image: " + this.imageId);
 		sb.append(" PublicKey: " + this.publicKey);
 		if ((this.contextScript != null) && !this.contextScript.isEmpty()) {
 			sb.append("\nContextScript: " + contextScript);
@@ -226,75 +213,8 @@ public class Specification implements Serializable {
 		return sb.toString();
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((contextScript == null) ? 0 : contextScript.hashCode());
-		result = prime * result + ((image == null) ? 0 : image.hashCode());
-		result = prime * result + ((privateKeyFilePath == null) ? 0 : privateKeyFilePath.hashCode());
-		result = prime * result + ((publicKey == null) ? 0 : publicKey.hashCode());
-		result = prime * result + ((userDataFile == null) ? 0 : userDataFile.hashCode());
-		result = prime * result + ((userDataType == null) ? 0 : userDataType.hashCode());
-		result = prime * result + ((requirements == null) ? 0 : requirements.hashCode());
-		result = prime * result + ((username == null) ? 0 : username.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Specification other = (Specification) obj;
-		if (contextScript == null) {
-			if (other.contextScript != null)
-				return false;
-		} else if (!contextScript.equals(other.contextScript))
-			return false;
-		if (image == null) {
-			if (other.image != null)
-				return false;
-		} else if (!image.equals(other.image))
-			return false;
-		if (privateKeyFilePath == null) {
-			if (other.privateKeyFilePath != null)
-				return false;
-		} else if (!privateKeyFilePath.equals(other.privateKeyFilePath))
-			return false;
-		if (publicKey == null) {
-			if (other.publicKey != null)
-				return false;
-		} else if (!publicKey.equals(other.publicKey))
-			return false;
-		if (userDataFile == null) {
-			if (other.userDataFile != null)
-				return false;
-		} else if (!userDataFile.equals(other.userDataFile))
-			return false;
-		if (userDataType == null) {
-			if (other.userDataType != null)
-				return false;
-		} else if (!userDataType.equals(other.userDataType))
-			return false;
-		if (requirements == null) {
-			if (other.requirements != null)
-				return false;
-		} else if (!requirements.equals(other.requirements))
-			return false;
-		if (username == null) {
-			if (other.username != null)
-				return false;
-		} else if (!username.equals(other.username))
-			return false;
-		return true;
-	}
-
 	public Specification clone() {
-		Specification cloneSpec = new Specification(this.image, this.username, this.publicKey, this.privateKeyFilePath,
+		Specification cloneSpec = new Specification(this.imageId, this.username, this.publicKey, this.privateKeyFilePath,
 				this.userDataFile, this.userDataType);
 		cloneSpec.putAllRequirements(this.getAllRequirements());
 		return cloneSpec;
@@ -303,7 +223,7 @@ public class Specification implements Serializable {
 	public JSONObject toJSON() {
 		try {
 			JSONObject specification = new JSONObject();
-			specification.put(IMAGE_STR, this.getImage());
+			specification.put(IMAGE_STR, this.getImageId());
 			specification.put(USERNAME_STR, this.getUsername());
 			specification.put(PUBLIC_KEY_STR, this.getPublicKey());
 			specification.put(PRIVATE_KEY_FILE_PATH_STR, this.getPrivateKeyFilePath());
@@ -393,5 +313,72 @@ public class Specification implements Serializable {
 			}
 		}
 		return fogbowRequirementValue;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((contextScript == null) ? 0 : contextScript.hashCode());
+		result = prime * result + ((imageId == null) ? 0 : imageId.hashCode());
+		result = prime * result + ((privateKeyFilePath == null) ? 0 : privateKeyFilePath.hashCode());
+		result = prime * result + ((publicKey == null) ? 0 : publicKey.hashCode());
+		result = prime * result + ((userDataFile == null) ? 0 : userDataFile.hashCode());
+		result = prime * result + ((userDataType == null) ? 0 : userDataType.hashCode());
+		result = prime * result + ((requirements == null) ? 0 : requirements.hashCode());
+		result = prime * result + ((username == null) ? 0 : username.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Specification other = (Specification) obj;
+		if (contextScript == null) {
+			if (other.contextScript != null)
+				return false;
+		} else if (!contextScript.equals(other.contextScript))
+			return false;
+		if (imageId == null) {
+			if (other.imageId != null)
+				return false;
+		} else if (!imageId.equals(other.imageId))
+			return false;
+		if (privateKeyFilePath == null) {
+			if (other.privateKeyFilePath != null)
+				return false;
+		} else if (!privateKeyFilePath.equals(other.privateKeyFilePath))
+			return false;
+		if (publicKey == null) {
+			if (other.publicKey != null)
+				return false;
+		} else if (!publicKey.equals(other.publicKey))
+			return false;
+		if (userDataFile == null) {
+			if (other.userDataFile != null)
+				return false;
+		} else if (!userDataFile.equals(other.userDataFile))
+			return false;
+		if (userDataType == null) {
+			if (other.userDataType != null)
+				return false;
+		} else if (!userDataType.equals(other.userDataType))
+			return false;
+		if (requirements == null) {
+			if (other.requirements != null)
+				return false;
+		} else if (!requirements.equals(other.requirements))
+			return false;
+		if (username == null) {
+			if (other.username != null)
+				return false;
+		} else if (!username.equals(other.username))
+			return false;
+		return true;
 	}
 }

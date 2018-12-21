@@ -100,7 +100,7 @@ public class TestFogbowInfrastructureProvider {
 			String bodyJsonString = EntityUtils.toString(bodyJson);
 
 			assertTrue(bodyJsonString.contains(FogbowRequirementsHelper.JSON_KEY_FOGBOW_REQUIREMENTS_PUBLIC_KEY));
-			assertTrue(bodyJsonString.contains(FogbowRequirementsHelper.JSON_KEY_FOGBOW_REQUIREMENTS_IMAGE_NAME));
+			assertTrue(bodyJsonString.contains(FogbowRequirementsHelper.JSON_KEY_FOGBOW_REQUIREMENTS_IMAGE_ID));
 			assertTrue(!bodyJsonString.contains(FogbowRequirementsHelper.JSON_KEY_FOGBOW_REQUIREMENTS_VCPU));
 			assertTrue(!bodyJsonString.contains(FogbowRequirementsHelper.JSON_KEY_FOGBOW_REQUIREMENTS_DISK));
 			assertTrue(!bodyJsonString.contains(FogbowRequirementsHelper.JSON_KEY_FOGBOW_REQUIREMENTS_MEMORY));
@@ -366,7 +366,6 @@ public class TestFogbowInfrastructureProvider {
 
 		fogbowInfrastructureProvider.setHttpWrapper(httpWrapperMock);
 		fogbowInfrastructureProvider.deleteResource(resource.getId());
-
 	}
 
 	// ---- HELPER METHODS ---- //

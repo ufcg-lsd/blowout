@@ -47,11 +47,9 @@ public class BlowoutController {
 		} catch (Exception e) {
 			throw new BlowoutException("Error while initialize Blowout Controller.", e);
 		}
-
 	}
 
 	public void start(boolean removePreviousResouces) throws Exception {
-
 		started = true;
 
 		blowoutPool = createBlowoutInstance();

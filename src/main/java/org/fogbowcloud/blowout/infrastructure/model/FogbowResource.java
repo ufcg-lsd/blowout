@@ -6,7 +6,6 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.infrastructure.provider.fogbow.FogbowRequirementsHelper;
 import org.fogbowcloud.blowout.pool.AbstractResource;
-import org.h2.security.Fog;
 
 public class FogbowResource extends AbstractResource {
 
@@ -21,9 +20,8 @@ public class FogbowResource extends AbstractResource {
 	}
 
 	public boolean match(Specification spec) {
-		
 		String fogbowRequirement = spec.getRequirementValue(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS);
-		String image = spec.getImage();
+		String image = spec.getImageId();
 		String publicKey = spec.getPublicKey();
 		if (fogbowRequirement != null && image != null) {
 
@@ -39,13 +37,10 @@ public class FogbowResource extends AbstractResource {
 		} else {
 			return false;
 		}
-
 		return true;
 	}
 
 	protected boolean internalCheckConnectivity() {
-
-
 		String host = this.getMetadataValue(METADATA_SSH_HOST);
 		String port = this.getMetadataValue(METADATA_SSH_PORT);
 
