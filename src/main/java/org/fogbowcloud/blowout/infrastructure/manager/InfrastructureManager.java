@@ -7,6 +7,6 @@ import org.fogbowcloud.blowout.pool.AbstractResource;
 
 public interface InfrastructureManager {
 	
-	public void act(List<AbstractResource> resources, List<Task> tasks) throws Exception ;
+	void act(List<AbstractResource> resources, List<Task> tasks) throws Exception ;
 
 }

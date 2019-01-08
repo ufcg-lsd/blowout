@@ -15,7 +15,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.fogbowcloud.manager.occi.model.HeaderUtils;
-import org.fogbowcloud.manager.occi.model.OCCIHeaders;
 import org.fogbowcloud.manager.occi.order.OrderConstants;
 
 public class HttpWrapper {
@@ -51,8 +50,6 @@ public class HttpWrapper {
             ((HttpPost) request).setEntity(bodyJsonStringEntity);
 
         }
-    	
-//        request.addHeader(OCCIHeaders.CONTENT_TYPE, OCCIHeaders.OCCI_CONTENT_TYPE);
 
         if (authToken != null) {
             request.addHeader(FEDERATION_TOKEN_VALUE_HEADER_KEY, authToken);
@@ -71,19 +68,12 @@ public class HttpWrapper {
             int statusCode = response.getStatusLine().getStatusCode();
             
             if (statusCode == HttpStatus.SC_OK || statusCode == HttpStatus.SC_CREATED) {
-
-                // TODO: check if this part of code is still up with new fogbow response
-                // Does it make sense to check the location header still? Does Fogbow RAS return it?
-                Header locationHeader = getLocationHeader(response.getAllHeaders());
-                
-                if (locationHeader != null && locationHeader.getValue().contains(OrderConstants.TERM)) {
-                    return generateLocationHeaderResponse(locationHeader);
-                } else {
-                    return EntityUtils.toString(response.getEntity());
-                }
+                return EntityUtils.toString(response.getEntity());
                 
             } else if(statusCode >= CLIENT_SIDE_CODE_ERRO_INIT && statusCode <= SERVER_SIDE_ERRO_MAX) {
-            	throw new Exception("Erro on request - Method ["+method+"] Endpoint: ["+endpoint+"] - Status: "+statusCode+" -  Msg: "+response.getStatusLine().toString());
+            	throw new Exception("Erro on request - Method ["+method+"] " +
+                        "Endpoint: ["+endpoint+"] - Status: "+statusCode+" -  " +
+                        "Msg: "+response.getStatusLine().toString());
             } else {
                 return response.getStatusLine().toString();
             }
@@ -93,9 +83,7 @@ public class HttpWrapper {
                 if (entity != null) {
                 	EntityUtils.toString(entity);
                 }
-            } catch (Exception e) {
-                // Do nothing
-            }
+            } catch (Exception e) {}
         }
     }
 
@@ -112,14 +100,4 @@ public class HttpWrapper {
         }
         return locationHeader;
     }
-
-    protected static String generateLocationHeaderResponse(Header header) {
-        String[] locations = header.getValue().split(",");
-        String response = "";
-        for (String location : locations) {
-            response += HeaderUtils.X_OCCI_LOCATION_PREFIX + location + "\n";
-        }
-        return response.trim();
-    }
-
 }

@@ -199,37 +199,6 @@ public class TaskImpl implements Task {
 		return this.processes;
 	}
 	
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((spec == null) ? 0 : spec.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		TaskImpl other = (TaskImpl) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		if (spec == null) {
-			if (other.spec != null)
-				return false;
-		} else if (!spec.equals(other.spec))
-			return false;
-		return true;
-	}
-	
 	public JSONObject toJSON() {
 		try {
 			JSONObject task = new JSONObject();
@@ -288,13 +257,41 @@ public class TaskImpl implements Task {
 	}
 
 	@Override
-	public void setState(TaskState state) {
-		this.state = state;
-		
-	}
+	public void setState(TaskState state) { this.state = state; }
 
 	@Override
 	public String getUUID() {
 		return this.uuid;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((spec == null) ? 0 : spec.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		TaskImpl other = (TaskImpl) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		if (spec == null) {
+			if (other.spec != null)
+				return false;
+		} else if (!spec.equals(other.spec))
+			return false;
+		return true;
 	}
 }

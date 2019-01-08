@@ -72,9 +72,6 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 	private static final String TOKEN_TEST = "";
 
-	// TODO: alter when fogbow are returning this attribute
-	public static final String INSTANCE_ATTRIBUTE_REQUEST_TYPE = "org.fogbowcloud.order.type";
-
 	public static final String FOGBOW_RAS_COMPUTE_ENDPOINT = "computes";
 	public static final String FOGBOW_RAS_PUBLIC_ID_ENDPOINT = "publicIps";
 
@@ -157,8 +154,6 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 			bodyRequest.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, HttpWrapper.HTTP_CONTENT_JSON));
 
 			orderId = this.doRequest("post", managerUrl + "/" + FOGBOW_RAS_COMPUTE_ENDPOINT, new LinkedList<Header>(), bodyRequest);
-
-
 
 		} catch (Exception e) {
 			LOGGER.error("Error while requesting resource on Fogbow", e);
@@ -246,8 +241,6 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 					fogbowResource.putMetadata(AbstractResource.METADATA_VCPU,
 							instanceAttributes.get(INSTANCE_ATTRIBUTE_VCORE));
-//					float menSize = Float.parseFloat(instanceAttributes.get(INSTANCE_ATTRIBUTE_MEMORY_SIZE));
-//					String menSizeFormated = String.valueOf(menSize * MEMORY_1Gbit);
 					fogbowResource.putMetadata(AbstractResource.METADATA_MEN_SIZE,
 							instanceAttributes.get(INSTANCE_ATTRIBUTE_MEMORY_SIZE));
 					fogbowResource.putMetadata(AbstractResource.METADATA_DISK_SIZE,
@@ -297,14 +290,6 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 			throw new InfrastructureException("Error when trying to delete resource id[" + fogbowResource.getId() + "]",
 					e);
 		}
-	}
-
-	protected Token createNewTokenFromFile(String certificateFilePath) throws FileNotFoundException, IOException {
-
-		String certificate = IOUtils.toString(new FileInputStream(certificateFilePath)).replaceAll("\n", "");
-		Date date = new Date(System.currentTimeMillis() + (long) Math.pow(10, 9));
-
-		return new Token(certificate, DEFAULT_USER, date, new HashMap<String, String>());
 	}
 
 	private Map<String, String> getFogbowRequestAttributes(String orderId) throws Exception {
@@ -394,7 +379,6 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		return headers;
 	}
 
-	@SuppressWarnings("resource")
 	protected static String getFileContent(String path) throws IOException {
 		FileReader reader = new FileReader(path);
 		BufferedReader leitor = new BufferedReader(reader);
@@ -605,5 +589,4 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 		return sshInfo;
 	}
-
 }

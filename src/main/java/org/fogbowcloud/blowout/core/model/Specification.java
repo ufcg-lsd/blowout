@@ -24,6 +24,7 @@ import com.google.gson.Gson;
 public class Specification implements Serializable {
 
 	private static final long serialVersionUID = 5255295548723927267L;
+	private static final String LN = System.lineSeparator();
 
 	private static final String REQUIREMENTS_MAP_STR = "requirementsMap";
 	private static final String USER_DATA_TYPE_STR = "userDataType";
@@ -75,7 +76,6 @@ public class Specification implements Serializable {
 
 	public void putAllRequirements(Map<String, String> requirements) {
 		for (Entry<String, String> e : requirements.entrySet()) {
-			
 			this.requirements.put(e.getKey(), e.getValue());
 		}
 	}
@@ -195,20 +195,20 @@ public class Specification implements Serializable {
 		sb.append("Image: " + this.imageId);
 		sb.append(" PublicKey: " + this.publicKey);
 		if ((this.contextScript != null) && !this.contextScript.isEmpty()) {
-			sb.append("\nContextScript: " + contextScript);
+			sb.append(LN + "ContextScript: " + contextScript);
 		}
 		if ((this.userDataFile != null) && !this.userDataFile.isEmpty()) {
-			sb.append("\nUserDataFile:" + this.userDataFile);
+			sb.append(LN + "UserDataFile:" + this.userDataFile);
 		}
 		if ((this.userDataType != null) && !this.userDataType.isEmpty()) {
-			sb.append("\nUserDataType:" + this.userDataType);
+			sb.append(LN + "UserDataType:" + this.userDataType);
 		}
 		if ((this.requirements != null) && !this.requirements.isEmpty()) {
-			sb.append("\nRequirements:{");
+			sb.append(LN + "Requirements:{");
 			for (Entry<String, String> entry : this.requirements.entrySet()) {
-				sb.append("\n\t" + entry.getKey() + ": " + entry.getValue());
+				sb.append(LN + "\t" + entry.getKey() + ": " + entry.getValue());
 			}
-			sb.append("\n}");
+			sb.append(LN + "}");
 		}
 		return sb.toString();
 	}

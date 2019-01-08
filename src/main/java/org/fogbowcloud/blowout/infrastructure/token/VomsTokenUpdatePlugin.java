@@ -68,12 +68,16 @@ public class VomsTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
 
 	protected Token createNewTokenFromFile(String certificateFilePath) throws FileNotFoundException, IOException {
 
+		return getToken(certificateFilePath, DEFAULT_USER);
+	}
+
+	private static Token getToken(String certificateFilePath, Token.User defaultUser) throws IOException {
 		String certificate = IOUtils.toString(new FileInputStream(certificateFilePath)).replaceAll("\n", "");
 		Date date = new Date(System.currentTimeMillis() + (long) Math.pow(10, 9));
 
-		return new Token(certificate, DEFAULT_USER, date, new HashMap<String, String>());
+		return new Token(certificate, defaultUser, date, new HashMap<String, String>());
 	}
-	
+
 	@Override
 	public void validateProperties() throws BlowoutException {
 		if (!properties.containsKey(VOMS_CERTIFICATE_FILE)) {
@@ -91,5 +95,5 @@ public class VomsTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
 					+ " was not set");
 		}
 	}
-	
+
 }

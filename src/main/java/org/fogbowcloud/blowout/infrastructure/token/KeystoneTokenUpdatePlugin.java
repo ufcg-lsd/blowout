@@ -29,7 +29,6 @@ public class KeystoneTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
 	private Properties properties;
 
 	public KeystoneTokenUpdatePlugin(Properties properties) {
-
 		super(properties);
 
 		this.properties = properties;
@@ -52,10 +51,6 @@ public class KeystoneTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
 		return null;
 	}
 
-	protected Token createToken() {
-		return createToken(new Properties());
-	}
-
 	protected Token createToken(Properties properties) {
 		KeystoneIdentityPlugin keystoneIdentityPlugin = new KeystoneIdentityPlugin(properties);
 
@@ -75,17 +70,15 @@ public class KeystoneTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
 
 	@Override
 	public void validateProperties() throws BlowoutException {
-		if (!properties.containsKey(FOGBOW_KEYSTONE_USERNAME)) {
-			throw new BlowoutException("Required property " + FOGBOW_KEYSTONE_USERNAME + " was not set");
-		}
-		if (!properties.containsKey(FOGBOW_KEYSTONE_TENANTNAME)) {
-			throw new BlowoutException("Required property " + FOGBOW_KEYSTONE_TENANTNAME + " was not set");
-		}
-		if (!properties.containsKey(FOGBOW_KEYSTONE_PASSWORD)) {
-			throw new BlowoutException("Required property " + FOGBOW_KEYSTONE_PASSWORD + " was not set");
-		}
-		if (!properties.containsKey(FOGBOW_KEYSTONE_AUTH_URL)) {
-			throw new BlowoutException("Required property " + FOGBOW_KEYSTONE_AUTH_URL + " was not set");
+		validadeProperty(FOGBOW_KEYSTONE_USERNAME);
+		validadeProperty(FOGBOW_KEYSTONE_TENANTNAME);
+		validadeProperty(FOGBOW_KEYSTONE_PASSWORD);
+		validadeProperty(FOGBOW_KEYSTONE_AUTH_URL);
+	}
+
+	private void validadeProperty(String property) throws  BlowoutException {
+		if (!this.properties.containsKey(property)) {
+			throw new BlowoutException("Required property " + property + " was not set");
 		}
 	}
 }

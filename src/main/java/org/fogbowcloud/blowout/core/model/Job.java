@@ -17,12 +17,7 @@ public abstract class Job implements Serializable {
 	public static final Logger LOGGER = Logger.getLogger(Job.class);
 	
 	public Job(List<Task> tasks) {
-		for(Task task : tasks){
-			addTask(task);
-		}
-	}
-	
-	public Job() {
+		populateJob(tasks);
 	}
 
 	public void addTask(Task task) {
@@ -44,5 +39,11 @@ public abstract class Job implements Serializable {
 		ArrayList<Task> tasks = new ArrayList<Task>();
 		tasks.addAll(getTaskList().values());
 		return tasks;
+	}
+
+	private void populateJob(List<Task> tasks) {
+		for(Task task : tasks){
+			addTask(task);
+		}
 	}
 }

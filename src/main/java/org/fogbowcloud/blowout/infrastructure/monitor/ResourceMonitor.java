@@ -31,7 +31,7 @@ public class ResourceMonitor {
 	private Thread monitoringServiceRunner;
 	private MonitoringService monitoringService;
 	private long infraMonitoringPeriod;
-	private Long noExpirationTime = new Long(0);
+	private Long noExpirationTime;
 	private Long idleLifeTime;
 	private int maxConnectionTries;
 	private int maxReuse;
@@ -39,6 +39,7 @@ public class ResourceMonitor {
 	public ResourceMonitor(InfrastructureProvider infraProvider, BlowoutPool blowoutPool, Properties properties) {
 		this.infraProvider = infraProvider;
 		this.resourcePool = blowoutPool;
+		noExpirationTime = 0L;
 
 		String defaultInfraMonitorPeriod = "30000";
 		String defaultIdleLifeTime = "120000";
@@ -60,7 +61,6 @@ public class ResourceMonitor {
 		if (previouResources != null && !previouResources.isEmpty()) {
 			this.resourcePool.addResourceList(previouResources);
 		}
-		
 	}
 
 	public void start() {
@@ -182,16 +182,14 @@ public class ResourceMonitor {
 			//          if there's no task processes READY or RUNNING
 			//       2. Make maxReuse indefinite by default and not one
 			//       3. Always reuse instance
-			if(resource.getReusedTimes() < maxReuse){
-				Long expirationDate = (long) 0;
-				expirationDate = Long.valueOf(+idleLifeTime);
+			if (resource.getReusedTimes() < maxReuse) {
 				Calendar c = Calendar.getInstance();
 				c.setTime(new Date());
 				c.add(Calendar.MILLISECOND, idleLifeTime.intValue());
-				expirationDate = c.getTimeInMillis();
+				Long expirationDate = c.getTimeInMillis();
 				idleResources.put(resource.getId(), expirationDate);
 				return true;
-			}else{
+			} else {
 				resourcePool.updateResource(resource, ResourceState.TO_REMOVE);
 				return false;
 			}
@@ -216,7 +214,6 @@ public class ResourceMonitor {
 				}
 			}
 		}
-		
 
 		public synchronized void stop() {
 			if(paused){

@@ -30,8 +30,7 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 	public synchronized void act(List<AbstractResource> resources,
 			List<Task> tasks) throws Exception {
 		
-		Map<Specification, Integer> specsDemand = (HashMap<Specification, Integer>) generateDemandBySpec(
-				tasks, resources);
+		Map<Specification, Integer> specsDemand = generateDemandBySpec(tasks, resources);
 		
 		requestResources(specsDemand);
 	}
@@ -81,9 +80,7 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 				filteredTasks.add(task);
 			}
 		}
-
 		return filteredTasks;
-
 	}
 
 	private Map<Specification, Integer> generateDemandBySpec(List<Task> tasks,

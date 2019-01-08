@@ -24,18 +24,15 @@ public class BlowoutController {
 	private String DEFAULT_IMPLEMENTATION_INFRA_MANAGER = "org.fogbowcloud.blowout.infrastructure.manager.DefaultInfrastructureManager";
 	private String DEFAULT_IMPLEMENTATION_INFRA_PROVIDER = "org.fogbowcloud.blowout.infrastructure.provider.fogbow.FogbowInfrastructureProvider";
 
-	protected BlowoutPool blowoutPool;
-
 	private SchedulerInterface schedulerInterface;
 	private TaskMonitor taskMonitor;
+	private Properties properties;
 
+	protected BlowoutPool blowoutPool;
 	protected InfrastructureProvider infraProvider;
-
 	protected InfrastructureManager infraManager;
 	protected ResourceMonitor resourceMonitor;
-
 	protected boolean started = false;
-	private Properties properties;
 
 	public BlowoutController(Properties properties) throws BlowoutException {
 		this.properties = properties;
@@ -155,6 +152,7 @@ public class BlowoutController {
 	}
 
 	protected static boolean checkProperties(Properties properties) {//FIXME: MAKE IT IN A GENERAL WAY.
+
 		if (!properties.containsKey(AppPropertiesConstants.IMPLEMENTATION_INFRA_PROVIDER)) {
 			LOGGER.error("Required property " + AppPropertiesConstants.IMPLEMENTATION_INFRA_PROVIDER + " was not set");
 			return false;
@@ -180,7 +178,7 @@ public class BlowoutController {
 		LOGGER.debug("All properties are set");
 		return true;
 	}
-	
+
 	public BlowoutPool getBlowoutPool() {
 		return this.blowoutPool;
 	}

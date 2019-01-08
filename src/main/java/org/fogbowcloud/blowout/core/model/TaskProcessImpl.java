@@ -143,7 +143,6 @@ public class TaskProcessImpl implements TaskProcess {
 
 	private Process startRemoteProcess(String commandString, Map<String, String> additionalVariables)
 			throws IOException {
-		// FIXME: extract strings or commands to a variable
 		ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c",
 				"ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i "
 						+ additionalVariables.get(ENV_PRIVATE_KEY_FILE) + " " + additionalVariables.get(ENV_SSH_USER)
@@ -154,12 +153,9 @@ public class TaskProcessImpl implements TaskProcess {
 				+ additionalVariables.get(ENV_HOST) + " -p " + additionalVariables.get(ENV_SSH_PORT) + " "
 				+ parseEnvironVariable(commandString, additionalVariables));
 		return builder.start();
-
 	}
 
 	private Process startLocalProcess(String command, Map<String, String> additionalEnvVariables) throws IOException {
-		//with local command interpreter:
-		//ProcessBuilder builder = new ProcessBuilder(this.localCommandInterpreter, this.userIdValue, "9999", command);
 		ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", command);
 		if (additionalEnvVariables == null || additionalEnvVariables.isEmpty()) {
 			return builder.start();
