@@ -157,20 +157,20 @@ public class ResourceMonitor {
 			} else {
 
 				String requestType = resource.getMetadataValue(AbstractResource.METADATA_REQUEST_TYPE);
-				if (OrderType.ONE_TIME.getValue().equals(requestType)) {
-
-					boolean isAlive = checkResourceConnectivity(resource);
-
-					if (isAlive && noExpirationTime.compareTo(expirationDateTime) != 0) {
-						Date expirationDate = new Date(expirationDateTime.longValue());
-						Date currentDate = new Date();
-						if (expirationDate.before(currentDate)) {
-							LOGGER.warn("Removing resource "+resource.getId()+" due Idle time expired.");
-							resourcePool.updateResource(resource, ResourceState.TO_REMOVE);
-							idleResources.remove(resource.getId());
-						}
-					}
-				}
+//				if (OrderType.ONE_TIME.getValue().equals(requestType)) {
+//
+//					boolean isAlive = checkResourceConnectivity(resource);
+//
+//					if (isAlive && noExpirationTime.compareTo(expirationDateTime) != 0) {
+//						Date expirationDate = new Date(expirationDateTime.longValue());
+//						Date currentDate = new Date();
+//						if (expirationDate.before(currentDate)) {
+//							LOGGER.warn("Removing resource "+resource.getId()+" due Idle time expired.");
+//							resourcePool.updateResource(resource, ResourceState.TO_REMOVE);
+//							idleResources.remove(resource.getId());
+//						}
+//					}
+//				}
 			}
 		}
 

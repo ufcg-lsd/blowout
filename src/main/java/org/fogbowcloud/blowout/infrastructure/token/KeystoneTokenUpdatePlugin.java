@@ -62,15 +62,15 @@ public class KeystoneTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
 
         String endpoint = this.rasBaseUrl + "/" + FOGBOW_RAS_TOKEN_ENDPOINT;
         StringEntity body = makeBodyJson();
+
         body.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, HttpWrapper.HTTP_CONTENT_JSON));
 
-        String acessToken = httpWrapper.doRequest("post", endpoint, new LinkedList<Header>(), body);
+        String acessToken = httpWrapper.doRequest("post", endpoint, new LinkedList<>(), body);
 
         User user = new User(this.userName, this.password);
-
         Token token = new Token(acessToken, user);
 
-        return null; // Todo
+        return token;
     }
 
     private StringEntity makeBodyJson() throws JSONException, UnsupportedEncodingException {
@@ -99,4 +99,4 @@ public class KeystoneTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
         // Todo
     }
 }
-}
+
