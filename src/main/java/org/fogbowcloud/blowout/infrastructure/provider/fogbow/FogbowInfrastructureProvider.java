@@ -2,7 +2,6 @@ package org.fogbowcloud.blowout.infrastructure.provider.fogbow;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,16 +12,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
-import com.amazonaws.util.json.JSONException;
-import com.amazonaws.util.json.JSONObject;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.apache.log4j.Logger;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
 import org.fogbowcloud.blowout.core.util.AppUtil;
@@ -31,34 +26,16 @@ import org.fogbowcloud.blowout.infrastructure.exception.InfrastructureException;
 import org.fogbowcloud.blowout.infrastructure.exception.RequestResourceException;
 import org.fogbowcloud.blowout.infrastructure.http.HttpWrapper;
 import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
+import org.fogbowcloud.blowout.infrastructure.model.Token;
 import org.fogbowcloud.blowout.infrastructure.provider.InfrastructureProvider;
 import org.fogbowcloud.blowout.infrastructure.token.AbstractTokenUpdatePlugin;
 import org.fogbowcloud.blowout.pool.AbstractResource;
-import org.fogbowcloud.manager.core.UserdataUtils;
-import org.fogbowcloud.manager.occi.model.Token;
-import org.fogbowcloud.manager.occi.model.Token.User;
-import org.fogbowcloud.manager.occi.order.OrderAttribute;
-import org.fogbowcloud.manager.occi.order.OrderConstants;
+import org.json.JSONObject;
 
 public class FogbowInfrastructureProvider implements InfrastructureProvider {
-
-	private static final int MEMORY_1Gbit = 1024;
-
 	// TODO: put in resource the user, token and localCommand
 
 	private static final Logger LOGGER = Logger.getLogger(FogbowInfrastructureProvider.class);
-
-	private static final String NULL_VALUE = "null";
-	private static final String CATEGORY = "Category";
-	private static final String X_OCCI_ATTRIBUTE = "X-OCCI-Attribute";
-	private static final User DEFAULT_USER = new Token.User("9999", "User");
-
-	public static final String REQUEST_ATTRIBUTE_MEMBER_ID = "org.fogbowcloud.order.providing-member";
-	public static final String DEFAULT_PROVIDING_MEMBER = "Fake-UFCG";
-
-	public static final String INSTANCE_ATTRIBUTE_SSH_PUBLIC_ADDRESS_ATT = "org.fogbowcloud.order.ssh-public-address";
-	public static final String INSTANCE_ATTRIBUTE_SSH_USERNAME_ATT = "org.fogbowcloud.order.ssh-username";
-	public static final String INSTANCE_ATTRIBUTE_EXTRA_PORTS_ATT = "org.fogbowcloud.order.extra-ports";
 
 	public static final String INSTANCE_ATTRIBUTE_MEMORY_SIZE = "ram";
 	public static final String INSTANCE_ATTRIBUTE_VCORE = "vCPU";
@@ -288,14 +265,6 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		}
 	}
 
-	private Map<String, String> getFogbowRequestAttributes(String orderId) throws Exception {
-		String endpoint = managerUrl + "/" + OrderConstants.TERM + "/" + orderId;
-		String requestResponse = doRequest(HttpWrapper.HTTP_METHOD_GET, endpoint, new ArrayList<Header>());
-
-		Map<String, String> attrs = parseRequestAttributes(requestResponse);
-		return attrs;
-	}
-
 	private Map<String, String> getFogbowInstanceAttributes(String orderId) throws Exception {
 		String endpoint = managerUrl + "/" +  FOGBOW_RAS_COMPUTE_ENDPOINT + "/" + orderId;
 		String instanceInformation = doRequest(HttpWrapper.HTTP_METHOD_GET, endpoint, new ArrayList<Header>());
@@ -363,20 +332,6 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		return isValid;
 	}
 
-	private Map<String, String> parseRequestAttributes(String response) {
-		Map<String, String> atts = new HashMap<String, String>();
-		for (String responseLine : response.split("\n")) {
-			if (responseLine.contains(X_OCCI_ATTRIBUTE + ": ")) {
-				String[] responseLineSplit = responseLine.substring((X_OCCI_ATTRIBUTE + ": ").length()).split("=");
-				String valueStr = responseLineSplit[1].trim().replace("\"", "");
-				if (!valueStr.equals(NULL_VALUE)) {
-					atts.put(responseLineSplit[0].trim(), valueStr);
-				}
-			}
-		}
-		return atts;
-	}
-
 	private Map<String, String> parseAttributes(String response) {
 		Map<String, String> atts = new HashMap<>();
 		try {
@@ -417,8 +372,9 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		this.frDatastore = frDatastore;
 	}
 
-	protected StringEntity makeBodyJson(Specification spec) throws JSONException, UnsupportedEncodingException {
+	protected StringEntity makeBodyJson(Specification spec) throws UnsupportedEncodingException {
 		JSONObject json = new JSONObject();
+
 
 		if (spec.getPublicKey() != null && !spec.getPublicKey().isEmpty()) {
 			json.put(FogbowRequirementsHelper.JSON_KEY_FOGBOW_REQUIREMENTS_PUBLIC_KEY, spec.getPublicKey());
@@ -444,7 +400,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		return se;
 	}
 
-	protected StringEntity makeRequestBodyJson(Map<String, String> bodyRequestAttrs) throws UnsupportedEncodingException, JSONException {
+	protected StringEntity makeRequestBodyJson(Map<String, String> bodyRequestAttrs) throws UnsupportedEncodingException {
 		JSONObject json = new JSONObject();
 
 		for (String jsonKey : bodyRequestAttrs.keySet()) {

@@ -31,11 +31,15 @@ public class HttpWrapper {
 		return HttpClients.createMinimal();
     }
 
+    public String doRequest(String method, String endpoint, List<Header> additionalHeaders, StringEntity body) throws Exception {
+        return doRequest(method, endpoint, null, additionalHeaders, body);
+    }
+
     public String doRequest(String method, String endpoint, String authToken, List<Header> additionalHeaders) throws Exception {
         return doRequest(method, endpoint, authToken, additionalHeaders, null);
     }
 
-    public String doRequest(String method, String endpoint, String authToken, List<Header> additionalHeaders, StringEntity bodyJsonStringEntity) throws Exception {
+    public String doRequest(String method, String endpoint, String authToken, List<Header> additionalHeaders, StringEntity body) throws Exception {
 
     	HttpUriRequest request = null;
         
@@ -45,8 +49,7 @@ public class HttpWrapper {
             request = new HttpDelete(endpoint);
         } else if (method.equalsIgnoreCase(HTTP_METHOD_POST)) {
             request = new HttpPost(endpoint);
-            ((HttpPost) request).setEntity(bodyJsonStringEntity);
-
+            ((HttpPost) request).setEntity(body);
         }
 
         if (authToken != null) {

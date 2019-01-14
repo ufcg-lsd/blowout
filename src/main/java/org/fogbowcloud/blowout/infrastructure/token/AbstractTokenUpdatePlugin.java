@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.fogbowcloud.blowout.core.exception.BlowoutException;
 import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
-import org.fogbowcloud.manager.occi.model.Token;
+import org.fogbowcloud.blowout.infrastructure.model.Token;
 
 public abstract class AbstractTokenUpdatePlugin {
 	

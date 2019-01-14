@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.fogbowcloud.blowout.core.util.AppUtil;
 import org.fogbowcloud.blowout.infrastructure.provider.fogbow.FogbowRequirementsHelper;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -248,20 +249,7 @@ public class Specification implements Serializable {
 	}
 
 	public static Map<String, String> toMap(String jsonStr) {
-		Map<String, String> newMap = new HashMap<String, String>();
-		jsonStr = jsonStr.replace("{", "").replace("}", "");
-		String[] blocks = jsonStr.split(",");
-		for (int i = 0; i < blocks.length; i++) {
-			String block = blocks[i];
-			int indexOfCarac = block.indexOf("=");
-			if (indexOfCarac < 0) {
-				continue;
-			}
-			String key = block.substring(0, indexOfCarac).trim();
-			String value = block.substring(indexOfCarac + 1, block.length()).trim();
-			newMap.put(key, value);
-		}
-		return newMap;
+		return AppUtil.toMap(jsonStr);
 	}
 
 	public String getvCPU() {

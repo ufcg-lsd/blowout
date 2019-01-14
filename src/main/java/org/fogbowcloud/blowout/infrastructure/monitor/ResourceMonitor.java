@@ -17,7 +17,6 @@ import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 import org.fogbowcloud.blowout.infrastructure.provider.InfrastructureProvider;
 import org.fogbowcloud.blowout.pool.AbstractResource;
 import org.fogbowcloud.blowout.pool.BlowoutPool;
-import org.fogbowcloud.manager.occi.order.OrderType;
 
 public class ResourceMonitor {
 
@@ -93,7 +92,6 @@ public class ResourceMonitor {
 					LOGGER.error("Error while executing MonitoringService");
 				}
 			}
-
 		}
 
 		protected void monitorProcess() throws InterruptedException {
