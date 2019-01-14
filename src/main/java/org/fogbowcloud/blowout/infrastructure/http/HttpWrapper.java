@@ -14,8 +14,6 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.fogbowcloud.manager.occi.model.HeaderUtils;
-import org.fogbowcloud.manager.occi.order.OrderConstants;
 
 public class HttpWrapper {
 
@@ -85,19 +83,5 @@ public class HttpWrapper {
                 }
             } catch (Exception e) {}
         }
-    }
-
-    protected static Header getLocationHeader(Header[] headers) {
-        return getSpecifHeader(headers, "Location");
-    }
-
-    protected static Header getSpecifHeader(Header[] headers, String headerName) {
-        Header locationHeader = null;
-        for (Header header : headers) {
-            if (header.getName().equals(headerName)) {
-                locationHeader = header;
-            }
-        }
-        return locationHeader;
     }
 }
