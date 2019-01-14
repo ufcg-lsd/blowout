@@ -59,18 +59,14 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 	public static final String INSTANCE_ATTRIBUTE_SSH_PUBLIC_ADDRESS_ATT = "org.fogbowcloud.order.ssh-public-address";
 	public static final String INSTANCE_ATTRIBUTE_SSH_USERNAME_ATT = "org.fogbowcloud.order.ssh-username";
 	public static final String INSTANCE_ATTRIBUTE_EXTRA_PORTS_ATT = "org.fogbowcloud.order.extra-ports";
-//	public static final String INSTANCE_ATTRIBUTE_MEMORY_SIZE = "occi.compute.memory";
-//	public static final String INSTANCE_ATTRIBUTE_VCORE = "occi.compute.cores";
+
 	public static final String INSTANCE_ATTRIBUTE_MEMORY_SIZE = "ram";
-	public static final String INSTANCE_ATTRIBUTE_DISK_SIZE = "disk";
 	public static final String INSTANCE_ATTRIBUTE_VCORE = "vCPU";
 	public static final String INSTANCE_ATTRIBUTE_HOSTNAME = "hostName";
 	public static final String INSTANCE_ATTRIBUTE_PUBLIC_IP = "ip";
 	public static final String INSTANCE_ATTRIBUTE_STATE = "state";
 	public static final String INSTANCE_ATTRIBUTE_PROVIDER = "provider";
 	public static final String DEFAULT_INSTANCE_ATTRIBUTE_SHH_USERNAME = "fogbow";
-
-	private static final String TOKEN_TEST = "";
 
 	public static final String FOGBOW_RAS_COMPUTE_ENDPOINT = "computes";
 	public static final String FOGBOW_RAS_PUBLIC_ID_ENDPOINT = "publicIps";
@@ -330,81 +326,12 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		}
 	}
 
-	private List<Header> requestNewInstanceHeaders(Specification specs) {
-		String fogbowImage = specs.getImageId();
-		String fogbowRequirements = specs.getRequirementValue(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS);
-		String fogbowRequestType = specs.getRequirementValue(FogbowRequirementsHelper.METADATA_FOGBOW_REQUEST_TYPE);
-
-		List<Header> headers = new LinkedList<Header>();
-		headers.add(new BasicHeader(CATEGORY, OrderConstants.TERM + "; scheme=\"" + OrderConstants.SCHEME
-				+ "\"; class=\"" + OrderConstants.KIND_CLASS + "\""));
-		headers.add(new BasicHeader(X_OCCI_ATTRIBUTE, OrderAttribute.INSTANCE_COUNT.getValue() + "=" + 1));
-		headers.add(new BasicHeader(X_OCCI_ATTRIBUTE, OrderAttribute.TYPE.getValue() + "=" + fogbowRequestType));
-
-		headers.add(new BasicHeader(CATEGORY, fogbowImage + "; scheme=\"" + OrderConstants.TEMPLATE_OS_SCHEME
-				+ "\"; class=\"" + OrderConstants.MIXIN_CLASS + "\""));
-
-		headers.add(
-				new BasicHeader(X_OCCI_ATTRIBUTE, OrderAttribute.REQUIREMENTS.getValue() + "=" + fogbowRequirements));
-
-		if (specs.getUserDataFile() != null && !specs.getUserDataFile().isEmpty()) {
-			if (specs.getUserDataType() == null || specs.getUserDataType().isEmpty()) {
-				LOGGER.error("Content type of user data file cannot be empty.");
-				return null;
-			}
-			try {
-				String userDataContent = getFileContent(specs.getUserDataFile());
-				String userData = userDataContent.replace("\n", UserdataUtils.USER_DATA_LINE_BREAKER);
-				userData = new String(Base64.encodeBase64(userData.getBytes()));
-				headers.add(new BasicHeader("X-OCCI-Attribute",
-						OrderAttribute.EXTRA_USER_DATA_ATT.getValue() + "=" + userData));
-				headers.add(new BasicHeader("X-OCCI-Attribute",
-						OrderAttribute.EXTRA_USER_DATA_CONTENT_TYPE_ATT.getValue() + "=" + specs.getUserDataType()));
-			} catch (IOException e) {
-				LOGGER.debug("User data file not found.", e);
-				return null;
-			}
-		}
-
-		headers.add(new BasicHeader(X_OCCI_ATTRIBUTE, OrderAttribute.RESOURCE_KIND.getValue() + "=" + "compute"));
-		if (specs.getPublicKey() != null && !specs.getPublicKey().isEmpty()) {
-			headers.add(new BasicHeader(CATEGORY, OrderConstants.PUBLIC_KEY_TERM + "; scheme=\""
-					+ OrderConstants.CREDENTIALS_RESOURCE_SCHEME + "\"; class=\"" + OrderConstants.MIXIN_CLASS + "\""));
-			headers.add(new BasicHeader(X_OCCI_ATTRIBUTE,
-					OrderAttribute.DATA_PUBLIC_KEY.getValue() + "=" + specs.getPublicKey()));
-		}
-
-		headers.add(new BasicHeader("X-OCCI-Attribute", OrderAttribute.RESOURCE_KIND.getValue() + "="
-				+ FogbowRequirementsHelper.METADATA_FOGBOW_RESOURCE_KIND));
-		return headers;
-	}
-
-	protected static String getFileContent(String path) throws IOException {
-		FileReader reader = new FileReader(path);
-		BufferedReader leitor = new BufferedReader(reader);
-		String fileContent = "";
-		String linha = "";
-		while (true) {
-			linha = leitor.readLine();
-			if (linha == null)
-				break;
-			fileContent += linha + "\n";
-		}
-		return fileContent.trim();
-	}
-
 	private String doRequest(String method, String endpoint, List<Header> headers, StringEntity bodyJson) throws Exception {
-		return httpWrapper.doRequest(method, endpoint, TOKEN_TEST, headers, bodyJson);
+		return httpWrapper.doRequest(method, endpoint, this.token.getAccessId(), headers, bodyJson);
 	}
 
 	private String doRequest(String method, String endpoint, List<Header> headers) throws Exception {
-		return httpWrapper.doRequest(method, endpoint, TOKEN_TEST, headers);
-	}
-
-	protected String getOrderId(String requestInformation) { // TODO: check if this method is still up with new fogbow response
-		String[] requestRes = requestInformation.split(":");
-		String[] requestId = requestRes[requestRes.length - 1].split("/");
-		return requestId[requestId.length - 1];
+		return httpWrapper.doRequest(method, endpoint, this.token.getAccessId(), headers);
 	}
 
 	private boolean validateInstanceAttributes(Map<String, String> instanceAttributes) {
@@ -474,48 +401,22 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		return tokenUpdatePlugin;
 	}
 
-	public HttpWrapper getHttpWrapper() {
-		return httpWrapper;
-	}
-
 	public void setHttpWrapper(HttpWrapper httpWrapper) {
 		this.httpWrapper = httpWrapper;
-	}
-
-	public String getManagerUrl() {
-		return managerUrl;
-	}
-
-	public void setManagerUrl(String managerUrl) {
-		this.managerUrl = managerUrl;
-	}
-
-	public Token getToken() {
-		return this.token;
 	}
 
 	protected void setToken(Token token) {
 		this.token = token;
 	}
 
-	protected Map<String, FogbowResource> getResourcesMap() {
-		return resourcesMap;
-	}
-
 	protected void setResourcesMap(Map<String, FogbowResource> resourcesMap) {
 		this.resourcesMap = resourcesMap;
-	}
-
-	protected FogbowResourceDatastore getFrDatastore() {
-		return frDatastore;
 	}
 
 	protected void setFrDatastore(FogbowResourceDatastore frDatastore) {
 		this.frDatastore = frDatastore;
 	}
 
-
-	// ToDo Do this in a generic way
 	protected StringEntity makeBodyJson(Specification spec) throws JSONException, UnsupportedEncodingException {
 		JSONObject json = new JSONObject();
 
