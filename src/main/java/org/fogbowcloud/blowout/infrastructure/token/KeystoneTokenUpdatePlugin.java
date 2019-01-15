@@ -6,6 +6,7 @@ import org.apache.http.protocol.HTTP;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.exception.BlowoutException;
 import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
+import static org.fogbowcloud.blowout.core.util.AppUtil.makeBodyField;
 import org.fogbowcloud.blowout.infrastructure.http.HttpWrapper;
 import org.fogbowcloud.blowout.infrastructure.model.Token;
 import org.fogbowcloud.blowout.infrastructure.model.User;
@@ -13,7 +14,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Properties;
 import java.util.UUID;
@@ -85,11 +85,7 @@ public class KeystoneTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
         return new StringEntity(json.toString());
     }
 
-    private void makeBodyField(JSONObject json, String propKey, String prop) {
-        if (prop != null && !prop.isEmpty()) {
-            json.put(propKey, prop);
-        }
-    }
+
 
     @Override
     public void validateProperties() throws BlowoutException {

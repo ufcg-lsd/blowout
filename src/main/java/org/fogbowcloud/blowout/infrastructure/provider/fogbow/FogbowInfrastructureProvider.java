@@ -20,7 +20,9 @@ import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
-import org.fogbowcloud.blowout.core.util.AppUtil;
+
+import static org.fogbowcloud.blowout.core.util.AppUtil.isStringEmpty;
+import static org.fogbowcloud.blowout.core.util.AppUtil.makeBodyField;
 import org.fogbowcloud.blowout.database.FogbowResourceDatastore;
 import org.fogbowcloud.blowout.infrastructure.exception.InfrastructureException;
 import org.fogbowcloud.blowout.infrastructure.exception.RequestResourceException;
@@ -318,7 +320,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 			// If any of these attributes are empty, then return invalid.
 			// TODO: add to "isStringEmpty diskSize and memberId when fogbow
 			// being returning this two attributes.
-			isValid = !AppUtil.isStringEmpty(sshInformation, vcore, memorySize);
+			isValid = !isStringEmpty(sshInformation, vcore, memorySize);
 			if (!isValid) {
 				LOGGER.debug("Instance attributes invalids.");
 				return false;
@@ -375,29 +377,13 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 	protected StringEntity makeBodyJson(Specification spec) throws UnsupportedEncodingException {
 		JSONObject json = new JSONObject();
 
+		makeBodyField(json, FogbowRequirementsHelper.JSON_KEY_FOGBOW_REQUIREMENTS_PUBLIC_KEY, spec.getPublicKey());
+		makeBodyField(json, FogbowRequirementsHelper.JSON_KEY_FOGBOW_REQUIREMENTS_MEMORY, spec.getMemory());
+		makeBodyField(json, FogbowRequirementsHelper.JSON_KEY_FOGBOW_REQUIREMENTS_DISK, spec.getDisk());
+		makeBodyField(json, FogbowRequirementsHelper.JSON_KEY_FOGBOW_REQUIREMENTS_IMAGE_ID, spec.getImageId());
+		makeBodyField(json, FogbowRequirementsHelper.JSON_KEY_FOGBOW_REQUIREMENTS_VCPU, spec.getvCPU());
 
-		if (spec.getPublicKey() != null && !spec.getPublicKey().isEmpty()) {
-			json.put(FogbowRequirementsHelper.JSON_KEY_FOGBOW_REQUIREMENTS_PUBLIC_KEY, spec.getPublicKey());
-		}
-
-		if (spec.getMemory() != null && !spec.getMemory().isEmpty()) {
-			json.put(FogbowRequirementsHelper.JSON_KEY_FOGBOW_REQUIREMENTS_MEMORY, spec.getMemory());
-		}
-
-		if (spec.getDisk() != null && !spec.getDisk().isEmpty()) {
-			json.put(FogbowRequirementsHelper.JSON_KEY_FOGBOW_REQUIREMENTS_DISK, spec.getDisk());
-		}
-
-		if (spec.getImageId() != null && !spec.getImageId().isEmpty()) {
-			json.put(FogbowRequirementsHelper.JSON_KEY_FOGBOW_REQUIREMENTS_IMAGE_ID, spec.getImageId());
-		}
-
-		if (spec.getvCPU() != null && !spec.getvCPU().isEmpty()) {
-			json.put(FogbowRequirementsHelper.JSON_KEY_FOGBOW_REQUIREMENTS_VCPU, spec.getvCPU());
-		}
-
-		StringEntity se = new StringEntity(json.toString());
-		return se;
+		return new StringEntity(json.toString());
 	}
 
 	protected StringEntity makeRequestBodyJson(Map<String, String> bodyRequestAttrs) throws UnsupportedEncodingException {

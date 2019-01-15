@@ -1,5 +1,7 @@
 package org.fogbowcloud.blowout.core.util;
 
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,6 +32,12 @@ public class AppUtil {
 			newMap.put(key, value);
 		}
 		return newMap;
+	}
+
+	public static void makeBodyField(JSONObject json, String propKey, String prop) {
+		if (prop != null && !prop.isEmpty()) {
+			json.put(propKey, prop);
+		}
 	}
 
 }
