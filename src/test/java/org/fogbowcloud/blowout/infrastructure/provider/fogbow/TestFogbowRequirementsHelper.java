@@ -14,7 +14,6 @@ import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
 import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
 import org.fogbowcloud.blowout.infrastructure.model.TestResourceHelper;
-import org.fogbowcloud.manager.occi.order.OrderType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -102,7 +101,7 @@ public class TestFogbowRequirementsHelper {
 		String location = "servers.your.domain";
 		
 		Map<String, String> resourceMetadata = TestResourceHelper.generateResourceMetadata(host, port, userName,
-				extraPorts, OrderType.ONE_TIME, spec.getImageId(), spec.getPublicKey(), cpuSize, menSize, diskSize,
+				extraPorts, spec.getImageId(), spec.getPublicKey(), cpuSize, menSize, diskSize,
 				location);
 
 		suitableResource = TestResourceHelper.generateMockResource(requestId, resourceMetadata, true);
@@ -127,7 +126,7 @@ public class TestFogbowRequirementsHelper {
 		String location = "\"servers.your.domain\"";
 
 		Map<String, String> resourceMetadata = TestResourceHelper.generateResourceMetadata(host, port, userName,
-				extraPorts, OrderType.ONE_TIME, spec.getImageId(), spec.getPublicKey(), cpuSize, menSize, diskSize,
+				extraPorts, spec.getImageId(), spec.getPublicKey(), cpuSize, menSize, diskSize,
 				location);
 
 		suitableResource = TestResourceHelper.generateMockResource(requestId, resourceMetadata, true);
@@ -152,7 +151,7 @@ public class TestFogbowRequirementsHelper {
 		String location = "servers.your.domain";
 		
 		Map<String, String> resourceMetadata = TestResourceHelper.generateResourceMetadata(host, port, userName,
-				extraPorts, OrderType.ONE_TIME, spec.getImageId(), spec.getPublicKey(), cpuSize, menSize, diskSize,
+				extraPorts, spec.getImageId(), spec.getPublicKey(), cpuSize, menSize, diskSize,
 				location);
 
 		suitableResource = TestResourceHelper.generateMockResource(requestId, resourceMetadata, true);
@@ -177,7 +176,7 @@ public class TestFogbowRequirementsHelper {
 		String location = "";
 
 		Map<String, String> resourceMetadata = TestResourceHelper.generateResourceMetadata(host, port, userName,
-				extraPorts, OrderType.ONE_TIME, spec.getImageId(), spec.getPublicKey(), cpuSize, menSize, diskSize,
+				extraPorts, spec.getImageId(), spec.getPublicKey(), cpuSize, menSize, diskSize,
 				location);
 		suitableResource = TestResourceHelper.generateMockResource(requestId, resourceMetadata, true);
 
@@ -200,7 +199,7 @@ public class TestFogbowRequirementsHelper {
 		String location = "";
 		
 		Map<String, String> resourceMetadata = TestResourceHelper.generateResourceMetadata(host, port, userName,
-				extraPorts, OrderType.ONE_TIME, spec.getImageId(), spec.getPublicKey(), cpuSize, menSize, diskSize,
+				extraPorts, spec.getImageId(), spec.getPublicKey(), cpuSize, menSize, diskSize,
 				location);
 		suitableResource = TestResourceHelper.generateMockResource(requestId, resourceMetadata, true);
 
@@ -226,7 +225,7 @@ public class TestFogbowRequirementsHelper {
 		String location = "";
 		
 		Map<String, String> resourceMetadata = TestResourceHelper.generateResourceMetadata(host, port, userName,
-				extraPorts, OrderType.ONE_TIME, spec.getImageId(), spec.getPublicKey(), cpuSize, menSize, diskSize,
+				extraPorts, spec.getImageId(), spec.getPublicKey(), cpuSize, menSize, diskSize,
 				location);
 		suitableResource = TestResourceHelper.generateMockResource(requestId, resourceMetadata, true);
 
@@ -251,7 +250,7 @@ public class TestFogbowRequirementsHelper {
 		String location = "";
 		
 		Map<String, String> resourceMetadata = TestResourceHelper.generateResourceMetadata(host, port, userName,
-				extraPorts, OrderType.ONE_TIME, spec.getImageId(), spec.getPublicKey(), cpuSize, menSize, diskSize,
+				extraPorts, spec.getImageId(), spec.getPublicKey(), cpuSize, menSize, diskSize,
 				location);
 		suitableResource = TestResourceHelper.generateMockResource(requestId, resourceMetadata, true);
 
@@ -276,7 +275,7 @@ public class TestFogbowRequirementsHelper {
 		String location = "";
 		
 		Map<String, String> resourceMetadata = TestResourceHelper.generateResourceMetadata(host, port, userName,
-				extraPorts, OrderType.ONE_TIME, spec.getImageId(), spec.getPublicKey(), cpuSize, menSize, diskSize,
+				extraPorts, spec.getImageId(), spec.getPublicKey(), cpuSize, menSize, diskSize,
 				location);
 		suitableResource = TestResourceHelper.generateMockResource(requestId, resourceMetadata, true);
 
@@ -300,7 +299,7 @@ public class TestFogbowRequirementsHelper {
 		String location = "servers.your.domain";
 
 		Map<String, String> resourceMetadata = TestResourceHelper.generateResourceMetadata(host, port, userName,
-				extraPorts, OrderType.ONE_TIME, spec.getImageId(), spec.getPublicKey(), cpuSize, menSize, diskSize,
+				extraPorts, spec.getImageId(), spec.getPublicKey(), cpuSize, menSize, diskSize,
 				location);
 
 		suitableResource = TestResourceHelper.generateMockResource(requestId, resourceMetadata, true);
@@ -325,7 +324,7 @@ public class TestFogbowRequirementsHelper {
 		String location = "servers.your.domainA";
 
 		Map<String, String> resourceMetadata = TestResourceHelper.generateResourceMetadata(host, port, userName,
-				extraPorts, OrderType.ONE_TIME, spec.getImageId(), spec.getPublicKey(), cpuSize, menSize, diskSize,
+				extraPorts,spec.getImageId(), spec.getPublicKey(), cpuSize, menSize, diskSize,
 				location);
 
 		suitableResource = TestResourceHelper.generateMockResource(requestId, resourceMetadata, true);

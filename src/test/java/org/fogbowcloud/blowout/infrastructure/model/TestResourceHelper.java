@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.fogbowcloud.blowout.core.model.Specification;
-import org.fogbowcloud.manager.occi.order.OrderType;
 import org.mockito.Mockito;
 
 public class TestResourceHelper {
@@ -51,7 +50,7 @@ public class TestResourceHelper {
 	}
 	
 	public static Map<String, String> generateResourceMetadata(String host, String port, String userName,
-			String extraPorts, OrderType orderType, String image, String publicKey, String cpuSize, String menSize,
+			String extraPorts, String image, String publicKey, String cpuSize, String menSize,
 			String diskSize, String location) {
 
 		Map<String, String> resourceMetadata = new HashMap<String, String>();
@@ -59,7 +58,6 @@ public class TestResourceHelper {
 		resourceMetadata.put(FogbowResource.METADATA_SSH_PORT, port);
 		resourceMetadata.put(FogbowResource.METADATA_SSH_USERNAME_ATT, userName);
 		resourceMetadata.put(FogbowResource.METADATA_EXTRA_PORTS_ATT, extraPorts);
-		resourceMetadata.put(FogbowResource.METADATA_REQUEST_TYPE, orderType.getValue());
 		resourceMetadata.put(FogbowResource.METADATA_IMAGE, image);
 		resourceMetadata.put(FogbowResource.METADATA_PUBLIC_KEY, publicKey);
 		resourceMetadata.put(FogbowResource.METADATA_VCPU, cpuSize);

@@ -30,7 +30,6 @@ public class ResourceMonitor {
 	private Thread monitoringServiceRunner;
 	private MonitoringService monitoringService;
 	private long infraMonitoringPeriod;
-	private Long noExpirationTime;
 	private Long idleLifeTime;
 	private int maxConnectionTries;
 	private int maxReuse;
@@ -38,7 +37,6 @@ public class ResourceMonitor {
 	public ResourceMonitor(InfrastructureProvider infraProvider, BlowoutPool blowoutPool, Properties properties) {
 		this.infraProvider = infraProvider;
 		this.resourcePool = blowoutPool;
-		noExpirationTime = 0L;
 
 		String defaultInfraMonitorPeriod = "30000";
 		String defaultIdleLifeTime = "120000";
@@ -120,9 +118,7 @@ public class ResourceMonitor {
 
                 LOGGER.debug("Monitoring resource of id " + resource.getId() + " and state " + resource.getState());
 
-				if (ResourceState.IDLE.equals(resource.getState())) {
-					resolveIdleResource(resource);
-				} else if (ResourceState.BUSY.equals(resource.getState())) {
+				if (ResourceState.BUSY.equals(resource.getState())) {
 					idleResources.remove(resource.getId());
 				} else if (ResourceState.FAILED.equals(resource.getState())) {
 					idleResources.remove(resource.getId());
@@ -143,34 +139,6 @@ public class ResourceMonitor {
 					
 				}
 
-			}
-		}
-
-		private void resolveIdleResource(AbstractResource resource) {
-
-			LOGGER.debug("Resolving idle resource [id: " + resource.getId() + "].");
-
-			Long expirationDateTime = idleResources.get(resource.getId());
-
-			if (expirationDateTime == null) {
-				moveResourceToIdle(resource);
-			} else {
-
-				String requestType = resource.getMetadataValue(AbstractResource.METADATA_REQUEST_TYPE);
-//				if (OrderType.ONE_TIME.getValue().equals(requestType)) {
-//
-//					boolean isAlive = checkResourceConnectivity(resource);
-//
-//					if (isAlive && noExpirationTime.compareTo(expirationDateTime) != 0) {
-//						Date expirationDate = new Date(expirationDateTime.longValue());
-//						Date currentDate = new Date();
-//						if (expirationDate.before(currentDate)) {
-//							LOGGER.warn("Removing resource "+resource.getId()+" due Idle time expired.");
-//							resourcePool.updateResource(resource, ResourceState.TO_REMOVE);
-//							idleResources.remove(resource.getId());
-//						}
-//					}
-//				}
 			}
 		}
 

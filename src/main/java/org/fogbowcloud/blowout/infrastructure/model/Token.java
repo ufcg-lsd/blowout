@@ -7,6 +7,9 @@ import java.util.Objects;
 
 public class Token {
 
+    private static final String JSON_PROPERTY_ACCESS_ID = "access_id";
+    private static final String JSON_PROPERTY_USER = "user";
+
     private String accessId;
     private User user;
 
@@ -32,13 +35,14 @@ public class Token {
     }
 
     public JSONObject toJSON() throws JSONException {
-        return new JSONObject().put("access_id", accessId).put("user", user != null ? user.toJSON() : null);
+        return new JSONObject().put(JSON_PROPERTY_ACCESS_ID, this.accessId)
+                .put(JSON_PROPERTY_USER, this.user != null ? this.user.toJSON() : null);
     }
 
     public static Token fromJSON(String jsonStr) throws JSONException {
         JSONObject jsonObject = new JSONObject(jsonStr);
-        String accessId = jsonObject.optString("access_id");
-        JSONObject userJson = jsonObject.optJSONObject("user");
+        String accessId = jsonObject.optString(JSON_PROPERTY_ACCESS_ID);
+        JSONObject userJson = jsonObject.optJSONObject(JSON_PROPERTY_USER);
         return new Token(!accessId.isEmpty() ? accessId : null,
                 userJson != null ? User.fromJSON(userJson.toString()) : null);
     }

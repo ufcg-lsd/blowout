@@ -1,5 +1,6 @@
 package org.fogbowcloud.blowout.infrastructure.model;
 
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
@@ -9,6 +10,7 @@ import org.fogbowcloud.blowout.infrastructure.provider.fogbow.FogbowRequirements
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
 
 public class TestFogbowResource {
 	
