@@ -13,6 +13,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Properties;
 import java.util.UUID;
@@ -66,8 +67,8 @@ public class KeystoneTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
         body.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, HttpWrapper.HTTP_CONTENT_JSON));
 
         String acessToken = httpWrapper.doRequest("post", endpoint, new LinkedList<>(), body);
-
-        User user = new User(this.userName, this.password);
+        String userId = String.valueOf(UUID.randomUUID());
+        User user = new User(userId, this.userName, this.password);
         Token token = new Token(acessToken, user);
 
         return token;
@@ -76,27 +77,33 @@ public class KeystoneTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
     private StringEntity makeBodyJson() throws JSONException, UnsupportedEncodingException {
         JSONObject json = new JSONObject();
 
-        if (this.userName != null && !this.userName.isEmpty()) {
-            json.put(AppPropertiesConstants.INFRA_AUTH_TOKEN_USERNAME, this.userName);
-        }
-        if (this.password != null && !this.password.isEmpty()) {
-            json.put(AppPropertiesConstants.INFRA_AUTH_TOKEN_PASSWORD, this.password);
-        }
-        if (this.domain != null && !this.domain.isEmpty()) {
-            json.put(AppPropertiesConstants.INFRA_AUTH_TOKEN_DOMAIN, this.domain);
-        }
-        if (this.projectName != null && !this.projectName.isEmpty()) {
-            json.put(AppPropertiesConstants.INFRA_AUTH_TOKEN_PROJECT_NAME, this.projectName);
-        }
+        makeBodyField(json, AppPropertiesConstants.INFRA_AUTH_TOKEN_USERNAME, this.userName);
+        makeBodyField(json, AppPropertiesConstants.INFRA_AUTH_TOKEN_PASSWORD, this.password);
+        makeBodyField(json, AppPropertiesConstants.INFRA_AUTH_TOKEN_DOMAIN, this.domain);
+        makeBodyField(json, AppPropertiesConstants.INFRA_AUTH_TOKEN_PROJECT_NAME, this.projectName);
 
-        StringEntity se = new StringEntity(json.toString());
+        return new StringEntity(json.toString());
+    }
 
-        return se;
+    private void makeBodyField(JSONObject json, String propKey, String prop) {
+        if (prop != null && !prop.isEmpty()) {
+            json.put(propKey, prop);
+        }
     }
 
     @Override
     public void validateProperties() throws BlowoutException {
-        // Todo
+        validateProperty(super.properties, AppPropertiesConstants.INFRA_AUTH_TOKEN_UPDATE_PLUGIN);
+        validateProperty(super.properties, FOGBOW_USERNAME);
+        validateProperty(super.properties, FOGBOW_PASSWORD);
+        validateProperty(super.properties, FOGBOW_PROJECT_NAME);
+        validateProperty(super.properties, FOGBOW_DOMAIN);
+    }
+
+    private void validateProperty(Properties property, String propertyKey) throws BlowoutException {
+        if (property == null || !property.containsKey(propertyKey)) {
+            throw new BlowoutException("Required property " + property.toString() + " was not set");
+        }
     }
 }
 
