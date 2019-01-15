@@ -1,6 +1,6 @@
 package org.fogbowcloud.blowout.infrastructure.provider.fogbow;
 
-import static org.junit.Assert.assertFalse;
+import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -107,7 +107,6 @@ public class TestFogbowRequirementsHelper {
 		suitableResource = TestResourceHelper.generateMockResource(requestId, resourceMetadata, true);
 		
 		assertTrue(FogbowRequirementsHelper.matches(suitableResource, fogbowRequirements));
-		
 	}
 
 	@Test

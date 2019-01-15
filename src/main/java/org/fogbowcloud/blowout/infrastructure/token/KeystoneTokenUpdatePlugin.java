@@ -1,5 +1,6 @@
 package org.fogbowcloud.blowout.infrastructure.token;
 
+import org.apache.http.Header;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
@@ -66,7 +67,7 @@ public class KeystoneTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
 
         body.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, HttpWrapper.HTTP_CONTENT_JSON));
 
-        String acessToken = httpWrapper.doRequest("post", endpoint, new LinkedList<>(), body);
+        String acessToken = httpWrapper.doRequest("post", endpoint, new LinkedList<Header>(), body);
         String userId = String.valueOf(UUID.randomUUID());
         User user = new User(userId, this.userName, this.password);
         Token token = new Token(acessToken, user);
