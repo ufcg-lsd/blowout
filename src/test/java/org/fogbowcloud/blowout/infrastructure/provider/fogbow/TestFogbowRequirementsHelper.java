@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.fogbowcloud.blowout.core.model.Specification;
-import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
+import org.fogbowcloud.blowout.constants.AppPropertiesConstants;
 import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
 import org.fogbowcloud.blowout.infrastructure.model.TestResourceHelper;
 import org.junit.After;

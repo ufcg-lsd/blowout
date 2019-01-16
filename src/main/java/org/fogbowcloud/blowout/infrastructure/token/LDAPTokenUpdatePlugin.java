@@ -5,7 +5,7 @@
 //
 //import org.apache.log4j.Logger;
 //import org.fogbowcloud.blowout.core.exception.BlowoutException;
-//import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
+//import org.fogbowcloud.blowout.constants.AppPropertiesConstants;
 //import org.fogbowcloud.manager.core.plugins.identity.ldap.LdapIdentityPlugin;
 //import org.fogbowcloud.manager.occi.model.Token;
 //

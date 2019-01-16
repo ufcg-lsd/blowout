@@ -1,4 +1,4 @@
-package org.fogbowcloud.blowout.core.util;
+package org.fogbowcloud.blowout.constants;
 
 public class AppPropertiesConstants {
 	
@@ -36,6 +36,4 @@ public class AppPropertiesConstants {
 	public static final String INFRA_INITIAL_SPECS_FILE_PATH = "infra_initial_specs_file_path";
 	public static final String INFRA_PROVIDER_CLASS_NAME = "infra_provider_class_name";
 	public static final String INFRA_SPECS_BLOCK_CREATING = "infra_specs_block_creating";
-
-	
 }

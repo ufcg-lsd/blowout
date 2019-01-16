@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.fogbowcloud.blowout.core.model.Specification;
-import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
+import org.fogbowcloud.blowout.constants.AppPropertiesConstants;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 
 public abstract class AbstractResource {

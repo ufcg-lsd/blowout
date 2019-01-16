@@ -15,7 +15,7 @@
 //import org.apache.http.impl.client.HttpClients;
 //import org.apache.http.message.BasicNameValuePair;
 //import org.fogbowcloud.blowout.core.exception.BlowoutException;
-//import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
+//import org.fogbowcloud.blowout.constants.AppPropertiesConstants;
 //import org.fogbowcloud.manager.core.plugins.identity.naf.NAFIdentityPlugin;
 //import org.fogbowcloud.manager.occi.model.Token;
 //
