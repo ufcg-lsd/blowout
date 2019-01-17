@@ -41,7 +41,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 	public static final String INSTANCE_ATTRIBUTE_MEMORY_SIZE = "ram";
 	public static final String INSTANCE_ATTRIBUTE_VCORE = "vCPU";
-	public static final String INSTANCE_ATTRIBUTE_HOSTNAME = "hostName";
+	public static final String INSTANCE_ATTRIBUTE_HOSTNAME = "name";
 	public static final String INSTANCE_ATTRIBUTE_PUBLIC_IP = "ip";
 	public static final String INSTANCE_ATTRIBUTE_STATE = "state";
 	public static final String INSTANCE_ATTRIBUTE_PROVIDER = "provider";
