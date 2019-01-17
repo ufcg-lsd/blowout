@@ -99,7 +99,7 @@ public class KeystoneTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
 
     private void validateProperty(Properties property, String propertyKey) throws BlowoutException {
         if (property == null || !property.containsKey(propertyKey)) {
-            throw new BlowoutException("Required property " + property.toString() + " was not set");
+            throw new BlowoutException("Required property " + property.getProperty(propertyKey) + " was not set");
         }
     }
 }
