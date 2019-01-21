@@ -12,14 +12,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
-import javafx.beans.binding.IntegerBinding;
 import org.apache.http.Header;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.constants.AppPropertiesConstants;
 
@@ -36,6 +33,10 @@ import org.fogbowcloud.blowout.infrastructure.token.AbstractTokenUpdatePlugin;
 import org.fogbowcloud.blowout.pool.AbstractResource;
 import org.json.JSONObject;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+
 public class FogbowInfrastructureProvider implements InfrastructureProvider {
 	// TODO: put in resource the user, token and localCommand
 
@@ -47,6 +48,8 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 	public static final String INSTANCE_ATTRIBUTE_STATE = "state";
 	public static final String INSTANCE_ATTRIBUTE_NAME = "name";
 	public static final String INSTANCE_ATTRIBUTE_DISK_SIZE = "disk";
+
+	public static final String JSON_KEY_PROVIDER = "provider";
 
 	public static final String DEFAULT_INSTANCE_ATTRIBUTE_SHH_USERNAME = "fogbow";
 
@@ -233,10 +236,6 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 					LOGGER.debug("Instance attributes not yet ready for instance: [" + instanceId + "]");
 				}
 			}
-
-			if (instanceId != null && !instanceId.isEmpty()) {
-				LOGGER.debug("Instance attributes not yet ready for instance: [" + instanceId + "]");
-			}
 			return fogbowResource;
 
 		} catch (Exception e) {
@@ -282,11 +281,13 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		Map<String, String> bodyRequestAttrs = new HashMap<>();
 		if (computeOrderId != null && !computeOrderId.isEmpty()) {
 			bodyRequestAttrs.put(FogbowRequirementsHelper.JSON_KEY_FOGBOW_COMPUTE_ID, computeOrderId);
+			bodyRequestAttrs.put(JSON_KEY_PROVIDER,
+					this.properties.getProperty(AppPropertiesConstants.INFRA_AUTH_TOKEN_PROJECT_NAME));
 		}
-
 		try {
 			StringEntity bodyRequest = makeRequestBodyJson(bodyRequestAttrs);
-			publicOrderID = this.doRequest(HttpWrapper.HTTP_METHOD_POST, requestUrl, new LinkedList<Header>(), bodyRequest);
+			publicOrderID = this.doRequest(HttpWrapper.HTTP_METHOD_POST, requestUrl,
+					new LinkedList<Header>(), bodyRequest);
 		} catch (Exception e) {
 			LOGGER.error("Error while getting public ip for computer order of id " + computeOrderId, e);
 		}
@@ -313,8 +314,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		String endpoint = managerUrl + "/" + RAS_ENDPOINT_COMPUTE + "/" + computeOrderId;
 		String instanceInformation = doRequest(HttpWrapper.HTTP_METHOD_GET, endpoint, new ArrayList<Header>());
 
-		Map<String, String> attrs = parseAttributes(instanceInformation);
-		return attrs;
+		return parseAttributes(instanceInformation);
 	}
 
 	private void validateSpecification(Specification specification) throws RequestResourceException {
@@ -349,7 +349,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 	private boolean validateInstanceAttributes(Map<String, String> instanceAttributes) {
 
-		LOGGER.debug("Validating instance attributes.");
+		LOGGER.info("Validating instance attributes.");
 
 		boolean isValid = true;
 
@@ -364,26 +364,29 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 			// being returning this two attributes.
 			isValid = !isStringEmpty(sshInformation, vcore, memorySize);
 			if (!isValid) {
-				LOGGER.debug("Instance attributes invalids.");
+				LOGGER.error("Instance attributes invalids.");
 				return false;
 			}
 
 		} else {
-			LOGGER.debug("Instance attributes invalids.");
+			LOGGER.error("Instance attributes invalids.");
 			isValid = false;
 		}
 
 		return isValid;
 	}
 
-	private Map<String, String> parseAttributes(String response) {
-		Map<String, String> atts = new HashMap<>();
-		try {
-			ObjectMapper mapper = new ObjectMapper();
-			atts = mapper.readValue(response, new TypeReference<Map<String,String>>(){});
-		} catch (IOException e) {
-			LOGGER.debug("String reponse is not valid.");
-		}
+	private Map<String, String> parseAttributes(String response) throws ScriptException {
+		ScriptEngine engine;
+		ScriptEngineManager sem = new ScriptEngineManager();
+		engine = sem.getEngineByName("javascript");
+
+		String script = "Java.asJSONCompatible(" + response + ")";
+		Object result = engine.eval(script);
+
+		Map contents = (Map) result;
+
+		Map<String, String> atts = new HashMap<String, String>(contents);
 		return atts;
 	}
 

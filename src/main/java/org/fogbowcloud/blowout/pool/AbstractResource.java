@@ -36,7 +36,7 @@ public abstract class AbstractResource {
 	private ResourceState state = ResourceState.NOT_READY;
 
 	private String id;
-	private Map<String, String> metadata = new HashMap<String, String>();
+	private Map<String, String> metadata = new HashMap<>();
 	private int timesReused = 0;
 	private int connectionFailTries = 0;
 	private String localCommandInterpreter;
@@ -58,7 +58,6 @@ public abstract class AbstractResource {
 		boolean success = this.internalCheckConnectivity();
 		connectionFailTries = success ? 0 : connectionFailTries+1;
 		return success;
-		
 	}
 
 	public void putMetadata(String attributeName, String value) {
