@@ -85,67 +85,6 @@ public class Specification implements Serializable {
 		return this.requirements;
 	}
 
-	public void removeAllRequirements() {
-		this.requirements = new HashMap<String, String>();
-	}
-
-	public static List<Specification> getSpecificationsFromJSonFile(String jsonFilePath) throws IOException {
-
-		List<Specification> specifications = new ArrayList<Specification>();
-		if (jsonFilePath != null && !jsonFilePath.isEmpty()) {
-
-			BufferedReader br = new BufferedReader(new FileReader(jsonFilePath));
-
-			Gson gson = new Gson();
-			specifications = Arrays.asList(gson.fromJson(br, Specification[].class));
-			br.close();
-
-			for (Specification spec : specifications) {
-
-				File file = new File(spec.getPublicKey());
-				if (file.exists()) {
-					StringBuilder sb = new StringBuilder();
-					BufferedReader brSpec = new BufferedReader(new FileReader(file));
-					String line = "";
-					while ((line = brSpec.readLine()) != null && !line.isEmpty()) {
-						sb.append(line);
-					}
-					spec.setPublicKey(sb.toString());
-
-					brSpec.close();
-				}
-			}
-		}
-		return specifications;
-	}
-
-	public boolean parseToJsonFile(String jsonDestFilePath) {
-
-		List<Specification> spec = new ArrayList<Specification>();
-		spec.add(this);
-		return Specification.parseSpecsToJsonFile(spec, jsonDestFilePath);
-	}
-
-	public static boolean parseSpecsToJsonFile(List<Specification> specs, String jsonDestFilePath) {
-
-		if (jsonDestFilePath != null && !jsonDestFilePath.isEmpty()) {
-
-			BufferedWriter bw;
-			try {
-				bw = new BufferedWriter(new FileWriter(jsonDestFilePath));
-				Gson gson = new Gson();
-				String spectString = gson.toJson(specs);
-				bw.write(spectString);
-				bw.close();
-				return true;
-			} catch (IOException e) {
-				return false;
-			}
-		} else {
-			return false;
-		}
-	}
-
 	public String getImageId() {
 		return this.imageId;
 	}

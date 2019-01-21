@@ -17,113 +17,113 @@ import org.fogbowcloud.blowout.pool.AbstractResource;
 
 public class DefaultInfrastructureManager implements InfrastructureManager {
 
-	private InfrastructureProvider infraProvider;
-	private ResourceMonitor resourceMonitor;
+    private InfrastructureProvider infraProvider;
+    private ResourceMonitor resourceMonitor;
 
-	public DefaultInfrastructureManager(InfrastructureProvider infraProvider,
-			ResourceMonitor resourceMonitor) {
-		this.infraProvider = infraProvider;
-		this.resourceMonitor = resourceMonitor;
-	}
+    public DefaultInfrastructureManager(InfrastructureProvider infraProvider,
+                                        ResourceMonitor resourceMonitor) {
+        this.infraProvider = infraProvider;
+        this.resourceMonitor = resourceMonitor;
+    }
 
-	@Override
-	public synchronized void act(List<AbstractResource> resources,
-			List<Task> tasks) throws Exception {
-		
-		Map<Specification, Integer> specsDemand = generateDemandBySpec(tasks, resources);
-		
-		requestResources(specsDemand);
-	}
+    @Override
+    public synchronized void act(List<AbstractResource> resources,
+                                 List<Task> tasks) throws Exception {
 
-	private void requestResources(Map<Specification, Integer> specsDemand)
-			throws RequestResourceException {
-		
-		for (Entry<Specification, Integer> entry : specsDemand.entrySet()) {
+        Map<Specification, Integer> specsDemand = generateDemandBySpec(tasks, resources);
 
-			Specification spec = entry.getKey();
-			
-			Integer requested = this.resourceMonitor.getPendingRequests().get(
-					spec);
-			if (requested == null)
-				requested = 0;
-			int requiredResources = entry.getValue() - requested;
+        requestResources(specsDemand);
+    }
 
-			for (int count = 0; count < requiredResources; count++) {
+    private void requestResources(Map<Specification, Integer> specsDemand)
+            throws RequestResourceException {
 
-				String resourceId = infraProvider.requestResource(spec);
-				resourceMonitor.addPendingResource(resourceId, spec);
-			}
-		}
-	}
+        for (Entry<Specification, Integer> entry : specsDemand.entrySet()) {
 
-	private List<AbstractResource> filterResourcesByState(
-			List<AbstractResource> resources, ResourceState... resourceStates) {
+            Specification spec = entry.getKey();
 
-		List<AbstractResource> filteredResources = new ArrayList<AbstractResource>();
-		for (AbstractResource resource : resources) {
-			for (ResourceState state : resourceStates) {
-				if (state.equals(resource.getState())) {
-					filteredResources.add(resource);
-				}
-			}
-		}
+            Integer requested = this.resourceMonitor.getPendingRequests().get(
+                    spec);
+            if (requested == null)
+                requested = 0;
+            int requiredResources = entry.getValue() - requested;
 
-		return filteredResources;
+            for (int count = 0; count < requiredResources; count++) {
 
-	}
+                String resourceId = infraProvider.requestResource(spec);
+                resourceMonitor.addPendingResource(resourceId, spec);
+            }
+        }
+    }
 
-	private List<Task> filterTasksByState(List<Task> tasks, TaskState taskState) {
+    private List<AbstractResource> filterResourcesByState(
+            List<AbstractResource> resources, ResourceState... resourceStates) {
 
-		List<Task> filteredTasks = new ArrayList<Task>();
-		for (Task task : tasks) {
-			if (taskState.equals(task.getState())) {
-				filteredTasks.add(task);
-			}
-		}
-		return filteredTasks;
-	}
+        List<AbstractResource> filteredResources = new ArrayList<AbstractResource>();
+        for (AbstractResource resource : resources) {
+            for (ResourceState state : resourceStates) {
+                if (state.equals(resource.getState())) {
+                    filteredResources.add(resource);
+                }
+            }
+        }
 
-	private Map<Specification, Integer> generateDemandBySpec(List<Task> tasks,
-			List<AbstractResource> resources) {
-		Map<Specification, Integer> specsDemand = new HashMap<Specification, Integer>();
+        return filteredResources;
 
-		// FIXME: this variable name is incorrect, since the list will not
-		List<AbstractResource> currentResources = filterResourcesByState(
-				resources, ResourceState.IDLE, ResourceState.BUSY,
-				ResourceState.FAILED);
-		
-		for (Task task : tasks) {
+    }
 
-			if (!task.isFinished()) {
+    private List<Task> filterTasksByState(List<Task> tasks, TaskState taskState) {
 
-				boolean resourceResolved = false;
+        List<Task> filteredTasks = new ArrayList<Task>();
+        for (Task task : tasks) {
+            if (taskState.equals(task.getState())) {
+                filteredTasks.add(task);
+            }
+        }
+        return filteredTasks;
+    }
 
-				for (AbstractResource resource : currentResources) {
-					if (resource.match(task.getSpecification())) {
-						resourceResolved = true;
-						currentResources.remove(resource);
-						break;
-					}
-				}
-				if (!resourceResolved) {
-					incrementDecrementDemand(specsDemand,
-							task.getSpecification(), true);
-				}
-			}
-		}
-		return specsDemand;
-	}
+    private Map<Specification, Integer> generateDemandBySpec(List<Task> tasks,
+                                                             List<AbstractResource> resources) {
+        Map<Specification, Integer> specsDemand = new HashMap<Specification, Integer>();
 
-	private void incrementDecrementDemand(
-			Map<Specification, Integer> specsDemand, Specification spec,
-			boolean increment) {
-		Integer zero = new Integer(0);
-		Integer demand = specsDemand.get(spec);
-		if (demand == null) {
-			demand = zero;
-		}
-		demand = new Integer(demand.intValue() + (increment ? 1 : -1));
-		specsDemand.put(spec, zero.compareTo(demand) > 0 ? zero : demand);
-	}
+        // FIXME: this variable name is incorrect, since the list will not
+        List<AbstractResource> currentResources = filterResourcesByState(
+                resources, ResourceState.IDLE, ResourceState.BUSY,
+                ResourceState.FAILED);
+
+        for (Task task : tasks) {
+
+            if (!task.isFinished()) {
+
+                boolean resourceResolved = false;
+
+                for (AbstractResource resource : currentResources) {
+                    if (resource.match(task.getSpecification())) {
+                        resourceResolved = true;
+                        currentResources.remove(resource);
+                        break;
+                    }
+                }
+                if (!resourceResolved) {
+                    incrementDecrementDemand(specsDemand,
+                            task.getSpecification(), true);
+                }
+            }
+        }
+        return specsDemand;
+    }
+
+    private void incrementDecrementDemand(
+            Map<Specification, Integer> specsDemand, Specification spec,
+            boolean increment) {
+        Integer zero = new Integer(0);
+        Integer demand = specsDemand.get(spec);
+        if (demand == null) {
+            demand = zero;
+        }
+        demand = new Integer(demand.intValue() + (increment ? 1 : -1));
+        specsDemand.put(spec, zero.compareTo(demand) > 0 ? zero : demand);
+    }
 
 }
