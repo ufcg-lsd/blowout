@@ -65,7 +65,7 @@ public class TestResourceIdDataStore {
 		assertEquals(1, fogbowResources.size());
 		for(FogbowResource fogbowResource : fogbowResources){
 			assertEquals(FAKE_RESOURCE_ID1, fogbowResource.getId());
-			assertEquals(FAKE_ORDER_ID1, fogbowResource.getOrderId());
+			assertEquals(FAKE_ORDER_ID1, fogbowResource.getComputeOrderId());
 			assertNull(fogbowResource.getInstanceId());
 		}
 	}
@@ -87,10 +87,10 @@ public class TestResourceIdDataStore {
 		assertEquals(fogbowResources.size(), returnedFogbowResources.size());
 		for(FogbowResource resource : fogbowResources){
 			if(FAKE_RESOURCE_ID1.equals(resource.getId())){
-				assertEquals(FAKE_ORDER_ID1, resource.getOrderId());
+				assertEquals(FAKE_ORDER_ID1, resource.getComputeOrderId());
 				assertNull(resource.getInstanceId());
 			}else if(FAKE_RESOURCE_ID2.equals(resource.getId())){
-				assertEquals(FAKE_ORDER_ID2, resource.getOrderId());
+				assertEquals(FAKE_ORDER_ID2, resource.getComputeOrderId());
 				assertNull(resource.getInstanceId());
 			}else{
 				fail();
@@ -119,10 +119,10 @@ public class TestResourceIdDataStore {
 		assertEquals(fogbowResources.size(), returnedFogbowResources.size());
 		for(FogbowResource resource : returnedFogbowResources){
 			if(FAKE_RESOURCE_ID1.equals(resource.getId())){
-				assertEquals(FAKE_ORDER_ID1, resource.getOrderId());
+				assertEquals(FAKE_ORDER_ID1, resource.getComputeOrderId());
 				assertEquals(FAKE_INSTANCE_ID1, resource.getInstanceId());
 			}else if(FAKE_RESOURCE_ID2.equals(resource.getId())){
-				assertEquals(FAKE_ORDER_ID2, resource.getOrderId());
+				assertEquals(FAKE_ORDER_ID2, resource.getComputeOrderId());
 				assertNull(resource.getInstanceId());
 			}else{
 				fail();
@@ -149,7 +149,7 @@ public class TestResourceIdDataStore {
 			if(FAKE_RESOURCE_ID1.equals(resource.getId())){
 				fail();
 			}else if(FAKE_RESOURCE_ID2.equals(resource.getId())){
-				assertEquals(FAKE_ORDER_ID2, resource.getOrderId());
+				assertEquals(FAKE_ORDER_ID2, resource.getComputeOrderId());
 				assertNull(resource.getInstanceId());
 			}else{
 				fail();

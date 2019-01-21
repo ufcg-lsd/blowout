@@ -37,8 +37,8 @@ public class TestResourceHelper {
 		.getMetadataValue(Mockito.eq(FogbowResource.METADATA_PUBLIC_KEY));
 		doReturn(resourceMetadata.get(FogbowResource.METADATA_VCPU)).when(fakeResource)
 		.getMetadataValue(Mockito.eq(FogbowResource.METADATA_VCPU));
-		doReturn(resourceMetadata.get(FogbowResource.METADATA_MEN_SIZE)).when(fakeResource)
-		.getMetadataValue(Mockito.eq(FogbowResource.METADATA_MEN_SIZE));
+		doReturn(resourceMetadata.get(FogbowResource.METADATA_MEM_SIZE)).when(fakeResource)
+		.getMetadataValue(Mockito.eq(FogbowResource.METADATA_MEM_SIZE));
 		doReturn(resourceMetadata.get(FogbowResource.METADATA_DISK_SIZE)).when(fakeResource)
 		.getMetadataValue(Mockito.eq(FogbowResource.METADATA_DISK_SIZE));
 		doReturn(resourceMetadata.get(FogbowResource.METADATA_LOCATION)).when(fakeResource)
@@ -61,7 +61,7 @@ public class TestResourceHelper {
 		resourceMetadata.put(FogbowResource.METADATA_IMAGE, image);
 		resourceMetadata.put(FogbowResource.METADATA_PUBLIC_KEY, publicKey);
 		resourceMetadata.put(FogbowResource.METADATA_VCPU, cpuSize);
-		resourceMetadata.put(FogbowResource.METADATA_MEN_SIZE, menSize);
+		resourceMetadata.put(FogbowResource.METADATA_MEM_SIZE, menSize);
 		resourceMetadata.put(FogbowResource.METADATA_DISK_SIZE, diskSize);
 		resourceMetadata.put(FogbowResource.METADATA_LOCATION, location);
 

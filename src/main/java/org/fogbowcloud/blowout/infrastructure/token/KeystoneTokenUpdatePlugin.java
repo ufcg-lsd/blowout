@@ -86,8 +86,6 @@ public class KeystoneTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
         return new StringEntity(json.toString());
     }
 
-
-
     @Override
     public void validateProperties() throws BlowoutException {
         validateProperty(super.properties, AppPropertiesConstants.INFRA_AUTH_TOKEN_UPDATE_PLUGIN);

@@ -35,7 +35,7 @@ public class FogbowRequirementsHelper {
 	public static final String JSON_KEY_FOGBOW_REQUIREMENTS_NETWORK_IDS = "networkIds";
 	public static final String JSON_KEY_FOGBOW_REQUIREMENTS_PROVIDING_MEMBER = "provider";
 	public static final String JSON_KEY_FOGBOW_REQUIREMENTS_PUBLIC_KEY = "publicKey";
-	public static final String JSON_KEY_FOGBOW_PUBLICIP_COMPUTER_ORDER_ID = "computeOrderId";
+	public static final String JSON_KEY_FOGBOW_COMPUTE_ID = "computeId";
 	public static final String JSON_KEY_FOGBOW_REQUIREMENTS_VCPU = "vCPU";
 	public static final String JSON_KEY_FOGBOW_REQUIREMENTS_REQUESTING_MEMBER = "requestingMember";
 
@@ -100,7 +100,7 @@ public class FogbowRequirementsHelper {
 					} 
 					else if (attr.equals(METADATA_FOGBOW_REQUIREMENTS_Glue2RAM)) {
 						listAttrSearched.add(attr);
-						value = resource.getMetadataValue(AbstractResource.METADATA_MEN_SIZE);
+						value = resource.getMetadataValue(AbstractResource.METADATA_MEM_SIZE);
 					} 
 					else if (attr.equals(METADATA_FOGBOW_REQUIREMENTS_Glue2disk)) {
 						value = resource.getMetadataValue(AbstractResource.METADATA_DISK_SIZE);

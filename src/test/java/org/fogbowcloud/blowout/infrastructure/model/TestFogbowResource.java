@@ -51,7 +51,7 @@ public class TestFogbowResource {
 		resource.putMetadata(FogbowResource.METADATA_IMAGE, image);
 		resource.putMetadata(FogbowResource.METADATA_PUBLIC_KEY, publicKey);
 		resource.putMetadata(FogbowResource.METADATA_VCPU, coreSize);
-		resource.putMetadata(FogbowResource.METADATA_MEN_SIZE, menSize);
+		resource.putMetadata(FogbowResource.METADATA_MEM_SIZE, menSize);
 		resource.putMetadata(FogbowResource.METADATA_DISK_SIZE, diskSize);
 		resource.putMetadata(FogbowResource.METADATA_LOCATION, location);
 		
@@ -84,7 +84,7 @@ public class TestFogbowResource {
 		resource.putMetadata(FogbowResource.METADATA_IMAGE, image);
 		resource.putMetadata(FogbowResource.METADATA_PUBLIC_KEY, publicKey);
 		resource.putMetadata(FogbowResource.METADATA_VCPU, coreSize);
-		resource.putMetadata(FogbowResource.METADATA_MEN_SIZE, menSize);
+		resource.putMetadata(FogbowResource.METADATA_MEM_SIZE, menSize);
 		resource.putMetadata(FogbowResource.METADATA_DISK_SIZE, diskSize);
 		resource.putMetadata(FogbowResource.METADATA_LOCATION, location);
 		
@@ -117,7 +117,7 @@ public class TestFogbowResource {
 		resource.putMetadata(FogbowResource.METADATA_IMAGE, imageA);
 		resource.putMetadata(FogbowResource.METADATA_PUBLIC_KEY, publicKey);
 		resource.putMetadata(FogbowResource.METADATA_VCPU, coreSize);
-		resource.putMetadata(FogbowResource.METADATA_MEN_SIZE, menSize);
+		resource.putMetadata(FogbowResource.METADATA_MEM_SIZE, menSize);
 		resource.putMetadata(FogbowResource.METADATA_DISK_SIZE, diskSize);
 		resource.putMetadata(FogbowResource.METADATA_LOCATION, location);
 		
@@ -150,7 +150,7 @@ public class TestFogbowResource {
 		resource.putMetadata(FogbowResource.METADATA_IMAGE, image);
 		resource.putMetadata(FogbowResource.METADATA_PUBLIC_KEY, publicKeyA);
 		resource.putMetadata(FogbowResource.METADATA_VCPU, coreSize);
-		resource.putMetadata(FogbowResource.METADATA_MEN_SIZE, menSize);
+		resource.putMetadata(FogbowResource.METADATA_MEM_SIZE, menSize);
 		resource.putMetadata(FogbowResource.METADATA_DISK_SIZE, diskSize);
 		resource.putMetadata(FogbowResource.METADATA_LOCATION, location);
 

@@ -188,7 +188,7 @@ public class TestFogbowInfrastructureProvider {
 		String resourceId = fogbowInfrastructureProvider.requestResource(specs);
 		
 //		FogbowResource resource = mock(FogbowResource.class);
-//		doReturn(returnedOrderId).when(resource).getOrderId();
+//		doReturn(returnedOrderId).when(resource).getComputeOrderId();
 //		createDefaulInstanceIdResponse(returnedOrderId, instanceIdMock, memberIdMock, OrderState.FULFILLED);
 
 //		doReturn(true).when(fogbowResourceDsMock).deleteFogbowResourceById(resource);
@@ -196,7 +196,7 @@ public class TestFogbowInfrastructureProvider {
 		FogbowResource newResource = fogbowInfrastructureProvider.getFogbowResource(resourceId);
 
  		assertNotNull(newResource.getId());
-		assertEquals(ramSizeMock, newResource.getMetadataValue(FogbowResource.METADATA_MEN_SIZE));
+		assertEquals(ramSizeMock, newResource.getMetadataValue(FogbowResource.METADATA_MEM_SIZE));
 		assertEquals("1", newResource.getMetadataValue(FogbowResource.METADATA_VCPU));
 //		assertEquals(hostMock, newResource.getMetadataValue(FogbowResource.METADATA_SSH_HOST));
 //		assertEquals(portMock, newResource.getMetadataValue(FogbowResource.METADATA_SSH_PORT));
@@ -371,7 +371,7 @@ public class TestFogbowInfrastructureProvider {
 	private void createDefaultRequestResponse(String returnedOrderId) throws Exception {
 
 		String urlEndpointNewInstance = properties.getProperty(AppPropertiesConstants.INFRA_FOGBOW_MANAGER_BASE_URL)
-				+ "/" + FogbowInfrastructureProvider.FOGBOW_RAS_COMPUTE_ENDPOINT;
+				+ "/" + FogbowInfrastructureProvider.RAS_ENDPOINT_COMPUTE;
 
 		doReturn(returnedOrderId).when(httpWrapperMock).doRequest(Mockito.any(String.class), Mockito.eq(urlEndpointNewInstance),
 				Mockito.any(String.class), Mockito.any(List.class), Mockito.any(StringEntity.class));
@@ -411,7 +411,7 @@ public class TestFogbowInfrastructureProvider {
 														String hostName) throws Exception {
 
 		String urlEndpointRequestInformations = properties.getProperty(AppPropertiesConstants.INFRA_FOGBOW_MANAGER_BASE_URL)
-				+ "/" + FogbowInfrastructureProvider.FOGBOW_RAS_COMPUTE_ENDPOINT + "/"+ orderId;
+				+ "/" + FogbowInfrastructureProvider.RAS_ENDPOINT_COMPUTE + "/"+ orderId;
 
 		String fogbowResponse = "{"
 				+ "\"id\":\"" + orderId + "\", "
@@ -427,7 +427,7 @@ public class TestFogbowInfrastructureProvider {
 	private void createDefaulInstanceAttributesResponseNoShh(String orderId, String vCPU, String ram, String disk) throws Exception {
 
 		String urlEndpointRequestInformations = properties.getProperty(AppPropertiesConstants.INFRA_FOGBOW_MANAGER_BASE_URL)
-				+ "/" + FogbowInfrastructureProvider.FOGBOW_RAS_COMPUTE_ENDPOINT + "/"+ orderId;
+				+ "/" + FogbowInfrastructureProvider.RAS_ENDPOINT_COMPUTE + "/"+ orderId;
 
 		String fogbowResponse = "{"
 				+ "\"id\":\"" + orderId + "\", "
@@ -456,7 +456,7 @@ public class TestFogbowInfrastructureProvider {
 
 	private void createDefaultPublicIpResponsePostRequest(String publicOrderId) throws Exception {
 		String urlEndpointRequestInformations = properties.getProperty(AppPropertiesConstants.INFRA_FOGBOW_MANAGER_BASE_URL)
-				+ "/" + FogbowInfrastructureProvider.FOGBOW_RAS_PUBLIC_ID_ENDPOINT;
+				+ "/" + FogbowInfrastructureProvider.RAS_ENDPOINT_PUBLIC_IP;
 
 		doReturn(publicOrderId).when(httpWrapperMock).doRequest(Mockito.any(String.class), Mockito.eq(urlEndpointRequestInformations),
 				Mockito.any(String.class), Mockito.any(List.class), Mockito.any(StringEntity.class));
@@ -464,12 +464,11 @@ public class TestFogbowInfrastructureProvider {
 
 	private void createDefaultPublicIpResponseGetRequest(String publicOrderId, String ip, String state, String provider) throws Exception {
 		String urlEndpointRequestInformations = properties.getProperty(AppPropertiesConstants.INFRA_FOGBOW_MANAGER_BASE_URL)
-				+ "/" + FogbowInfrastructureProvider.FOGBOW_RAS_PUBLIC_ID_ENDPOINT + "/"+ publicOrderId;
+				+ "/" + FogbowInfrastructureProvider.RAS_ENDPOINT_PUBLIC_IP + "/"+ publicOrderId;
 
 		String fogbowResponse = "{"
 				+ "\"" + FogbowInfrastructureProvider.INSTANCE_ATTRIBUTE_PUBLIC_IP + "\":\"" + ip + "\", "
-				+ "\"" + FogbowInfrastructureProvider.INSTANCE_ATTRIBUTE_STATE + "\":\"" +  state + "\", "
-				+ "\"" + FogbowInfrastructureProvider.INSTANCE_ATTRIBUTE_PROVIDER + "\":\"" + provider + "\"}";
+				+ "\"" + FogbowInfrastructureProvider.INSTANCE_ATTRIBUTE_STATE + "\":\"" +  state + "\"}";
 
 		doReturn(fogbowResponse).when(httpWrapperMock).doRequest(Mockito.any(String.class), Mockito.eq(urlEndpointRequestInformations),
 				Mockito.any(String.class), Mockito.any(List.class));

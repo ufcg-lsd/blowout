@@ -11,12 +11,12 @@ public class FogbowResource extends AbstractResource {
 
 	public final Logger LOGGER = Logger.getLogger(FogbowResource.class);
 
-	private final String orderId;
+	private final String computeOrderId;
 	private String instanceId;
 
-	public FogbowResource(String id, String orderId, Specification spec) {
+	public FogbowResource(String id, String computeOrderId, Specification spec) {
 		super(id, spec);
-		this.orderId = orderId;
+		this.computeOrderId = computeOrderId;
 	}
 
 	public boolean match(Specification spec) {
@@ -94,8 +94,8 @@ public class FogbowResource extends AbstractResource {
 		this.instanceId = instanceId;
 	}
 
-	public String getOrderId() {
-		return orderId;
+	public String getComputeOrderId() {
+		return computeOrderId;
 	}
 	
 }

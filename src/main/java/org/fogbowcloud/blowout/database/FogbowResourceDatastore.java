@@ -119,7 +119,7 @@ public class FogbowResourceDatastore {
 
 			insertResourceStatement = prepare(connection, INSERT_FOGBOW_RESOURCE_SQL);
 			insertResourceStatement.setString(1, fogbowResource.getId());
-			insertResourceStatement.setString(2, fogbowResource.getOrderId());
+			insertResourceStatement.setString(2, fogbowResource.getComputeOrderId());
 			insertResourceStatement.setString(3, fogbowResource.getInstanceId());
 			if (spec == null) {
 				insertResourceStatement.setNull(4, Types.VARCHAR);
@@ -162,7 +162,7 @@ public class FogbowResourceDatastore {
 				}
 
 				insertResourcesStatement.setString(1, fogbowResource.getId());
-				insertResourcesStatement.setString(2, fogbowResource.getOrderId());
+				insertResourcesStatement.setString(2, fogbowResource.getComputeOrderId());
 				insertResourcesStatement.setString(3, fogbowResource.getInstanceId());
 				if (spec == null) {
 					insertResourcesStatement.setNull(4, Types.VARCHAR);
@@ -202,7 +202,7 @@ public class FogbowResourceDatastore {
 			connection.setAutoCommit(false);
 
 			updateFogbowResourceStatment = prepare(connection, UPDATE_FOGBOW_RESOURCE);
-			updateFogbowResourceStatment.setString(1, fogbowResource.getOrderId());
+			updateFogbowResourceStatment.setString(1, fogbowResource.getComputeOrderId());
 			updateFogbowResourceStatment.setString(2, fogbowResource.getInstanceId());
 			updateFogbowResourceStatment.setString(3, fogbowResource.getId());
 			boolean result = updateFogbowResourceStatment.executeUpdate() > 0 ? true : false;

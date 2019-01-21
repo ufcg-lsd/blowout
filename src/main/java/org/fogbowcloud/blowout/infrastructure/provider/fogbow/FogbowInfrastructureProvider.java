@@ -12,12 +12,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
+import javafx.beans.binding.IntegerBinding;
 import org.apache.http.Header;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.constants.AppPropertiesConstants;
 
@@ -39,16 +41,17 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 	private static final Logger LOGGER = Logger.getLogger(FogbowInfrastructureProvider.class);
 
-	public static final String INSTANCE_ATTRIBUTE_MEMORY_SIZE = "ram";
+	public static final String INSTANCE_ATTRIBUTE_MEMORY_SIZE = "memory";
 	public static final String INSTANCE_ATTRIBUTE_VCORE = "vCPU";
-	public static final String INSTANCE_ATTRIBUTE_HOSTNAME = "hostName";
 	public static final String INSTANCE_ATTRIBUTE_PUBLIC_IP = "ip";
 	public static final String INSTANCE_ATTRIBUTE_STATE = "state";
-	public static final String INSTANCE_ATTRIBUTE_PROVIDER = "provider";
+	public static final String INSTANCE_ATTRIBUTE_NAME = "name";
+	public static final String INSTANCE_ATTRIBUTE_DISK_SIZE = "disk";
+
 	public static final String DEFAULT_INSTANCE_ATTRIBUTE_SHH_USERNAME = "fogbow";
 
-	public static final String FOGBOW_RAS_COMPUTE_ENDPOINT = "computes";
-	public static final String FOGBOW_RAS_PUBLIC_ID_ENDPOINT = "publicIps";
+	public static final String RAS_ENDPOINT_COMPUTE = "computes";
+	public static final String RAS_ENDPOINT_PUBLIC_IP = "publicIps";
 
 	private HttpWrapper httpWrapper;
 	private String managerUrl;
@@ -120,7 +123,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 		LOGGER.debug("Requesting resource on Fogbow with specifications: " + spec.toString());
 
-		String orderId;
+		String computeOrderId;
 
 		try {
 			this.validateSpecification(spec);
@@ -128,7 +131,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 			StringEntity bodyRequest = makeBodyJson(spec);
 			bodyRequest.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, HttpWrapper.HTTP_CONTENT_JSON));
 
-			orderId = this.doRequest("post", managerUrl + "/" + FOGBOW_RAS_COMPUTE_ENDPOINT, new LinkedList<Header>(), bodyRequest);
+			computeOrderId = this.doRequest("post", managerUrl + "/" + RAS_ENDPOINT_COMPUTE, new LinkedList<Header>(), bodyRequest);
 
 		} catch (Exception e) {
 			LOGGER.error("Error while requesting resource on Fogbow", e);
@@ -138,7 +141,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 		String resourceId = String.valueOf(UUID.randomUUID());
 
-		FogbowResource fogbowResource = new FogbowResource(resourceId, orderId, spec);
+		FogbowResource fogbowResource = new FogbowResource(resourceId, computeOrderId, spec);
 		String requestType = spec.getRequirementValue(FogbowRequirementsHelper.METADATA_FOGBOW_REQUEST_TYPE);
 		fogbowResource.putMetadata(AbstractResource.METADATA_REQUEST_TYPE, requestType);
 		fogbowResource.putMetadata(AbstractResource.METADATA_IMAGE, spec.getImageId());
@@ -147,8 +150,8 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		resourcesMap.put(resourceId, fogbowResource);
 		frDatastore.addFogbowResource(fogbowResource);
 
-		LOGGER.debug("Request for Fogbow Resource was Successful. Resource ID: [" + resourceId + "] Order ID: ["
-				+ orderId + "]");
+		LOGGER.debug("Request for Fogbow Resource was Successful. Resource ID: [" + fogbowResource.getId() + "] Order ID: ["
+				+ fogbowResource.getComputeOrderId() + "]");
 		return fogbowResource.getId();
 	}
 
@@ -183,12 +186,12 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		}
 
 		try {
-			LOGGER.debug("Getting request attributes - Retrieve Instace ID.");
+			LOGGER.debug("Getting request attributes - Retrieve Instance ID.");
 
-			instanceAttributes = getFogbowInstanceAttributes(fogbowResource.getOrderId());
-			instanceId = instanceAttributes.get(INSTANCE_ATTRIBUTE_HOSTNAME);
+			instanceAttributes = getFogbowInstanceAttributes(fogbowResource.getComputeOrderId());
+			instanceId = instanceAttributes.get(INSTANCE_ATTRIBUTE_NAME);
 
-			fogbowPublicIpOrderId = requestInstancePublicIp(fogbowResource.getOrderId());
+			fogbowPublicIpOrderId = requestInstancePublicIp(fogbowResource.getComputeOrderId());
 			Map<String, String> sshInfo = getInstancePublicIp(fogbowPublicIpOrderId);
 
 			for (Map.Entry<String, String> entry : sshInfo.entrySet()) {
@@ -202,6 +205,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 				fogbowResource.setInstanceId(instanceId);
 
+
 				if (this.validateInstanceAttributes(instanceAttributes)) {
 
 					LOGGER.debug("Getting Instance attributes.");
@@ -211,28 +215,32 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 					fogbowResource.putMetadata(AbstractResource.METADATA_SSH_HOST,
 							instanceAttributes.get(INSTANCE_ATTRIBUTE_PUBLIC_IP));
+
 					fogbowResource.putMetadata(AbstractResource.METADATA_SSH_USERNAME_ATT,
 							DEFAULT_INSTANCE_ATTRIBUTE_SHH_USERNAME);
 
-					fogbowResource.putMetadata(AbstractResource.METADATA_VCPU,
-							instanceAttributes.get(INSTANCE_ATTRIBUTE_VCORE));
-					fogbowResource.putMetadata(AbstractResource.METADATA_MEN_SIZE,
-							instanceAttributes.get(INSTANCE_ATTRIBUTE_MEMORY_SIZE));
-					fogbowResource.putMetadata(AbstractResource.METADATA_DISK_SIZE,
-							instanceAttributes.get(INSTANCE_ATTRIBUTE_MEMORY_SIZE));
+					fogbowResource.putMetadata(AbstractResource.METADATA_VCPU, instanceAttributes.get(INSTANCE_ATTRIBUTE_VCORE));
 
-					LOGGER.debug("New Fogbow Resource created - Instace ID: [" + instanceId + "]");
+					fogbowResource.putMetadata(AbstractResource.METADATA_MEM_SIZE, instanceAttributes.get(INSTANCE_ATTRIBUTE_MEMORY_SIZE));
+
+					fogbowResource.putMetadata(AbstractResource.METADATA_DISK_SIZE, instanceAttributes.get(INSTANCE_ATTRIBUTE_DISK_SIZE));
+
+					LOGGER.debug("New Fogbow Resource created - Instance ID: [" + instanceId + "]");
 
 					frDatastore.updateFogbowResource(fogbowResource);
-					return fogbowResource;
 
 				} else {
 					LOGGER.debug("Instance attributes not yet ready for instance: [" + instanceId + "]");
 				}
 			}
 
+			if (instanceId != null && !instanceId.isEmpty()) {
+				LOGGER.debug("Instance attributes not yet ready for instance: [" + instanceId + "]");
+			}
+			return fogbowResource;
+
 		} catch (Exception e) {
-			LOGGER.error("Error while getting resource from Order id: [" + fogbowResource.getOrderId() + "]", e);
+			LOGGER.error("Error while getting resource from Order id: [" + fogbowResource.getComputeOrderId() + "]", e);
 		}
 		return null;
 	}
@@ -254,8 +262,8 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		LOGGER.debug("Deleting resource with ID = " + fogbowResource.getId());
 
 		try {
-			if (fogbowResource.getInstanceId() != null) {
-				this.doRequest(HttpWrapper.HTTP_METHOD_DELETE, managerUrl + "/" + FOGBOW_RAS_COMPUTE_ENDPOINT + "/" + fogbowResource.getInstanceId(),
+			if (fogbowResource.getComputeOrderId() != null) {
+				this.doRequest(HttpWrapper.HTTP_METHOD_DELETE, managerUrl + "/" + RAS_ENDPOINT_COMPUTE + "/" + fogbowResource.getComputeOrderId(),
 						new ArrayList<Header>());
 			}
 			resourcesMap.remove(resourceId);
@@ -267,8 +275,42 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		}
 	}
 
-	private Map<String, String> getFogbowInstanceAttributes(String orderId) throws Exception {
-		String endpoint = managerUrl + "/" +  FOGBOW_RAS_COMPUTE_ENDPOINT + "/" + orderId;
+	protected String requestInstancePublicIp(String computeOrderId) {
+		String publicOrderID = null;
+		String requestUrl = managerUrl + "/" + RAS_ENDPOINT_PUBLIC_IP;
+
+		Map<String, String> bodyRequestAttrs = new HashMap<>();
+		if (computeOrderId != null && !computeOrderId.isEmpty()) {
+			bodyRequestAttrs.put(FogbowRequirementsHelper.JSON_KEY_FOGBOW_COMPUTE_ID, computeOrderId);
+		}
+
+		try {
+			StringEntity bodyRequest = makeRequestBodyJson(bodyRequestAttrs);
+			publicOrderID = this.doRequest(HttpWrapper.HTTP_METHOD_POST, requestUrl, new LinkedList<Header>(), bodyRequest);
+		} catch (Exception e) {
+			LOGGER.error("Error while getting public ip for computer order of id " + computeOrderId, e);
+		}
+		return publicOrderID;
+	}
+
+	protected Map<String, String> getInstancePublicIp(String publicIpOrderId) {
+		String publicOrderStringResponse;
+		Map<String, String> sshInfo = new HashMap<>();
+		String requestUrl = managerUrl + "/" + RAS_ENDPOINT_PUBLIC_IP + "/" + publicIpOrderId;
+
+		try {
+			publicOrderStringResponse = this.doRequest(HttpWrapper.HTTP_METHOD_GET, requestUrl, new LinkedList<Header>());
+			sshInfo = parseAttributes(publicOrderStringResponse);
+			LOGGER.debug(sshInfo);
+		} catch (Exception e) {
+			LOGGER.error("Error while getting info about public instance of order with id " + publicIpOrderId, e);
+		}
+
+		return sshInfo;
+	}
+
+	private Map<String, String> getFogbowInstanceAttributes(String computeOrderId) throws Exception {
+		String endpoint = managerUrl + "/" + RAS_ENDPOINT_COMPUTE + "/" + computeOrderId;
 		String instanceInformation = doRequest(HttpWrapper.HTTP_METHOD_GET, endpoint, new ArrayList<Header>());
 
 		Map<String, String> attrs = parseAttributes(instanceInformation);
@@ -313,9 +355,9 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 		if (instanceAttributes != null && !instanceAttributes.isEmpty()) {
 
-			String sshInformation = instanceAttributes.get(INSTANCE_ATTRIBUTE_PUBLIC_IP);
-			String vcore = instanceAttributes.get(INSTANCE_ATTRIBUTE_VCORE);
-			String memorySize = instanceAttributes.get(INSTANCE_ATTRIBUTE_MEMORY_SIZE);
+			String sshInformation = String.valueOf(instanceAttributes.get(INSTANCE_ATTRIBUTE_PUBLIC_IP));
+			String vcore = String.valueOf(instanceAttributes.get(INSTANCE_ATTRIBUTE_VCORE));
+			String memorySize = String.valueOf(instanceAttributes.get(INSTANCE_ATTRIBUTE_MEMORY_SIZE));
 
 			// If any of these attributes are empty, then return invalid.
 			// TODO: add to "isStringEmpty diskSize and memberId when fogbow
@@ -338,7 +380,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		Map<String, String> atts = new HashMap<>();
 		try {
 			ObjectMapper mapper = new ObjectMapper();
-			atts = mapper.readValue(response, HashMap.class);
+			atts = mapper.readValue(response, new TypeReference<Map<String,String>>(){});
 		} catch (IOException e) {
 			LOGGER.debug("String reponse is not valid.");
 		}
@@ -400,36 +442,5 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		return se;
 	}
 
-	protected String requestInstancePublicIp(String computeOrderId) {
-		String publicOrderID = null;
-		String requestUrl = managerUrl + "/" + FOGBOW_RAS_PUBLIC_ID_ENDPOINT;
 
-		Map<String, String> bodyRequestAttrs = new HashMap<>();
-		if (computeOrderId != null && !computeOrderId.isEmpty()) {
-			bodyRequestAttrs.put(FogbowRequirementsHelper.JSON_KEY_FOGBOW_PUBLICIP_COMPUTER_ORDER_ID, computeOrderId);
-		}
-
-		try {
-			StringEntity bodyRequest = makeRequestBodyJson(bodyRequestAttrs);
-			publicOrderID = this.doRequest(HttpWrapper.HTTP_METHOD_POST, requestUrl, new LinkedList<Header>(), bodyRequest);
-		} catch (Exception e) {
-			LOGGER.error("Error while getting public ip for computer order of id " + computeOrderId, e);
-		}
-		return publicOrderID;
-	}
-
-	protected Map<String, String> getInstancePublicIp(String publicIpOrderId) {
-		String publicOrderStringResponse;
-		Map<String, String> sshInfo = new HashMap<>();
-		String requestUrl = managerUrl + "/" + FOGBOW_RAS_PUBLIC_ID_ENDPOINT + "/" + publicIpOrderId;
-
-		try {
-			publicOrderStringResponse = this.doRequest(HttpWrapper.HTTP_METHOD_GET, requestUrl, new LinkedList<Header>());
-			sshInfo = parseAttributes(publicOrderStringResponse);
-		} catch (Exception e) {
-			LOGGER.error("Error while getting info about public instance of order with id " + publicIpOrderId, e);
-		}
-
-		return sshInfo;
-	}
 }

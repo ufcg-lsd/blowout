@@ -101,7 +101,7 @@ public class ResourceMonitor {
 		
 		private void monitoringPendingResources() {
 
-			for (String resourceId : getPendingResources()) {
+			for (String resourceId : pendingResources.keySet()) {
 				AbstractResource resource = infraProvider.getResource(resourceId);
 				if (resource != null) {
 					pendingResources.remove(resourceId);

@@ -245,7 +245,7 @@ public class TestDefaultInfrastructureManager {
 		idleResource.putMetadata(FogbowResource.METADATA_IMAGE, image);
 		idleResource.putMetadata(FogbowResource.METADATA_PUBLIC_KEY, publicKey);
 		idleResource.putMetadata(FogbowResource.METADATA_VCPU, coreSize);
-		idleResource.putMetadata(FogbowResource.METADATA_MEN_SIZE, menSize);
+		idleResource.putMetadata(FogbowResource.METADATA_MEM_SIZE, menSize);
 		idleResource.putMetadata(FogbowResource.METADATA_DISK_SIZE, diskSize);
 		idleResource.putMetadata(FogbowResource.METADATA_LOCATION, location);
 		
