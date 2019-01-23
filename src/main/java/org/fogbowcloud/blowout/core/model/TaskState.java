@@ -6,7 +6,7 @@ public enum TaskState {
 	
 	private String desc;
 	
-	private TaskState(String desc){
+	TaskState(String desc){
 		this.desc = desc;
 	}
 	

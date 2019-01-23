@@ -205,7 +205,7 @@ public class FogbowResourceDatastore {
 			updateFogbowResourceStatment.setString(1, fogbowResource.getComputeOrderId());
 			updateFogbowResourceStatment.setString(2, fogbowResource.getInstanceId());
 			updateFogbowResourceStatment.setString(3, fogbowResource.getId());
-			boolean result = updateFogbowResourceStatment.executeUpdate() > 0 ? true : false;
+			boolean result = updateFogbowResourceStatment.executeUpdate() > 0;
 			connection.commit();
 			return result;
 		} catch (SQLException e) {

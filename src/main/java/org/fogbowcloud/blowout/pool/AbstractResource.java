@@ -36,7 +36,7 @@ public abstract class AbstractResource {
 	private ResourceState state = ResourceState.NOT_READY;
 
 	private String id;
-	private Map<String, String> metadata = new HashMap<>();
+	private Map<String, Object> metadata = new HashMap<>();
 	private int timesReused = 0;
 	private int connectionFailTries = 0;
 	private String localCommandInterpreter;
@@ -60,7 +60,7 @@ public abstract class AbstractResource {
 		return success;
 	}
 
-	public void putMetadata(String attributeName, String value) {
+	public void putMetadata(String attributeName, Object value) {
 		metadata.put(attributeName, value);
 	}
 
@@ -71,10 +71,10 @@ public abstract class AbstractResource {
 	}
 
 	public String getMetadataValue(String attributeName) {
-		return metadata.get(attributeName);
+		return String.valueOf(metadata.get(attributeName));
 	}
 
-	public Map<String, String> getAllMetadata() {
+	public Map<String, Object> getAllMetadata() {
 		return metadata;
 	}
 

@@ -31,14 +31,11 @@ public class FogbowResource extends AbstractResource {
 			if (!image.equalsIgnoreCase(this.getMetadataValue(METADATA_IMAGE))) {
 				return false;
 			}
-			if (!publicKey.equalsIgnoreCase(this.getMetadataValue(METADATA_PUBLIC_KEY))) {
-				return false;
-			}
+            return publicKey.equalsIgnoreCase(this.getMetadataValue(METADATA_PUBLIC_KEY));
 		} else {
 			return false;
 		}
-		return true;
-	}
+    }
 
 	protected boolean internalCheckConnectivity() {
 		String host = this.getMetadataValue(METADATA_SSH_HOST);

@@ -134,7 +134,8 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 			StringEntity bodyRequest = makeBodyJson(spec);
 			bodyRequest.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, HttpWrapper.HTTP_CONTENT_JSON));
 
-			computeOrderId = this.doRequest("post", managerUrl + "/" + RAS_ENDPOINT_COMPUTE, new LinkedList<Header>(), bodyRequest);
+			computeOrderId = this.doRequest(HttpWrapper.HTTP_METHOD_POST, managerUrl + "/" +
+                    RAS_ENDPOINT_COMPUTE, new LinkedList<>(), bodyRequest);
 
 		} catch (Exception e) {
 			LOGGER.error("Error while requesting resource on Fogbow", e);
@@ -178,7 +179,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		LOGGER.debug("Initiating Resource Instanciation - Resource id: [" + resourceId + "]");
 		String instanceId;
 		String fogbowPublicIpOrderId;
-		Map<String, String> instanceAttributes;
+		Map<String, Object> instanceAttributes;
 
 		FogbowResource fogbowResource = resourcesMap.get(resourceId);
 
@@ -192,14 +193,14 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 			LOGGER.debug("Getting request attributes - Retrieve Instance ID.");
 
 			instanceAttributes = getFogbowInstanceAttributes(fogbowResource.getComputeOrderId());
-			instanceId = instanceAttributes.get(INSTANCE_ATTRIBUTE_NAME);
+			instanceId = String.valueOf(instanceAttributes.get(INSTANCE_ATTRIBUTE_NAME));
 
 			fogbowPublicIpOrderId = requestInstancePublicIp(fogbowResource.getComputeOrderId());
-			Map<String, String> sshInfo = getInstancePublicIp(fogbowPublicIpOrderId);
+			Map<String, Object> sshInfo = getInstancePublicIp(fogbowPublicIpOrderId);
 
-			for (Map.Entry<String, String> entry : sshInfo.entrySet()) {
+			for (Map.Entry<String, Object> entry : sshInfo.entrySet()) {
 				String key = entry.getKey();
-				String value = entry.getValue();
+				Object value = entry.getValue();
 				instanceAttributes.putIfAbsent(key, value);
 			}
 
@@ -243,10 +244,10 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		}
 		return null;
 	}
-	
+
 	@Override
 	public List<AbstractResource> getAllResources(){
-		return new ArrayList<AbstractResource>(resourcesMap.values());
+		return new ArrayList<>(resourcesMap.values());
 	}
 
 	@Override
@@ -294,9 +295,9 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		return publicOrderID;
 	}
 
-	protected Map<String, String> getInstancePublicIp(String publicIpOrderId) {
+	protected Map<String, Object> getInstancePublicIp(String publicIpOrderId) {
 		String publicOrderStringResponse;
-		Map<String, String> sshInfo = new HashMap<>();
+		Map<String, Object> sshInfo = new HashMap<>();
 		String requestUrl = managerUrl + "/" + RAS_ENDPOINT_PUBLIC_IP + "/" + publicIpOrderId;
 
 		try {
@@ -310,7 +311,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		return sshInfo;
 	}
 
-	private Map<String, String> getFogbowInstanceAttributes(String computeOrderId) throws Exception {
+	private Map<String, Object> getFogbowInstanceAttributes(String computeOrderId) throws Exception {
 		String endpoint = managerUrl + "/" + RAS_ENDPOINT_COMPUTE + "/" + computeOrderId;
 		String instanceInformation = doRequest(HttpWrapper.HTTP_METHOD_GET, endpoint, new ArrayList<Header>());
 
@@ -347,7 +348,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		return httpWrapper.doRequest(method, endpoint, this.token.getAccessId(), headers);
 	}
 
-	private boolean validateInstanceAttributes(Map<String, String> instanceAttributes) {
+	private boolean validateInstanceAttributes(Map<String, Object> instanceAttributes) {
 
 		LOGGER.info("Validating instance attributes.");
 
@@ -376,7 +377,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		return isValid;
 	}
 
-	private Map<String, String> parseAttributes(String response) throws ScriptException {
+	private Map<String, Object> parseAttributes(String response) throws ScriptException {
 		ScriptEngine engine;
 		ScriptEngineManager sem = new ScriptEngineManager();
 		engine = sem.getEngineByName("javascript");
@@ -386,7 +387,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 		Map contents = (Map) result;
 
-		Map<String, String> atts = new HashMap<String, String>(contents);
+		Map<String, Object> atts = new HashMap<String, Object>(contents);
 		return atts;
 	}
 
@@ -444,6 +445,4 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 		return se;
 	}
-
-
 }

@@ -7,8 +7,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.List;
@@ -394,7 +392,7 @@ public class TestFogbowInfrastructureProvider {
 	}
 
 	private void createDefaulRequestInstanceIdResponseNoId(String requestIdMock) 
-			throws FileNotFoundException, IOException, Exception {
+			throws Exception {
 
 		String urlEndpointRequestInformations = properties.getProperty(AppPropertiesConstants.INFRA_FOGBOW_MANAGER_BASE_URL)
 				+ "/"+ requestIdMock;
