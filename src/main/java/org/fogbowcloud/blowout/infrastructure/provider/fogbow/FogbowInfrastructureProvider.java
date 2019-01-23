@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -17,12 +16,11 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.apache.log4j.Logger;
-import org.fogbowcloud.blowout.constants.FogbowConstants;
+import org.fogbowcloud.blowout.core.constants.AppMessagesConstants;
+import org.fogbowcloud.blowout.core.constants.FogbowConstants;
 import org.fogbowcloud.blowout.core.model.Specification;
-import org.fogbowcloud.blowout.constants.AppPropertiesConstants;
+import org.fogbowcloud.blowout.core.constants.AppPropertiesConstants;
 
-import static org.fogbowcloud.blowout.core.util.AppUtil.isStringEmpty;
-import static org.fogbowcloud.blowout.core.util.AppUtil.makeBodyField;
 import org.fogbowcloud.blowout.database.FogbowResourceDatastore;
 import org.fogbowcloud.blowout.infrastructure.exception.InfrastructureException;
 import org.fogbowcloud.blowout.infrastructure.exception.RequestResourceException;
@@ -38,11 +36,13 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import static org.fogbowcloud.blowout.core.util.AppUtil.*;
+
 public class FogbowInfrastructureProvider implements InfrastructureProvider {
 	// TODO: put in resource the user, token and localCommand
 
 	private static final Logger LOGGER = Logger.getLogger(FogbowInfrastructureProvider.class);
-	public static final String DEFAULT_INSTANCE_ATTRIBUTE_SHH_USERNAME = "fogbow";
+	private static final String DEFAULT_INSTANCE_ATTRIBUTE_SHH_USERNAME = "fogbow";
 
 	private HttpWrapper httpWrapper;
 	private String managerUrl;
@@ -51,7 +51,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 	private AbstractTokenUpdatePlugin tokenUpdatePlugin;
 	private FogbowResourceDatastore frDatastore;
 
-	private Map<String, FogbowResource> resourcesMap = new ConcurrentHashMap<String, FogbowResource>();
+	private Map<String, FogbowResource> resourcesMap = new ConcurrentHashMap<>();
 
     protected FogbowInfrastructureProvider(Properties properties, ScheduledExecutorService handleTokeUpdateExecutor,
                                            AbstractTokenUpdatePlugin tokenUpdatePlugin) throws Exception {
@@ -62,8 +62,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
         this.token = tokenUpdatePlugin.generateToken();
 
-        ScheduledExecutorService handleTokenUpdateExecutor = handleTokeUpdateExecutor;
-        handleTokenUpdate(handleTokenUpdateExecutor);
+		this.handleTokenUpdate(handleTokeUpdateExecutor);
     }
 
 	protected FogbowInfrastructureProvider(Properties properties, ScheduledExecutorService handleTokeUpdateExecutor,
@@ -71,49 +70,23 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		this(properties, handleTokeUpdateExecutor, createTokenUpdatePlugin(properties));
 		frDatastore = new FogbowResourceDatastore(properties);
 
-        verifyPreviousResource(cleanPrevious);
+        this.verifyPreviousResource(cleanPrevious);
 	}
 
 	public FogbowInfrastructureProvider(Properties properties, boolean removePrevious) throws Exception {
 		this(properties, Executors.newScheduledThreadPool(1), removePrevious);
 	}
 
-    private void verifyPreviousResource(boolean cleanPrevious) {
-        for (FogbowResource fogbowResource : frDatastore.getAllFogbowResources()) {
-
-            resourcesMap.put(fogbowResource.getId(), fogbowResource);
-
-            if(cleanPrevious){
-                try {
-                    this.deleteResource(fogbowResource.getId());
-                } catch (Exception e) {
-                    LOGGER.error("Error while trying to delete resource on initialization: "+fogbowResource.getId());
-                }
-            }
-        }
-    }
-
-	protected void handleTokenUpdate(ScheduledExecutorService handleTokenUpdateExecutor) {
-		LOGGER.debug("Turning on handle token update.");
-
-		handleTokenUpdateExecutor.scheduleWithFixedDelay(
-				() -> setToken(tokenUpdatePlugin.generateToken()),
-				tokenUpdatePlugin.getUpdateTime(),
-				tokenUpdatePlugin.getUpdateTime(),
-				tokenUpdatePlugin.getUpdateTimeUnits());
-	}
-
 	@Override
-	public String requestResource(Specification spec) throws RequestResourceException {
+	public String requestResource(Specification specification) throws RequestResourceException {
 
-		LOGGER.debug("Requesting resource on Fogbow with specifications: " + spec.toString());
-
+		LOGGER.debug("Requesting resource on Fogbow with specifications: " + specification.toString());
 		String computeOrderId;
 
 		try {
-			this.validateSpecification(spec);
+			this.validateSpecification(specification);
 
-			StringEntity requestBody = makeBodyJson(spec);
+			StringEntity requestBody = makeBodyJson(specification);
 			requestBody.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, HttpWrapper.HTTP_CONTENT_JSON));
 
 			computeOrderId = this.doRequest(HttpWrapper.HTTP_METHOD_POST, managerUrl + "/" +
@@ -124,14 +97,14 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 			throw new RequestResourceException("Request for Fogbow Resource has FAILED: " + e.getMessage(), e);
 		}
 
-		String resourceId = String.valueOf(UUID.randomUUID());
+		String resourceId = generateRandomIdentifier();
 
-		FogbowResource fogbowResource = new FogbowResource(resourceId, computeOrderId, spec);
-		String requestType = spec.getRequirementValue(FogbowConstants.METADATA_FOGBOW_REQUEST_TYPE);
+		FogbowResource fogbowResource = new FogbowResource(resourceId, computeOrderId, specification);
+		String requestType = specification.getRequirementValue(FogbowConstants.METADATA_REQUEST_TYPE);
 
 		fogbowResource.putMetadata(AbstractResource.METADATA_REQUEST_TYPE, requestType);
-		fogbowResource.putMetadata(AbstractResource.METADATA_IMAGE, spec.getImageId());
-		fogbowResource.putMetadata(AbstractResource.METADATA_PUBLIC_KEY, spec.getPublicKey());
+		fogbowResource.putMetadata(AbstractResource.METADATA_IMAGE, specification.getImageId());
+		fogbowResource.putMetadata(AbstractResource.METADATA_PUBLIC_KEY, specification.getPublicKey());
 
 		resourcesMap.put(resourceId, fogbowResource);
 		frDatastore.addFogbowResource(fogbowResource);
@@ -191,7 +164,6 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 				fogbowResource.setInstanceId(instanceId);
 
-
 				if (this.validateInstanceAttributes(instanceAttributes)) {
 
 					LOGGER.debug("Getting Instance attributes.");
@@ -199,14 +171,14 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 					fogbowResource.setLocalCommandInterpreter(
 							properties.getProperty(AppPropertiesConstants.LOCAL_COMMAND_INTERPRETER));
 
-					fogbowResource.putMetadata(AbstractResource.METADATA_SSH_HOST,
-							instanceAttributes.get(FogbowConstants.INSTANCE_ATTRIBUTE_PUBLIC_IP));
+					fogbowResource.putMetadata(AbstractResource.METADATA_SSH_PUBLIC_IP,
+							instanceAttributes.get(FogbowConstants.JSON_KEY_FOGBOW_PUBLIC_IP));
 
 					fogbowResource.putMetadata(AbstractResource.METADATA_SSH_USERNAME_ATT,
 							DEFAULT_INSTANCE_ATTRIBUTE_SHH_USERNAME);
 
 					fogbowResource.putMetadata(AbstractResource.METADATA_VCPU,
-							instanceAttributes.get(FogbowConstants.INSTANCE_ATTRIBUTE_VCORE));
+							instanceAttributes.get(FogbowConstants.INSTANCE_ATTRIBUTE_VCPU));
 
 					fogbowResource.putMetadata(AbstractResource.METADATA_MEM_SIZE,
 							instanceAttributes.get(FogbowConstants.INSTANCE_ATTRIBUTE_MEMORY_SIZE));
@@ -248,9 +220,14 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 		try {
 			if (fogbowResource.getComputeOrderId() != null) {
-				this.doRequest(HttpWrapper.HTTP_METHOD_DELETE, managerUrl + "/" +
-								FogbowConstants.RAS_ENDPOINT_COMPUTE + "/" + fogbowResource.getComputeOrderId(),
-						new ArrayList<Header>());
+				String computeEndpoint = managerUrl + "/" +
+						FogbowConstants.RAS_ENDPOINT_COMPUTE + "/" + fogbowResource.getComputeOrderId();
+				String publicIpEndpoint = managerUrl + "/" +
+						FogbowConstants.RAS_ENDPOINT_PUBLIC_IP + "/" + fogbowResource.getComputeOrderId();
+				this.doRequest(HttpWrapper.HTTP_METHOD_DELETE, computeEndpoint, new ArrayList<>());
+
+				this.doRequest(HttpWrapper.HTTP_METHOD_DELETE, publicIpEndpoint, new ArrayList<>());
+
 			}
 			resourcesMap.remove(resourceId);
 			frDatastore.deleteFogbowResourceById(fogbowResource);
@@ -262,8 +239,8 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 	}
 
 	protected String requestInstancePublicIp(String computeOrderId) {
-		String publicOrderID = null;
-		String requestUrl = managerUrl + "/" + FogbowConstants.RAS_ENDPOINT_PUBLIC_IP;
+		String publicIpOrderId = null;
+		String requestUrl = this.managerUrl + "/" + FogbowConstants.RAS_ENDPOINT_PUBLIC_IP;
 
 		Map<String, String> bodyRequestAttrs = new HashMap<>();
 		if (computeOrderId != null && !computeOrderId.isEmpty()) {
@@ -273,45 +250,42 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		}
 		try {
 			StringEntity bodyRequest = makeRequestBodyJson(bodyRequestAttrs);
-			publicOrderID = this.doRequest(HttpWrapper.HTTP_METHOD_POST, requestUrl,
+			publicIpOrderId = this.doRequest(HttpWrapper.HTTP_METHOD_POST, requestUrl,
 					new LinkedList<>(), bodyRequest);
+			LOGGER.debug(publicIpOrderId);
 		} catch (Exception e) {
 			LOGGER.error("Error while getting public ip for computer order of id " + computeOrderId, e);
 		}
-		return publicOrderID;
+		return publicIpOrderId;
 	}
 
 	protected Map<String, Object> getInstancePublicIp(String publicIpOrderId) {
-		String publicOrderStringResponse;
+		String response;
 		Map<String, Object> sshInfo = new HashMap<>();
-		String requestUrl = managerUrl + "/" + FogbowConstants.RAS_ENDPOINT_PUBLIC_IP + "/" + publicIpOrderId;
+		String requestUrl = this.managerUrl + "/" + FogbowConstants.RAS_ENDPOINT_PUBLIC_IP + "/" + publicIpOrderId;
 
 		try {
-			publicOrderStringResponse = this.doRequest(HttpWrapper.HTTP_METHOD_GET, requestUrl, new LinkedList<Header>());
-			sshInfo = parseAttributes(publicOrderStringResponse);
-			LOGGER.debug(sshInfo);
+			response = this.doRequest(HttpWrapper.HTTP_METHOD_GET, requestUrl, new LinkedList<>());
+			sshInfo = parseAttributes(response);
+			LOGGER.debug("SSh information " + sshInfo);
 		} catch (Exception e) {
 			LOGGER.error("Error while getting info about public instance of order with id " + publicIpOrderId, e);
 		}
-
 		return sshInfo;
 	}
 
 	private Map<String, Object> getFogbowInstanceAttributes(String computeOrderId) throws Exception {
-		String endpoint = managerUrl + "/" + FogbowConstants.RAS_ENDPOINT_COMPUTE + "/" + computeOrderId;
-		String instanceInformation = doRequest(HttpWrapper.HTTP_METHOD_GET, endpoint, new ArrayList<Header>());
+		String requestUrl = managerUrl + "/" + FogbowConstants.RAS_ENDPOINT_COMPUTE + "/" + computeOrderId;
+		String instanceInformation = doRequest(HttpWrapper.HTTP_METHOD_GET, requestUrl, new ArrayList<>());
 
 		return parseAttributes(instanceInformation);
 	}
 
 	private void validateSpecification(Specification specification) throws RequestResourceException {
-
 		if (specification.getImageId() == null || specification.getImageId().isEmpty()) {
-
 			throw new RequestResourceException();
 		}
 		if (specification.getPublicKey() == null || specification.getPublicKey().isEmpty()) {
-
 			throw new RequestResourceException();
 		}
 
@@ -320,9 +294,9 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 		if (!FogbowRequirementsHelper.validateFogbowRequirementsSyntax(fogbowRequirements)) {
 			LOGGER.debug("FogbowRequirements [" + fogbowRequirements
-					+ "] is not in valid format. e.g: [Glue2vCPU >= 1 && Glue2RAM >= 1024 && Glue2disk >= 20 && Glue2CloudComputeManagerID ==\"servers.your.domain\"]");
+					+ "] is not in valid format." + AppMessagesConstants.FOGBOW_REQUIREMENTS_EXAMPLE);
 			throw new RequestResourceException("FogbowRequirements [" + fogbowRequirements
-					+ "] is not in valid format. e.g: [Glue2vCPU >= 1 && Glue2RAM >= 1024 && Glue2disk >= 20 && Glue2CloudComputeManagerID ==\"servers.your.domain\"]");
+					+ "] is not in valid format." + AppMessagesConstants.FOGBOW_REQUIREMENTS_EXAMPLE);
 		}
 	}
 
@@ -335,31 +309,26 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 	}
 
 	private boolean validateInstanceAttributes(Map<String, Object> instanceAttributes) {
-
-		LOGGER.info("Validating instance attributes.");
+		LOGGER.info(AppMessagesConstants.VALIDATING_ATTRIBUTES);
 
 		boolean isValid = true;
 
 		if (instanceAttributes != null && !instanceAttributes.isEmpty()) {
 
-			String sshInformation = String.valueOf(instanceAttributes.get(FogbowConstants.INSTANCE_ATTRIBUTE_PUBLIC_IP));
-			String vcore = String.valueOf(instanceAttributes.get(FogbowConstants.INSTANCE_ATTRIBUTE_VCORE));
+			String sshInformation = String.valueOf(instanceAttributes.get(
+			        FogbowConstants.JSON_KEY_FOGBOW_PUBLIC_IP));
+			String vCPU = String.valueOf(instanceAttributes.get(FogbowConstants.INSTANCE_ATTRIBUTE_VCPU));
 			String memorySize = String.valueOf(instanceAttributes.get(FogbowConstants.INSTANCE_ATTRIBUTE_MEMORY_SIZE));
 
-			// If any of these attributes are empty, then return invalid.
-			// TODO: add to "isStringEmpty diskSize and memberId when fogbow
-			// being returning this two attributes.
-			isValid = !isStringEmpty(sshInformation, vcore, memorySize);
+			isValid = !isStringEmpty(sshInformation, vCPU, memorySize);
 			if (!isValid) {
-				LOGGER.error("Instance attributes invalids.");
+				LOGGER.error(AppMessagesConstants.ATTRIBUTES_INVALIDS);
 				return false;
 			}
-
 		} else {
-			LOGGER.error("Instance attributes invalids.");
+			LOGGER.error(AppMessagesConstants.ATTRIBUTES_INVALIDS);
 			isValid = false;
 		}
-
 		return isValid;
 	}
 
@@ -373,8 +342,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 		Map contents = (Map) result;
 
-		Map<String, Object> atts = new HashMap<String, Object>(contents);
-		return atts;
+        return new HashMap<String, Object>(contents);
 	}
 
 	private static AbstractTokenUpdatePlugin createTokenUpdatePlugin(Properties properties) throws Exception {
@@ -430,5 +398,28 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, HttpWrapper.HTTP_CONTENT_JSON));
 
 		return se;
+	}
+
+	private void verifyPreviousResource(boolean cleanPrevious) {
+		for (FogbowResource fogbowResource : frDatastore.getAllFogbowResources()) {
+			resourcesMap.put(fogbowResource.getId(), fogbowResource);
+			if(cleanPrevious){
+				try {
+					this.deleteResource(fogbowResource.getId());
+				} catch (Exception e) {
+					LOGGER.error("Error while trying to delete resource on initialization: "+fogbowResource.getId());
+				}
+			}
+		}
+	}
+
+	protected void handleTokenUpdate(ScheduledExecutorService handleTokenUpdateExecutor) {
+		LOGGER.info("Turning on handle token update.");
+
+		handleTokenUpdateExecutor.scheduleWithFixedDelay(
+				() -> setToken(tokenUpdatePlugin.generateToken()),
+				tokenUpdatePlugin.getUpdateTime(),
+				tokenUpdatePlugin.getUpdateTime(),
+				tokenUpdatePlugin.getUpdateTimeUnits());
 	}
 }

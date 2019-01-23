@@ -14,12 +14,12 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-import org.fogbowcloud.blowout.constants.FogbowConstants;
+import org.fogbowcloud.blowout.core.constants.FogbowConstants;
 import org.json.JSONException;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 import org.fogbowcloud.blowout.core.model.Specification;
-import org.fogbowcloud.blowout.constants.AppPropertiesConstants;
+import org.fogbowcloud.blowout.core.constants.AppPropertiesConstants;
 import org.fogbowcloud.blowout.database.FogbowResourceDatastore;
 import org.fogbowcloud.blowout.infrastructure.exception.InfrastructureException;
 import org.fogbowcloud.blowout.infrastructure.http.HttpWrapper;
@@ -466,7 +466,7 @@ public class TestFogbowInfrastructureProvider {
 				+ "/" + FogbowConstants.RAS_ENDPOINT_PUBLIC_IP + "/"+ publicOrderId;
 
 		String fogbowResponse = "{"
-				+ "\"" + FogbowConstants.INSTANCE_ATTRIBUTE_PUBLIC_IP + "\":\"" + ip + "\", "
+				+ "\"" + FogbowConstants.JSON_KEY_FOGBOW_PUBLIC_IP + "\":\"" + ip + "\", "
 				+ "\"" + FogbowConstants.INSTANCE_ATTRIBUTE_STATE + "\":\"" +  state + "\"}";
 
 		doReturn(fogbowResponse).when(httpWrapperMock).doRequest(Mockito.any(String.class), Mockito.eq(urlEndpointRequestInformations),

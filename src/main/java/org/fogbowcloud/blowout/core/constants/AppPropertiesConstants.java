@@ -1,4 +1,4 @@
-package org.fogbowcloud.blowout.constants;
+package org.fogbowcloud.blowout.core.constants;
 
 public class AppPropertiesConstants {
 	

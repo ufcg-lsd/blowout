@@ -14,7 +14,7 @@ public class TaskExecutionResult {
 	}
 
 	public boolean isExecutionFinished() {
-		return taskFinished;
+		return this.taskFinished;
 	}
 
 	public void finish(int exitValue) {

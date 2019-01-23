@@ -13,7 +13,7 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.model.Specification;
-import org.fogbowcloud.blowout.constants.AppPropertiesConstants;
+import org.fogbowcloud.blowout.core.constants.AppPropertiesConstants;
 import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
 import org.json.JSONException;
 import org.json.JSONObject;

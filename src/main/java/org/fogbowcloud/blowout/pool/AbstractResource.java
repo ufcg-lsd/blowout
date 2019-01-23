@@ -5,23 +5,21 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.fogbowcloud.blowout.core.model.Specification;
-import org.fogbowcloud.blowout.constants.AppPropertiesConstants;
+import org.fogbowcloud.blowout.core.constants.AppPropertiesConstants;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 
 public abstract class AbstractResource {
 
+	public static final String ENV_PRIVATE_KEY_FILE = "PRIVATE_KEY_FILE";
 	public static final String ENV_HOST = "HOST";
 	public static final String ENV_SSH_PORT = "SSH_PORT";
 	public static final String ENV_SSH_USER = "SSH_USER";
-	public static final String ENV_PRIVATE_KEY_FILE = "PRIVATE_KEY_FILE";
-	
-	public static final String METADATA_TOKEN_USER = "tokenUser";
-	public static final String METADATA_LOCAL_COMMAND_INTERPRETER = "metadataLocalCommandInterpreter";
 	
 	public static final String METADATA_SSH_HOST = "metadataSSHHost";
 	public static final String METADATA_SSH_PORT = "metadataSSHPort";
-	public static final String METADATA_SSH_USERNAME_ATT = "metadateSshUsername";
-	public static final String METADATA_EXTRA_PORTS_ATT = "metadateExtraPorts";
+	public static final String METADATA_SSH_USERNAME_ATT = "metadataSshUsername";
+	public static final String METADATA_EXTRA_PORTS_ATT = "metadataExtraPorts";
+	public static final String METADATA_SSH_PUBLIC_IP = "metadataSshPublicIp";
 
 	public static final String METADATA_IMAGE = "metadataImage";
 	public static final String METADATA_PUBLIC_KEY = "metadataPublicKey";

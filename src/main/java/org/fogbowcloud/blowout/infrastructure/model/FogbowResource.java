@@ -3,7 +3,8 @@ package org.fogbowcloud.blowout.infrastructure.model;
 import java.util.Scanner;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.blowout.constants.FogbowConstants;
+import org.fogbowcloud.blowout.core.constants.AppMessagesConstants;
+import org.fogbowcloud.blowout.core.constants.FogbowConstants;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.infrastructure.provider.fogbow.FogbowRequirementsHelper;
 import org.fogbowcloud.blowout.pool.AbstractResource;
@@ -68,8 +69,7 @@ public class FogbowResource extends AbstractResource {
 				}
 			}
 		} catch (Exception e) {
-			LOGGER.debug("Failed to connect with resource.");
-			e.printStackTrace();
+			LOGGER.error(AppMessagesConstants.RESOURCE_CONNECT_FAILED);
 			return false;
 		} finally {
 			run = null;
@@ -80,7 +80,7 @@ public class FogbowResource extends AbstractResource {
 				scanner.close();
 			}
 		}
-		LOGGER.debug("Failed to connect with resource.");
+		LOGGER.debug(AppMessagesConstants.RESOURCE_CONNECT_FAILED);
 		return false;
 	}
 
@@ -95,5 +95,4 @@ public class FogbowResource extends AbstractResource {
 	public String getComputeOrderId() {
 		return computeOrderId;
 	}
-	
 }

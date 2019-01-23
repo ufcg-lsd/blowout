@@ -20,7 +20,6 @@ public class TaskProcessImpl implements TaskProcess {
 	public static final String ENV_PRIVATE_KEY_FILE = "PRIVATE_KEY_FILE";
 
 	public static final String METADATA_SSH_HOST = "metadataSSHHost";
-	public static final String METADATA_SSH_PORT = "metadataSSHPort";
 	public static final String METADATA_SSH_USERNAME_ATT = "metadateSshUsername";
 	public static final String METADATA_EXTRA_PORTS_ATT = "metadateExtraPorts";
 
@@ -72,7 +71,7 @@ public class TaskProcessImpl implements TaskProcess {
 	@Override
 	public TaskExecutionResult executeTask(AbstractResource resource) {
 		this.resource = resource;
-		localCommandInterpreter = resource.getLocalCommandInterpreter();
+		this.localCommandInterpreter = resource.getLocalCommandInterpreter();
 
 		TaskExecutionResult taskExecutionResult = new TaskExecutionResult();
 
@@ -118,7 +117,7 @@ public class TaskProcessImpl implements TaskProcess {
 			AbstractResource resource) {
 
 		TaskExecutionResult taskExecutionResult = new TaskExecutionResult();
-		int returnValue = TaskExecutionResult.NOK;
+		int returnValue;
 
 		Map<String, String> additionalVariables = getAdditionalEnvVariables(resource);
 		try {
@@ -180,8 +179,6 @@ public class TaskProcessImpl implements TaskProcess {
 		Map<String, String> additionalEnvVar = new HashMap<String, String>();
 		additionalEnvVar.put(ENV_HOST, resource.getMetadataValue(METADATA_SSH_HOST));
 		LOGGER.debug("Env_host:" + resource.getMetadataValue(METADATA_SSH_HOST));
-		additionalEnvVar.put(ENV_SSH_PORT, resource.getMetadataValue(METADATA_SSH_PORT));
-		LOGGER.debug("Env_ssh_port:" + resource.getMetadataValue(METADATA_SSH_PORT));
 		if (this.spec.getUsername() != null && !this.spec.getUsername().isEmpty()) {
 			additionalEnvVar.put(ENV_SSH_USER, this.spec.getUsername());
 			LOGGER.debug("Env_ssh_user:" + this.spec.getUsername());

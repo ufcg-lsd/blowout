@@ -6,7 +6,7 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.exception.BlowoutException;
-import org.fogbowcloud.blowout.constants.AppPropertiesConstants;
+import org.fogbowcloud.blowout.core.constants.AppPropertiesConstants;
 import static org.fogbowcloud.blowout.core.util.AppUtil.makeBodyField;
 import org.fogbowcloud.blowout.infrastructure.http.HttpWrapper;
 import org.fogbowcloud.blowout.infrastructure.model.Token;
@@ -62,12 +62,12 @@ public class KeystoneTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
     private Token createToken() throws Exception {
         HttpWrapper httpWrapper = new HttpWrapper();
 
-        String endpoint = this.rasBaseUrl + "/" + FOGBOW_RAS_TOKEN_ENDPOINT;
+        String requestUrl = this.rasBaseUrl + "/" + FOGBOW_RAS_TOKEN_ENDPOINT;
         StringEntity body = makeBodyJson();
 
         body.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, HttpWrapper.HTTP_CONTENT_JSON));
 
-        String acessToken = httpWrapper.doRequest("post", endpoint, new LinkedList<Header>(), body);
+        String acessToken = httpWrapper.doRequest("post", requestUrl, new LinkedList<Header>(), body);
         String userId = String.valueOf(UUID.randomUUID());
         User user = new User(userId, this.userName, this.password);
         Token token = new Token(acessToken, user);
