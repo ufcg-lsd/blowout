@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
+import org.fogbowcloud.blowout.constants.FogbowConstants;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.model.Task;
 import org.fogbowcloud.blowout.core.model.TaskImpl;
@@ -19,7 +20,6 @@ import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 import org.fogbowcloud.blowout.infrastructure.monitor.ResourceMonitor;
 import org.fogbowcloud.blowout.infrastructure.provider.InfrastructureProvider;
-import org.fogbowcloud.blowout.infrastructure.provider.fogbow.FogbowRequirementsHelper;
 import org.fogbowcloud.blowout.pool.AbstractResource;
 import org.fogbowcloud.blowout.pool.ResourceStateHelper;
 import org.junit.After;
@@ -234,7 +234,7 @@ public class TestDefaultInfrastructureManager {
 		String location = "edu.ufcg.lsd.cloud_1s";
 		
 		Specification specA = new Specification(image, userName, publicKey, privateKey, userDataFile, userDataType);
-		specA.addRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
+		specA.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
 		
 		AbstractResource idleResource = new FogbowResource(resourceId, orderId, specA);
 		idleResource.putMetadata(AbstractResource.METADATA_IMAGE, "ImageA");

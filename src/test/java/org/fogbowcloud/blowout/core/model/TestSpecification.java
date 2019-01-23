@@ -2,17 +2,10 @@ package org.fogbowcloud.blowout.core.model;
 
 import static org.junit.Assert.*;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.fogbowcloud.blowout.infrastructure.provider.fogbow.FogbowRequirementsHelper;
+import org.fogbowcloud.blowout.constants.FogbowConstants;
 import org.json.JSONObject;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,17 +56,17 @@ public class TestSpecification {
 		Specification spec;
 		for (String fogbowRequirement: fogbowRequirements) {
 			spec = new Specification(IMAGE, USERNAME, PUBLIC_KEY, PRIVATE_KEY_PATH);
-			spec.addRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
+			spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
 
 			assertEquals("1", spec.getvCPU());
 		}
 
         spec = new Specification(IMAGE, USERNAME, PUBLIC_KEY, PRIVATE_KEY_PATH);
-        spec.addRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_E);
+        spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_E);
         assertEquals("", spec.getvCPU());
 
         spec = new Specification(IMAGE, USERNAME, PUBLIC_KEY, PRIVATE_KEY_PATH);
-        spec.addRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_F);
+        spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_F);
         assertEquals(null, spec.getvCPU());
 	}
 
@@ -88,17 +81,17 @@ public class TestSpecification {
         Specification spec;
         for (String fogbowRequirement: fogbowRequirements) {
             spec = new Specification(IMAGE, USERNAME, PUBLIC_KEY, PRIVATE_KEY_PATH);
-            spec.addRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
+            spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
 
             assertEquals("1024", spec.getMemory());
         }
 
         spec = new Specification(IMAGE, USERNAME, PUBLIC_KEY, PRIVATE_KEY_PATH);
-        spec.addRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_E);
+        spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_E);
         assertEquals("", spec.getMemory());
 
         spec = new Specification(IMAGE, USERNAME, PUBLIC_KEY, PRIVATE_KEY_PATH);
-        spec.addRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_F);
+        spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_F);
         assertEquals(null, spec.getMemory());
     }
 
@@ -112,17 +105,17 @@ public class TestSpecification {
         Specification spec;
         for (String fogbowRequirement: fogbowRequirements) {
             spec = new Specification(IMAGE, USERNAME, PUBLIC_KEY, PRIVATE_KEY_PATH);
-            spec.addRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
+            spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
 
             assertEquals("20", spec.getDisk());
         }
 
         spec = new Specification(IMAGE, USERNAME, PUBLIC_KEY, PRIVATE_KEY_PATH);
-        spec.addRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_E);
+        spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_E);
         assertEquals("", spec.getDisk());
 
         spec = new Specification(IMAGE, USERNAME, PUBLIC_KEY, PRIVATE_KEY_PATH);
-        spec.addRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_F);
+        spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_F);
         assertEquals(null, spec.getDisk());
     }
 

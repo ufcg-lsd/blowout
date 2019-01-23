@@ -5,8 +5,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
 
+import org.fogbowcloud.blowout.constants.FogbowConstants;
 import org.fogbowcloud.blowout.core.model.Specification;
-import org.fogbowcloud.blowout.infrastructure.provider.fogbow.FogbowRequirementsHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,7 +46,7 @@ public class TestFogbowResource {
 		String location = "edu.ufcg.lsd.cloud_1s";
 		
 		Specification spec = new Specification(image, userName, publicKey, privateKey, userDataFile, userDataType);
-		spec.addRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
+		spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
 		
 		resource.putMetadata(FogbowResource.METADATA_IMAGE, image);
 		resource.putMetadata(FogbowResource.METADATA_PUBLIC_KEY, publicKey);
@@ -79,7 +79,7 @@ public class TestFogbowResource {
 		String location = "edu.ufcg.lsd.cloud_1s";
 		
 		Specification spec = new Specification(image, userName, publicKey, privateKey, userDataFile, userDataType);
-		spec.addRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
+		spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
 		
 		resource.putMetadata(FogbowResource.METADATA_IMAGE, image);
 		resource.putMetadata(FogbowResource.METADATA_PUBLIC_KEY, publicKey);
@@ -112,7 +112,7 @@ public class TestFogbowResource {
 		String location = "edu.ufcg.lsd.cloud_1s";
 		
 		Specification spec = new Specification(imageB, userName, publicKey, privateKey, userDataFile, userDataType);
-		spec.addRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
+		spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
 		
 		resource.putMetadata(FogbowResource.METADATA_IMAGE, imageA);
 		resource.putMetadata(FogbowResource.METADATA_PUBLIC_KEY, publicKey);
@@ -145,7 +145,7 @@ public class TestFogbowResource {
 		String location = "edu.ufcg.lsd.cloud_1s";
 
 		Specification spec = new Specification(image, userName, publicKeyB, privateKey, userDataFile, userDataType);
-		spec.addRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
+		spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
 
 		resource.putMetadata(FogbowResource.METADATA_IMAGE, image);
 		resource.putMetadata(FogbowResource.METADATA_PUBLIC_KEY, publicKeyA);

@@ -3,6 +3,7 @@ package org.fogbowcloud.blowout.infrastructure.model;
 import java.util.Scanner;
 
 import org.apache.log4j.Logger;
+import org.fogbowcloud.blowout.constants.FogbowConstants;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.infrastructure.provider.fogbow.FogbowRequirementsHelper;
 import org.fogbowcloud.blowout.pool.AbstractResource;
@@ -20,7 +21,7 @@ public class FogbowResource extends AbstractResource {
 	}
 
 	public boolean match(Specification spec) {
-		String fogbowRequirement = spec.getRequirementValue(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS);
+		String fogbowRequirement = spec.getRequirementValue(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS);
 		String image = spec.getImageId();
 		String publicKey = spec.getPublicKey();
 		if (fogbowRequirement != null && image != null) {

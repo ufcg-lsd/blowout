@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.fogbowcloud.blowout.constants.FogbowConstants;
 import org.fogbowcloud.blowout.core.StandardScheduler;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.model.Task;
@@ -40,7 +41,7 @@ public class TestDefaultBlowoutPool {
 	public void setUp() {
 		defaultBlowoutPool = spy(new DefaultBlowoutPool());
 		spec = new Specification("fakeimage", "fakeusername", "fakepublickey", "fakekeypath");
-		spec.addRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS, "fakeRequirements");
+		spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, "fakeRequirements");
 	}
 	
 	@Test
