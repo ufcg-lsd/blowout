@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.fogbowcloud.blowout.constants.FogbowConstants;
 import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
 import org.fogbowcloud.blowout.pool.AbstractResource;
 
@@ -18,26 +19,7 @@ public class FogbowRequirementsHelper {
 
 	private static final Logger LOGGER = Logger.getLogger(FogbowRequirementsHelper.class);
 	
-	protected static final String ZERO = "0";
-
-	public static final String METADATA_FOGBOW_RESOURCE_KIND = "compute";
-	public static final String METADATA_FOGBOW_REQUIREMENTS = "FogbowRequirements";
-	public static final String METADATA_FOGBOW_REQUIREMENTS_Glue2vCPU = "Glue2vCPU";
-	public static final String METADATA_FOGBOW_REQUIREMENTS_Glue2RAM = "Glue2RAM";
-	public static final String METADATA_FOGBOW_REQUIREMENTS_Glue2disk = "Glue2disk";
-	public static final String METADATA_FOGBOW_REQUIREMENTS_1Glue2CloudComputeManagerID = "Glue2CloudComputeManagerID";
-	public static final String METADATA_FOGBOW_REQUEST_TYPE = "RequestType";
-
-	public static final String JSON_KEY_FOGBOW_REQUIREMENTS_DISK = "disk";
-	public static final String JSON_KEY_FOGBOW_REQUIREMENTS_IMAGE_ID = "imageId";
-	public static final String JSON_KEY_FOGBOW_REQUIREMENTS_COMPUTE_NAME = "name";
-	public static final String JSON_KEY_FOGBOW_REQUIREMENTS_MEMORY = "memory";
-	public static final String JSON_KEY_FOGBOW_REQUIREMENTS_NETWORK_IDS = "networkIds";
-	public static final String JSON_KEY_FOGBOW_REQUIREMENTS_PROVIDING_MEMBER = "provider";
-	public static final String JSON_KEY_FOGBOW_REQUIREMENTS_PUBLIC_KEY = "publicKey";
-	public static final String JSON_KEY_FOGBOW_COMPUTE_ID = "computeId";
-	public static final String JSON_KEY_FOGBOW_REQUIREMENTS_VCPU = "vCPU";
-	public static final String JSON_KEY_FOGBOW_REQUIREMENTS_REQUESTING_MEMBER = "requestingMember";
+	private static final String ZERO = "0";
 
 	// TODO: delete this method
 	public static boolean validateFogbowRequirementsSyntax(String requirementsString) {
@@ -80,10 +62,10 @@ public class FogbowRequirementsHelper {
 			ClassAdParser classAdParser = new ClassAdParser(requirementsStr);		
 			Op expr = (Op) classAdParser.parse();
 			
-			listAttrProvided.add(METADATA_FOGBOW_REQUIREMENTS_Glue2vCPU);
-			listAttrProvided.add(METADATA_FOGBOW_REQUIREMENTS_Glue2RAM);
-			listAttrProvided.add(METADATA_FOGBOW_REQUIREMENTS_Glue2disk);  
-			listAttrProvided.add(METADATA_FOGBOW_REQUIREMENTS_1Glue2CloudComputeManagerID); 
+			listAttrProvided.add(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_Glue2vCPU);
+			listAttrProvided.add(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_Glue2RAM);
+			listAttrProvided.add(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_Glue2disk);
+			listAttrProvided.add(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_1Glue2CloudComputeManagerID);
 			
 			Env env = new Env();
 			String value = null;
@@ -94,21 +76,21 @@ public class FogbowRequirementsHelper {
 				if (findValuesInRequiremets.size() > 0) {
 
 					// TODO: Check if you need to refact this
-					if (attr.equals(METADATA_FOGBOW_REQUIREMENTS_Glue2vCPU)) {
+					if (attr.equals(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_Glue2vCPU)) {
 						listAttrSearched.add(attr);
 						value = resource.getMetadataValue(AbstractResource.METADATA_VCPU);
 					} 
-					else if (attr.equals(METADATA_FOGBOW_REQUIREMENTS_Glue2RAM)) {
+					else if (attr.equals(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_Glue2RAM)) {
 						listAttrSearched.add(attr);
 						value = resource.getMetadataValue(AbstractResource.METADATA_MEM_SIZE);
 					} 
-					else if (attr.equals(METADATA_FOGBOW_REQUIREMENTS_Glue2disk)) {
+					else if (attr.equals(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_Glue2disk)) {
 						value = resource.getMetadataValue(AbstractResource.METADATA_DISK_SIZE);
 						if (value != null && !value.equals(ZERO) ) {
 							listAttrSearched.add(attr);							
 						}
 					} 
-					else if (attr.equals(METADATA_FOGBOW_REQUIREMENTS_1Glue2CloudComputeManagerID)) {
+					else if (attr.equals(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_1Glue2CloudComputeManagerID)) {
 						listAttrSearched.add(attr);
 						value = resource.getMetadataValue(AbstractResource.METADATA_LOCATION);
 					}

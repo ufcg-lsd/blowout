@@ -1,26 +1,15 @@
 package org.fogbowcloud.blowout.core.model;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.fogbowcloud.blowout.constants.FogbowConstants;
 import org.fogbowcloud.blowout.core.util.AppUtil;
-import org.fogbowcloud.blowout.infrastructure.provider.fogbow.FogbowRequirementsHelper;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.google.gson.Gson;
 
 public class Specification implements Serializable {
 
@@ -192,19 +181,19 @@ public class Specification implements Serializable {
 	}
 
 	public String getvCPU() {
-		return getFogbowRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS_Glue2vCPU);
+		return getFogbowRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_Glue2vCPU);
 	}
 
 	public String getMemory() {
-		return getFogbowRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS_Glue2RAM);
+		return getFogbowRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_Glue2RAM);
 	}
 
 	public String getDisk() {
-		return getFogbowRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS_Glue2disk);
+		return getFogbowRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_Glue2disk);
 	}
 
 	private String getFogbowRequirement(String fogbowRequirementKey) {
-		String fogbowRequirements = getRequirementValue(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS);
+		String fogbowRequirements = getRequirementValue(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS);
 
 		if (fogbowRequirements == null) {
 			return null;
