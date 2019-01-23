@@ -6,7 +6,7 @@ public enum ResourceState {
 
 	private String desc;
 	
-	private ResourceState(String desc){
+	ResourceState(String desc){
 		this.desc = desc;
 	}
 	

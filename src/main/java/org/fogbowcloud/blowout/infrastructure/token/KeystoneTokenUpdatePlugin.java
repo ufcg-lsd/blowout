@@ -46,7 +46,7 @@ public class KeystoneTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
         this.password = super.properties.getProperty(FOGBOW_PASSWORD);
         this.projectName = super.properties.getProperty(FOGBOW_PROJECT_NAME);
         this.domain = super.properties.getProperty(FOGBOW_DOMAIN);
-        this.rasBaseUrl =  super.properties.getProperty(AppPropertiesConstants.INFRA_FOGBOW_MANAGER_BASE_URL);;
+        this.rasBaseUrl =  super.properties.getProperty(AppPropertiesConstants.INFRA_FOGBOW_MANAGER_BASE_URL);
     }
 
     @Override

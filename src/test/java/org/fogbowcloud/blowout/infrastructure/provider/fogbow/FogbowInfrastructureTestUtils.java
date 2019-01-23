@@ -22,7 +22,7 @@ public class FogbowInfrastructureTestUtils {
 	public static final String PROVIDER_MEMBER_TAG = "${PROVIDER_MEMBER}";
 	
 	
-	public static String createHttpWrapperResponseFromFile(String filePath, Map<String, String> params) throws FileNotFoundException, IOException{
+	public static String createHttpWrapperResponseFromFile(String filePath, Map<String, String> params) throws IOException{
 
 		FileInputStream fis = null;
 		try{

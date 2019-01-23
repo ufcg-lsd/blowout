@@ -105,11 +105,11 @@ public class TestTaskImpl {
 		commands.add(prologueCommand);
 		doReturn(commands).when(task).getAllCommands();
 		
-		List<Command> remoteCommands = (ArrayList<Command>) task.getCommandsByType(Command.Type.REMOTE);
+		List<Command> remoteCommands = task.getCommandsByType(Command.Type.REMOTE);
 		assertEquals(1, remoteCommands.size());
 		assert(remoteCommands.contains(remoteCommand));
 		
-		List<Command> epilogueCommands = (ArrayList<Command>) task.getCommandsByType(Command.Type.EPILOGUE);
+		List<Command> epilogueCommands = task.getCommandsByType(Command.Type.EPILOGUE);
 		assertEquals(2, epilogueCommands.size());
 		assert(epilogueCommands.contains(epilogueCommand));
 		assert(epilogueCommands.contains(epilogueCommand2));

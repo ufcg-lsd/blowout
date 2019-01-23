@@ -149,11 +149,7 @@ public class TaskImpl implements Task {
 			LOGGER.error("Timeout badly formated, ignoring it: ", e);
 			return false;
 		}
-		if (System.currentTimeMillis() - this.startedRunningAt > timeOut){
-			return true;
-		} else {
-			return false;
-		}
+        return System.currentTimeMillis() - this.startedRunningAt > timeOut;
 
 	}
 
@@ -288,10 +284,7 @@ public class TaskImpl implements Task {
 		} else if (!id.equals(other.id))
 			return false;
 		if (spec == null) {
-			if (other.spec != null)
-				return false;
-		} else if (!spec.equals(other.spec))
-			return false;
-		return true;
-	}
+            return other.spec == null;
+		} else return spec.equals(other.spec);
+    }
 }

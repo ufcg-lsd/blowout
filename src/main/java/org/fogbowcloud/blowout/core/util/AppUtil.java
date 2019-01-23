@@ -28,7 +28,7 @@ public class AppUtil {
 				continue;
 			}
 			String key = block.substring(0, indexOfCarac).trim();
-			String value = block.substring(indexOfCarac + 1, block.length()).trim();
+			String value = block.substring(indexOfCarac + 1).trim();
 			newMap.put(key, value);
 		}
 		return newMap;

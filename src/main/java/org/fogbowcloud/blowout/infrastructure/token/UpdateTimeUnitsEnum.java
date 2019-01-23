@@ -6,7 +6,7 @@ public enum UpdateTimeUnitsEnum {
 	
 	private String value;
 	
-	private UpdateTimeUnitsEnum(String value){
+	UpdateTimeUnitsEnum(String value){
 		this.value = value;
 	}
 	
