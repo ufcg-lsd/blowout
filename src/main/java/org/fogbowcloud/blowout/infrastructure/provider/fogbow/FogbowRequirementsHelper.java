@@ -28,14 +28,14 @@ public class FogbowRequirementsHelper {
 		
 		if (requirementsString == null || requirementsString.isEmpty()) {
 			
-			LOGGER.debug("Fogbow Requirements ["+requirementsString+"] Validate with sucess.");
+			LOGGER.debug("Fogbow Requirements ["+requirementsString+"] Validate with success.");
 			return true;
 		}
 		try {
 			ClassAdParser adParser = new ClassAdParser(requirementsString);
 			if (adParser.parse() != null) {
 			
-				LOGGER.debug("Fogbow Requirements ["+requirementsString+"] Validate with sucess.");
+				LOGGER.debug("Fogbow Requirements ["+requirementsString+"] Validate with success.");
 				return true;
 			}
 			LOGGER.info("Fogbow Requirements ["+requirementsString+"] Invalid - Expression not found.");

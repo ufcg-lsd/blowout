@@ -19,9 +19,9 @@ import java.util.LinkedList;
 import java.util.Properties;
 import java.util.UUID;
 
-public class KeystoneTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
+public class RASTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
 
-    private static final Logger LOGGER = Logger.getLogger(KeystoneTokenUpdatePlugin.class);
+    private static final Logger LOGGER = Logger.getLogger(RASTokenUpdatePlugin.class);
 
     private static final String FOGBOW_USERNAME = AppPropertiesConstants.INFRA_AUTH_TOKEN_PREFIX +
             AppPropertiesConstants.INFRA_AUTH_TOKEN_USERNAME;
@@ -40,13 +40,13 @@ public class KeystoneTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
     private final String projectName;
     private final String domain;
 
-    public KeystoneTokenUpdatePlugin(Properties properties) {
+    public RASTokenUpdatePlugin(Properties properties) {
         super(properties);
         this.userName = super.properties.getProperty(FOGBOW_USERNAME);
         this.password = super.properties.getProperty(FOGBOW_PASSWORD);
         this.projectName = super.properties.getProperty(FOGBOW_PROJECT_NAME);
         this.domain = super.properties.getProperty(FOGBOW_DOMAIN);
-        this.rasBaseUrl =  super.properties.getProperty(AppPropertiesConstants.INFRA_FOGBOW_MANAGER_BASE_URL);
+        this.rasBaseUrl =  super.properties.getProperty(AppPropertiesConstants.INFRA_RAS_BASE_URL);
     }
 
     @Override
@@ -70,9 +70,8 @@ public class KeystoneTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
         String acessToken = httpWrapper.doRequest("post", requestUrl, new LinkedList<Header>(), body);
         String userId = String.valueOf(UUID.randomUUID());
         User user = new User(userId, this.userName, this.password);
-        Token token = new Token(acessToken, user);
 
-        return token;
+        return new Token(acessToken, user);
     }
 
     private StringEntity makeBodyJson() throws JSONException, UnsupportedEncodingException {

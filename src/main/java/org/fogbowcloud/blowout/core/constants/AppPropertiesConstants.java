@@ -22,7 +22,7 @@ public class AppPropertiesConstants {
 	public static final String INFRA_AUTH_TOKEN_PROJECT_NAME = "projectname";
 	public static final String INFRA_AUTH_TOKEN_DOMAIN = "domain";
 
-	public static final String INFRA_FOGBOW_MANAGER_BASE_URL = "infra_fogbow_manager_base_url";
+	public static final String INFRA_RAS_BASE_URL = "infra_fogbow_manager_base_url";
 
 	public static final String TOKEN_UPDATE_TIME = "token_update_time";
 	public static final String TOKEN_UPDATE_TIME_UNIT = "token_update_time_unit";

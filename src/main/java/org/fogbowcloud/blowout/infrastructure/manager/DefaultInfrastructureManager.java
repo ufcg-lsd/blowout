@@ -17,8 +17,8 @@ import org.fogbowcloud.blowout.pool.AbstractResource;
 
 public class DefaultInfrastructureManager implements InfrastructureManager {
 
-    private InfrastructureProvider infraProvider;
-    private ResourceMonitor resourceMonitor;
+    private final InfrastructureProvider infraProvider;
+    private final ResourceMonitor resourceMonitor;
 
     public DefaultInfrastructureManager(InfrastructureProvider infraProvider,
                                         ResourceMonitor resourceMonitor) {

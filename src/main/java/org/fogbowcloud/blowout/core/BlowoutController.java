@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
+import org.fogbowcloud.blowout.core.constants.BlowoutConstants;
 import org.fogbowcloud.blowout.core.exception.BlowoutException;
 import org.fogbowcloud.blowout.core.model.Task;
 import org.fogbowcloud.blowout.core.model.TaskState;
@@ -17,12 +18,7 @@ import org.fogbowcloud.blowout.pool.BlowoutPool;
 
 public class BlowoutController {
 
-	public static final Logger LOGGER = Logger.getLogger(BlowoutController.class);
-
-	private String DEFAULT_IMPLEMENTATION_BLOWOUT_POOL = "org.fogbowcloud.blowout.pool.DefaultBlowoutPool";
-	private String DEFAULT_IMPLEMENTATION_SCHEDULER = "org.fogbowcloud.blowout.core.StandardScheduler";
-	private String DEFAULT_IMPLEMENTATION_INFRA_MANAGER = "org.fogbowcloud.blowout.infrastructure.manager.DefaultInfrastructureManager";
-	private String DEFAULT_IMPLEMENTATION_INFRA_PROVIDER = "org.fogbowcloud.blowout.infrastructure.provider.fogbow.FogbowInfrastructureProvider";
+	private static final Logger LOGGER = Logger.getLogger(BlowoutController.class);
 
 	private SchedulerInterface schedulerInterface;
 	private TaskMonitor taskMonitor;
@@ -109,7 +105,7 @@ public class BlowoutController {
 
 	public BlowoutPool createBlowoutInstance() throws Exception {
 		String providerClassName = this.properties.getProperty(AppPropertiesConstants.IMPLEMENTATION_BLOWOUT_POOL,
-				DEFAULT_IMPLEMENTATION_BLOWOUT_POOL);
+				BlowoutConstants.DEFAULT_IMPLEMENTATION_BLOWOUT_POOL);
 		Class<?> forName = Class.forName(providerClassName);
 		Object clazz = forName.getConstructor().newInstance();
 		if (!(clazz instanceof BlowoutPool)) {
@@ -120,7 +116,7 @@ public class BlowoutController {
 
 	public InfrastructureProvider createInfraProviderInstance(boolean removePreviousResouces) throws Exception {
 		String providerClassName = this.properties.getProperty(AppPropertiesConstants.IMPLEMENTATION_INFRA_PROVIDER,
-				DEFAULT_IMPLEMENTATION_INFRA_PROVIDER);
+				BlowoutConstants.DEFAULT_IMPLEMENTATION_INFRA_PROVIDER);
 		Class<?> forName = Class.forName(providerClassName);
 		Object clazz = forName.getConstructor(Properties.class, Boolean.TYPE).newInstance(properties, removePreviousResouces);
 		if (!(clazz instanceof InfrastructureProvider)) {
@@ -131,7 +127,7 @@ public class BlowoutController {
 
 	public InfrastructureManager createInfraManagerInstance() throws Exception {
 		String providerClassName = this.properties.getProperty(AppPropertiesConstants.IMPLEMENTATION_INFRA_MANAGER,
-				DEFAULT_IMPLEMENTATION_INFRA_MANAGER);
+				BlowoutConstants.DEFAULT_IMPLEMENTATION_INFRA_MANAGER);
 		Class<?> forName = Class.forName(providerClassName);
 		Object clazz = forName.getConstructor(InfrastructureProvider.class, ResourceMonitor.class).newInstance(infraProvider, resourceMonitor);
 		if (!(clazz instanceof InfrastructureManager)) {
@@ -142,7 +138,7 @@ public class BlowoutController {
 
 	protected SchedulerInterface createSchedulerInstance(TaskMonitor taskMonitor) throws Exception {
 		String providerClassName = this.properties.getProperty(AppPropertiesConstants.IMPLEMENTATION_SCHEDULER,
-				DEFAULT_IMPLEMENTATION_SCHEDULER);
+				BlowoutConstants.DEFAULT_IMPLEMENTATION_SCHEDULER);
 		Class<?> forName = Class.forName(providerClassName);
 		Object clazz = forName.getConstructor(TaskMonitor.class).newInstance(taskMonitor);
 		if (!(clazz instanceof SchedulerInterface)) {

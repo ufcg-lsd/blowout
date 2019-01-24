@@ -341,7 +341,7 @@ public class TestFogbowRequirementsHelper {
 				"org.fogbowcloud.scheduler.infrastructure.fogbow.FogbowInfrastructureProvider");
 		properties.setProperty(AppPropertiesConstants.INFRA_RESOURCE_CONNECTION_TIMEOUT, "10000");
 		properties.setProperty(AppPropertiesConstants.INFRA_RESOURCE_IDLE_LIFETIME, "300000");
-		properties.setProperty(AppPropertiesConstants.INFRA_FOGBOW_MANAGER_BASE_URL, "100_02_01_01:8098");
+		properties.setProperty(AppPropertiesConstants.INFRA_RAS_BASE_URL, "100_02_01_01:8098");
 
 	}
 

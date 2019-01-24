@@ -35,7 +35,7 @@ public class RASRequestsHelper {
         this.http = new HttpWrapper();
         this.properties = properties;
         this.token = tokenUpdatePlugin.generateToken();
-        this.RAS_BASE_URL = this.properties.getProperty(AppPropertiesConstants.INFRA_FOGBOW_MANAGER_BASE_URL);
+        this.RAS_BASE_URL = this.properties.getProperty(AppPropertiesConstants.INFRA_RAS_BASE_URL);
     }
 
     public String getComputeOrderId(Specification specification) throws RequestResourceException {
@@ -116,8 +116,14 @@ public class RASRequestsHelper {
         this.http = httpWrapper;
     }
 
-    public void setToken(Token token) {
-        this.token = token;
+    public void setToken(Token token) { this.token = token; }
+
+    private String doRequest(String method, String endpoint, List<Header> headers, StringEntity bodyJson) throws Exception {
+        return this.http.doRequest(method, endpoint, this.token.getAccessId(), headers, bodyJson);
+    }
+
+    private String doRequest(String method, String endpoint, List<Header> headers) throws Exception {
+        return this.http.doRequest(method, endpoint, this.token.getAccessId(), headers);
     }
 
     public StringEntity makeJsonBody(Specification specification) throws UnsupportedEncodingException {
@@ -132,14 +138,6 @@ public class RASRequestsHelper {
         return new StringEntity(json.toString());
     }
 
-    private String doRequest(String method, String endpoint, List<Header> headers, StringEntity bodyJson) throws Exception {
-        return this.http.doRequest(method, endpoint, this.token.getAccessId(), headers, bodyJson);
-    }
-
-    private String doRequest(String method, String endpoint, List<Header> headers) throws Exception {
-        return this.http.doRequest(method, endpoint, this.token.getAccessId(), headers);
-    }
-
     private Map<String, Object> parseAttributes(String response) throws ScriptException {
         ScriptEngine engine;
         ScriptEngineManager sem = new ScriptEngineManager();
@@ -148,9 +146,9 @@ public class RASRequestsHelper {
         String script = "Java.asJSONCompatible(" + response + ")";
         Object result = engine.eval(script);
 
-        Map contents = (Map) result;
+        Map<String, Object> contents = (Map<String, Object>) result;
 
-        return new HashMap<String, Object>(contents);
+        return new HashMap<>(contents);
     }
 
     private StringEntity makeRequestBodyJson(Map<String, String> bodyRequestAttrs) throws UnsupportedEncodingException {

@@ -33,16 +33,16 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 	// TODO: put in resource the user, token and localCommand
 
 	private static final Logger LOGGER = Logger.getLogger(FogbowInfrastructureProvider.class);
-	private static final String DEFAULT_INSTANCE_ATTRIBUTE_SHH_USERNAME = "fogbow";
 
-	private RASRequestsHelper requestsHelper;
-	private Properties properties;
+	private final RASRequestsHelper requestsHelper;
+	private final Properties properties;
+	private final AbstractTokenUpdatePlugin tokenUpdatePlugin;
 	private FogbowResourceDatastore frDatastore;
-	private AbstractTokenUpdatePlugin tokenUpdatePlugin;
-	private Map<String, FogbowResource> resourcesMap = new ConcurrentHashMap<>();
+	private Map<String, FogbowResource> resourcesMap;
 
 	public FogbowInfrastructureProvider(Properties properties, ScheduledExecutorService handleTokeUpdateExecutor,
 										AbstractTokenUpdatePlugin tokenUpdatePlugin) {
+		this.resourcesMap = new ConcurrentHashMap<>();
 		this.properties = properties;
 		this.frDatastore = new FogbowResourceDatastore(properties);
 		this.tokenUpdatePlugin =  tokenUpdatePlugin;
@@ -223,7 +223,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
                 instanceAttributes.get(FogbowConstants.JSON_KEY_FOGBOW_PUBLIC_IP));
 
         fogbowResource.putMetadata(AbstractResource.METADATA_SSH_USERNAME_ATT,
-                DEFAULT_INSTANCE_ATTRIBUTE_SHH_USERNAME);
+                FogbowConstants.INSTANCE_ATTRIBUTE_DEFAULT_SHH_USERNAME);
 
         fogbowResource.putMetadata(AbstractResource.METADATA_VCPU,
                 instanceAttributes.get(FogbowConstants.INSTANCE_ATTRIBUTE_VCPU));
