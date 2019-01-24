@@ -19,7 +19,7 @@ public class Command implements Serializable{
 		UNSTARTED, RUNNING, FINISHED, FAILED
 	}
 
-	private String command;
+	private final String command;
 	private final Type type;
 	private State state = State.UNSTARTED;
 

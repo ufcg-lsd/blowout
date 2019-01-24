@@ -19,6 +19,7 @@ public class FogbowConstants {
     public static final String JSON_KEY_FOGBOW_REQUIREMENTS_VCPU = "vCPU";
     public static final String JSON_KEY_FOGBOW_REQUIREMENTS_REQUESTING_MEMBER = "requestingMember";
 
+    public static final String INSTANCE_ATTRIBUTE_DEFAULT_SHH_USERNAME = "fogbow";
     public static final String METADATA_FOGBOW_REQUIREMENTS = "FogbowRequirements";
     public static final String METADATA_FOGBOW_REQUIREMENTS_Glue2vCPU = "Glue2vCPU";
     public static final String METADATA_FOGBOW_REQUIREMENTS_Glue2RAM = "Glue2RAM";

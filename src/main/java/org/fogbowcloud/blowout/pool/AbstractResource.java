@@ -24,27 +24,28 @@ public abstract class AbstractResource {
 	public static final String METADATA_IMAGE = "metadataImage";
 	public static final String METADATA_PUBLIC_KEY = "metadataPublicKey";
 
-	public static final String METADATA_VCPU = "metadataVcpu";
+	public static final String METADATA_VCPU = "metadaVCPU";
 	public static final String METADATA_MEM_SIZE = "metadataMenSize";
 	public static final String METADATA_DISK_SIZE = "metadataDiskSize";	
 	public static final String METADATA_LOCATION = "metadataLocation";
 
 	public static final String METADATA_REQUEST_TYPE = "metadataRequestType";
 	
-	private ResourceState state = ResourceState.NOT_READY;
+	private ResourceState state;
 
-	private String id;
-	private Map<String, Object> metadata = new HashMap<>();
+	private final String id;
+	private final Map<String, Object> metadata;
 	private int timesReused = 0;
 	private int connectionFailTries = 0;
 	private String localCommandInterpreter;
 	private Specification requestedSpec;
 	
 	public AbstractResource(String id, Specification requestedSpec) {
+		this.metadata = new HashMap<>();
 		this.id = id;
 		this.requestedSpec = requestedSpec;
 		this.localCommandInterpreter = requestedSpec.getRequirementValue(AppPropertiesConstants.LOCAL_COMMAND_INTERPRETER);
-		setState(ResourceState.NOT_READY);
+		this.state = ResourceState.NOT_READY;
 	}
 
 	public abstract boolean match(Specification spec);
@@ -62,7 +63,7 @@ public abstract class AbstractResource {
 		metadata.put(attributeName, value);
 	}
 
-	public void putAllMetadatas(Map<String, String> instanceAttributes) {
+	public void putAllMetadata(Map<String, String> instanceAttributes) {
 		for (Entry<String, String> entry : instanceAttributes.entrySet()) {
 			this.putMetadata(entry.getKey(), entry.getValue());
 		}
@@ -76,7 +77,7 @@ public abstract class AbstractResource {
 		return metadata;
 	}
 
-	public void copyInformations(AbstractResource resource) {
+	public void copyInformation(AbstractResource resource) {
 		this.metadata.clear();
 		this.metadata.putAll(resource.getAllMetadata());
 	}

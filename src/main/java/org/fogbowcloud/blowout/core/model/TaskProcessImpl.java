@@ -51,7 +51,6 @@ public class TaskProcessImpl implements TaskProcess {
 		this.commandList = commandList;
 		this.userId = UserID;
 		this.userIdValue = UserId;
-
 	}
 
 	public String getProcessId() {

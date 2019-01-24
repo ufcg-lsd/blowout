@@ -11,7 +11,7 @@ public abstract class AbstractTokenUpdatePlugin {
 	
 	private static final int DEFAULT_UPDATE_TIME = 6;
 	private static final TimeUnit DEFAULT_UPDATE_TIME_UNIT = TimeUnit.HOURS;
-	protected Properties properties;
+	protected final Properties properties;
 	
 	public AbstractTokenUpdatePlugin(Properties properties){
 		this.properties = properties;

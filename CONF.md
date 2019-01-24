@@ -90,7 +90,7 @@ LDAP Public Key | File path of the Public Key | **Yes**
 
 
 #### Authentication Token Properties - Case Keystone
-	infra_auth_token_update_plugin=org.fogbowcloud.blowout.infrastructure.token.KeystoneTokenUpdatePlugin
+	infra_auth_token_update_plugin=org.fogbowcloud.blowout.infrastructure.token.RASTokenUpdatePlugin
 	auth_token_prop_keystone_username=
 	auth_token_prop_keystone_tenantname=
 	auth_token_prop_keystone_password=
