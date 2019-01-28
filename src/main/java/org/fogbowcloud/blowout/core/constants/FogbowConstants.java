@@ -5,6 +5,7 @@ public class FogbowConstants {
     /*
      * Resource Allocation Service endpoints.
      */
+    public static final String RAS_ENDPOINT_TOKEN = "tokens";
     public static final String RAS_ENDPOINT_COMPUTE = "computes";
     public static final String RAS_ENDPOINT_PUBLIC_IP = "publicIps";
 

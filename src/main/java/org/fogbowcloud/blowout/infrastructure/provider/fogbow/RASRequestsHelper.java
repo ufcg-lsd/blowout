@@ -69,38 +69,37 @@ public class RASRequestsHelper {
         this.doRequest(HttpWrapper.HTTP_METHOD_DELETE, publicIpEndpoint, new ArrayList<>());
     }
 
-    public String getPublicIpOrderId(String computeOrderId) {
-        String publicIpOrderId = null;
+    public String getPublicIpId(String computeOrderId) {
+        String publicIpId = null;
+        String provider = this.properties.getProperty(AppPropertiesConstants.INFRA_AUTH_TOKEN_PROJECT_NAME);
         String requestUrl = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_PUBLIC_IP;
 
         Map<String, String> bodyRequestAttrs = new HashMap<>();
         if (computeOrderId != null && !computeOrderId.isEmpty()) {
             bodyRequestAttrs.put(FogbowConstants.JSON_KEY_FOGBOW_COMPUTE_ID, computeOrderId);
-            bodyRequestAttrs.put(FogbowConstants.JSON_KEY_FOGBOW_PROVIDER,
-                    this.properties.getProperty(AppPropertiesConstants.INFRA_AUTH_TOKEN_PROJECT_NAME));
+            bodyRequestAttrs.put(FogbowConstants.JSON_KEY_FOGBOW_PROVIDER, provider);
         }
         try {
             StringEntity bodyRequest = makeRequestBodyJson(bodyRequestAttrs);
-            publicIpOrderId = this.doRequest(HttpWrapper.HTTP_METHOD_POST, requestUrl,
+            publicIpId = this.doRequest(HttpWrapper.HTTP_METHOD_POST, requestUrl,
                     new LinkedList<>(), bodyRequest);
-            LOGGER.debug(publicIpOrderId);
         } catch (Exception e) {
             LOGGER.error("Error while getting public ip for computer order of id " + computeOrderId, e);
         }
-        return publicIpOrderId;
+        return publicIpId;
     }
 
-    public Map<String, Object> getPublicIpInstance(String publicIpOrderId) {
+    public Map<String, Object> getPublicIpInstance(String publicIpId) {
         String response;
         Map<String, Object> sshInfo = new HashMap<>();
-        String requestUrl = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_PUBLIC_IP + "/" + publicIpOrderId;
+        String requestUrl = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_PUBLIC_IP + "/" + publicIpId;
 
         try {
             response = this.doRequest(HttpWrapper.HTTP_METHOD_GET, requestUrl, new LinkedList<>());
             sshInfo = parseAttributes(response);
             LOGGER.debug("SSh information " + sshInfo);
         } catch (Exception e) {
-            LOGGER.error("Error while getting info about public instance of order with id " + publicIpOrderId, e);
+            LOGGER.error("Error while getting info about public instance of order with id " + publicIpId, e);
         }
         return sshInfo;
     }

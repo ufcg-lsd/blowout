@@ -37,14 +37,12 @@ public abstract class AbstractResource {
 	private final Map<String, Object> metadata;
 	private int timesReused = 0;
 	private int connectionFailTries = 0;
-	private String localCommandInterpreter;
 	private Specification requestedSpec;
 	
 	public AbstractResource(String id, Specification requestedSpec) {
 		this.metadata = new HashMap<>();
 		this.id = id;
 		this.requestedSpec = requestedSpec;
-		this.localCommandInterpreter = requestedSpec.getRequirementValue(AppPropertiesConstants.LOCAL_COMMAND_INTERPRETER);
 		this.state = ResourceState.NOT_READY;
 	}
 
@@ -104,14 +102,6 @@ public abstract class AbstractResource {
 
 	public synchronized void setState(ResourceState state) {
 		this.state = state;
-	}
-	
-	public String getLocalCommandInterpreter() {
-		return localCommandInterpreter;
-	}
-
-	public void setLocalCommandInterpreter(String localCommandInterpreter) {
-		this.localCommandInterpreter = localCommandInterpreter;
 	}
 
 	public Specification getRequestedSpec() {

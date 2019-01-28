@@ -83,10 +83,10 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 	@Override
 	public AbstractResource getResource(String resourceId) {
 
-		LOGGER.debug("Getting resource from request id: [" + resourceId + "]");
+		LOGGER.info("Getting resource from request id: [" + resourceId + "]");
 		try {
 			FogbowResource resource = getFogbowResource(resourceId);
-			LOGGER.debug("Returning Resource from Resource id: [" + resourceId + "] - Instance ID : ["
+			LOGGER.info("Returning Resource from Resource id: [" + resourceId + "] - Instance ID : ["
 					+ resource.getInstanceId() + "]");
 			return resource;
 		} catch (Exception e) {
@@ -104,14 +104,15 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 			throw new InfrastructureException(AppMessagesConstants.ATTRIBUTES_INVALIDS);
 		}
 
-		LOGGER.debug("Deleting resource with ID = " + fogbowResource.getId());
+		LOGGER.info("Deleting resource with ID = " + fogbowResource.getId());
 
 		try {
             this.requestsHelper.deleteFogbowResource(fogbowResource);
 			this.resourcesMap.remove(resourceId);
 			this.frDatastore.deleteFogbowResourceById(fogbowResource);
-			LOGGER.debug("Resource " + fogbowResource.getId() + " deleted successfully");
+			LOGGER.info("Resource " + fogbowResource.getId() + " deleted successfully");
 		} catch (Exception e) {
+			LOGGER.error("Here");
 			throw new InfrastructureException("Error when trying to delete resource id[" + fogbowResource.getId() + "]",
 					e);
 		}
@@ -126,7 +127,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
         LOGGER.info("Initiating Resource Instanciation - Resource id: [" + resourceId + "]");
 
         String instanceId;
-        String fogbowPublicIpOrderId;
+        String publicIpId;
         Map<String, Object> instanceAttributes;
 
         FogbowResource fogbowResource = this.resourcesMap.get(resourceId);
@@ -139,8 +140,8 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
             instanceAttributes = this.requestsHelper.getComputeInstance(fogbowResource.getComputeOrderId());
             instanceId = String.valueOf(instanceAttributes.get(FogbowConstants.INSTANCE_ATTRIBUTE_NAME));
 
-            fogbowPublicIpOrderId = requestInstancePublicIp(fogbowResource.getComputeOrderId());
-            Map<String, Object> sshInfo = getSshInformation(fogbowPublicIpOrderId);
+            publicIpId = requestInstancePublicIp(fogbowResource.getComputeOrderId());
+            Map<String, Object> sshInfo = getSshInformation(publicIpId);
 
             this.populateInstanceAttributes(instanceAttributes, sshInfo);
 
@@ -216,8 +217,6 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
     }
 
     private void putMetadata(AbstractResource fogbowResource, Map<String, Object> instanceAttributes) {
-        fogbowResource.setLocalCommandInterpreter(
-                properties.getProperty(AppPropertiesConstants.LOCAL_COMMAND_INTERPRETER));
 
         fogbowResource.putMetadata(AbstractResource.METADATA_SSH_PUBLIC_IP,
                 instanceAttributes.get(FogbowConstants.JSON_KEY_FOGBOW_PUBLIC_IP));
@@ -236,7 +235,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
     }
 
 	protected String requestInstancePublicIp(String computeOrderId) {
-		return this.requestsHelper.getPublicIpOrderId(computeOrderId);
+		return this.requestsHelper.getPublicIpId(computeOrderId);
 	}
 
 	protected Map<String, Object> getSshInformation(String publicIpOrderId) {

@@ -40,21 +40,21 @@ public class FogbowResource extends AbstractResource {
     }
 
 	protected boolean internalCheckConnectivity() {
-		String host = this.getMetadataValue(METADATA_SSH_HOST);
-		String port = this.getMetadataValue(METADATA_SSH_PORT);
+		String host = super.getMetadataValue(METADATA_SSH_PUBLIC_IP);
+		String port = "22";
 
 		LOGGER.debug("Checking resource connectivity [host: " + host + ", port: " + port + ".");
 
-		Runtime run = null;
+		Runtime run;
 		Process p = null;
 		Scanner scanner = null;
 
 		try {
 			run = Runtime.getRuntime();
-			p = run.exec(new String[] { "/bin/bash", "-c", "echo quit | telnet " + host + " " + port + " 2>/dev/null | grep Connected" });
+			p = run.exec(new String[] { "/bin/bash", "-c", "echo quit | telnet " + host + " 2>/dev/null | grep Connected" });
 			p.waitFor();
 
-			LOGGER.debug("Running command: /bin/bash -c echo quit | telnet " + host + " " + port + " 2>/dev/null | grep Connected");
+			LOGGER.debug("Running command: /bin/bash -c echo quit | telnet " + host + " 2>/dev/null | grep Connected");
 
 			scanner = new Scanner(p.getInputStream());
 			if (scanner.hasNext()) {

@@ -5,6 +5,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.apache.log4j.Logger;
+import org.fogbowcloud.blowout.core.constants.FogbowConstants;
 import org.fogbowcloud.blowout.core.exception.BlowoutException;
 import org.fogbowcloud.blowout.core.constants.AppPropertiesConstants;
 import static org.fogbowcloud.blowout.core.util.AppUtil.makeBodyField;
@@ -31,8 +32,6 @@ public class RASTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
             AppPropertiesConstants.INFRA_AUTH_TOKEN_PROJECT_NAME;
     private static final String FOGBOW_DOMAIN = AppPropertiesConstants.INFRA_AUTH_TOKEN_PREFIX +
             AppPropertiesConstants.INFRA_AUTH_TOKEN_DOMAIN;
-
-    public static final String FOGBOW_RAS_TOKEN_ENDPOINT = "tokens";
 
     private final String rasBaseUrl;
     private final String userName;
@@ -62,7 +61,7 @@ public class RASTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
     private Token createToken() throws Exception {
         HttpWrapper httpWrapper = new HttpWrapper();
 
-        String requestUrl = this.rasBaseUrl + "/" + FOGBOW_RAS_TOKEN_ENDPOINT;
+        String requestUrl = this.rasBaseUrl + "/" + FogbowConstants.RAS_ENDPOINT_TOKEN;
         StringEntity body = makeBodyJson();
 
         body.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, HttpWrapper.HTTP_CONTENT_JSON));

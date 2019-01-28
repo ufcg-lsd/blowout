@@ -13,7 +13,6 @@ import org.fogbowcloud.blowout.core.model.TaskProcess;
 import org.fogbowcloud.blowout.core.model.TaskProcessImpl;
 import org.fogbowcloud.blowout.core.model.TaskState;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
-import org.fogbowcloud.blowout.infrastructure.monitor.ResourceMonitor;
 import org.fogbowcloud.blowout.pool.AbstractResource;
 import org.fogbowcloud.blowout.pool.BlowoutPool;
 
@@ -21,7 +20,7 @@ public class TaskMonitor implements Runnable {
 
 	private static final Logger LOGGER = Logger.getLogger(TaskMonitor.class);
 
-	Map<Task, TaskProcess> runningTasks = new HashMap<Task, TaskProcess>();
+	private Map<Task, TaskProcess> runningTasks = new HashMap<Task, TaskProcess>();
 	
 	private ExecutorService taskExecutor = Executors.newCachedThreadPool();
 
@@ -31,7 +30,7 @@ public class TaskMonitor implements Runnable {
 	
 	private long timeout;
 	
-	private boolean active = false;
+	private boolean isActive = false;
 	
 	public TaskMonitor(BlowoutPool pool, long timeout) {
 		this.pool = pool;
@@ -39,19 +38,19 @@ public class TaskMonitor implements Runnable {
 	}
 	
 	public void start() {
-		active = true;
+		isActive = true;
 		monitoringServiceRunner = new Thread(this);
 		monitoringServiceRunner.start();
 	}
 	
 	public void stop(){
-		active = false;
+		isActive = false;
 		monitoringServiceRunner.interrupt();
 	}
 	
 	@Override
 	public void run() {
-		while(active){
+		while(isActive){
 			procMon();
 			try {
 				Thread.sleep(timeout);
@@ -103,12 +102,8 @@ public class TaskMonitor implements Runnable {
 			LOGGER.debug("Setting state of resource [id: " + resource.getId() + "] to busy.");
 			pool.updateResource(resource, ResourceState.BUSY);
 		}
-		getExecutorService().submit(new Runnable() {
-			
-			@Override
-			public void run() {
-				tp.executeTask(resource);
-			}
+		getExecutorService().submit(() -> {
+			tp.executeTask(resource);
 		});
 	}
 	

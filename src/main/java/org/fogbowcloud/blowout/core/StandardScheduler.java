@@ -14,11 +14,12 @@ import org.fogbowcloud.blowout.pool.AbstractResource;
 
 public class StandardScheduler implements SchedulerInterface {
 
-	private Map<AbstractResource, Task> runningTasks = new HashMap<AbstractResource, Task>();
-	private TaskMonitor taskMon;
+	private Map<AbstractResource, Task> runningTasks;
+	private TaskMonitor taskMonitor;
 
-	public StandardScheduler(TaskMonitor taskMon) {
-		this.taskMon = taskMon;
+	public StandardScheduler(TaskMonitor taskMonitor) {
+		this.runningTasks = new HashMap<>();
+		this.taskMonitor = taskMonitor;
 	}
 
 	@Override
@@ -26,14 +27,14 @@ public class StandardScheduler implements SchedulerInterface {
 		for (AbstractResource resource : resources) {
 			actOnResource(resource, tasks);
 		}
-		for (Task runningTask : runningTasks.values()) {
+		for (Task runningTask : this.runningTasks.values()) {
 			if (!tasks.contains(runningTask)) {
 				stopTask(runningTask);
 			}
 		}
-		for (AbstractResource inUse : runningTasks.keySet()) {
+		for (AbstractResource inUse : this.runningTasks.keySet()) {
 			if (!resources.contains(inUse)) {
-				stopTask(runningTasks.get(inUse));
+				stopTask(this.runningTasks.get(inUse));
 			}
 		}
 	}
@@ -47,15 +48,14 @@ public class StandardScheduler implements SchedulerInterface {
 		}
 		
 		if (resource.getState().equals(ResourceState.TO_REMOVE)) {
-			runningTasks.remove(resource);
+			this.runningTasks.remove(resource);
 		}
-
 	}
 
 	protected Task chooseTaskForRunning(AbstractResource resource, List<Task> tasks) {
 		for (Task task : tasks) {
 			boolean isSameSpecification = resource.getRequestedSpec().equals(task.getSpecification());
-			if (!task.isFinished() && !runningTasks.containsValue(task) && isSameSpecification) {
+			if (!task.isFinished() && !this.runningTasks.containsValue(task) && isSameSpecification) {
 				return task;
 			}
 		}
@@ -65,10 +65,10 @@ public class StandardScheduler implements SchedulerInterface {
 	@Override
 	public void stopTask(Task task) {
 		// TODO: Find out how to stop the execution of the process
-		for (AbstractResource resource : runningTasks.keySet()) {
-			if (runningTasks.get(resource).equals(task)) {
-				this.taskMon.stopTask(task);
-				runningTasks.remove(resource);
+		for (AbstractResource resource : this.runningTasks.keySet()) {
+			if (this.runningTasks.get(resource).equals(task)) {
+				this.taskMonitor.stopTask(task);
+				this.runningTasks.remove(resource);
 			}
 		}
 	}
@@ -76,16 +76,16 @@ public class StandardScheduler implements SchedulerInterface {
 	@Override
 	public void runTask(Task task, AbstractResource resource) {
 		task.setRetries(task.getRetries()+1);
-		runningTasks.put(resource, task);
+		this.runningTasks.put(resource, task);
 
 		submitToMonitor(task, resource);
 	}
 
 	public void submitToMonitor(Task task, AbstractResource resource) {
-		taskMon.runTask(task, resource);
+		this.taskMonitor.runTask(task, resource);
 	}
 
-	protected TaskProcess createProcess(Task task) {//FIXME: IS NOT USED
+	protected TaskProcess createProcess(Task task) { //FIXME: IS NOT USED
 		return new TaskProcessImpl(task.getId(), task.getAllCommands(), task.getSpecification(), task.getUUID());
 	}
 

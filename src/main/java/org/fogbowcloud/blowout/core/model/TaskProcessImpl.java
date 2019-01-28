@@ -19,28 +19,14 @@ public class TaskProcessImpl implements TaskProcess {
 	public static final String ENV_SSH_USER = "SSH_USER";
 	public static final String ENV_PRIVATE_KEY_FILE = "PRIVATE_KEY_FILE";
 
-	public static final String METADATA_SSH_HOST = "metadataSSHHost";
-	public static final String METADATA_SSH_USERNAME_ATT = "metadateSshUsername";
-	public static final String METADATA_EXTRA_PORTS_ATT = "metadateExtraPorts";
-
-	public static final String UserID = "UUID";
-
+	private static final String UserID = "UUID";
 	private final String taskId;
-
 	private TaskState status;
-
 	private final List<Command> commandList;
-
 	private final Specification spec;
-
-	private String localCommandInterpreter;
-
 	private String processId;
-
 	private String userId;
-	
 	private AbstractResource resource;
-
 	private String userIdValue;
 
 	public TaskProcessImpl(String taskId, List<Command> commandList, Specification spec, String UserId) {
@@ -70,19 +56,17 @@ public class TaskProcessImpl implements TaskProcess {
 	@Override
 	public TaskExecutionResult executeTask(AbstractResource resource) {
 		this.resource = resource;
-		this.localCommandInterpreter = resource.getLocalCommandInterpreter();
 
 		TaskExecutionResult taskExecutionResult = new TaskExecutionResult();
 
 		this.setStatus(TaskState.RUNNING);
 		for (Command command : this.getCommands()) {
-			// FIXME: avoid multiple related log line when possible
-			LOGGER.debug("Command " + command.getCommand());
-			LOGGER.debug("Command Type " + command.getType());
+			LOGGER.info("Command " + command.getCommand());
+			LOGGER.info("Command Type " + command.getType());
 			String commandString = getExecutableCommandString(command);
 
 			taskExecutionResult = executeCommandString(commandString, command.getType(), resource);
-			LOGGER.debug("Command result: " + taskExecutionResult.getExitValue());
+			LOGGER.info("Command result: " + taskExecutionResult.getExitValue());
 			if (taskExecutionResult.getExitValue() != TaskExecutionResult.OK) {
 				if(taskExecutionResult.getExitValue() == TaskExecutionResult.TIMEOUT) {
 					this.setStatus(TaskState.TIMEDOUT);
@@ -176,8 +160,8 @@ public class TaskProcessImpl implements TaskProcess {
 	protected Map<String, String> getAdditionalEnvVariables(AbstractResource resource) {
 
 		Map<String, String> additionalEnvVar = new HashMap<String, String>();
-		additionalEnvVar.put(ENV_HOST, resource.getMetadataValue(METADATA_SSH_HOST));
-		LOGGER.debug("Env_host:" + resource.getMetadataValue(METADATA_SSH_HOST));
+		additionalEnvVar.put(ENV_HOST, resource.getMetadataValue(AbstractResource.METADATA_SSH_PUBLIC_IP));
+		LOGGER.debug("Env_host:" + resource.getMetadataValue(AbstractResource.METADATA_SSH_PUBLIC_IP));
 		if (this.spec.getUsername() != null && !this.spec.getUsername().isEmpty()) {
 			additionalEnvVar.put(ENV_SSH_USER, this.spec.getUsername());
 			LOGGER.debug("Env_ssh_user:" + this.spec.getUsername());

@@ -1,5 +1,6 @@
 package org.fogbowcloud.blowout.core;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -33,34 +34,35 @@ public class BlowoutController {
 	public BlowoutController(Properties properties) throws BlowoutException {
 		this.properties = properties;
 		try {
-			if (!BlowoutController.checkProperties(properties)) {
+			if (!checkProperties(properties)) {
 				throw new BlowoutException("Error on validate the file ");
+			} else {
+				LOGGER.info("All properties are set");
 			}
-
 		} catch (Exception e) {
 			throw new BlowoutException("Error while initialize Blowout Controller.", e);
 		}
 	}
 
-	public void start(boolean removePreviousResouces) throws Exception {
-		started = true;
+	public void start(boolean removePreviousResources) throws Exception {
+		this.started = true;
 
-		blowoutPool = createBlowoutInstance();
-		infraProvider = createInfraProviderInstance(removePreviousResouces);
+		this.blowoutPool = createBlowoutInstance();
+		this.infraProvider = createInfraProviderInstance(removePreviousResources);
 
-		taskMonitor = new TaskMonitor(blowoutPool, 30000);
-		taskMonitor.start();
-		resourceMonitor = new ResourceMonitor(infraProvider, blowoutPool, properties);
-		resourceMonitor.start();
+		this.taskMonitor = new TaskMonitor(this.blowoutPool, 30000);
+		this.taskMonitor.start();
 
-		schedulerInterface = createSchedulerInstance(taskMonitor);
-		infraManager = createInfraManagerInstance();
+		this.resourceMonitor = new ResourceMonitor(this.infraProvider, this.blowoutPool, this.properties);
+		this.resourceMonitor.start();
 
-		blowoutPool.start(infraManager, schedulerInterface);
+		this.schedulerInterface = createSchedulerInstance(this.taskMonitor);
+		this.infraManager = createInfraManagerInstance();
+
+		this.blowoutPool.start(this.infraManager, this.schedulerInterface);
 	}
 
 	public void stop() throws Exception {
-
 		for (AbstractResource resource : blowoutPool.getAllResources()) {
 			infraProvider.deleteResource(resource.getId());
 		}
@@ -147,32 +149,38 @@ public class BlowoutController {
 		return (SchedulerInterface) clazz;
 	}
 
-	protected static boolean checkProperties(Properties properties) {//FIXME: MAKE IT IN A GENERAL WAY.
+	protected static boolean checkProperties(Properties properties) {
+		List<String> propertiesKeys = new ArrayList<>();
+		populateWithPropertiesKeys(propertiesKeys);
+		return checkAllProperties(properties, propertiesKeys);
+	}
 
-		if (!properties.containsKey(AppPropertiesConstants.IMPLEMENTATION_INFRA_PROVIDER)) {
-			LOGGER.error("Required property " + AppPropertiesConstants.IMPLEMENTATION_INFRA_PROVIDER + " was not set");
+	private static boolean checkAllProperties(Properties properties, List<String> propertiesKeys) {
+		boolean passed = true;
+
+		for (String key : propertiesKeys) {
+			if (!checkProperty(properties, key)) {
+				passed = false;
+				break;
+			}
+		}
+		return passed;
+	}
+
+	private static boolean checkProperty(Properties properties, String propertyKey) {
+		if (!properties.containsKey(propertyKey)) {
+			LOGGER.error("Required property " + propertyKey + " was not set");
 			return false;
 		}
-		if (!properties.containsKey(AppPropertiesConstants.INFRA_RESOURCE_IDLE_LIFETIME)) {
-			LOGGER.error("Required property " + AppPropertiesConstants.INFRA_RESOURCE_IDLE_LIFETIME + " was not set");
-			return false;
-		}
-		if (!properties.containsKey(AppPropertiesConstants.INFRA_RESOURCE_CONNECTION_TIMEOUT)) {
-			LOGGER.error(
-					"Required property " + AppPropertiesConstants.INFRA_RESOURCE_CONNECTION_TIMEOUT + " was not set");
-			return false;
-		}
-		if (!properties.containsKey(AppPropertiesConstants.INFRA_IS_STATIC)) {
-			LOGGER.error("Required property " + AppPropertiesConstants.INFRA_IS_STATIC + " was not set");
-			return false;
-		}
-		if (!properties.containsKey(AppPropertiesConstants.INFRA_AUTH_TOKEN_UPDATE_PLUGIN)) {
-			LOGGER.error(
-					"Required property " + AppPropertiesConstants.INFRA_AUTH_TOKEN_UPDATE_PLUGIN + " was not set");
-			return false;
-		}
-		LOGGER.debug("All properties are set");
 		return true;
+	}
+
+	private static void populateWithPropertiesKeys(List<String> propertiesKeys) {
+		propertiesKeys.add(AppPropertiesConstants.IMPLEMENTATION_INFRA_PROVIDER);
+		propertiesKeys.add(AppPropertiesConstants.INFRA_RESOURCE_IDLE_LIFETIME);
+		propertiesKeys.add(AppPropertiesConstants.INFRA_RESOURCE_CONNECTION_TIMEOUT);
+		propertiesKeys.add(AppPropertiesConstants.INFRA_IS_STATIC);
+		propertiesKeys.add(AppPropertiesConstants.INFRA_AUTH_TOKEN_UPDATE_PLUGIN);
 	}
 
 	public BlowoutPool getBlowoutPool() {
