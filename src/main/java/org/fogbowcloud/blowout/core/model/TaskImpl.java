@@ -31,22 +31,24 @@ public class TaskImpl implements Task {
 	public static final String METADATA_TASK_TIMEOUT = "task_timeout";
 	public static final String METADATA_MAX_RESOURCE_CONN_RETRIES = "max_conn_retries";
 
-	private boolean isFinished = false;
 	private String id;
+	private String uuid;
 	private Specification spec;
-	private List<Command> commands = new ArrayList<Command>();
-	List<String> processes = new ArrayList<String>();
-	private Map<String, String> metadata = new HashMap<String, String>();
-	private boolean isFailed = false;
-	private int retries = -1;
 	private TaskState state;
-
+	private List<Command> commands;
+	private List<String> processes;
+	private Map<String, String> metadata;
+	private boolean isFailed;
+	private boolean isFinished;
+	private int retries = -1;
 	private long startedRunningAt = Long.MAX_VALUE;
 
-	private String uuid;
-
-
 	public TaskImpl(String id, Specification spec, String uuid) {
+		this.commands = new ArrayList<>();
+		this.processes =  new ArrayList<>();
+		this.metadata = new HashMap<>();
+		this.isFailed = false;
+		this.isFinished = false;
 		this.id = id;
 		this.spec = spec;
 		this.state = TaskState.READY;
@@ -151,13 +153,11 @@ public class TaskImpl implements Task {
 			return false;
 		}
         return System.currentTimeMillis() - this.startedRunningAt > timeOut;
-
 	}
 
 	@Override
 	public void startedRunning() {
 		this.startedRunningAt = System.currentTimeMillis();
-
 	}
 
 	@Override

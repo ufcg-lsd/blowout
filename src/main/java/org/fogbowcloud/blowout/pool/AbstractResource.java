@@ -11,9 +11,6 @@ import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 public abstract class AbstractResource {
 
 	public static final String ENV_PRIVATE_KEY_FILE = "PRIVATE_KEY_FILE";
-	public static final String ENV_HOST = "HOST";
-	public static final String ENV_SSH_PORT = "SSH_PORT";
-	public static final String ENV_SSH_USER = "SSH_USER";
 	
 	public static final String METADATA_SSH_HOST = "metadataSSHHost";
 	public static final String METADATA_SSH_PORT = "metadataSSHPort";
@@ -31,13 +28,12 @@ public abstract class AbstractResource {
 
 	public static final String METADATA_REQUEST_TYPE = "metadataRequestType";
 	
-	private ResourceState state;
-
 	private final String id;
 	private final Map<String, Object> metadata;
 	private int timesReused = 0;
 	private int connectionFailTries = 0;
 	private Specification requestedSpec;
+	private ResourceState state;
 	
 	public AbstractResource(String id, Specification requestedSpec) {
 		this.metadata = new HashMap<>();

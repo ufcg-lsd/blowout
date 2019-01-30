@@ -10,6 +10,8 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.util.AppUtil;
 import org.fogbowcloud.blowout.pool.AbstractResource;
 
+import static java.lang.Thread.sleep;
+
 public class TaskProcessImpl implements TaskProcess {
 
 	private static final Logger LOGGER = Logger.getLogger(TaskProcessImpl.class);
@@ -50,7 +52,7 @@ public class TaskProcessImpl implements TaskProcess {
 
 	@Override
 	public List<Command> getCommands() {
-		return new ArrayList<Command>(this.commandList);
+		return new ArrayList<>(this.commandList);
 	}
 
 	@Override
@@ -111,7 +113,6 @@ public class TaskProcessImpl implements TaskProcess {
 			} else {
 				Process remoteProc = startRemoteProcess(commandString, additionalVariables);
 				returnValue = remoteProc.waitFor();
-
 			}
 		} catch (Exception e) {
 			LOGGER.error("Failed to execute command in resource of id " + resource.getId());
@@ -130,7 +131,7 @@ public class TaskProcessImpl implements TaskProcess {
 						+ additionalVariables.get(ENV_PRIVATE_KEY_FILE) + " " + additionalVariables.get(ENV_SSH_USER)
 						+ "@" + additionalVariables.get(ENV_HOST) + " -p " + additionalVariables.get(ENV_SSH_PORT) + " "
 						+ parseEnvironVariable(commandString, additionalVariables));
-		LOGGER.debug("ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i "
+		LOGGER.info("Running: ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i "
 				+ additionalVariables.get(ENV_PRIVATE_KEY_FILE) + " " + additionalVariables.get(ENV_SSH_USER) + "@"
 				+ additionalVariables.get(ENV_HOST) + " -p " + additionalVariables.get(ENV_SSH_PORT) + " "
 				+ parseEnvironVariable(commandString, additionalVariables));
@@ -146,7 +147,7 @@ public class TaskProcessImpl implements TaskProcess {
 		for (String envVariable : additionalEnvVariables.keySet()) {
 			builder.environment().put(envVariable, additionalEnvVariables.get(envVariable));
 		}
-		LOGGER.debug("Command: " + builder.command().toString());
+		LOGGER.info("Command: " + builder.command().toString());
 		return builder.start();
 	}
 
@@ -157,28 +158,59 @@ public class TaskProcessImpl implements TaskProcess {
 		return commandString;
 	}
 
+	// TODO getEnvVariables from task
 	protected Map<String, String> getAdditionalEnvVariables(AbstractResource resource) {
+		Map<String, String> additionalEnvVar = new HashMap<>();
 
-		Map<String, String> additionalEnvVar = new HashMap<String, String>();
-		additionalEnvVar.put(ENV_HOST, resource.getMetadataValue(AbstractResource.METADATA_SSH_PUBLIC_IP));
-		LOGGER.debug("Env_host:" + resource.getMetadataValue(AbstractResource.METADATA_SSH_PUBLIC_IP));
-		if (this.spec.getUsername() != null && !this.spec.getUsername().isEmpty()) {
-			additionalEnvVar.put(ENV_SSH_USER, this.spec.getUsername());
-			LOGGER.debug("Env_ssh_user:" + this.spec.getUsername());
-		} else if (resource.getMetadataValue(ENV_SSH_USER) != null && !resource.getMetadataValue(ENV_SSH_USER).isEmpty()) {
-			additionalEnvVar.put(ENV_SSH_USER, resource.getMetadataValue(ENV_SSH_USER));
-			LOGGER.debug("Env_ssh_user:" + resource.getMetadataValue(ENV_SSH_USER));
-		}  else {
-			additionalEnvVar.put(ENV_SSH_USER, resource.getMetadataValue(AbstractResource.METADATA_SSH_USERNAME_ATT));
-			LOGGER.debug("Env_ssh_user:" + resource.getMetadataValue(AbstractResource.METADATA_SSH_USERNAME_ATT));
-		}
-		additionalEnvVar.put(ENV_PRIVATE_KEY_FILE, spec.getPrivateKeyFilePath());
-
-		additionalEnvVar.put(UserID, this.userId);
-		LOGGER.debug("Env_private_key_file:" + spec.getPrivateKeyFilePath());
-		// TODO getEnvVariables from task
+		setPublicIp(resource, additionalEnvVar);
+		setUser(resource, additionalEnvVar);
+		setPrivateKeyFilePath(additionalEnvVar);
+		setUserId(additionalEnvVar);
+		setDefaultPort(additionalEnvVar);
 
 		return additionalEnvVar;
+	}
+
+	private void setDefaultPort(Map<String, String> additionalEnvVar) {
+		String defaultPort = "22";
+		additionalEnvVar.put(ENV_SSH_PORT, defaultPort);
+		LOGGER.info("SSH - Port [default]: " + defaultPort);
+	}
+
+	private void setPublicIp(AbstractResource resource, Map<String, String> additionalEnvVar) {
+		additionalEnvVar.put(ENV_HOST, resource.getMetadataValue(AbstractResource.METADATA_SSH_PUBLIC_IP));
+		LOGGER.info("SSH - Host: " + resource.getMetadataValue(AbstractResource.METADATA_SSH_PUBLIC_IP));
+	}
+
+	private void setUser(AbstractResource resource, Map<String, String> additionalEnvVar) {
+		String specUsername = this.spec.getUsername();
+		String metadataUsername = resource.getMetadataValue(AbstractResource.METADATA_SSH_USERNAME_ATT);
+
+		if (validateUsername(specUsername)) {
+			additionalEnvVar.put(ENV_SSH_USER, specUsername);
+			loggerUser(specUsername);
+		} else if (validateUsername(metadataUsername)) {
+			additionalEnvVar.put(ENV_SSH_USER, metadataUsername);
+			loggerUser(metadataUsername);
+		}
+	}
+
+	private boolean validateUsername(String username) {
+		return (username != null) && !(username.isEmpty());
+	}
+
+	private void loggerUser(String username) {
+		LOGGER.info("SSH - User: " + username);
+	}
+
+	private void setPrivateKeyFilePath(Map<String, String> additionalEnvVar) {
+		additionalEnvVar.put(ENV_PRIVATE_KEY_FILE, this.spec.getPrivateKeyFilePath());
+		LOGGER.info("SSH - Private key file path: " + this.spec.getPrivateKeyFilePath());
+	}
+
+	private void setUserId(Map<String, String> additionalEnvVar) {
+		additionalEnvVar.put(UserID, this.userId);
+		LOGGER.info("SSH - User ID: " + this.userId);
 	}
 
 	@Override

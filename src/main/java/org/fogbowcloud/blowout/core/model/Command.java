@@ -45,7 +45,7 @@ public class Command implements Serializable{
 	}
 
 	public Command clone() {
-		return null;
+		return new Command(this.command, this.type);
 	}
 	
 	public JSONObject toJSON() {

@@ -41,9 +41,9 @@ public class FogbowResource extends AbstractResource {
 
 	protected boolean internalCheckConnectivity() {
 		String host = super.getMetadataValue(METADATA_SSH_PUBLIC_IP);
-		String port = "22";
+		String defaultPort = "22";
 
-		LOGGER.debug("Checking resource connectivity [host: " + host + ", port: " + port + ".");
+		LOGGER.debug("Checking resource connectivity [host: " + host + ", port: " + defaultPort + "].");
 
 		Runtime run;
 		Process p = null;
@@ -52,21 +52,21 @@ public class FogbowResource extends AbstractResource {
 		try {
 			run = Runtime.getRuntime();
 			p = run.exec(new String[] { "/bin/bash", "-c",
-					"echo quit | telnet " + host + " " + port + " 2>/dev/null | grep Connected" });;
+					"echo quit | telnet " + host + " " + defaultPort + " 2>/dev/null | grep Connected" });
 			p.waitFor();
 
-			LOGGER.debug("Running command: /bin/bash\", \"-c\",\n" +
-					"\t\t\t\t\t\"echo quit | telnet \" + host + \" \" + port + \" 2>/dev/null | grep Connected");
+			LOGGER.info("Running command: /bin/bash -c echo quit | telnet " + host +
+					" " + defaultPort + " 2>/dev/null | grep Connected");
 
 			scanner = new Scanner(p.getInputStream());
 			if (scanner.hasNext()) {
 				String result = scanner.nextLine();
 
-				LOGGER.debug("Command result: " + result);
+				LOGGER.info("Command result: " + result);
 
 				if (result != null && !result.isEmpty()) {
 
-					LOGGER.debug("Resource is alive!");
+					LOGGER.info("Resource is alive!");
 					return true;
 				}
 			}
@@ -82,7 +82,6 @@ public class FogbowResource extends AbstractResource {
 				scanner.close();
 			}
 		}
-		LOGGER.debug(AppMessagesConstants.RESOURCE_CONNECT_FAILED);
 		return false;
 	}
 
