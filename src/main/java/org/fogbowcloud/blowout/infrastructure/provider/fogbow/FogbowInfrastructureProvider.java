@@ -26,6 +26,7 @@ import org.fogbowcloud.blowout.infrastructure.provider.InfrastructureProvider;
 import org.fogbowcloud.blowout.infrastructure.token.AbstractTokenUpdatePlugin;
 import org.fogbowcloud.blowout.pool.AbstractResource;
 
+import static java.lang.Thread.sleep;
 import static org.fogbowcloud.blowout.core.util.AppUtil.generateRandomIdentifier;
 import static org.fogbowcloud.blowout.core.util.AppUtil.isStringEmpty;
 
@@ -141,6 +142,8 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
             instanceId = String.valueOf(instanceAttributes.get(FogbowConstants.INSTANCE_ATTRIBUTE_NAME));
 
             publicIpId = requestInstancePublicIp(fogbowResource.getComputeOrderId());
+
+            sleep(3000);
             Map<String, Object> sshInfo = getSshInformation(publicIpId);
 
             this.populateInstanceAttributes(instanceAttributes, sshInfo);

@@ -45,12 +45,14 @@ public class BlowoutController {
 	}
 
 	public void start(boolean removePreviousResources) throws Exception {
+		long timeout = 30000;
+
 		this.started = true;
 
 		this.blowoutPool = createBlowoutInstance();
 		this.infraProvider = createInfraProviderInstance(removePreviousResources);
 
-		this.taskMonitor = new TaskMonitor(this.blowoutPool, 30000);
+		this.taskMonitor = new TaskMonitor(this.blowoutPool, timeout);
 		this.taskMonitor.start();
 
 		this.resourceMonitor = new ResourceMonitor(this.infraProvider, this.blowoutPool, this.properties);
@@ -155,34 +157,6 @@ public class BlowoutController {
 		return checkAllProperties(properties, propertiesKeys);
 	}
 
-	private static boolean checkAllProperties(Properties properties, List<String> propertiesKeys) {
-		boolean passed = true;
-
-		for (String key : propertiesKeys) {
-			if (!checkProperty(properties, key)) {
-				passed = false;
-				break;
-			}
-		}
-		return passed;
-	}
-
-	private static boolean checkProperty(Properties properties, String propertyKey) {
-		if (!properties.containsKey(propertyKey)) {
-			LOGGER.error("Required property " + propertyKey + " was not set");
-			return false;
-		}
-		return true;
-	}
-
-	private static void populateWithPropertiesKeys(List<String> propertiesKeys) {
-		propertiesKeys.add(AppPropertiesConstants.IMPLEMENTATION_INFRA_PROVIDER);
-		propertiesKeys.add(AppPropertiesConstants.INFRA_RESOURCE_IDLE_LIFETIME);
-		propertiesKeys.add(AppPropertiesConstants.INFRA_RESOURCE_CONNECTION_TIMEOUT);
-		propertiesKeys.add(AppPropertiesConstants.INFRA_IS_STATIC);
-		propertiesKeys.add(AppPropertiesConstants.INFRA_AUTH_TOKEN_UPDATE_PLUGIN);
-	}
-
 	public BlowoutPool getBlowoutPool() {
 		return this.blowoutPool;
 	}
@@ -251,5 +225,33 @@ public class BlowoutController {
 		} else {
 			return task.getRetries();
 		}
+	}
+
+	private static boolean checkAllProperties(Properties properties, List<String> propertiesKeys) {
+		boolean passed = true;
+
+		for (String key : propertiesKeys) {
+			if (!checkProperty(properties, key)) {
+				passed = false;
+				break;
+			}
+		}
+		return passed;
+	}
+
+	private static boolean checkProperty(Properties properties, String propertyKey) {
+		if (!properties.containsKey(propertyKey)) {
+			LOGGER.error("Required property " + propertyKey + " was not set");
+			return false;
+		}
+		return true;
+	}
+
+	private static void populateWithPropertiesKeys(List<String> propertiesKeys) {
+		propertiesKeys.add(AppPropertiesConstants.IMPLEMENTATION_INFRA_PROVIDER);
+		propertiesKeys.add(AppPropertiesConstants.INFRA_RESOURCE_IDLE_LIFETIME);
+		propertiesKeys.add(AppPropertiesConstants.INFRA_RESOURCE_CONNECTION_TIMEOUT);
+		propertiesKeys.add(AppPropertiesConstants.INFRA_IS_STATIC);
+		propertiesKeys.add(AppPropertiesConstants.INFRA_AUTH_TOKEN_UPDATE_PLUGIN);
 	}
 }

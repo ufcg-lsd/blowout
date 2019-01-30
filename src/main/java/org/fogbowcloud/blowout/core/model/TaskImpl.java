@@ -10,6 +10,7 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.model.Command.Type;
+import org.fogbowcloud.blowout.core.util.AppUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -69,7 +70,7 @@ public class TaskImpl implements Task {
 
 	@Override
 	public Task clone() {
-		TaskImpl taskClone = new TaskImpl(UUID.randomUUID().toString() + "_clonedFrom_" + getId(),
+		TaskImpl taskClone = new TaskImpl(AppUtil.generateRandomIdentifier() + "_clonedFrom_" + getId(),
 				getSpecification(), getUUID());
 		Map<String, String> allMetadata = getAllMetadata();
 		for (String attribute : allMetadata.keySet()) {

@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.apache.log4j.Logger;
+import org.fogbowcloud.blowout.core.util.AppUtil;
 import org.fogbowcloud.blowout.pool.AbstractResource;
 
 public class TaskProcessImpl implements TaskProcess {
@@ -30,7 +30,7 @@ public class TaskProcessImpl implements TaskProcess {
 	private String userIdValue;
 
 	public TaskProcessImpl(String taskId, List<Command> commandList, Specification spec, String UserId) {
-		this.processId = UUID.randomUUID().toString();
+		this.processId = AppUtil.generateRandomIdentifier();
 		this.taskId = taskId;
 		this.status = TaskState.READY;
 		this.spec = spec;
@@ -114,7 +114,7 @@ public class TaskProcessImpl implements TaskProcess {
 
 			}
 		} catch (Exception e) {
-			LOGGER.debug("Failed to execute command in resource of id " + resource.getId());
+			LOGGER.error("Failed to execute command in resource of id " + resource.getId());
 			e.printStackTrace();
 			returnValue = TaskExecutionResult.NOK;
 		}

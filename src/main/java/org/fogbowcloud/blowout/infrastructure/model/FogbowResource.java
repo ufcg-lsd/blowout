@@ -51,10 +51,12 @@ public class FogbowResource extends AbstractResource {
 
 		try {
 			run = Runtime.getRuntime();
-			p = run.exec(new String[] { "/bin/bash", "-c", "echo quit | telnet " + host + " 2>/dev/null | grep Connected" });
+			p = run.exec(new String[] { "/bin/bash", "-c",
+					"echo quit | telnet " + host + " " + port + " 2>/dev/null | grep Connected" });;
 			p.waitFor();
 
-			LOGGER.debug("Running command: /bin/bash -c echo quit | telnet " + host + " 2>/dev/null | grep Connected");
+			LOGGER.debug("Running command: /bin/bash\", \"-c\",\n" +
+					"\t\t\t\t\t\"echo quit | telnet \" + host + \" \" + port + \" 2>/dev/null | grep Connected");
 
 			scanner = new Scanner(p.getInputStream());
 			if (scanner.hasNext()) {

@@ -101,12 +101,13 @@ public class RASRequestsHelper {
         } catch (Exception e) {
             LOGGER.error("Error while getting info about public instance of order with id " + publicIpId, e);
         }
+
         return sshInfo;
     }
 
     public Map<String, Object> getComputeInstance(String computeOrderId) throws Exception {
         String requestUrl = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_COMPUTE + "/" + computeOrderId;
-        String instanceInformation = doRequest(HttpWrapper.HTTP_METHOD_GET, requestUrl, new ArrayList<>());
+        String instanceInformation = this.doRequest(HttpWrapper.HTTP_METHOD_GET, requestUrl, new ArrayList<>());
 
         return parseAttributes(instanceInformation);
     }
