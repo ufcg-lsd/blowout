@@ -17,26 +17,21 @@ import org.fogbowcloud.blowout.pool.AbstractResource;
 
 public class DefaultInfrastructureManager implements InfrastructureManager {
 
-    private InfrastructureProvider infraProvider;
-    private ResourceMonitor resourceMonitor;
+    private final InfrastructureProvider infraProvider;
+    private final ResourceMonitor resourceMonitor;
 
-    public DefaultInfrastructureManager(InfrastructureProvider infraProvider,
-                                        ResourceMonitor resourceMonitor) {
+    public DefaultInfrastructureManager(InfrastructureProvider infraProvider, ResourceMonitor resourceMonitor) {
         this.infraProvider = infraProvider;
         this.resourceMonitor = resourceMonitor;
     }
 
     @Override
-    public synchronized void act(List<AbstractResource> resources,
-                                 List<Task> tasks) throws Exception {
-
+    public synchronized void act(List<AbstractResource> resources, List<Task> tasks) throws Exception {
         Map<Specification, Integer> specsDemand = generateDemandBySpec(tasks, resources);
-
         requestResources(specsDemand);
     }
 
-    private void requestResources(Map<Specification, Integer> specsDemand)
-            throws RequestResourceException {
+    private void requestResources(Map<Specification, Integer> specsDemand) throws RequestResourceException {
 
         for (Entry<Specification, Integer> entry : specsDemand.entrySet()) {
 
@@ -67,9 +62,7 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
                 }
             }
         }
-
         return filteredResources;
-
     }
 
     private List<Task> filterTasksByState(List<Task> tasks, TaskState taskState) {
@@ -85,7 +78,7 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 
     private Map<Specification, Integer> generateDemandBySpec(List<Task> tasks,
                                                              List<AbstractResource> resources) {
-        Map<Specification, Integer> specsDemand = new HashMap<Specification, Integer>();
+        Map<Specification, Integer> specsDemand = new HashMap<>();
 
         // FIXME: this variable name is incorrect, since the list will not
         List<AbstractResource> currentResources = filterResourcesByState(
@@ -125,5 +118,4 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
         demand = new Integer(demand.intValue() + (increment ? 1 : -1));
         specsDemand.put(spec, zero.compareTo(demand) > 0 ? zero : demand);
     }
-
 }

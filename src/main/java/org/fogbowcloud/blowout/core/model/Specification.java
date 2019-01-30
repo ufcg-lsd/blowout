@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.blowout.constants.FogbowConstants;
+import org.fogbowcloud.blowout.core.constants.FogbowConstants;
 import org.fogbowcloud.blowout.core.util.AppUtil;
 import org.json.JSONException;
 import org.json.JSONObject;

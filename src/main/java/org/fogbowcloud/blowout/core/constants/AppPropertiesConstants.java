@@ -1,4 +1,4 @@
-package org.fogbowcloud.blowout.constants;
+package org.fogbowcloud.blowout.core.constants;
 
 public class AppPropertiesConstants {
 	
@@ -13,7 +13,6 @@ public class AppPropertiesConstants {
 	public static final String INFRA_RESOURCE_REUSE_TIMES = "max_resource_reuse";
 	public static final String INFRA_RESOURCE_CONNECTION_RETRY = "max_resource_connection_retry";
 	public static final String INFRA_MONITOR_PERIOD = "infra_monitor_period";
-	public static final String LOCAL_COMMAND_INTERPRETER = "local_command_interpreter";
 
 	public static final String INFRA_AUTH_TOKEN_PREFIX = "auth_token_prop_";
 	public static final String INFRA_AUTH_TOKEN_UPDATE_PLUGIN = "infra_auth_token_update_plugin";
@@ -22,7 +21,7 @@ public class AppPropertiesConstants {
 	public static final String INFRA_AUTH_TOKEN_PROJECT_NAME = "projectname";
 	public static final String INFRA_AUTH_TOKEN_DOMAIN = "domain";
 
-	public static final String INFRA_FOGBOW_MANAGER_BASE_URL = "infra_fogbow_manager_base_url";
+	public static final String INFRA_RAS_BASE_URL = "infra_fogbow_manager_base_url";
 
 	public static final String TOKEN_UPDATE_TIME = "token_update_time";
 	public static final String TOKEN_UPDATE_TIME_UNIT = "token_update_time_unit";

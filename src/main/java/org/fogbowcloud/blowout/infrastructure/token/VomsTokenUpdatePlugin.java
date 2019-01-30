@@ -10,7 +10,7 @@
 //import org.apache.commons.io.IOUtils;
 //import org.apache.log4j.Logger;
 //import org.fogbowcloud.blowout.core.exception.BlowoutException;
-//import org.fogbowcloud.blowout.constants.AppPropertiesConstants;
+//import org.fogbowcloud.blowout.core.constants.AppPropertiesConstants;
 //import org.fogbowcloud.manager.core.plugins.identity.voms.VomsIdentityPlugin;
 //import org.fogbowcloud.manager.occi.model.Token;
 //

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.fogbowcloud.blowout.core.model.Specification;
-import org.fogbowcloud.blowout.constants.AppPropertiesConstants;
+import org.fogbowcloud.blowout.core.constants.AppPropertiesConstants;
 import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
 import org.fogbowcloud.blowout.infrastructure.provider.InfrastructureProvider;
 import org.fogbowcloud.blowout.pool.AbstractResource;

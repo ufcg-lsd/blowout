@@ -4,14 +4,14 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import org.fogbowcloud.blowout.core.exception.BlowoutException;
-import org.fogbowcloud.blowout.constants.AppPropertiesConstants;
+import org.fogbowcloud.blowout.core.constants.AppPropertiesConstants;
 import org.fogbowcloud.blowout.infrastructure.model.Token;
 
 public abstract class AbstractTokenUpdatePlugin {
 	
 	private static final int DEFAULT_UPDATE_TIME = 6;
 	private static final TimeUnit DEFAULT_UPDATE_TIME_UNIT = TimeUnit.HOURS;
-	protected Properties properties;
+	protected final Properties properties;
 	
 	public AbstractTokenUpdatePlugin(Properties properties){
 		this.properties = properties;

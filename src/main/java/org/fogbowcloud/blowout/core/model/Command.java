@@ -19,7 +19,7 @@ public class Command implements Serializable{
 		UNSTARTED, RUNNING, FINISHED, FAILED
 	}
 
-	private String command;
+	private final String command;
 	private final Type type;
 	private State state = State.UNSTARTED;
 
@@ -45,7 +45,7 @@ public class Command implements Serializable{
 	}
 
 	public Command clone() {
-		return null;
+		return new Command(this.command, this.type);
 	}
 	
 	public JSONObject toJSON() {

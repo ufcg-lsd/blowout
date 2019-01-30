@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.blowout.constants.FogbowConstants;
+import org.fogbowcloud.blowout.core.constants.FogbowConstants;
 import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
 import org.fogbowcloud.blowout.pool.AbstractResource;
 
@@ -28,14 +28,14 @@ public class FogbowRequirementsHelper {
 		
 		if (requirementsString == null || requirementsString.isEmpty()) {
 			
-			LOGGER.debug("Fogbow Requirements ["+requirementsString+"] Validate with sucess.");
+			LOGGER.debug("Fogbow Requirements ["+requirementsString+"] Validate with success.");
 			return true;
 		}
 		try {
 			ClassAdParser adParser = new ClassAdParser(requirementsString);
 			if (adParser.parse() != null) {
 			
-				LOGGER.debug("Fogbow Requirements ["+requirementsString+"] Validate with sucess.");
+				LOGGER.debug("Fogbow Requirements ["+requirementsString+"] Validate with success.");
 				return true;
 			}
 			LOGGER.info("Fogbow Requirements ["+requirementsString+"] Invalid - Expression not found.");

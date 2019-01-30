@@ -2,7 +2,7 @@ package org.fogbowcloud.blowout.core.model;
 
 import static org.junit.Assert.*;
 
-import org.fogbowcloud.blowout.constants.FogbowConstants;
+import org.fogbowcloud.blowout.core.constants.FogbowConstants;
 import org.json.JSONObject;
 import org.junit.Test;
 

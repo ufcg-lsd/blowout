@@ -1,14 +1,16 @@
 package org.fogbowcloud.blowout.core;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
+import org.fogbowcloud.blowout.core.constants.BlowoutConstants;
 import org.fogbowcloud.blowout.core.exception.BlowoutException;
 import org.fogbowcloud.blowout.core.model.Task;
 import org.fogbowcloud.blowout.core.model.TaskState;
 import org.fogbowcloud.blowout.core.monitor.TaskMonitor;
-import org.fogbowcloud.blowout.constants.AppPropertiesConstants;
+import org.fogbowcloud.blowout.core.constants.AppPropertiesConstants;
 import org.fogbowcloud.blowout.infrastructure.manager.InfrastructureManager;
 import org.fogbowcloud.blowout.infrastructure.monitor.ResourceMonitor;
 import org.fogbowcloud.blowout.infrastructure.provider.InfrastructureProvider;
@@ -17,12 +19,7 @@ import org.fogbowcloud.blowout.pool.BlowoutPool;
 
 public class BlowoutController {
 
-	public static final Logger LOGGER = Logger.getLogger(BlowoutController.class);
-
-	private String DEFAULT_IMPLEMENTATION_BLOWOUT_POOL = "org.fogbowcloud.blowout.pool.DefaultBlowoutPool";
-	private String DEFAULT_IMPLEMENTATION_SCHEDULER = "org.fogbowcloud.blowout.core.StandardScheduler";
-	private String DEFAULT_IMPLEMENTATION_INFRA_MANAGER = "org.fogbowcloud.blowout.infrastructure.manager.DefaultInfrastructureManager";
-	private String DEFAULT_IMPLEMENTATION_INFRA_PROVIDER = "org.fogbowcloud.blowout.infrastructure.provider.fogbow.FogbowInfrastructureProvider";
+	private static final Logger LOGGER = Logger.getLogger(BlowoutController.class);
 
 	private SchedulerInterface schedulerInterface;
 	private TaskMonitor taskMonitor;
@@ -37,34 +34,37 @@ public class BlowoutController {
 	public BlowoutController(Properties properties) throws BlowoutException {
 		this.properties = properties;
 		try {
-			if (!BlowoutController.checkProperties(properties)) {
+			if (!checkProperties(properties)) {
 				throw new BlowoutException("Error on validate the file ");
+			} else {
+				LOGGER.info("All properties are set");
 			}
-
 		} catch (Exception e) {
 			throw new BlowoutException("Error while initialize Blowout Controller.", e);
 		}
 	}
 
-	public void start(boolean removePreviousResouces) throws Exception {
-		started = true;
+	public void start(boolean removePreviousResources) throws Exception {
+		long timeout = 30000;
 
-		blowoutPool = createBlowoutInstance();
-		infraProvider = createInfraProviderInstance(removePreviousResouces);
+		this.started = true;
 
-		taskMonitor = new TaskMonitor(blowoutPool, 30000);
-		taskMonitor.start();
-		resourceMonitor = new ResourceMonitor(infraProvider, blowoutPool, properties);
-		resourceMonitor.start();
+		this.blowoutPool = createBlowoutInstance();
+		this.infraProvider = createInfraProviderInstance(removePreviousResources);
 
-		schedulerInterface = createSchedulerInstance(taskMonitor);
-		infraManager = createInfraManagerInstance();
+		this.taskMonitor = new TaskMonitor(this.blowoutPool, timeout);
+		this.taskMonitor.start();
 
-		blowoutPool.start(infraManager, schedulerInterface);
+		this.resourceMonitor = new ResourceMonitor(this.infraProvider, this.blowoutPool, this.properties);
+		this.resourceMonitor.start();
+
+		this.schedulerInterface = createSchedulerInstance(this.taskMonitor);
+		this.infraManager = createInfraManagerInstance();
+
+		this.blowoutPool.start(this.infraManager, this.schedulerInterface);
 	}
 
 	public void stop() throws Exception {
-
 		for (AbstractResource resource : blowoutPool.getAllResources()) {
 			infraProvider.deleteResource(resource.getId());
 		}
@@ -109,7 +109,7 @@ public class BlowoutController {
 
 	public BlowoutPool createBlowoutInstance() throws Exception {
 		String providerClassName = this.properties.getProperty(AppPropertiesConstants.IMPLEMENTATION_BLOWOUT_POOL,
-				DEFAULT_IMPLEMENTATION_BLOWOUT_POOL);
+				BlowoutConstants.DEFAULT_IMPLEMENTATION_BLOWOUT_POOL);
 		Class<?> forName = Class.forName(providerClassName);
 		Object clazz = forName.getConstructor().newInstance();
 		if (!(clazz instanceof BlowoutPool)) {
@@ -120,7 +120,7 @@ public class BlowoutController {
 
 	public InfrastructureProvider createInfraProviderInstance(boolean removePreviousResouces) throws Exception {
 		String providerClassName = this.properties.getProperty(AppPropertiesConstants.IMPLEMENTATION_INFRA_PROVIDER,
-				DEFAULT_IMPLEMENTATION_INFRA_PROVIDER);
+				BlowoutConstants.DEFAULT_IMPLEMENTATION_INFRA_PROVIDER);
 		Class<?> forName = Class.forName(providerClassName);
 		Object clazz = forName.getConstructor(Properties.class, Boolean.TYPE).newInstance(properties, removePreviousResouces);
 		if (!(clazz instanceof InfrastructureProvider)) {
@@ -131,7 +131,7 @@ public class BlowoutController {
 
 	public InfrastructureManager createInfraManagerInstance() throws Exception {
 		String providerClassName = this.properties.getProperty(AppPropertiesConstants.IMPLEMENTATION_INFRA_MANAGER,
-				DEFAULT_IMPLEMENTATION_INFRA_MANAGER);
+				BlowoutConstants.DEFAULT_IMPLEMENTATION_INFRA_MANAGER);
 		Class<?> forName = Class.forName(providerClassName);
 		Object clazz = forName.getConstructor(InfrastructureProvider.class, ResourceMonitor.class).newInstance(infraProvider, resourceMonitor);
 		if (!(clazz instanceof InfrastructureManager)) {
@@ -142,7 +142,7 @@ public class BlowoutController {
 
 	protected SchedulerInterface createSchedulerInstance(TaskMonitor taskMonitor) throws Exception {
 		String providerClassName = this.properties.getProperty(AppPropertiesConstants.IMPLEMENTATION_SCHEDULER,
-				DEFAULT_IMPLEMENTATION_SCHEDULER);
+				BlowoutConstants.DEFAULT_IMPLEMENTATION_SCHEDULER);
 		Class<?> forName = Class.forName(providerClassName);
 		Object clazz = forName.getConstructor(TaskMonitor.class).newInstance(taskMonitor);
 		if (!(clazz instanceof SchedulerInterface)) {
@@ -151,32 +151,10 @@ public class BlowoutController {
 		return (SchedulerInterface) clazz;
 	}
 
-	protected static boolean checkProperties(Properties properties) {//FIXME: MAKE IT IN A GENERAL WAY.
-
-		if (!properties.containsKey(AppPropertiesConstants.IMPLEMENTATION_INFRA_PROVIDER)) {
-			LOGGER.error("Required property " + AppPropertiesConstants.IMPLEMENTATION_INFRA_PROVIDER + " was not set");
-			return false;
-		}
-		if (!properties.containsKey(AppPropertiesConstants.INFRA_RESOURCE_IDLE_LIFETIME)) {
-			LOGGER.error("Required property " + AppPropertiesConstants.INFRA_RESOURCE_IDLE_LIFETIME + " was not set");
-			return false;
-		}
-		if (!properties.containsKey(AppPropertiesConstants.INFRA_RESOURCE_CONNECTION_TIMEOUT)) {
-			LOGGER.error(
-					"Required property " + AppPropertiesConstants.INFRA_RESOURCE_CONNECTION_TIMEOUT + " was not set");
-			return false;
-		}
-		if (!properties.containsKey(AppPropertiesConstants.INFRA_IS_STATIC)) {
-			LOGGER.error("Required property " + AppPropertiesConstants.INFRA_IS_STATIC + " was not set");
-			return false;
-		}
-		if (!properties.containsKey(AppPropertiesConstants.INFRA_AUTH_TOKEN_UPDATE_PLUGIN)) {
-			LOGGER.error(
-					"Required property " + AppPropertiesConstants.INFRA_AUTH_TOKEN_UPDATE_PLUGIN + " was not set");
-			return false;
-		}
-		LOGGER.debug("All properties are set");
-		return true;
+	protected static boolean checkProperties(Properties properties) {
+		List<String> propertiesKeys = new ArrayList<>();
+		populateWithPropertiesKeys(propertiesKeys);
+		return checkAllProperties(properties, propertiesKeys);
 	}
 
 	public BlowoutPool getBlowoutPool() {
@@ -247,5 +225,33 @@ public class BlowoutController {
 		} else {
 			return task.getRetries();
 		}
+	}
+
+	private static boolean checkAllProperties(Properties properties, List<String> propertiesKeys) {
+		boolean passed = true;
+
+		for (String key : propertiesKeys) {
+			if (!checkProperty(properties, key)) {
+				passed = false;
+				break;
+			}
+		}
+		return passed;
+	}
+
+	private static boolean checkProperty(Properties properties, String propertyKey) {
+		if (!properties.containsKey(propertyKey)) {
+			LOGGER.error("Required property " + propertyKey + " was not set");
+			return false;
+		}
+		return true;
+	}
+
+	private static void populateWithPropertiesKeys(List<String> propertiesKeys) {
+		propertiesKeys.add(AppPropertiesConstants.IMPLEMENTATION_INFRA_PROVIDER);
+		propertiesKeys.add(AppPropertiesConstants.INFRA_RESOURCE_IDLE_LIFETIME);
+		propertiesKeys.add(AppPropertiesConstants.INFRA_RESOURCE_CONNECTION_TIMEOUT);
+		propertiesKeys.add(AppPropertiesConstants.INFRA_IS_STATIC);
+		propertiesKeys.add(AppPropertiesConstants.INFRA_AUTH_TOKEN_UPDATE_PLUGIN);
 	}
 }

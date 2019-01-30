@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.model.Specification;
-import org.fogbowcloud.blowout.constants.AppPropertiesConstants;
+import org.fogbowcloud.blowout.core.constants.AppPropertiesConstants;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 import org.fogbowcloud.blowout.infrastructure.provider.InfrastructureProvider;
 import org.fogbowcloud.blowout.pool.AbstractResource;
@@ -24,8 +24,8 @@ public class ResourceMonitor {
 
 	private InfrastructureProvider infraProvider;
 	private BlowoutPool resourcePool;
-	private Map<String, Long> idleResources = new ConcurrentHashMap<String, Long>();
-	private Map<String, Specification> pendingResources = new ConcurrentHashMap<String, Specification>();
+	private Map<String, Long> idleResources;
+	private Map<String, Specification> pendingResources;
 
 	private Thread monitoringServiceRunner;
 	private MonitoringService monitoringService;
@@ -35,13 +35,15 @@ public class ResourceMonitor {
 	private int maxReuse;
 	
 	public ResourceMonitor(InfrastructureProvider infraProvider, BlowoutPool blowoutPool, Properties properties) {
+		this.idleResources = new ConcurrentHashMap<>();
+		this.pendingResources = new ConcurrentHashMap<>();
 		this.infraProvider = infraProvider;
 		this.resourcePool = blowoutPool;
 
-		String defaultInfraMonitorPeriod = "30000";
-		String defaultIdleLifeTime = "120000";
-		String defaultMaxConnectTries = "1";
-		String defaultMaxReuse = "1";
+		final String defaultInfraMonitorPeriod = "30000";
+		final String defaultIdleLifeTime = "120000";
+		final String defaultMaxConnectTries = "1";
+		final String defaultMaxReuse = "1";
 
 		this.infraMonitoringPeriod = Long.parseLong(properties.getProperty(
 				AppPropertiesConstants.INFRA_MONITOR_PERIOD, defaultInfraMonitorPeriod));
@@ -54,9 +56,9 @@ public class ResourceMonitor {
 
 		this.monitoringService = new MonitoringService();
 		this.monitoringServiceRunner = new Thread(this.monitoringService);
-		List<AbstractResource> previouResources = infraProvider.getAllResources();
-		if (previouResources != null && !previouResources.isEmpty()) {
-			this.resourcePool.addResourceList(previouResources);
+		List<AbstractResource> previousResources = infraProvider.getAllResources();
+		if (previousResources != null && !previousResources.isEmpty()) {
+			this.resourcePool.addResourceList(previousResources);
 		}
 	}
 
@@ -71,34 +73,37 @@ public class ResourceMonitor {
 			monitoringService.resume();
 		}
 	}
-	
+
 	protected class MonitoringService implements Runnable {
 
-		private boolean paused = false;
-		private boolean active = true;
+		private boolean isPaused;
+		private boolean isActive;
+
+		public MonitoringService() {
+			this.isPaused = false;
+			this.isActive = true;
+		}
 
 		@Override
 		public void run() {
-
-			while (active) {
-
+			while (isActive) {
 				try {
-					monitorProcess();
+					LOGGER.info("Resource monitor waiting.");
 					Thread.sleep(infraMonitoringPeriod);
-					
+					monitorProcess();
 				} catch (InterruptedException e) {
-					LOGGER.error("Error while executing MonitoringService");
+					LOGGER.error("Error while executing MonitoringService.");
 				}
 			}
 		}
 
 		protected void monitorProcess() throws InterruptedException {
-			
+
 			List<AbstractResource> resources = resourcePool.getAllResources();
 			monitoringPendingResources();
 			monitoringResources(resources);
 		}
-		
+
 		private void monitoringPendingResources() {
 
 			for (String resourceId : pendingResources.keySet()) {
@@ -109,14 +114,14 @@ public class ResourceMonitor {
 				}
 			}
 		}
-		
+
 		private void monitoringResources(List<AbstractResource> resources) {
 
-			LOGGER.debug("Monitoring resources.");
+			LOGGER.info("Monitoring resources.");
 
 			for (AbstractResource resource : resources) {
 
-                LOGGER.debug("Monitoring resource of id " + resource.getId() + " and state " + resource.getState());
+                LOGGER.info("Monitoring resource of id " + resource.getId() + " and state " + resource.getState() + ".");
 
 				if (ResourceState.BUSY.equals(resource.getState())) {
 					idleResources.remove(resource.getId());
@@ -134,11 +139,9 @@ public class ResourceMonitor {
 						infraProvider.deleteResource(resource.getId());
 						resourcePool.removeResource(resource);
 					} catch (Exception e) {
-						LOGGER.error("Error while tring to remove resource "+resource.getId()+" - "+e.getMessage());
+						LOGGER.error("Error while tring to remove resource "+resource.getId()+" - "+e.getMessage() + ".");
 					}
-					
 				}
-
 			}
 		}
 
@@ -175,33 +178,31 @@ public class ResourceMonitor {
 
 		public void checkIsPaused() throws InterruptedException {
 			synchronized (this) {
-				while (paused) {
+				while (isPaused) {
 					wait();
 				}
 			}
 		}
 
 		public synchronized void stop() {
-			if(paused){
-				resume();
-			}
-			active = false;
+			if(isPaused){ resume(); }
+			this.isActive = false;
 		}
 
 		public synchronized void pause() {
-			paused = true;
+			isPaused = true;
 		}
 
 		public synchronized void resume() {
-			paused = false;
+			this.isPaused = false;
 			notify();
 		}
 
 		public boolean isPaused() {
-			return paused;
+			return isPaused;
 		}
 	}
-	
+
 	public void stop(){
 		if(monitoringService.isPaused()){
 			monitoringService.resume();
@@ -212,21 +213,21 @@ public class ResourceMonitor {
 	protected void setMonitoringService(MonitoringService monitoringService){
 		this.monitoringService = monitoringService;
 	}
-	
+
 	protected MonitoringService getMonitoringService(){
 		return monitoringService;
 	}
-	
+
 	public List<String> getPendingResources() {
-		return new ArrayList<String>(pendingResources.keySet());
+		return new ArrayList<>(pendingResources.keySet());
 	}
-	
+
 	public List<Specification> getPendingSpecification() {
-		return new ArrayList<Specification>(pendingResources.values());
+		return new ArrayList<>(pendingResources.values());
 	}
-	
+
 	public Map<Specification, Integer> getPendingRequests() {
-		Map<Specification, Integer> specCount = new HashMap<Specification, Integer>();
+		Map<Specification, Integer> specCount = new HashMap<>();
 		for (Entry<String, Specification> e : this.pendingResources.entrySet()) {
 			if (specCount.containsKey(e.getValue())) {
 				specCount.put(e.getValue(), specCount.get(e.getValue()) +1);
@@ -235,7 +236,5 @@ public class ResourceMonitor {
 			}
 		}
 		return specCount;
-		
 	}
-	
 }

@@ -4,11 +4,11 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class AppUtil {
 
 	public static boolean isStringEmpty(String... values) {
-
 		for (String s : values) {
 			if (s == null || s.isEmpty()) {
 				return true;
@@ -38,6 +38,10 @@ public class AppUtil {
 		if (prop != null && !prop.isEmpty()) {
 			json.put(propKey, prop);
 		}
+	}
+
+	public static String generateRandomIdentifier() {
+		return String.valueOf(UUID.randomUUID());
 	}
 
 }

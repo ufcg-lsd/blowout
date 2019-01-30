@@ -13,7 +13,7 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.model.Specification;
-import org.fogbowcloud.blowout.constants.AppPropertiesConstants;
+import org.fogbowcloud.blowout.core.constants.AppPropertiesConstants;
 import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -42,11 +42,9 @@ public class FogbowResourceDatastore {
 	private static final String DELETE_BY_RESOURCE_ID_SQL = DELETE_ALL_CONTENT_SQL + " WHERE " + RESOURCE_ID + "=? ";
 
 	private String dataStoreURL;
-	private Properties properties;
 
 	public FogbowResourceDatastore(Properties properties) {
-		this.properties = properties;
-		this.dataStoreURL = this.properties.getProperty(AppPropertiesConstants.DB_DATASTORE_URL);
+		this.dataStoreURL = properties.getProperty(AppPropertiesConstants.DB_DATASTORE_URL);
 
 		Statement statement = null;
 		Connection connection = null;
