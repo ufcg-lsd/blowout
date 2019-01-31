@@ -64,15 +64,20 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 	@Override
 	public String requestResource(Specification specification) throws RequestResourceException {
 		LOGGER.info("Requesting resource on Fogbow with specifications: " + specification.toString());
-
 		this.validateSpecification(specification);
+
 		String computeOrderId = this.requestsHelper.getComputeOrderId(specification);
+		String publicIpId = null;
+
+		try {
+			publicIpId = this.requestsHelper.getPublicIpId(computeOrderId);
+		} catch (InterruptedException e) {
+			LOGGER.error("Error while requesting Public IP.");
+		}
+
 		String resourceId = generateRandomIdentifier();
-
-		FogbowResource fogbowResource = new FogbowResource(resourceId, computeOrderId, specification);
-
+		FogbowResource fogbowResource = new FogbowResource(resourceId, computeOrderId, specification, publicIpId);
 		this.putMetadata(fogbowResource, specification);
-
 		this.resourcesMap.put(resourceId, fogbowResource);
 		this.frDatastore.addFogbowResource(fogbowResource);
 
@@ -83,7 +88,6 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 	@Override
 	public AbstractResource getResource(String resourceId) {
-
 		LOGGER.info("Getting resource from request id: [" + resourceId + "]");
 		try {
 			FogbowResource resource = getFogbowResource(resourceId);
@@ -98,7 +102,6 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 	@Override
 	public void deleteResource(String resourceId) throws InfrastructureException {
-
 		FogbowResource fogbowResource = resourcesMap.get(resourceId);
 
 		if (fogbowResource == null) {
@@ -113,9 +116,8 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 			this.frDatastore.deleteFogbowResourceById(fogbowResource);
 			LOGGER.info("Resource " + fogbowResource.getId() + " deleted successfully");
 		} catch (Exception e) {
-			LOGGER.error("Here");
-			throw new InfrastructureException("Error when trying to delete resource id[" + fogbowResource.getId() + "]",
-					e);
+			throw new InfrastructureException("Error when trying to delete resource id[" +
+					fogbowResource.getId() + "]", e);
 		}
 	}
 
@@ -125,15 +127,12 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 	}
 
     public FogbowResource getFogbowResource(String resourceId) throws InfrastructureException {
-        LOGGER.info("Initiating Resource Instanciation - Resource id: [" + resourceId + "]");
+        LOGGER.info("Initiating Resource Instantiation - Resource id: [" + resourceId + "]");
 
         String instanceId;
-        String publicIpId;
         Map<String, Object> instanceAttributes;
-
         FogbowResource fogbowResource = this.resourcesMap.get(resourceId);
-
-        this.validateFogbowResource(fogbowResource);
+        validateFogbowResource(fogbowResource);
 
         try {
             LOGGER.info("Getting request attributes - Retrieve Instance ID.");
@@ -141,10 +140,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
             instanceAttributes = this.requestsHelper.getComputeInstance(fogbowResource.getComputeOrderId());
             instanceId = String.valueOf(instanceAttributes.get(FogbowConstants.INSTANCE_ATTRIBUTE_NAME));
 
-            publicIpId = requestInstancePublicIp(fogbowResource.getComputeOrderId());
-
-            sleep(3000);
-            Map<String, Object> sshInfo = getSshInformation(publicIpId);
+            Map<String, Object> sshInfo = getPublicIpInstance(fogbowResource.getPublicIpId());
 
             this.populateInstanceAttributes(instanceAttributes, sshInfo);
 
@@ -237,11 +233,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
                 instanceAttributes.get(FogbowConstants.INSTANCE_ATTRIBUTE_DISK_SIZE));
     }
 
-	protected String requestInstancePublicIp(String computeOrderId) {
-		return this.requestsHelper.getPublicIpId(computeOrderId);
-	}
-
-	protected Map<String, Object> getSshInformation(String publicIpOrderId) {
+	protected Map<String, Object> getPublicIpInstance(String publicIpOrderId) {
         return this.requestsHelper.getPublicIpInstance(publicIpOrderId);
 
 	}

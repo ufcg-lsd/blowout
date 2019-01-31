@@ -21,6 +21,7 @@ import javax.script.ScriptException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
+import static java.lang.Thread.sleep;
 import static org.fogbowcloud.blowout.core.util.AppUtil.*;
 
 public class RASRequestsHelper {
@@ -51,25 +52,16 @@ public class RASRequestsHelper {
         try {
             computeOrderId = this.doRequest(HttpWrapper.HTTP_METHOD_POST, this.RAS_BASE_URL + "/" +
                     FogbowConstants.RAS_ENDPOINT_COMPUTE, new LinkedList<>(), requestBody);
+            LOGGER.info("Compute ID was requested successfully.");
         } catch (Exception e){
             LOGGER.error("Error while requesting resource on Fogbow", e);
             throw new RequestResourceException("Request for Fogbow Resource has FAILED: " + e.getMessage(), e);
         }
-
         return computeOrderId;
     }
 
-    public void deleteFogbowResource(FogbowResource fogbowResource) throws Exception {
-        String computeEndpoint = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_COMPUTE +
-                "/" + fogbowResource.getComputeOrderId();
-        String publicIpEndpoint = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_PUBLIC_IP +
-                "/" + fogbowResource.getComputeOrderId();
-
-        this.doRequest(HttpWrapper.HTTP_METHOD_DELETE, computeEndpoint, new ArrayList<>());
-        this.doRequest(HttpWrapper.HTTP_METHOD_DELETE, publicIpEndpoint, new ArrayList<>());
-    }
-
-    public String getPublicIpId(String computeOrderId) {
+    public String getPublicIpId(String computeOrderId) throws InterruptedException {
+        sleep(6000);
         String publicIpId = null;
         String provider = this.properties.getProperty(AppPropertiesConstants.INFRA_AUTH_TOKEN_PROJECT_NAME);
         String requestUrl = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_PUBLIC_IP;
@@ -83,8 +75,9 @@ public class RASRequestsHelper {
             StringEntity bodyRequest = makeRequestBodyJson(bodyRequestAttrs);
             publicIpId = this.doRequest(HttpWrapper.HTTP_METHOD_POST, requestUrl,
                     new LinkedList<>(), bodyRequest);
+            LOGGER.info("Public IP ID was requested successfully.");
         } catch (Exception e) {
-            LOGGER.error("Error while getting public ip for computer order of id " + computeOrderId, e);
+            LOGGER.error("Error while getting Public IP for compute order of id " + computeOrderId, e);
         }
         return publicIpId;
     }
@@ -97,11 +90,11 @@ public class RASRequestsHelper {
         try {
             response = this.doRequest(HttpWrapper.HTTP_METHOD_GET, requestUrl, new LinkedList<>());
             sshInfo = parseAttributes(response);
-            LOGGER.debug("SSh information " + sshInfo);
+            LOGGER.debug("Getting SSH information.");
+            LOGGER.debug(sshInfo);
         } catch (Exception e) {
             LOGGER.error("Error while getting info about public instance of order with id " + publicIpId, e);
         }
-
         return sshInfo;
     }
 
@@ -110,6 +103,26 @@ public class RASRequestsHelper {
         String instanceInformation = this.doRequest(HttpWrapper.HTTP_METHOD_GET, requestUrl, new ArrayList<>());
 
         return parseAttributes(instanceInformation);
+    }
+
+    public void deleteFogbowResource(FogbowResource fogbowResource) throws Exception {
+        final String computeEndpoint = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_COMPUTE +
+                "/" + fogbowResource.getComputeOrderId();
+        final String publicIpEndpoint = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_PUBLIC_IP +
+                "/" + fogbowResource.getPublicIpId();
+        try {
+            this.doRequest(HttpWrapper.HTTP_METHOD_DELETE, computeEndpoint, new ArrayList<>());
+            LOGGER.info("Compute was deleted successfully.");
+        } catch (Exception e) {
+            LOGGER.error("Error while trying to delete the Compute order.");
+        }
+
+        try {
+            this.doRequest(HttpWrapper.HTTP_METHOD_DELETE, publicIpEndpoint, new ArrayList<>());
+            LOGGER.info("Public IP was deleted successfully.");
+        } catch (Exception e){
+            LOGGER.error("Error while trying to delete the Public IP.");
+        }
     }
 
     public void setHttpWrapper(HttpWrapper httpWrapper) {

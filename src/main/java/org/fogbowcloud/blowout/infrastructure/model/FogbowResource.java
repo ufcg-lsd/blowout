@@ -15,10 +15,16 @@ public class FogbowResource extends AbstractResource {
 
 	private final String computeOrderId;
 	private String instanceId;
+	private String publicIpId;
 
 	public FogbowResource(String id, String computeOrderId, Specification spec) {
 		super(id, spec);
 		this.computeOrderId = computeOrderId;
+	}
+
+	public FogbowResource(String id, String computeOrderId, Specification spec, String publicIpId) {
+		this(id, computeOrderId, spec);
+		this.publicIpId = publicIpId;
 	}
 
 	public boolean match(Specification spec) {
@@ -86,7 +92,7 @@ public class FogbowResource extends AbstractResource {
 	}
 
 	public String getInstanceId() {
-		return instanceId;
+		return this.instanceId;
 	}
 
 	public void setInstanceId(String instanceId) {
@@ -94,6 +100,8 @@ public class FogbowResource extends AbstractResource {
 	}
 
 	public String getComputeOrderId() {
-		return computeOrderId;
+		return this.computeOrderId;
 	}
+
+	public String getPublicIpId() { return this.publicIpId; }
 }
