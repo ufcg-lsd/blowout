@@ -60,8 +60,7 @@ public class RASRequestsHelper {
         return computeOrderId;
     }
 
-    public String getPublicIpId(String computeOrderId) throws InterruptedException {
-        sleep(6000);
+    public String getPublicIpId(String computeOrderId) {
         String publicIpId = null;
         String provider = this.properties.getProperty(AppPropertiesConstants.INFRA_AUTH_TOKEN_PROJECT_NAME);
         String requestUrl = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_PUBLIC_IP;
@@ -82,19 +81,35 @@ public class RASRequestsHelper {
         return publicIpId;
     }
 
-    public Map<String, Object> getPublicIpInstance(String publicIpId) {
+    public Map<String, Object> getPublicIpInstance(String publicIpId) throws InterruptedException {
+        sleep(6000);
         String response;
         Map<String, Object> sshInfo = new HashMap<>();
         String requestUrl = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_PUBLIC_IP + "/" + publicIpId;
 
-        try {
-            response = this.doRequest(HttpWrapper.HTTP_METHOD_GET, requestUrl, new LinkedList<>());
-            sshInfo = parseAttributes(response);
-            LOGGER.debug("Getting SSH information.");
-            LOGGER.debug(sshInfo);
-        } catch (Exception e) {
-            LOGGER.error("Error while getting info about public instance of order with id " + publicIpId, e);
+        final String state = "state";
+        final String desiredState = "READY";
+        final int maxRequestsTries = 5;
+        int counter = 0;
+
+        final String errorMessage = "Error while getting info about public instance of order with id " + publicIpId;
+
+        while (counter <= maxRequestsTries && !sshInfo.get(state).equals(desiredState)) {
+            counter++;
+            try {
+                response = this.doRequest(HttpWrapper.HTTP_METHOD_GET, requestUrl, new LinkedList<>());
+                sshInfo = parseAttributes(response);
+                LOGGER.debug("Getting SSH information.");
+                LOGGER.debug(sshInfo);
+            } catch (Exception e) {
+                LOGGER.error(errorMessage, e);
+            }
         }
+
+        if (counter == maxRequestsTries && !sshInfo.get(state).equals(desiredState)) {
+            LOGGER.error(errorMessage);
+        }
+
         return sshInfo;
     }
 

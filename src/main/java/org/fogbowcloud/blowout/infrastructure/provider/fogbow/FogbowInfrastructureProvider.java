@@ -67,13 +67,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		this.validateSpecification(specification);
 
 		String computeOrderId = this.requestsHelper.getComputeOrderId(specification);
-		String publicIpId = null;
-
-		try {
-			publicIpId = this.requestsHelper.getPublicIpId(computeOrderId);
-		} catch (InterruptedException e) {
-			LOGGER.error("Error while requesting Public IP.");
-		}
+		String publicIpId = this.requestsHelper.getPublicIpId(computeOrderId);
 
 		String resourceId = generateRandomIdentifier();
 		FogbowResource fogbowResource = new FogbowResource(resourceId, computeOrderId, specification, publicIpId);
@@ -233,7 +227,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
                 instanceAttributes.get(FogbowConstants.INSTANCE_ATTRIBUTE_DISK_SIZE));
     }
 
-	protected Map<String, Object> getPublicIpInstance(String publicIpOrderId) {
+	protected Map<String, Object> getPublicIpInstance(String publicIpOrderId) throws InterruptedException {
         return this.requestsHelper.getPublicIpInstance(publicIpOrderId);
 
 	}

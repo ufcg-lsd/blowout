@@ -17,7 +17,6 @@ public class TaskProcessImpl implements TaskProcess {
 	private static final Logger LOGGER = Logger.getLogger(TaskProcessImpl.class);
 
 	public static final String ENV_HOST = "HOST";
-	public static final String ENV_SSH_PORT = "SSH_PORT";
 	public static final String ENV_SSH_USER = "SSH_USER";
 	public static final String ENV_PRIVATE_KEY_FILE = "PRIVATE_KEY_FILE";
 
@@ -81,7 +80,6 @@ public class TaskProcessImpl implements TaskProcess {
 		if (!this.getStatus().equals(TaskState.FAILED)) {
 			this.setStatus(TaskState.FINISHED);
 		}
-
 		return taskExecutionResult;
 	}
 
@@ -129,12 +127,11 @@ public class TaskProcessImpl implements TaskProcess {
 		ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c",
 				"ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i "
 						+ additionalVariables.get(ENV_PRIVATE_KEY_FILE) + " " + additionalVariables.get(ENV_SSH_USER)
-						+ "@" + additionalVariables.get(ENV_HOST) + " -p " + additionalVariables.get(ENV_SSH_PORT) + " "
-						+ parseEnvironVariable(commandString, additionalVariables));
+						+ "@" + additionalVariables.get(ENV_HOST)
+						+ " " + parseEnvironVariable(commandString, additionalVariables));
 		LOGGER.info("Running: ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i "
 				+ additionalVariables.get(ENV_PRIVATE_KEY_FILE) + " " + additionalVariables.get(ENV_SSH_USER) + "@"
-				+ additionalVariables.get(ENV_HOST) + " -p " + additionalVariables.get(ENV_SSH_PORT) + " "
-				+ parseEnvironVariable(commandString, additionalVariables));
+				+ additionalVariables.get(ENV_HOST) + " " + parseEnvironVariable(commandString, additionalVariables));
 		return builder.start();
 	}
 
@@ -166,15 +163,8 @@ public class TaskProcessImpl implements TaskProcess {
 		setUser(resource, additionalEnvVar);
 		setPrivateKeyFilePath(additionalEnvVar);
 		setUserId(additionalEnvVar);
-		setDefaultPort(additionalEnvVar);
 
 		return additionalEnvVar;
-	}
-
-	private void setDefaultPort(Map<String, String> additionalEnvVar) {
-		String defaultPort = "22";
-		additionalEnvVar.put(ENV_SSH_PORT, defaultPort);
-		LOGGER.info("SSH - Port [default]: " + defaultPort);
 	}
 
 	private void setPublicIp(AbstractResource resource, Map<String, String> additionalEnvVar) {
