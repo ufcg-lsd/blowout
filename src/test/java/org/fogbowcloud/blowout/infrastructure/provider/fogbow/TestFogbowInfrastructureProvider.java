@@ -187,7 +187,7 @@ public class TestFogbowInfrastructureProvider {
 		String resourceId = fogbowInfrastructureProvider.requestResource(specs);
 		
 //		FogbowResource resource = mock(FogbowResource.class);
-//		doReturn(returnedOrderId).when(resource).getComputeOrderId();
+//		doReturn(returnedOrderId).when(resource).createCompute();
 //		createDefaulInstanceIdResponse(returnedOrderId, instanceIdMock, memberIdMock, OrderState.FULFILLED);
 
 //		doReturn(true).when(fogbowResourceDsMock).deleteFogbowResourceById(resource);

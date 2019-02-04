@@ -66,8 +66,14 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		LOGGER.info("Requesting resource on Fogbow with specifications: " + specification.toString());
 		this.validateSpecification(specification);
 
-		String computeOrderId = this.requestsHelper.getComputeOrderId(specification);
-		String publicIpId = this.requestsHelper.getPublicIpId(computeOrderId);
+		String computeOrderId = this.requestsHelper.createCompute(specification);
+		String publicIpId = null;
+
+		try {
+			publicIpId = this.requestsHelper.createPublicIp(computeOrderId);
+		} catch (InterruptedException e) {
+			LOGGER.error("Error while requesting Public IP.");
+		}
 
 		String resourceId = generateRandomIdentifier();
 		FogbowResource fogbowResource = new FogbowResource(resourceId, computeOrderId, specification, publicIpId);

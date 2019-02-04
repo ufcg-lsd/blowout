@@ -39,7 +39,7 @@ public class RASRequestsHelper {
         this.RAS_BASE_URL = this.properties.getProperty(AppPropertiesConstants.INFRA_RAS_BASE_URL);
     }
 
-    public String getComputeOrderId(Specification specification) throws RequestResourceException {
+    public String createCompute(Specification specification) throws RequestResourceException {
         StringEntity requestBody = null;
         try {
             requestBody = this.makeJsonBody(specification);
@@ -60,10 +60,11 @@ public class RASRequestsHelper {
         return computeOrderId;
     }
 
-    public String getPublicIpId(String computeOrderId) {
+    public String createPublicIp(String computeOrderId) throws InterruptedException {
+        sleep(6000);
         String publicIpId = null;
-        String provider = this.properties.getProperty(AppPropertiesConstants.INFRA_AUTH_TOKEN_PROJECT_NAME);
-        String requestUrl = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_PUBLIC_IP;
+        final String provider = this.properties.getProperty(AppPropertiesConstants.INFRA_AUTH_TOKEN_PROJECT_NAME);
+        final String requestUrl = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_PUBLIC_IP;
 
         Map<String, String> bodyRequestAttrs = new HashMap<>();
         if (computeOrderId != null && !computeOrderId.isEmpty()) {
@@ -71,7 +72,7 @@ public class RASRequestsHelper {
             bodyRequestAttrs.put(FogbowConstants.JSON_KEY_FOGBOW_PROVIDER, provider);
         }
         try {
-            StringEntity bodyRequest = makeRequestBodyJson(bodyRequestAttrs);
+            final StringEntity bodyRequest = makeRequestBodyJson(bodyRequestAttrs);
             publicIpId = this.doRequest(HttpWrapper.HTTP_METHOD_POST, requestUrl,
                     new LinkedList<>(), bodyRequest);
             LOGGER.info("Public IP ID was requested successfully.");
@@ -85,37 +86,23 @@ public class RASRequestsHelper {
         sleep(6000);
         String response;
         Map<String, Object> sshInfo = new HashMap<>();
-        String requestUrl = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_PUBLIC_IP + "/" + publicIpId;
-
-        final String state = "state";
-        final String desiredState = "READY";
-        final int maxRequestsTries = 5;
-        int counter = 0;
-
+        final String requestUrl = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_PUBLIC_IP + "/" + publicIpId;
         final String errorMessage = "Error while getting info about public instance of order with id " + publicIpId;
 
-        while (counter <= maxRequestsTries && !sshInfo.get(state).equals(desiredState)) {
-            counter++;
-            try {
-                response = this.doRequest(HttpWrapper.HTTP_METHOD_GET, requestUrl, new LinkedList<>());
-                sshInfo = parseAttributes(response);
-                LOGGER.debug("Getting SSH information.");
-                LOGGER.debug(sshInfo);
-            } catch (Exception e) {
-                LOGGER.error(errorMessage, e);
-            }
+        try {
+            response = this.doRequest(HttpWrapper.HTTP_METHOD_GET, requestUrl, new LinkedList<>());
+            sshInfo = parseAttributes(response);
+            LOGGER.debug("Getting SSH information.");
+            LOGGER.debug(sshInfo);
+        } catch (Exception e) {
+            LOGGER.error(errorMessage, e);
         }
-
-        if (counter == maxRequestsTries && !sshInfo.get(state).equals(desiredState)) {
-            LOGGER.error(errorMessage);
-        }
-
         return sshInfo;
     }
 
     public Map<String, Object> getComputeInstance(String computeOrderId) throws Exception {
-        String requestUrl = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_COMPUTE + "/" + computeOrderId;
-        String instanceInformation = this.doRequest(HttpWrapper.HTTP_METHOD_GET, requestUrl, new ArrayList<>());
+        final String requestUrl = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_COMPUTE + "/" + computeOrderId;
+        final String instanceInformation = this.doRequest(HttpWrapper.HTTP_METHOD_GET, requestUrl, new ArrayList<>());
 
         return parseAttributes(instanceInformation);
     }
@@ -171,7 +158,7 @@ public class RASRequestsHelper {
         ScriptEngineManager sem = new ScriptEngineManager();
         engine = sem.getEngineByName("javascript");
 
-        String script = "Java.asJSONCompatible(" + response + ")";
+        final String script = "Java.asJSONCompatible(" + response + ")";
         Object result = engine.eval(script);
 
         Map<String, Object> contents = (Map<String, Object>) result;
