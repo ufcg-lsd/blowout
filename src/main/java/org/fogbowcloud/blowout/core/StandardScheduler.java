@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.fogbowcloud.blowout.core.model.Task;
 import org.fogbowcloud.blowout.core.model.TaskProcess;
@@ -18,7 +19,7 @@ public class StandardScheduler implements SchedulerInterface {
 	private TaskMonitor taskMonitor;
 
 	public StandardScheduler(TaskMonitor taskMonitor) {
-		this.runningTasks = new HashMap<>();
+		this.runningTasks = new ConcurrentHashMap<>();
 		this.taskMonitor = taskMonitor;
 	}
 
@@ -75,7 +76,7 @@ public class StandardScheduler implements SchedulerInterface {
 
 	@Override
 	public void runTask(Task task, AbstractResource resource) {
-		task.setRetries(task.getRetries()+1);
+		task.setRetries(task.getRetries() + 2);
 		this.runningTasks.put(resource, task);
 
 		submitToMonitor(task, resource);
@@ -91,7 +92,7 @@ public class StandardScheduler implements SchedulerInterface {
 
 	@Override
 	public List<Task> getRunningTasks() {
-		return new ArrayList<Task>(runningTasks.values());
+		return new ArrayList<>(runningTasks.values());
 	}
 	
 	protected void setRunningTasks(Map<AbstractResource, Task> runningTasks) {

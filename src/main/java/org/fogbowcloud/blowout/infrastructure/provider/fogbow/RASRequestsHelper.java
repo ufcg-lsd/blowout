@@ -82,8 +82,7 @@ public class RASRequestsHelper {
         return publicIpId;
     }
 
-    public Map<String, Object> getPublicIpInstance(String publicIpId) throws InterruptedException {
-        sleep(6000);
+    public Map<String, Object> getPublicIpInstance(String publicIpId) {
         String response;
         Map<String, Object> sshInfo = new HashMap<>();
         final String requestUrl = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_PUBLIC_IP + "/" + publicIpId;

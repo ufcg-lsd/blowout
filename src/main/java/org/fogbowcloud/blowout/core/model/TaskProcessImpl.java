@@ -61,6 +61,7 @@ public class TaskProcessImpl implements TaskProcess {
 		TaskExecutionResult taskExecutionResult = new TaskExecutionResult();
 
 		this.setStatus(TaskState.RUNNING);
+		LOGGER.debug("Task : " + taskId + " is running. ");
 		for (Command command : this.getCommands()) {
 			LOGGER.info("Command " + command.getCommand());
 			LOGGER.info("Command Type " + command.getType());
