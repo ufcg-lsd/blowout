@@ -113,7 +113,7 @@ public class TestDefaultBlowoutPool {
 				TaskImpl task = new TaskImpl("task-two-id", spec, FAKE_UUID);
 
 				
-				defaultBlowoutPool.putTask(task);
+				defaultBlowoutPool.addTask(task);
 				verify(resourceMonitor).addPendingResource(any(String.class), any (Specification.class));
 				// expect
 				
@@ -149,11 +149,11 @@ public class TestDefaultBlowoutPool {
 		defaultBlowoutPool.callAct();
 		TaskImpl task = new TaskImpl("task-two-id", spec, FAKE_UUID);
 
-		defaultBlowoutPool.putTask(task);
+		defaultBlowoutPool.addTask(task);
 		
 //		TaskImpl task2 = new TaskImpl("task-two-id2", spec, FAKE_UUID);
 //
-//		defaultBlowoutPool.putTask(task2);
+//		defaultBlowoutPool.addTask(task2);
 		
 		verify(resourceMonitor, never()).addPendingResource(any(String.class), any (Specification.class));
 		// expect
@@ -191,11 +191,11 @@ public class TestDefaultBlowoutPool {
 		// exercise
 		TaskImpl task2 = new TaskImpl("task-two-id", spec, FAKE_UUID);
 
-		defaultBlowoutPool.putTask(task2);
+		defaultBlowoutPool.addTask(task2);
 		
 //		TaskImpl task2 = new TaskImpl("task-two-id2", spec, FAKE_UUID);
 //
-//		defaultBlowoutPool.putTask(task2);
+//		defaultBlowoutPool.addTask(task2);
 		verify(defaultBlowoutPool).callAct();
 		verify(resourceMonitor).addPendingResource(any(String.class), any (Specification.class));
 		// expect

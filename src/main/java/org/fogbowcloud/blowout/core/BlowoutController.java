@@ -29,10 +29,11 @@ public class BlowoutController {
 	protected InfrastructureProvider infraProvider;
 	protected InfrastructureManager infraManager;
 	protected ResourceMonitor resourceMonitor;
-	protected boolean started = false;
+	protected boolean started;
 
 	public BlowoutController(Properties properties) throws BlowoutException {
 		this.properties = properties;
+		this.started = false;
 		try {
 			if (!checkProperties(properties)) {
 				throw new BlowoutException("Error on validate the file ");
@@ -45,23 +46,9 @@ public class BlowoutController {
 	}
 
 	public void start(boolean removePreviousResources) throws Exception {
-		long timeout = 30000;
-
+		LOGGER.info("Starting Blowout.");
 		this.started = true;
-
-		this.blowoutPool = createBlowoutInstance();
-		this.infraProvider = createInfraProviderInstance(removePreviousResources);
-
-		this.taskMonitor = new TaskMonitor(this.blowoutPool, timeout);
-		this.taskMonitor.start();
-
-		this.resourceMonitor = new ResourceMonitor(this.infraProvider, this.blowoutPool, this.properties);
-		this.resourceMonitor.start();
-
-		this.schedulerInterface = createSchedulerInstance(this.taskMonitor);
-		this.infraManager = createInfraManagerInstance();
-
-		this.blowoutPool.start(this.infraManager, this.schedulerInterface);
+		createEntitiesInstances(removePreviousResources);
 	}
 
 	public void stop() throws Exception {
@@ -79,7 +66,7 @@ public class BlowoutController {
 		if (!started) {
 			throw new BlowoutException("Blowout hasn't been started yet");
 		}
-		blowoutPool.putTask(task);
+		blowoutPool.addTask(task);
 	}
 
 	public void addTaskList(List<Task> tasks) throws BlowoutException {
@@ -149,6 +136,23 @@ public class BlowoutController {
 			throw new Exception("Scheduler Class Name is not a SchedulerInterface implementation");
 		}
 		return (SchedulerInterface) clazz;
+	}
+
+	private void createEntitiesInstances(boolean removePreviousResources) throws Exception {
+		final long timeout = 30000;
+		this.blowoutPool = createBlowoutInstance();
+		this.infraProvider = createInfraProviderInstance(removePreviousResources);
+
+		this.taskMonitor = new TaskMonitor(this.blowoutPool, timeout);
+		this.taskMonitor.start();
+
+		this.resourceMonitor = new ResourceMonitor(this.infraProvider, this.blowoutPool, this.properties);
+		this.resourceMonitor.start();
+
+		this.schedulerInterface = createSchedulerInstance(this.taskMonitor);
+		this.infraManager = createInfraManagerInstance();
+
+		this.blowoutPool.start(this.infraManager, this.schedulerInterface);
 	}
 
 	protected static boolean checkProperties(Properties properties) {

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.model.Task;
 import org.fogbowcloud.blowout.core.model.TaskState;
@@ -16,6 +17,7 @@ import org.fogbowcloud.blowout.infrastructure.provider.InfrastructureProvider;
 import org.fogbowcloud.blowout.pool.AbstractResource;
 
 public class DefaultInfrastructureManager implements InfrastructureManager {
+    private static final Logger LOGGER = Logger.getLogger(DefaultInfrastructureManager.class);
 
     private final InfrastructureProvider infraProvider;
     private final ResourceMonitor resourceMonitor;
@@ -27,6 +29,7 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 
     @Override
     public synchronized void act(List<AbstractResource> resources, List<Task> tasks) throws Exception {
+        LOGGER.debug("Calling Infrastructure act.");
         Map<Specification, Integer> specsDemand = generateDemandBySpec(tasks, resources);
         requestResources(specsDemand);
     }
@@ -76,14 +79,16 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
         return filteredTasks;
     }
 
-    private Map<Specification, Integer> generateDemandBySpec(List<Task> tasks,
-                                                             List<AbstractResource> resources) {
+    private Map<Specification, Integer> generateDemandBySpec(List<Task> tasks, List<AbstractResource> resources) {
+
+        LOGGER.debug("Generating Fogbow specification ");
         Map<Specification, Integer> specsDemand = new HashMap<>();
 
-        // FIXME: this variable name is incorrect, since the list will not
-        List<AbstractResource> currentResources = filterResourcesByState(
-                resources, ResourceState.IDLE, ResourceState.BUSY,
-                ResourceState.FAILED);
+        List<AbstractResource> currentResources = filterResourcesByState(resources,
+                ResourceState.IDLE,
+                ResourceState.BUSY,
+                ResourceState.FAILED
+        );
 
         for (Task task : tasks) {
 

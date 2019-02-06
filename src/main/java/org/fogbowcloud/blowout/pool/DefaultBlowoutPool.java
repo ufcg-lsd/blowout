@@ -13,7 +13,7 @@ import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 
 public class DefaultBlowoutPool implements BlowoutPool {
 	
-	public static final Logger LOGGER = Logger.getLogger(DefaultBlowoutPool.class);
+	private static final Logger LOGGER = Logger.getLogger(DefaultBlowoutPool.class);
 
 	private Map<String, AbstractResource> resourcePool = new ConcurrentHashMap<String, AbstractResource>();
 	private List<Task> taskPool = new ArrayList<Task>();
@@ -77,7 +77,7 @@ public class DefaultBlowoutPool implements BlowoutPool {
 	}
 
 	@Override
-	public void putTask(Task task) {
+	public void addTask(Task task) {
 
 		taskPool.add(task);
 		callAct();
@@ -85,7 +85,7 @@ public class DefaultBlowoutPool implements BlowoutPool {
 
 	@Override
 	public void addTasks(List<Task> tasks) {
-
+		LOGGER.info("Tasks: " + tasks.toString() + "was added in Pool.");
 		taskPool.addAll(tasks);
 		callAct();
 	}

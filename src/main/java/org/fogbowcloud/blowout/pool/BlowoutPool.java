@@ -23,7 +23,7 @@ public interface BlowoutPool {
 	
 	void removeResource(AbstractResource resource);
 	
-	void putTask(Task task);
+	void addTask(Task task);
 	
 	void addTasks(List<Task> tasks);
 	
