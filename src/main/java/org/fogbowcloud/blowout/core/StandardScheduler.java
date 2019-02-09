@@ -6,14 +6,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.model.Task;
 import org.fogbowcloud.blowout.core.model.TaskProcess;
 import org.fogbowcloud.blowout.core.model.TaskProcessImpl;
 import org.fogbowcloud.blowout.core.monitor.TaskMonitor;
+import org.fogbowcloud.blowout.infrastructure.manager.DefaultInfrastructureManager;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 import org.fogbowcloud.blowout.pool.AbstractResource;
 
 public class StandardScheduler implements SchedulerInterface {
+	private static final Logger LOGGER = Logger.getLogger(StandardScheduler.class);
 
 	private Map<AbstractResource, Task> runningTasks;
 	private TaskMonitor taskMonitor;
@@ -25,6 +28,7 @@ public class StandardScheduler implements SchedulerInterface {
 
 	@Override
 	public void act(List<Task> tasks, List<AbstractResource> resources) {
+		LOGGER.debug("Calling Scheduler act to resources " + resources.toString() + " and tasks " + tasks.toString());
 		for (AbstractResource resource : resources) {
 			actOnResource(resource, tasks);
 		}
@@ -54,6 +58,7 @@ public class StandardScheduler implements SchedulerInterface {
 	}
 
 	protected Task chooseTaskForRunning(AbstractResource resource, List<Task> tasks) {
+		LOGGER.debug("Choosing task");
 		for (Task task : tasks) {
 			boolean isSameSpecification = resource.getRequestedSpec().equals(task.getSpecification());
 			if (!task.isFinished() && !this.runningTasks.containsValue(task) && isSameSpecification) {
