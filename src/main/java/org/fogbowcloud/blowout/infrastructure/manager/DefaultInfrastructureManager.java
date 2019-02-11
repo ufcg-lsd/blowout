@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.fogbowcloud.blowout.core.constants.AppMessagesConstants;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.model.Task;
 import org.fogbowcloud.blowout.core.model.TaskState;
@@ -29,7 +30,7 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 
     @Override
     public synchronized void act(List<AbstractResource> resources, List<Task> tasks) throws Exception {
-        LOGGER.debug("Calling Infrastructure act.");
+        LOGGER.debug(AppMessagesConstants.ACT_SOURCE_MESSAGE);
         Map<Specification, Integer> specsDemand = generateDemandBySpec(tasks, resources);
         requestResources(specsDemand);
     }
@@ -54,34 +55,7 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
         }
     }
 
-    private List<AbstractResource> filterResourcesByState(
-            List<AbstractResource> resources, ResourceState... resourceStates) {
-
-        List<AbstractResource> filteredResources = new ArrayList<AbstractResource>();
-        for (AbstractResource resource : resources) {
-            for (ResourceState state : resourceStates) {
-                if (state.equals(resource.getState())) {
-                    filteredResources.add(resource);
-                }
-            }
-        }
-        return filteredResources;
-    }
-
-    private List<Task> filterTasksByState(List<Task> tasks, TaskState taskState) {
-
-        List<Task> filteredTasks = new ArrayList<Task>();
-        for (Task task : tasks) {
-            if (taskState.equals(task.getState())) {
-                filteredTasks.add(task);
-            }
-        }
-        return filteredTasks;
-    }
-
     private Map<Specification, Integer> generateDemandBySpec(List<Task> tasks, List<AbstractResource> resources) {
-
-        LOGGER.debug("Generating Fogbow specification ");
         Map<Specification, Integer> specsDemand = new HashMap<>();
 
         List<AbstractResource> currentResources = filterResourcesByState(resources,
@@ -122,5 +96,30 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
         }
         demand = new Integer(demand.intValue() + (increment ? 1 : -1));
         specsDemand.put(spec, zero.compareTo(demand) > 0 ? zero : demand);
+    }
+
+    private List<AbstractResource> filterResourcesByState(
+            List<AbstractResource> resources, ResourceState... resourceStates) {
+
+        List<AbstractResource> filteredResources = new ArrayList<AbstractResource>();
+        for (AbstractResource resource : resources) {
+            for (ResourceState state : resourceStates) {
+                if (state.equals(resource.getState())) {
+                    filteredResources.add(resource);
+                }
+            }
+        }
+        return filteredResources;
+    }
+
+    private List<Task> filterTasksByState(List<Task> tasks, TaskState taskState) {
+
+        List<Task> filteredTasks = new ArrayList<Task>();
+        for (Task task : tasks) {
+            if (taskState.equals(task.getState())) {
+                filteredTasks.add(task);
+            }
+        }
+        return filteredTasks;
     }
 }

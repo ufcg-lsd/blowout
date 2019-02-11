@@ -66,6 +66,7 @@ public class BlowoutController {
 		if (!started) {
 			throw new BlowoutException("Blowout hasn't been started yet");
 		}
+		LOGGER.debug("Task" + Thread.currentThread().getName() + " submitted to the Pool.");
 		blowoutPool.addTask(task);
 	}
 
@@ -73,6 +74,7 @@ public class BlowoutController {
 		if (!started) {
 			throw new BlowoutException("Blowout hasn't been started yet");
 		}
+		LOGGER.debug("Tasks of the job " + Thread.currentThread().getName() + " submitted to the Pool.");
 		blowoutPool.addTasks(tasks);
 	}
 

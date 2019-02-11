@@ -406,7 +406,7 @@ public class TestFogbowInfrastructureProvider {
 				Mockito.any(String.class), Mockito.any(List.class));
 	}
 
-	private void createDefaulInstanceAttributesResponse(String orderId, String vCPU, String ram, String disk,
+	private void createDefaulInstanceAttributesResponse(String orderId, String vCPU, String memSize, String disk,
 														String hostName) throws Exception {
 
 		String urlEndpointRequestInformations = properties.getProperty(AppPropertiesConstants.INFRA_RAS_BASE_URL)
@@ -415,7 +415,7 @@ public class TestFogbowInfrastructureProvider {
 		String fogbowResponse = "{"
 				+ "\"id\":\"" + orderId + "\", "
 				+ "\"vCPU\":\"" +  vCPU + "\", "
-				+ "\"ram\":\"" + ram + "\", "
+				+ "\"memory\":\"" + memSize + "\", "
 				+ "\"disk\":\"" + disk + "\", "
 				+ "\"hostName\":\"" + hostName + "\"}";
 

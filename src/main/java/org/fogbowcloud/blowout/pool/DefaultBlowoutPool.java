@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.SchedulerInterface;
+import org.fogbowcloud.blowout.core.constants.AppMessagesConstants;
 import org.fogbowcloud.blowout.core.model.Task;
 import org.fogbowcloud.blowout.infrastructure.manager.InfrastructureManager;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
@@ -15,13 +17,15 @@ public class DefaultBlowoutPool implements BlowoutPool {
 	
 	private static final Logger LOGGER = Logger.getLogger(DefaultBlowoutPool.class);
 
-	private Map<String, AbstractResource> resourcePool = new ConcurrentHashMap<String, AbstractResource>();
-	private List<Task> taskPool = new ArrayList<Task>();
+	private Map<String, AbstractResource> resourcePool;
+	private List<Task> taskPool;
 	private InfrastructureManager infraManager;
 	private SchedulerInterface schedulerInterface;
 
 	@Override
 	public void start(InfrastructureManager infraManager, SchedulerInterface schedulerInterface) {
+		this.resourcePool = new ConcurrentHashMap<>();
+		this.taskPool = new CopyOnWriteArrayList<>();
 		this.infraManager = infraManager;
 		this.schedulerInterface = schedulerInterface;
 	}
@@ -54,6 +58,7 @@ public class DefaultBlowoutPool implements BlowoutPool {
 
 	protected synchronized void callAct() {
 		try {
+			LOGGER.debug(AppMessagesConstants.ACT_SOURCE_MESSAGE);
 			infraManager.act(getAllResources(), getAllTasks());
 			schedulerInterface.act(getAllTasks(), getAllResources());
 		} catch (Exception e) {
@@ -63,7 +68,7 @@ public class DefaultBlowoutPool implements BlowoutPool {
 
 	@Override
 	public List<AbstractResource> getAllResources() {
-		return new ArrayList<AbstractResource>(resourcePool.values());
+		return new ArrayList<>(resourcePool.values());
 	}
 
 	@Override
@@ -85,14 +90,15 @@ public class DefaultBlowoutPool implements BlowoutPool {
 
 	@Override
 	public void addTasks(List<Task> tasks) {
-		LOGGER.info("Tasks: " + tasks.toString() + "was added in Pool.");
 		taskPool.addAll(tasks);
+		LOGGER.info("The tasks that references the job " + Thread.currentThread().getName() +
+				" was added to the Pool.");
 		callAct();
 	}
 
 	@Override
 	public List<Task> getAllTasks() {
-		return new ArrayList<Task>(taskPool);
+		return new ArrayList<>(taskPool);
 	}
 
 	@Override

@@ -78,7 +78,8 @@ public class TaskProcessImpl implements TaskProcess {
 				break;
 			}
 		}
-		if (!this.getStatus().equals(TaskState.FAILED)) {
+		if (!this.getStatus().equals(TaskState.FAILED)
+				&& !this.getStatus().equals(TaskState.TIMEDOUT)) {
 			this.setStatus(TaskState.FINISHED);
 		}
 		return taskExecutionResult;

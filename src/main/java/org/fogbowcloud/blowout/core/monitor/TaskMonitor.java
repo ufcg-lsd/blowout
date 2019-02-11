@@ -20,7 +20,7 @@ public class TaskMonitor implements Runnable {
 
 	private static final Logger LOGGER = Logger.getLogger(TaskMonitor.class);
 
-	private Map<Task, TaskProcess> runningTasks = new HashMap<Task, TaskProcess>();
+	private Map<Task, TaskProcess> runningTasks = new HashMap<>();
 	
 	private ExecutorService taskExecutor = Executors.newCachedThreadPool();
 
@@ -39,7 +39,7 @@ public class TaskMonitor implements Runnable {
 	
 	public void start() {
 		isActive = true;
-		monitoringServiceRunner = new Thread(this);
+		monitoringServiceRunner = new Thread(this, this.toString());
 		monitoringServiceRunner.start();
 	}
 	
@@ -71,6 +71,7 @@ public class TaskMonitor implements Runnable {
 				Task task = getTaskById(tp.getTaskId());
 				task.finish();
 				getRunningTasks().remove(task);
+
 				if (tp.getResource()!= null) {
 					pool.updateResource(tp.getResource(), ResourceState.IDLE);
 				}
@@ -93,7 +94,7 @@ public class TaskMonitor implements Runnable {
 	}
 	
 	public void runTask(Task task,final AbstractResource resource) {
-		LOGGER.debug("Starting to run task of id " + task.getId());
+		LOGGER.debug("Starting to run task of id " + task.getId() + " on resource " + resource.getId());
 
 		final TaskProcess tp = createProcess(task);
 		if (getRunningTasks().get(task) == null) {
