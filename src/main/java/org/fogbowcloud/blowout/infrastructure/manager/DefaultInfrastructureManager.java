@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.fogbowcloud.blowout.core.constants.AppMessagesConstants;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.model.Task;
 import org.fogbowcloud.blowout.core.model.TaskState;
@@ -29,7 +30,7 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 
     @Override
     public synchronized void act(List<AbstractResource> resources, List<Task> tasks) throws Exception {
-        LOGGER.debug("Calling Infrastructure act to the job: " + Thread.currentThread().getName());
+        LOGGER.debug(AppMessagesConstants.ACT_SOURCE_MESSAGE);
         Map<Specification, Integer> specsDemand = generateDemandBySpec(tasks, resources);
         requestResources(specsDemand);
     }

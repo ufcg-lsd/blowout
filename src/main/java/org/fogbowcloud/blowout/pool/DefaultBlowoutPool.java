@@ -8,6 +8,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.SchedulerInterface;
+import org.fogbowcloud.blowout.core.constants.AppMessagesConstants;
 import org.fogbowcloud.blowout.core.model.Task;
 import org.fogbowcloud.blowout.infrastructure.manager.InfrastructureManager;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
@@ -57,7 +58,7 @@ public class DefaultBlowoutPool implements BlowoutPool {
 
 	protected synchronized void callAct() {
 		try {
-			LOGGER.debug("Calling act to the job " + Thread.currentThread().getName());
+			LOGGER.debug(AppMessagesConstants.ACT_SOURCE_MESSAGE);
 			infraManager.act(getAllResources(), getAllTasks());
 			schedulerInterface.act(getAllTasks(), getAllResources());
 		} catch (Exception e) {

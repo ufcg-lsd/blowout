@@ -142,12 +142,14 @@ public class RASRequestsHelper {
 
     public StringEntity makeJsonBody(Specification specification) throws UnsupportedEncodingException {
         JSONObject json = new JSONObject();
+        final String iguassuComputesName = "Iguassu";
 
         makeBodyField(json, FogbowConstants.JSON_KEY_FOGBOW_REQUIREMENTS_PUBLIC_KEY, specification.getPublicKey());
         makeBodyField(json, FogbowConstants.JSON_KEY_FOGBOW_REQUIREMENTS_MEMORY, specification.getMemory());
         makeBodyField(json, FogbowConstants.JSON_KEY_FOGBOW_REQUIREMENTS_DISK, specification.getDisk());
         makeBodyField(json, FogbowConstants.JSON_KEY_FOGBOW_REQUIREMENTS_IMAGE_ID, specification.getImageId());
         makeBodyField(json, FogbowConstants.JSON_KEY_FOGBOW_REQUIREMENTS_VCPU, specification.getvCPU());
+        makeBodyField(json, FogbowConstants.JSON_KEY_FOGBOW_REQUIREMENTS_COMPUTE_NAME, iguassuComputesName);
 
         return new StringEntity(json.toString());
     }

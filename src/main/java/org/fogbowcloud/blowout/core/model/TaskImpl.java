@@ -104,7 +104,7 @@ public class TaskImpl implements Task {
 	@Override
 	public void finish(){
 		this.isFinished = true;
-		setState(TaskState.FINISHED); // This field was 'TaskState.COMPLETED' before.
+		setState(TaskState.COMPLETED);
 	}
 
 	@Override

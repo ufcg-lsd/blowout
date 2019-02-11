@@ -39,7 +39,7 @@ public class TaskMonitor implements Runnable {
 	
 	public void start() {
 		isActive = true;
-		monitoringServiceRunner = new Thread(this);
+		monitoringServiceRunner = new Thread(this, this.toString());
 		monitoringServiceRunner.start();
 	}
 	
@@ -71,7 +71,7 @@ public class TaskMonitor implements Runnable {
 				Task task = getTaskById(tp.getTaskId());
 				task.finish();
 				getRunningTasks().remove(task);
-				task.setState(TaskState.COMPLETED);
+
 				if (tp.getResource()!= null) {
 					pool.updateResource(tp.getResource(), ResourceState.IDLE);
 				}

@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
+import org.fogbowcloud.blowout.core.constants.AppMessagesConstants;
 import org.fogbowcloud.blowout.core.model.Task;
 import org.fogbowcloud.blowout.core.model.TaskProcess;
 import org.fogbowcloud.blowout.core.model.TaskProcessImpl;
@@ -28,7 +29,7 @@ public class StandardScheduler implements SchedulerInterface {
 
 	@Override
 	public void act(List<Task> tasks, List<AbstractResource> resources) {
-		LOGGER.debug("Calling Scheduler act to the job " + Thread.currentThread().getName());
+		LOGGER.debug(AppMessagesConstants.ACT_SOURCE_MESSAGE);
 		for (AbstractResource resource : resources) {
 			actOnResource(resource, tasks);
 		}

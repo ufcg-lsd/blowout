@@ -55,7 +55,7 @@ public class ResourceMonitor {
 				.getProperty(AppPropertiesConstants.INFRA_RESOURCE_REUSE_TIMES, defaultMaxReuse));
 
 		this.monitoringService = new MonitoringService();
-		this.monitoringServiceRunner = new Thread(this.monitoringService);
+		this.monitoringServiceRunner = new Thread(this.monitoringService, this.monitoringService.toString());
 		List<AbstractResource> previousResources = infraProvider.getAllResources();
 		if (previousResources != null && !previousResources.isEmpty()) {
 			this.resourcePool.addResourceList(previousResources);
