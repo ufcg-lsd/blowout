@@ -64,7 +64,7 @@ public class ResourceMonitor {
 
 	public void start() {
 		monitoringServiceRunner.start();
-		LOGGER.warn("Started");
+		LOGGER.warn("Resource Monitor started.");
 	}
 
 	public void addPendingResource(String resourceId, Specification spec){
@@ -88,7 +88,7 @@ public class ResourceMonitor {
 		public void run() {
 			while (isActive) {
 				try {
-					LOGGER.info("Resource monitor waiting.");
+					LOGGER.info("Resource monitor is waiting.");
 					Thread.sleep(infraMonitoringPeriod);
 					monitorProcess();
 				} catch (InterruptedException e) {
@@ -105,10 +105,12 @@ public class ResourceMonitor {
 		}
 
 		private void monitoringPendingResources() {
+			LOGGER.info("Monitoring pending resources.");
 
 			for (String resourceId : pendingResources.keySet()) {
 				AbstractResource resource = infraProvider.getResource(resourceId);
 				if (resource != null) {
+					LOGGER.info("Monitoring resource with id " + resource.getId() + " and state " + resource.getState() + ".");
 					pendingResources.remove(resourceId);
 					resourcePool.addResource(resource);
 				}
@@ -121,7 +123,7 @@ public class ResourceMonitor {
 
 			for (AbstractResource resource : resources) {
 
-                LOGGER.info("Monitoring resource of id " + resource.getId() + " and state " + resource.getState() + ".");
+                LOGGER.info("Monitoring resource with id " + resource.getId() + " and state " + resource.getState() + ".");
 
 				if (ResourceState.BUSY.equals(resource.getState())) {
 					idleResources.remove(resource.getId());

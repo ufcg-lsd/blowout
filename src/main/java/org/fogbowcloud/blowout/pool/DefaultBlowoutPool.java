@@ -89,9 +89,9 @@ public class DefaultBlowoutPool implements BlowoutPool {
 
 	@Override
 	public void addTasks(List<Task> tasks) {
+		taskPool.addAll(tasks);
 		LOGGER.info("The tasks that references the job " + Thread.currentThread().getName() +
 				" was added to the Pool.");
-		taskPool.addAll(tasks);
 		callAct();
 	}
 

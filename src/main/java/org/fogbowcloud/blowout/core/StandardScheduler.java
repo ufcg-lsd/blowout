@@ -28,7 +28,7 @@ public class StandardScheduler implements SchedulerInterface {
 
 	@Override
 	public void act(List<Task> tasks, List<AbstractResource> resources) {
-		LOGGER.debug("Calling Scheduler act to resources " + resources.toString() + " and tasks " + tasks.toString());
+		LOGGER.debug("Calling Scheduler act to the job " + Thread.currentThread().getName());
 		for (AbstractResource resource : resources) {
 			actOnResource(resource, tasks);
 		}
@@ -62,6 +62,7 @@ public class StandardScheduler implements SchedulerInterface {
 		for (Task task : tasks) {
 			boolean isSameSpecification = resource.getRequestedSpec().equals(task.getSpecification());
 			if (!task.isFinished() && !this.runningTasks.containsValue(task) && isSameSpecification) {
+
 				return task;
 			}
 		}
@@ -82,6 +83,8 @@ public class StandardScheduler implements SchedulerInterface {
 	@Override
 	public void runTask(Task task, AbstractResource resource) {
 		task.setRetries(task.getRetries() + 1);
+		LOGGER.debug("Submitting task " + task.getId() + " to Task Monitor with " + task.getRetries() +
+				" retries.");
 		this.runningTasks.put(resource, task);
 
 		submitToMonitor(task, resource);

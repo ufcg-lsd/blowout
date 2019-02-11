@@ -129,8 +129,8 @@ Task State | Description
 ----------- | -----------
 Ready | The Task is ready to be executed
 Running | The Task is running on the associated resource
-Finished | The Task was finished with sucess
-Completed | The Task was finished with sucess and was taken from the running tasks list
+Finished | The Task was finished with success
+Completed | The Task was finished with success and was taken from the running tasks list
 Not Created | The Task does not exist in Blowout
 Timedout | The Task took timeout
 

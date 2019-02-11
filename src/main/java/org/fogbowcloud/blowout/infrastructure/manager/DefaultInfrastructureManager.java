@@ -29,7 +29,7 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 
     @Override
     public synchronized void act(List<AbstractResource> resources, List<Task> tasks) throws Exception {
-        LOGGER.debug("Calling Infrastructure act to resources " + resources.toString() + " and tasks " + tasks.toString());
+        LOGGER.debug("Calling Infrastructure act to the job: " + Thread.currentThread().getName());
         Map<Specification, Integer> specsDemand = generateDemandBySpec(tasks, resources);
         requestResources(specsDemand);
     }
@@ -55,8 +55,6 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
     }
 
     private Map<Specification, Integer> generateDemandBySpec(List<Task> tasks, List<AbstractResource> resources) {
-
-        LOGGER.debug("Generating Fogbow specification");
         Map<Specification, Integer> specsDemand = new HashMap<>();
 
         List<AbstractResource> currentResources = filterResourcesByState(resources,
