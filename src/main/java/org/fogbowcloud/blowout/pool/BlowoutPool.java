@@ -2,14 +2,14 @@ package org.fogbowcloud.blowout.pool;
 
 import java.util.List;
 
-import org.fogbowcloud.blowout.core.SchedulerInterface;
+import org.fogbowcloud.blowout.core.Scheduler;
 import org.fogbowcloud.blowout.core.model.Task;
 import org.fogbowcloud.blowout.infrastructure.manager.InfrastructureManager;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 
 public interface BlowoutPool {
 	
-	void start(InfrastructureManager infraManager, SchedulerInterface schedulerInterface);
+	void start(InfrastructureManager infraManager, Scheduler scheduler);
 	
 	void addResource(AbstractResource resource);
 	

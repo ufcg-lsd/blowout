@@ -40,7 +40,7 @@ public class AppUtil {
 		}
 	}
 
-	public static String generateRandomIdentifier() {
+	public static String generateIdentifier() {
 		return String.valueOf(UUID.randomUUID());
 	}
 

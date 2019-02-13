@@ -142,6 +142,7 @@ public class TaskMonitor implements Runnable {
 		if (processToHalt != null) {
 			if (processToHalt.getResource() != null) {
 				pool.updateResource(processToHalt.getResource(), ResourceState.IDLE);
+				LOGGER.debug("Resource " + processToHalt.getResource().getId() + " was stopped.");
 			}
 		}
 		

@@ -7,8 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.blowout.core.SchedulerInterface;
-import org.fogbowcloud.blowout.core.constants.AppMessagesConstants;
+import org.fogbowcloud.blowout.core.Scheduler;
 import org.fogbowcloud.blowout.core.model.Task;
 import org.fogbowcloud.blowout.infrastructure.manager.InfrastructureManager;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
@@ -20,14 +19,14 @@ public class DefaultBlowoutPool implements BlowoutPool {
 	private Map<String, AbstractResource> resourcePool;
 	private List<Task> taskPool;
 	private InfrastructureManager infraManager;
-	private SchedulerInterface schedulerInterface;
+	private Scheduler scheduler;
 
 	@Override
-	public void start(InfrastructureManager infraManager, SchedulerInterface schedulerInterface) {
+	public void start(InfrastructureManager infraManager, Scheduler scheduler) {
 		this.resourcePool = new ConcurrentHashMap<>();
 		this.taskPool = new CopyOnWriteArrayList<>();
 		this.infraManager = infraManager;
-		this.schedulerInterface = schedulerInterface;
+		this.scheduler = scheduler;
 	}
 
 	@Override
@@ -58,9 +57,10 @@ public class DefaultBlowoutPool implements BlowoutPool {
 
 	protected synchronized void callAct() {
 		try {
-			LOGGER.debug(AppMessagesConstants.ACT_SOURCE_MESSAGE);
+			LOGGER.debug("Calling act from the Thread " + Thread.currentThread().getId() +
+					" of entity: " + Thread.currentThread().getName());
 			infraManager.act(getAllResources(), getAllTasks());
-			schedulerInterface.act(getAllTasks(), getAllResources());
+			scheduler.act(getAllTasks(), getAllResources());
 		} catch (Exception e) {
 			LOGGER.error("Error while calling act", e);
 		}
@@ -125,12 +125,12 @@ public class DefaultBlowoutPool implements BlowoutPool {
 		this.infraManager = infraManager;
 	}
 
-	protected SchedulerInterface getSchedulerInterface() {
-		return schedulerInterface;
+	protected Scheduler getScheduler() {
+		return scheduler;
 	}
 
-	protected void setSchedulerInterface(SchedulerInterface schedulerInterface) {
-		this.schedulerInterface = schedulerInterface;
+	protected void setScheduler(Scheduler scheduler) {
+		this.scheduler = scheduler;
 	}
 
 	protected Map<String, AbstractResource> getResourcePool() {

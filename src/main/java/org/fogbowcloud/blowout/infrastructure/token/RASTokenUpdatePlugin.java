@@ -73,7 +73,7 @@ public class RASTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
         body.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, HttpWrapper.HTTP_CONTENT_JSON));
 
         String accessToken = httpWrapper.doRequest("post", requestUrl, new LinkedList<>(), body);
-        String userId = AppUtil.generateRandomIdentifier();
+        String userId = AppUtil.generateIdentifier();
         User user = new User(userId, this.userName, this.password);
 
         return new Token(accessToken, user);

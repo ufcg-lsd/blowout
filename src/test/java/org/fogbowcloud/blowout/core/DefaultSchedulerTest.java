@@ -16,14 +16,14 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-public class StandardSchedulerTest {
+public class DefaultSchedulerTest {
 
 	private static final String FAKE_UUID = "1234";
 
 	@Test
 	public void testChooseTaskForRunningNotRunningAndSameSpecification() {
 		TaskMonitor taskMon = Mockito.mock(TaskMonitor.class);
-		StandardScheduler standardScheduler = new StandardScheduler(taskMon);
+		DefaultScheduler defaultScheduler = new DefaultScheduler(taskMon);
 		
 		List<Task> tasks = new ArrayList<Task>();
 		Specification specA = new Specification("imageA", "usernameA", "publicKeyA", "privateKeyFilePathA");
@@ -36,14 +36,14 @@ public class StandardSchedulerTest {
 		
 		AbstractResource resourceWithSpecB = new FogbowResource("id", "orderId", specB);
 		
-		Task choosenTaskForRunning = standardScheduler.chooseTaskForRunning(resourceWithSpecB, tasks);
+		Task choosenTaskForRunning = defaultScheduler.chooseTaskForRunning(resourceWithSpecB, tasks);
 		Assert.assertEquals(taskExcepcted, choosenTaskForRunning);
 	}
 	
 	@Test
 	public void testChooseTaskForRunningWithSameSpecification() {
 		TaskMonitor taskMon = Mockito.mock(TaskMonitor.class);
-		StandardScheduler standardScheduler = new StandardScheduler(taskMon);
+		DefaultScheduler defaultScheduler = new DefaultScheduler(taskMon);
 		
 		List<Task> tasks = new ArrayList<Task>();
 		Specification specA = new Specification("imageA", "usernameA", "publicKeyA", "privateKeyFilePathA");
@@ -66,9 +66,9 @@ public class StandardSchedulerTest {
 		runningTasks.put(resourceTwoSpecB, taskTwoRunning);
 		runningTasks.put(resourceThreeSpecB, taskThreeRunning);
 		runningTasks.put(resourceFiveSpecB, taskFiveRunning);
-		standardScheduler.setRunningTasks(runningTasks);		
+		defaultScheduler.setRunningTasks(runningTasks);
 		
-		Task choosenTaskForRunning = standardScheduler.chooseTaskForRunning(resourceFourSpecB, tasks);		
+		Task choosenTaskForRunning = defaultScheduler.chooseTaskForRunning(resourceFourSpecB, tasks);
 		Assert.assertEquals(taskExpected, choosenTaskForRunning);
 	}	
 	
@@ -76,7 +76,7 @@ public class StandardSchedulerTest {
 	public void testAct() {
 		TaskMonitor taskMon = Mockito.mock(TaskMonitor.class);
 		Mockito.doNothing().when(taskMon).runTask(Mockito.any(Task.class), Mockito.any(AbstractResource.class));
-		StandardScheduler standardScheduler = new StandardScheduler(taskMon);
+		DefaultScheduler defaultScheduler = new DefaultScheduler(taskMon);
 		
 		List<Task> tasks = new ArrayList<Task>();
 		Specification specA = new Specification("imageA", "usernameA", "publicKeyA", "privateKeyFilePathA");
@@ -105,24 +105,24 @@ public class StandardSchedulerTest {
 		resources.add(resourceFourIdle);
 		resources.add(resourceFiveRunning);
 		
-		standardScheduler.runTask(taskTwoRunning, resourceTwoRunning);
-		standardScheduler.runTask(taskThreeRunning, resourceThreeRunning);
-		standardScheduler.runTask(taskFiveRunning, resourceFiveRunning);
+		defaultScheduler.runTask(taskTwoRunning, resourceTwoRunning);
+		defaultScheduler.runTask(taskThreeRunning, resourceThreeRunning);
+		defaultScheduler.runTask(taskFiveRunning, resourceFiveRunning);
 		int countRunningTaskBefore = 3;
 		
-		Assert.assertEquals(countRunningTaskBefore, standardScheduler.getRunningTasks().size());
+		Assert.assertEquals(countRunningTaskBefore, defaultScheduler.getRunningTasks().size());
 		
-		standardScheduler.act(tasks, resources);
+		defaultScheduler.act(tasks, resources);
 		
 		int addedTaskToRunning = 1;
-		Assert.assertEquals(countRunningTaskBefore + addedTaskToRunning, standardScheduler.getRunningTasks().size());
+		Assert.assertEquals(countRunningTaskBefore + addedTaskToRunning, defaultScheduler.getRunningTasks().size());
 	}
 
 	@Test
 	public void testActRetryTask(){
 		TaskMonitor taskMon = Mockito.mock(TaskMonitor.class);
 		Mockito.doNothing().when(taskMon).runTask(Mockito.any(Task.class), Mockito.any(AbstractResource.class));
-		StandardScheduler standardScheduler = new StandardScheduler(taskMon);
+		DefaultScheduler defaultScheduler = new DefaultScheduler(taskMon);
 		
 		List<Task> tasks = new ArrayList<Task>();
 		Specification specA = new Specification("imageA", "usernameA", "publicKeyA", "privateKeyFilePathA");
@@ -152,17 +152,17 @@ public class StandardSchedulerTest {
 		resources.add(resourceFourIdle);
 		resources.add(resourceFiveRunning);
 		
-		standardScheduler.runTask(taskTwoRunning, resourceTwoRunning);
-		standardScheduler.runTask(taskThreeRunning, resourceThreeRunning);
-		standardScheduler.runTask(taskFiveRunning, resourceFiveRunning);
+		defaultScheduler.runTask(taskTwoRunning, resourceTwoRunning);
+		defaultScheduler.runTask(taskThreeRunning, resourceThreeRunning);
+		defaultScheduler.runTask(taskFiveRunning, resourceFiveRunning);
 		int countRunningTaskBefore = 3;
 		
-		Assert.assertEquals(countRunningTaskBefore, standardScheduler.getRunningTasks().size());
+		Assert.assertEquals(countRunningTaskBefore, defaultScheduler.getRunningTasks().size());
 		
-		standardScheduler.act(tasks, resources);
+		defaultScheduler.act(tasks, resources);
 		
 		int addedTaskToRunning = 1;
-		Assert.assertEquals(countRunningTaskBefore + addedTaskToRunning, standardScheduler.getRunningTasks().size());
+		Assert.assertEquals(countRunningTaskBefore + addedTaskToRunning, defaultScheduler.getRunningTasks().size());
 		Assert.assertEquals(3, taskToRunning.getRetries());
 		Assert.assertEquals(0, taskTwoRunning.getRetries());
 	}

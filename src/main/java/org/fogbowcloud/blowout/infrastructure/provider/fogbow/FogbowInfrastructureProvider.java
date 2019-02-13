@@ -27,7 +27,7 @@ import org.fogbowcloud.blowout.infrastructure.token.AbstractTokenUpdatePlugin;
 import org.fogbowcloud.blowout.pool.AbstractResource;
 
 import static java.lang.Thread.sleep;
-import static org.fogbowcloud.blowout.core.util.AppUtil.generateRandomIdentifier;
+import static org.fogbowcloud.blowout.core.util.AppUtil.generateIdentifier;
 import static org.fogbowcloud.blowout.core.util.AppUtil.isStringEmpty;
 
 public class FogbowInfrastructureProvider implements InfrastructureProvider {
@@ -75,7 +75,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 			LOGGER.error("Error while requesting Public IP.");
 		}
 
-		String resourceId = generateRandomIdentifier();
+		String resourceId = generateIdentifier();
 		FogbowResource fogbowResource = new FogbowResource(resourceId, computeOrderId, specification, publicIpId);
 		this.putMetadata(fogbowResource, specification);
 		this.resourcesMap.put(resourceId, fogbowResource);

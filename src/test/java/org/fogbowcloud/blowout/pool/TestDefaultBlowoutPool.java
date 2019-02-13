@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.fogbowcloud.blowout.core.DefaultScheduler;
 import org.fogbowcloud.blowout.core.constants.FogbowConstants;
-import org.fogbowcloud.blowout.core.StandardScheduler;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.model.Task;
 import org.fogbowcloud.blowout.core.model.TaskImpl;
@@ -33,7 +33,7 @@ public class TestDefaultBlowoutPool {
 	private static final String FAKE_UUID = "1234";
 	private DefaultBlowoutPool defaultBlowoutPool;
 	private InfrastructureManager infraManager;
-	private StandardScheduler standardScheduler;
+	private DefaultScheduler defaultScheduler;
 	private Specification spec;
 	
 	@Before
@@ -74,9 +74,9 @@ public class TestDefaultBlowoutPool {
 		TaskMonitor taskMon = new TaskMonitor(defaultBlowoutPool, 3000);
 		
 		infraManager = new DefaultInfrastructureManager(fogbowInfraProvider, resourceMonitor);
-		standardScheduler = new StandardScheduler(taskMon);
+		defaultScheduler = new DefaultScheduler(taskMon);
 		
-		defaultBlowoutPool.start(infraManager, standardScheduler);
+		defaultBlowoutPool.start(infraManager, defaultScheduler);
 		
 		// exercise
 		defaultBlowoutPool.callAct();
@@ -104,9 +104,9 @@ public class TestDefaultBlowoutPool {
 				TaskMonitor taskMon = new TaskMonitor(defaultBlowoutPool, 3000);
 				
 				infraManager = spy( new DefaultInfrastructureManager(fogbowInfraProvider, resourceMonitor));
-				standardScheduler = spy( new StandardScheduler(taskMon));
+				defaultScheduler = spy( new DefaultScheduler(taskMon));
 				
-				defaultBlowoutPool.start(infraManager, standardScheduler);
+				defaultBlowoutPool.start(infraManager, defaultScheduler);
 				
 				// exercise
 				defaultBlowoutPool.callAct();
@@ -141,9 +141,9 @@ public class TestDefaultBlowoutPool {
 		TaskMonitor taskMon = new TaskMonitor(defaultBlowoutPool, 3000);
 		
 		infraManager = spy( new DefaultInfrastructureManager(fogbowInfraProvider, resourceMonitor));
-		standardScheduler = spy( new StandardScheduler(taskMon));
+		defaultScheduler = spy( new DefaultScheduler(taskMon));
 		
-		defaultBlowoutPool.start(infraManager, standardScheduler);
+		defaultBlowoutPool.start(infraManager, defaultScheduler);
 		
 		// exercise
 		defaultBlowoutPool.callAct();
@@ -184,9 +184,9 @@ public class TestDefaultBlowoutPool {
 		TaskMonitor taskMon = new TaskMonitor(defaultBlowoutPool, 3000);
 		
 		infraManager = spy( new DefaultInfrastructureManager(fogbowInfraProvider, resourceMonitor));
-		standardScheduler = spy( new StandardScheduler(taskMon));
+		defaultScheduler = spy( new DefaultScheduler(taskMon));
 		
-		defaultBlowoutPool.start(infraManager, standardScheduler);
+		defaultBlowoutPool.start(infraManager, defaultScheduler);
 		
 		// exercise
 		TaskImpl task2 = new TaskImpl("task-two-id", spec, FAKE_UUID);
@@ -221,9 +221,9 @@ public class TestDefaultBlowoutPool {
 				TaskMonitor taskMon = new TaskMonitor(defaultBlowoutPool, 3000);
 				
 				infraManager = spy( new DefaultInfrastructureManager(fogbowInfraProvider, resourceMonitor));
-				standardScheduler = spy( new StandardScheduler(taskMon));
+				defaultScheduler = spy( new DefaultScheduler(taskMon));
 				
-				defaultBlowoutPool.start(infraManager, standardScheduler);
+				defaultBlowoutPool.start(infraManager, defaultScheduler);
 				
 				// exercise
 				defaultBlowoutPool.callAct();

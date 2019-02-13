@@ -30,7 +30,8 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 
     @Override
     public synchronized void act(List<AbstractResource> resources, List<Task> tasks) throws Exception {
-        LOGGER.debug(AppMessagesConstants.ACT_SOURCE_MESSAGE);
+        LOGGER.debug("Calling act from the Thread " + Thread.currentThread().getId() +
+                " of entity: " + Thread.currentThread().getName());
         Map<Specification, Integer> specsDemand = generateDemandBySpec(tasks, resources);
         requestResources(specsDemand);
     }

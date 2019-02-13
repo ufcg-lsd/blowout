@@ -5,7 +5,7 @@ import java.util.List;
 import org.fogbowcloud.blowout.core.model.Task;
 import org.fogbowcloud.blowout.pool.AbstractResource;
 
-public interface SchedulerInterface {
+public interface Scheduler {
 
 	void act(List<Task> tasks, List<AbstractResource> resources);
 	

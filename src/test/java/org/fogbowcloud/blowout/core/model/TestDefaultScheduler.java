@@ -7,8 +7,8 @@ import static org.mockito.Mockito.spy;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.fogbowcloud.blowout.core.SchedulerInterface;
-import org.fogbowcloud.blowout.core.StandardScheduler;
+import org.fogbowcloud.blowout.core.DefaultScheduler;
+import org.fogbowcloud.blowout.core.Scheduler;
 import org.fogbowcloud.blowout.core.monitor.TaskMonitor;
 import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
@@ -19,16 +19,16 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 
-public class TestStandardScheduler {
+public class TestDefaultScheduler {
 
 	private static final String FAKE_UUID = "1234";
-	SchedulerInterface sched;
+	Scheduler sched;
 	TaskMonitor taskMon;
 	
 	@Before
 	public void setUp() {
 		this.taskMon = Mockito.mock(TaskMonitor.class);
-		this.sched = spy(new StandardScheduler(taskMon));
+		this.sched = spy(new DefaultScheduler(taskMon));
 	}
 	
 	@Test

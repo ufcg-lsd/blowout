@@ -23,7 +23,7 @@ public class ResourceMonitor {
 	private static final Logger LOGGER = Logger.getLogger(ResourceMonitor.class);
 
 	private InfrastructureProvider infraProvider;
-	private BlowoutPool resourcePool;
+	private BlowoutPool blowoutPool;
 	private Map<String, Long> idleResources;
 	private Map<String, Specification> pendingResources;
 
@@ -38,7 +38,7 @@ public class ResourceMonitor {
 		this.idleResources = new ConcurrentHashMap<>();
 		this.pendingResources = new ConcurrentHashMap<>();
 		this.infraProvider = infraProvider;
-		this.resourcePool = blowoutPool;
+		this.blowoutPool = blowoutPool;
 
 		final String defaultInfraMonitorPeriod = "30000";
 		final String defaultIdleLifeTime = "120000";
@@ -58,7 +58,7 @@ public class ResourceMonitor {
 		this.monitoringServiceRunner = new Thread(this.monitoringService, this.monitoringService.toString());
 		List<AbstractResource> previousResources = infraProvider.getAllResources();
 		if (previousResources != null && !previousResources.isEmpty()) {
-			this.resourcePool.addResourceList(previousResources);
+			this.blowoutPool.addResourceList(previousResources);
 		}
 	}
 
@@ -99,7 +99,7 @@ public class ResourceMonitor {
 
 		protected void monitorProcess() throws InterruptedException {
 
-			List<AbstractResource> resources = resourcePool.getAllResources();
+			List<AbstractResource> resources = blowoutPool.getAllResources();
 			monitoringPendingResources();
 			monitoringResources(resources);
 		}
@@ -112,7 +112,7 @@ public class ResourceMonitor {
 				if (resource != null) {
 					LOGGER.info("Monitoring resource with id " + resource.getId() + " and state " + resource.getState() + ".");
 					pendingResources.remove(resourceId);
-					resourcePool.addResource(resource);
+					blowoutPool.addResource(resource);
 				}
 			}
 		}
@@ -132,16 +132,16 @@ public class ResourceMonitor {
 					boolean isAlive = this.checkResourceConnectivity(resource);
 					if(isAlive){
 						if(moveResourceToIdle(resource)){
-							resourcePool.updateResource(resource, ResourceState.IDLE);
+							blowoutPool.updateResource(resource, ResourceState.IDLE);
 						}
 					}
 				} else if (ResourceState.TO_REMOVE.equals(resource.getState())) {
 					try {
 						idleResources.remove(resource.getId());
 						infraProvider.deleteResource(resource.getId());
-						resourcePool.removeResource(resource);
+						blowoutPool.removeResource(resource);
 					} catch (Exception e) {
-						LOGGER.error("Error while tring to remove resource "+resource.getId()+" - "+e.getMessage() + ".");
+						LOGGER.error("Error while trying to remove resource "+resource.getId()+" - "+e.getMessage() + ".");
 					}
 				}
 			}
@@ -161,7 +161,7 @@ public class ResourceMonitor {
 				idleResources.put(resource.getId(), expirationDate);
 				return true;
 			} else {
-				resourcePool.updateResource(resource, ResourceState.TO_REMOVE);
+				blowoutPool.updateResource(resource, ResourceState.TO_REMOVE);
 				return false;
 			}
 		}
@@ -169,9 +169,9 @@ public class ResourceMonitor {
 		private boolean checkResourceConnectivity(AbstractResource resource) {
 			if (!resource.checkConnectivity()) {
 				if(resource.getConnectionFailTries() >= maxConnectionTries){
-					resourcePool.updateResource(resource, ResourceState.TO_REMOVE);
+					blowoutPool.updateResource(resource, ResourceState.TO_REMOVE);
 				}else{
-					resourcePool.updateResource(resource, ResourceState.FAILED);
+					blowoutPool.updateResource(resource, ResourceState.FAILED);
 				}
 				return false;
 			}
