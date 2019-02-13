@@ -141,7 +141,7 @@ public class ResourceMonitor {
 						infraProvider.deleteResource(resource.getId());
 						blowoutPool.removeResource(resource);
 					} catch (Exception e) {
-						LOGGER.error("Error while trying to remove resource "+resource.getId()+" - "+e.getMessage() + ".");
+						LOGGER.error("Error while tring to remove resource "+resource.getId()+" - "+e.getMessage() + ".");
 					}
 				}
 			}
