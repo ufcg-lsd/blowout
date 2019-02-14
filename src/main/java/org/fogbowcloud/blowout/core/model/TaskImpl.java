@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.model.Command.Type;
@@ -72,7 +71,7 @@ public class TaskImpl implements Task {
 
 	@Override
 	public Task clone() {
-		TaskImpl taskClone = new TaskImpl(AppUtil.generateRandomIdentifier() + "_clonedFrom_" + getId(),
+		TaskImpl taskClone = new TaskImpl(AppUtil.generateIdentifier() + "_clonedFrom_" + getId(),
 				getSpecification(), getUUID());
 		Map<String, String> allMetadata = getAllMetadata();
 		for (String attribute : allMetadata.keySet()) {

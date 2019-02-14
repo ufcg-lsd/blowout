@@ -1,45 +1,43 @@
 package org.fogbowcloud.blowout.core;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.blowout.core.constants.AppMessagesConstants;
 import org.fogbowcloud.blowout.core.model.Task;
 import org.fogbowcloud.blowout.core.model.TaskProcess;
 import org.fogbowcloud.blowout.core.model.TaskProcessImpl;
 import org.fogbowcloud.blowout.core.monitor.TaskMonitor;
-import org.fogbowcloud.blowout.infrastructure.manager.DefaultInfrastructureManager;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 import org.fogbowcloud.blowout.pool.AbstractResource;
 
-public class StandardScheduler implements SchedulerInterface {
-	private static final Logger LOGGER = Logger.getLogger(StandardScheduler.class);
+public class DefaultScheduler implements Scheduler {
+	private static final Logger LOGGER = Logger.getLogger(DefaultScheduler.class);
 
 	private Map<AbstractResource, Task> runningTasks;
 	private TaskMonitor taskMonitor;
 
-	public StandardScheduler(TaskMonitor taskMonitor) {
+	public DefaultScheduler(TaskMonitor taskMonitor) {
 		this.runningTasks = new ConcurrentHashMap<>();
 		this.taskMonitor = taskMonitor;
 	}
 
 	@Override
-	public void act(List<Task> tasks, List<AbstractResource> resources) {
-		LOGGER.debug(AppMessagesConstants.ACT_SOURCE_MESSAGE);
-		for (AbstractResource resource : resources) {
-			actOnResource(resource, tasks);
+	public void act(List<Task> tasksPool, List<AbstractResource> resourcesPool) {
+		LOGGER.debug("Calling act from the Thread " + Thread.currentThread().getId() +
+				" of entity: " + Thread.currentThread().getName());
+		for (AbstractResource resource : resourcesPool) {
+			actOnResource(resource, tasksPool);
 		}
 		for (Task runningTask : this.runningTasks.values()) {
-			if (!tasks.contains(runningTask)) {
+			if (!tasksPool.contains(runningTask)) {
 				stopTask(runningTask);
 			}
 		}
 		for (AbstractResource inUse : this.runningTasks.keySet()) {
-			if (!resources.contains(inUse)) {
+			if (!resourcesPool.contains(inUse)) {
 				stopTask(this.runningTasks.get(inUse));
 			}
 		}
@@ -59,7 +57,7 @@ public class StandardScheduler implements SchedulerInterface {
 	}
 
 	protected Task chooseTaskForRunning(AbstractResource resource, List<Task> tasks) {
-		LOGGER.debug("Choosing task");
+		LOGGER.debug("Choosing task for resource " + resource.getId());
 		for (Task task : tasks) {
 			boolean isSameSpecification = resource.getRequestedSpec().equals(task.getSpecification());
 			if (!task.isFinished() && !this.runningTasks.containsValue(task) && isSameSpecification) {
@@ -75,6 +73,7 @@ public class StandardScheduler implements SchedulerInterface {
 		// TODO: Find out how to stop the execution of the process
 		for (AbstractResource resource : this.runningTasks.keySet()) {
 			if (this.runningTasks.get(resource).equals(task)) {
+				LOGGER.debug("Stopping task with id: " + task.getId());
 				this.taskMonitor.stopTask(task);
 				this.runningTasks.remove(resource);
 			}

@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
-import org.fogbowcloud.blowout.core.StandardScheduler;
+import org.fogbowcloud.blowout.core.DefaultScheduler;
 import org.fogbowcloud.blowout.core.model.Command;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.model.Task;
@@ -119,10 +119,10 @@ public class TestTaskMonitor {
 	public void testTaskFinished() {
 		// set up
 		DefaultInfrastructureManager infraManager = mock(DefaultInfrastructureManager.class);
-		StandardScheduler standardScheduler = mock(StandardScheduler.class);
+		DefaultScheduler defaultScheduler = mock(DefaultScheduler.class);
 		
 		DefaultBlowoutPool blowoutPool = new DefaultBlowoutPool();
-		blowoutPool.start(infraManager, standardScheduler);
+		blowoutPool.start(infraManager, defaultScheduler);
 
 		TaskImpl taskOne = new TaskImpl("task-one-id", spec, FAKE_UUID);
 		

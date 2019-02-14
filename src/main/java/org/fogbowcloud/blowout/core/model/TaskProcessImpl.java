@@ -31,7 +31,7 @@ public class TaskProcessImpl implements TaskProcess {
 	private String userIdValue;
 
 	public TaskProcessImpl(String taskId, List<Command> commandList, Specification spec, String UserId) {
-		this.processId = AppUtil.generateRandomIdentifier();
+		this.processId = AppUtil.generateIdentifier();
 		this.taskId = taskId;
 		this.status = TaskState.READY;
 		this.spec = spec;

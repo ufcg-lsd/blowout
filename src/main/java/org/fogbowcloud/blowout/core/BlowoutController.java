@@ -21,7 +21,7 @@ public class BlowoutController {
 
 	private static final Logger LOGGER = Logger.getLogger(BlowoutController.class);
 
-	private SchedulerInterface schedulerInterface;
+	private Scheduler scheduler;
 	private TaskMonitor taskMonitor;
 	private Properties properties;
 
@@ -107,11 +107,11 @@ public class BlowoutController {
 		return (BlowoutPool) clazz;
 	}
 
-	public InfrastructureProvider createInfraProviderInstance(boolean removePreviousResouces) throws Exception {
+	public InfrastructureProvider createInfraProviderInstance(boolean removePreviousResources) throws Exception {
 		String providerClassName = this.properties.getProperty(AppPropertiesConstants.IMPLEMENTATION_INFRA_PROVIDER,
 				BlowoutConstants.DEFAULT_IMPLEMENTATION_INFRA_PROVIDER);
 		Class<?> forName = Class.forName(providerClassName);
-		Object clazz = forName.getConstructor(Properties.class, Boolean.TYPE).newInstance(properties, removePreviousResouces);
+		Object clazz = forName.getConstructor(Properties.class, Boolean.TYPE).newInstance(properties, removePreviousResources);
 		if (!(clazz instanceof InfrastructureProvider)) {
 			throw new Exception("Provider Class Name is not a InfrastructureProvider implementation");
 		}
@@ -129,15 +129,15 @@ public class BlowoutController {
 		return (InfrastructureManager) clazz;
 	}
 
-	protected SchedulerInterface createSchedulerInstance(TaskMonitor taskMonitor) throws Exception {
+	protected Scheduler createSchedulerInstance(TaskMonitor taskMonitor) throws Exception {
 		String providerClassName = this.properties.getProperty(AppPropertiesConstants.IMPLEMENTATION_SCHEDULER,
 				BlowoutConstants.DEFAULT_IMPLEMENTATION_SCHEDULER);
 		Class<?> forName = Class.forName(providerClassName);
 		Object clazz = forName.getConstructor(TaskMonitor.class).newInstance(taskMonitor);
-		if (!(clazz instanceof SchedulerInterface)) {
-			throw new Exception("Scheduler Class Name is not a SchedulerInterface implementation");
+		if (!(clazz instanceof Scheduler)) {
+			throw new Exception("Scheduler Class Name is not a Scheduler implementation");
 		}
-		return (SchedulerInterface) clazz;
+		return (Scheduler) clazz;
 	}
 
 	private void createEntitiesInstances(boolean removePreviousResources) throws Exception {
@@ -151,10 +151,10 @@ public class BlowoutController {
 		this.resourceMonitor = new ResourceMonitor(this.infraProvider, this.blowoutPool, this.properties);
 		this.resourceMonitor.start();
 
-		this.schedulerInterface = createSchedulerInstance(this.taskMonitor);
+		this.scheduler = createSchedulerInstance(this.taskMonitor);
 		this.infraManager = createInfraManagerInstance();
 
-		this.blowoutPool.start(this.infraManager, this.schedulerInterface);
+		this.blowoutPool.start(this.infraManager, this.scheduler);
 	}
 
 	protected static boolean checkProperties(Properties properties) {
@@ -179,12 +179,12 @@ public class BlowoutController {
 		this.taskMonitor = taskMonitor;
 	}
 
-	public SchedulerInterface getSchedulerInterface() {
-		return schedulerInterface;
+	public Scheduler getScheduler() {
+		return scheduler;
 	}
 
-	public void setSchedulerInterface(SchedulerInterface schedulerInterface) {
-		this.schedulerInterface = schedulerInterface;
+	public void setScheduler(Scheduler scheduler) {
+		this.scheduler = scheduler;
 	}
 
 	public InfrastructureProvider getInfraProvider() {
