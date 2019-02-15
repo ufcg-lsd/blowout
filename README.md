@@ -17,7 +17,7 @@ Blowout works similarly to a scheduler of tasks to computational resources dispe
 
 Blowout has six main components:
 
-- **BlowoutPool**: manages a blowoutPool of tasks and resources. It is through the BlowoutPool that the components have access to the received tasks and resources that were raised by the Infrastructure Provider.
+- **BlowoutPool**: manages a pool of tasks and resources. It is through the BlowoutPool that the components have access to the received tasks and resources that were raised by the Infrastructure Provider.
 
 - **Scheduler**: associates and disassociates a task, that is ready to be executed, to an available resource. After associating or disassociating a resource to a task, the Scheduler delegates to Task Monitor the assignment of creating or terminating the task execution process in the resource.
 
@@ -25,7 +25,7 @@ Blowout has six main components:
 
 - **Infrastructure Provider**: interacts with the physical resource provider, being responsible for executing the resource requests and making them available in the BlowoutPool.
 
-- **Resource Monitor**: monitors the taskState of resources that have already been allocated and are pending, managing the availability of these resources in the blowoutPool.
+- **Resource Monitor**: monitors the state of resources that have already been allocated and are pending, managing the availability of these resources in the pool.
 
 - **Task Monitor**: creates and closes a process for a task that is ready to be executed, in addition, monitors the execution of tasks that are in running state.
 
@@ -115,7 +115,7 @@ It's possible to remove a submitted task:
 Two Tasks are equal when they have the same ID and Specifications.
 
 ### Monitoring Tasks
-You can know the taskState of a Task that has been submitted to Blowout.
+You can know the state of a Task that has been submitted to Blowout.
 
 	blowout.addTask(task);
 

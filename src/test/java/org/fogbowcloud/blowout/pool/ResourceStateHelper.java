@@ -1,7 +1,7 @@
 package org.fogbowcloud.blowout.pool;
 
-import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
-import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
+import org.fogbowcloud.blowout.core.model.resource.AbstractResource;
+import org.fogbowcloud.blowout.core.model.resource.ResourceState;
 
 public class ResourceStateHelper {
 	

@@ -1,4 +1,4 @@
-package org.fogbowcloud.blowout.core.model;
+package org.fogbowcloud.blowout.core.model.task;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.doReturn;
@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.fogbowcloud.blowout.core.model.Command;
+import org.fogbowcloud.blowout.core.model.Specification;
 import org.junit.Before;
 import org.junit.Test;
 

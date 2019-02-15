@@ -1,8 +1,10 @@
-package org.fogbowcloud.blowout.core.model;
+package org.fogbowcloud.blowout.core.model.task;
 
 import java.util.List;
 
-import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
+import org.fogbowcloud.blowout.core.model.Command;
+import org.fogbowcloud.blowout.core.model.Specification;
+import org.fogbowcloud.blowout.core.model.resource.AbstractResource;
 
 public interface TaskProcess {
 

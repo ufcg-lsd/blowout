@@ -1,4 +1,4 @@
-package org.fogbowcloud.blowout.core.model;
+package org.fogbowcloud.blowout.core.model.task;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -7,8 +7,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.fogbowcloud.blowout.core.model.Command;
+import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.util.AppUtil;
-import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
+import org.fogbowcloud.blowout.core.model.resource.AbstractResource;
 
 import static java.lang.Thread.sleep;
 

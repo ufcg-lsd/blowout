@@ -8,12 +8,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.blowout.core.model.Task;
-import org.fogbowcloud.blowout.core.model.TaskProcess;
-import org.fogbowcloud.blowout.core.model.TaskProcessImpl;
-import org.fogbowcloud.blowout.core.model.TaskState;
-import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
-import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
+import org.fogbowcloud.blowout.core.model.task.Task;
+import org.fogbowcloud.blowout.core.model.task.TaskProcess;
+import org.fogbowcloud.blowout.core.model.task.TaskProcessImpl;
+import org.fogbowcloud.blowout.core.model.task.TaskState;
+import org.fogbowcloud.blowout.core.model.resource.ResourceState;
+import org.fogbowcloud.blowout.core.model.resource.AbstractResource;
 import org.fogbowcloud.blowout.pool.BlowoutPool;
 
 public class TaskMonitor implements Runnable {

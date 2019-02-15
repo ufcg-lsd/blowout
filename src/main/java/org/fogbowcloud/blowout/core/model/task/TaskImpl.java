@@ -1,4 +1,4 @@
-package org.fogbowcloud.blowout.core.model;
+package org.fogbowcloud.blowout.core.model.task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,7 +8,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.fogbowcloud.blowout.core.model.Command;
 import org.fogbowcloud.blowout.core.model.Command.Type;
+import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.util.AppUtil;
 import org.json.JSONArray;
 import org.json.JSONException;

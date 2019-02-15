@@ -1,6 +1,6 @@
 package org.fogbowcloud.blowout.infrastructure.answer;
 
-import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
+import org.fogbowcloud.blowout.core.model.resource.AbstractResource;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 

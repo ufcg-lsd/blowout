@@ -1,4 +1,4 @@
-package org.fogbowcloud.blowout.infrastructure.model;
+package org.fogbowcloud.blowout.core.model.resource;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -8,13 +8,13 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.model.Specification;
-import org.fogbowcloud.blowout.core.model.Task;
-import org.fogbowcloud.blowout.core.model.TaskState;
+import org.fogbowcloud.blowout.core.model.task.Task;
+import org.fogbowcloud.blowout.core.model.task.TaskState;
 import org.fogbowcloud.blowout.infrastructure.exception.RequestResourceException;
-import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
+import org.fogbowcloud.blowout.core.model.resource.ResourceState;
 import org.fogbowcloud.blowout.infrastructure.monitor.ResourceMonitor;
 import org.fogbowcloud.blowout.infrastructure.provider.InfrastructureProvider;
-import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
+import org.fogbowcloud.blowout.core.model.resource.AbstractResource;
 
 public class DefaultInfrastructureManager implements InfrastructureManager {
     private static final Logger LOGGER = Logger.getLogger(DefaultInfrastructureManager.class);

@@ -2,8 +2,8 @@ package org.fogbowcloud.blowout.scheduler;
 
 import java.util.List;
 
-import org.fogbowcloud.blowout.core.model.Task;
-import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
+import org.fogbowcloud.blowout.core.model.task.Task;
+import org.fogbowcloud.blowout.core.model.resource.AbstractResource;
 
 public interface Scheduler {
 
