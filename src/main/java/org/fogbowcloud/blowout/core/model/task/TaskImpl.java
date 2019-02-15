@@ -1,4 +1,4 @@
-package org.fogbowcloud.blowout.core.model;
+package org.fogbowcloud.blowout.core.model.task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,7 +8,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.fogbowcloud.blowout.core.model.Command;
 import org.fogbowcloud.blowout.core.model.Command.Type;
+import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.util.AppUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,26 +34,28 @@ public class TaskImpl implements Task {
 
 	private String id;
 	private String uuid;
-	private Specification spec;
+	private Specification specification;
 	private TaskState state;
 	private List<Command> commands;
 	private List<String> processes;
 	private Map<String, String> metadata;
 	private boolean isFailed;
 	private boolean isFinished;
-	private int retries = -1;
-	private long startedRunningAt = Long.MAX_VALUE;
+	private int retries;
+	private long startedRunningAt;
 
-	public TaskImpl(String id, Specification spec, String uuid) {
+	public TaskImpl(String id, Specification specification, String uuid) {
 		this.commands = new ArrayList<>();
 		this.processes =  new ArrayList<>();
 		this.metadata = new HashMap<>();
 		this.isFailed = false;
 		this.isFinished = false;
 		this.id = id;
-		this.spec = spec;
+		this.retries = -1;
+		this.specification = specification;
 		this.state = TaskState.READY;
 		this.uuid = uuid;
+		this.startedRunningAt = Long.MAX_VALUE;
 	}
 	
 	@Override
@@ -66,7 +70,7 @@ public class TaskImpl implements Task {
 
 	@Override
 	public Specification getSpecification() {
-		return this.spec;
+		return this.specification;
 	}
 
 	@Override
@@ -141,7 +145,7 @@ public class TaskImpl implements Task {
 	public boolean checkTimeOuted() {
 		String timeOutRaw = getMetadata(METADATA_TASK_TIMEOUT);
 
-		if (timeOutRaw == null || timeOutRaw.isEmpty()){
+		if (timeOutRaw == null || timeOutRaw.trim().isEmpty()){
 			return false;
 		}
 		long timeOut;
@@ -157,6 +161,7 @@ public class TaskImpl implements Task {
 	@Override
 	public void startedRunning() {
 		this.startedRunningAt = System.currentTimeMillis();
+		this.retries++;
 	}
 
 	@Override
@@ -194,6 +199,19 @@ public class TaskImpl implements Task {
 		
 		return this.processes;
 	}
+
+	@Override
+	public TaskState getState() {
+		return this.state;
+	}
+
+	@Override
+	public void setState(TaskState state) { this.state = state; }
+
+	@Override
+	public String getUUID() {
+		return this.uuid;
+	}
 	
 	public JSONObject toJSON() {
 		try {
@@ -201,7 +219,7 @@ public class TaskImpl implements Task {
 			task.put("isFinished", this.isFinished());
 			task.put("isFailed", this.isFailed());
 			task.put("id", this.getId());
-			task.put("spec", this.getSpecification().toJSON());
+			task.put("specification", this.getSpecification().toJSON());
 			task.put("retries", this.getRetries());
 			task.put("uuid", this.getUUID());
 			task.put("state", this.state.getDesc());
@@ -223,7 +241,7 @@ public class TaskImpl implements Task {
 	}
 
 	public static Task fromJSON(JSONObject taskJSON) {
-		Specification specification = Specification.fromJSON(taskJSON.optJSONObject("spec"));
+		Specification specification = Specification.fromJSON(taskJSON.optJSONObject("specification"));
 		Task task = new TaskImpl(taskJSON.optString("id"), specification, taskJSON.optString("uuid"));
 		task.setRetries(taskJSON.optInt("retries"));
 		if (taskJSON.optBoolean("isFinished")) {
@@ -248,24 +266,11 @@ public class TaskImpl implements Task {
 	}
 
 	@Override
-	public TaskState getState() {
-		return this.state;
-	}
-
-	@Override
-	public void setState(TaskState state) { this.state = state; }
-
-	@Override
-	public String getUUID() {
-		return this.uuid;
-	}
-
-	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((spec == null) ? 0 : spec.hashCode());
+		result = prime * result + ((specification == null) ? 0 : specification.hashCode());
 		return result;
 	}
 
@@ -283,8 +288,8 @@ public class TaskImpl implements Task {
 				return false;
 		} else if (!id.equals(other.id))
 			return false;
-		if (spec == null) {
-            return other.spec == null;
-		} else return spec.equals(other.spec);
+		if (specification == null) {
+            return other.specification == null;
+		} else return specification.equals(other.specification);
     }
 }

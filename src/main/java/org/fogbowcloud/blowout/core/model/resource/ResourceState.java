@@ -1,4 +1,4 @@
-package org.fogbowcloud.blowout.infrastructure.model;
+package org.fogbowcloud.blowout.core.model.resource;
 
 public enum ResourceState {
 	

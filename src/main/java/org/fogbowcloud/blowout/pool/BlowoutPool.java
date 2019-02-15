@@ -2,10 +2,11 @@ package org.fogbowcloud.blowout.pool;
 
 import java.util.List;
 
-import org.fogbowcloud.blowout.core.Scheduler;
-import org.fogbowcloud.blowout.core.model.Task;
+import org.fogbowcloud.blowout.scheduler.Scheduler;
+import org.fogbowcloud.blowout.core.model.task.Task;
 import org.fogbowcloud.blowout.infrastructure.manager.InfrastructureManager;
-import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
+import org.fogbowcloud.blowout.core.model.resource.AbstractResource;
+import org.fogbowcloud.blowout.core.model.resource.ResourceState;
 
 public interface BlowoutPool {
 	

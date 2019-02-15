@@ -8,76 +8,87 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.blowout.core.model.Task;
-import org.fogbowcloud.blowout.core.model.TaskProcess;
-import org.fogbowcloud.blowout.core.model.TaskProcessImpl;
-import org.fogbowcloud.blowout.core.model.TaskState;
-import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
-import org.fogbowcloud.blowout.pool.AbstractResource;
+import org.fogbowcloud.blowout.core.model.task.Task;
+import org.fogbowcloud.blowout.core.model.task.TaskProcess;
+import org.fogbowcloud.blowout.core.model.task.TaskProcessImpl;
+import org.fogbowcloud.blowout.core.model.task.TaskState;
+import org.fogbowcloud.blowout.core.model.resource.ResourceState;
+import org.fogbowcloud.blowout.core.model.resource.AbstractResource;
 import org.fogbowcloud.blowout.pool.BlowoutPool;
 
 public class TaskMonitor implements Runnable {
 
 	private static final Logger LOGGER = Logger.getLogger(TaskMonitor.class);
 
-	private Map<Task, TaskProcess> runningTasks = new HashMap<>();
-	
-	private ExecutorService taskExecutor = Executors.newCachedThreadPool();
-
+	private Map<Task, TaskProcess> runningTasks;
+	private ExecutorService taskExecutor;
 	private Thread monitoringServiceRunner;
-	
-	private BlowoutPool pool;
-	
+	private BlowoutPool blowoutPool;
 	private long timeout;
+	private boolean isActive;
 	
-	private boolean isActive = false;
-	
-	public TaskMonitor(BlowoutPool pool, long timeout) {
-		this.pool = pool;
+	public TaskMonitor(BlowoutPool blowoutPool, long timeout) {
+		this.blowoutPool = blowoutPool;
 		this.timeout = timeout;
+		this.runningTasks = new HashMap<>();
+		this.taskExecutor = Executors.newCachedThreadPool();
+        this.isActive = false;
 	}
 	
 	public void start() {
+	    LOGGER.info("Starting Task Monitor");
 		isActive = true;
-		monitoringServiceRunner = new Thread(this, this.toString());
+		monitoringServiceRunner = new Thread(this, "task-monitor");
 		monitoringServiceRunner.start();
 	}
 	
-	public void stop(){
+	public void stop() {
+	    LOGGER.info("Stopping Task Monitor");
 		isActive = false;
+		this.taskExecutor.shutdown();
 		monitoringServiceRunner.interrupt();
 	}
 	
 	@Override
 	public void run() {
+	    LOGGER.info("Running Task Monitor");
 		while(isActive){
-			procMon();
+			processMonitor();
 			try {
 				Thread.sleep(timeout);
 			} catch (InterruptedException e) {
+                LOGGER.error("Task monitor was interrupted");
 			}
 		}
 	}
 	
-	public void procMon() {
-		for (TaskProcess tp : getRunningProcesses()) {
-			if (tp.getStatus().equals(TaskState.FAILED)) {
-				getRunningTasks().remove(getTaskById(tp.getTaskId()));
-				if (tp.getResource() != null) {
-					pool.updateResource(tp.getResource(), ResourceState.FAILED);
+	public void processMonitor() {
+	    LOGGER.debug("Task Monitor process");
+		for (TaskProcess taskProcess : getRunningProcesses()) {
+		    TaskState taskProcessState = taskProcess.getTaskState();
+            AbstractResource taskProcessResource = taskProcess.getResource();
+			if (taskProcessState.equals(TaskState.FAILED)) {
+			    removeRunningTask(getTaskById(taskProcess.getTaskId()));
+
+				if (taskProcessResource != null) {
+					blowoutPool.updateResource(taskProcessResource, ResourceState.FAILED);
 				}
 			}
-			if (tp.getStatus().equals(TaskState.FINISHED)) {
-				Task task = getTaskById(tp.getTaskId());
+			if (taskProcessState.equals(TaskState.FINISHED)) {
+				Task task = getTaskById(taskProcess.getTaskId());
 				task.finish();
-				getRunningTasks().remove(task);
+                removeRunningTask(task);
 
-				if (tp.getResource()!= null) {
-					pool.updateResource(tp.getResource(), ResourceState.IDLE);
+				if (taskProcessResource != null) {
+					blowoutPool.updateResource(taskProcessResource, ResourceState.IDLE);
 				}
 			}
 		}
 	}
+
+    private void removeRunningTask(Task task) {
+        this.runningTasks.remove(task);
+    }
 	
 	public Map<Task, TaskProcess> getRunningTasks(){
 		return this.runningTasks;
@@ -89,35 +100,45 @@ public class TaskMonitor implements Runnable {
 	
 	public List<TaskProcess> getRunningProcesses(){
 		List<TaskProcess> processes = new ArrayList<TaskProcess>();
-		processes.addAll(runningTasks.values());
+		processes.addAll(this.runningTasks.values());
 		return processes;
 	}
 	
-	public void runTask(Task task,final AbstractResource resource) {
-		LOGGER.debug("Starting to run task of id " + task.getId() + " on resource " + resource.getId());
+	public void runTask(Task task, final AbstractResource resource) {
+        if (!runningTaskContains(task)) {
 
-		final TaskProcess tp = createProcess(task);
-		if (getRunningTasks().get(task) == null) {
-			getRunningTasks().put(task, tp);
+            final TaskProcess taskProcess = createProcess(task);
+            putTaskToRunningTasks(task, taskProcess);
+            LOGGER.debug("Starting to run task of id " + task.getId() + " on resource " + resource.getId());
+            task.startedRunning();
 
-			LOGGER.debug("Setting state of resource [id: " + resource.getId() + "] to busy.");
-			pool.updateResource(resource, ResourceState.BUSY);
-		}
-		getExecutorService().submit(() -> {
-			tp.executeTask(resource);
-		});
+            LOGGER.debug("Setting state of resource [id: " + resource.getId() + "] to busy.");
+            blowoutPool.updateResource(resource, ResourceState.BUSY);
+
+            getExecutorService().submit(() -> {
+                taskProcess.executeTask(resource);
+            });
+        }
 	}
+
+	private boolean runningTaskContains(Task task) {
+	    return this.runningTasks.containsKey(task);
+    }
+
+    private void putTaskToRunningTasks(Task task, TaskProcess taskProcess) {
+        this.runningTasks.put(task, taskProcess);
+    }
 	
 	public TaskState getTaskState(Task task){
 		
-		TaskProcess tp = runningTasks.get(task);
-		if(tp == null){
+		TaskProcess taskProcess = runningTasks.get(task);
+		if(taskProcess == null){
 			if(task.isFinished()){
 				return TaskState.COMPLETED;
 			}
 			return TaskState.READY;
 		}
-		return tp.getStatus();
+		return taskProcess.getTaskState();
 	}
 	
 	public ExecutorService getExecutorService() {
@@ -141,14 +162,13 @@ public class TaskMonitor implements Runnable {
 		TaskProcess processToHalt = getRunningTasks().get(task);
 		if (processToHalt != null) {
 			if (processToHalt.getResource() != null) {
-				pool.updateResource(processToHalt.getResource(), ResourceState.IDLE);
+				blowoutPool.updateResource(processToHalt.getResource(), ResourceState.IDLE);
 				LOGGER.debug("Resource " + processToHalt.getResource().getId() + " was stopped.");
 			}
 		}
-		
 	}
 	
 	public BlowoutPool getBlowoutPool() {
-		return this.pool;
+		return this.blowoutPool;
 	}
 }

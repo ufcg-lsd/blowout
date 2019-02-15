@@ -1,4 +1,4 @@
-package org.fogbowcloud.blowout.core.model;
+package org.fogbowcloud.blowout.core.model.task;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -7,8 +7,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.fogbowcloud.blowout.core.model.Command;
+import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.util.AppUtil;
-import org.fogbowcloud.blowout.pool.AbstractResource;
+import org.fogbowcloud.blowout.core.model.resource.AbstractResource;
 
 import static java.lang.Thread.sleep;
 
@@ -16,28 +18,26 @@ public class TaskProcessImpl implements TaskProcess {
 
 	private static final Logger LOGGER = Logger.getLogger(TaskProcessImpl.class);
 
-	public static final String ENV_HOST = "HOST";
-	public static final String ENV_SSH_USER = "SSH_USER";
-	public static final String ENV_PRIVATE_KEY_FILE = "PRIVATE_KEY_FILE";
+	private static final String ENV_HOST = "HOST";
+	private static final String ENV_SSH_USER = "SSH_USER";
+	private static final String ENV_PRIVATE_KEY_FILE = "PRIVATE_KEY_FILE";
+	private static final String USER_ID_FIELD = "UUID";
 
-	private static final String UserID = "UUID";
 	private final String taskId;
-	private TaskState status;
+	private TaskState taskState;
 	private final List<Command> commandList;
-	private final Specification spec;
+	private final Specification specification;
 	private String processId;
 	private String userId;
 	private AbstractResource resource;
-	private String userIdValue;
 
-	public TaskProcessImpl(String taskId, List<Command> commandList, Specification spec, String UserId) {
+	public TaskProcessImpl(String taskId, List<Command> commandList, Specification specification, String userId) {
 		this.processId = AppUtil.generateIdentifier();
 		this.taskId = taskId;
-		this.status = TaskState.READY;
-		this.spec = spec;
+		this.taskState = TaskState.READY;
+		this.specification = specification;
 		this.commandList = commandList;
-		this.userId = UserID;
-		this.userIdValue = UserId;
+		this.userId = userId;
 	}
 
 	public String getProcessId() {
@@ -57,37 +57,36 @@ public class TaskProcessImpl implements TaskProcess {
 	@Override
 	public TaskExecutionResult executeTask(AbstractResource resource) {
 		this.resource = resource;
-
+		this.setTaskState(TaskState.RUNNING);
 		TaskExecutionResult taskExecutionResult = new TaskExecutionResult();
 
-		this.setStatus(TaskState.RUNNING);
 		LOGGER.debug("Task : " + taskId + " is running. ");
 		for (Command command : this.getCommands()) {
-			LOGGER.info("Command " + command.getCommand());
-			LOGGER.info("Command Type " + command.getType());
+			LOGGER.trace("Command " + command.getCommand());
+			LOGGER.trace("Command Type " + command.getType());
 			String commandString = getExecutableCommandString(command);
 
 			taskExecutionResult = executeCommandString(commandString, command.getType(), resource);
-			LOGGER.info("Command result: " + taskExecutionResult.getExitValue());
+			LOGGER.trace("Command result: " + taskExecutionResult.getExitValue());
 			if (taskExecutionResult.getExitValue() != TaskExecutionResult.OK) {
 				if(taskExecutionResult.getExitValue() == TaskExecutionResult.TIMEOUT) {
-					this.setStatus(TaskState.TIMEDOUT);
+					this.setTaskState(TaskState.TIMEDOUT);
 					break;
 				}
-				this.setStatus(TaskState.FAILED);
+				this.setTaskState(TaskState.FAILED);
 				break;
 			}
 		}
-		if (!this.getStatus().equals(TaskState.FAILED)
-				&& !this.getStatus().equals(TaskState.TIMEDOUT)) {
-			this.setStatus(TaskState.FINISHED);
+		if (!this.getTaskState().equals(TaskState.FAILED)
+				&& !this.getTaskState().equals(TaskState.TIMEDOUT)) {
+			this.setTaskState(TaskState.FINISHED);
 		}
 		return taskExecutionResult;
 	}
 
 	@Override
-	public void setStatus(TaskState status) {
-		this.status = status;
+	public void setTaskState(TaskState taskState) {
+		this.taskState = taskState;
 	}
 	
 	public void setResource(AbstractResource resource) {
@@ -152,7 +151,7 @@ public class TaskProcessImpl implements TaskProcess {
 
 	private String parseEnvironVariable(String commandString, Map<String, String> additionalVariables) {
 		for (String envVar : additionalVariables.keySet()) {
-			commandString.replace(envVar, additionalVariables.get(envVar));
+			commandString = commandString.replace(envVar, additionalVariables.get(envVar));
 		}
 		return commandString;
 	}
@@ -175,7 +174,7 @@ public class TaskProcessImpl implements TaskProcess {
 	}
 
 	private void setUser(AbstractResource resource, Map<String, String> additionalEnvVar) {
-		String specUsername = this.spec.getUsername();
+		String specUsername = this.specification.getUsername();
 		String metadataUsername = resource.getMetadataValue(AbstractResource.METADATA_SSH_USERNAME_ATT);
 
 		if (validateUsername(specUsername)) {
@@ -196,23 +195,23 @@ public class TaskProcessImpl implements TaskProcess {
 	}
 
 	private void setPrivateKeyFilePath(Map<String, String> additionalEnvVar) {
-		additionalEnvVar.put(ENV_PRIVATE_KEY_FILE, this.spec.getPrivateKeyFilePath());
-		LOGGER.info("SSH - Private key file path: " + this.spec.getPrivateKeyFilePath());
+		additionalEnvVar.put(ENV_PRIVATE_KEY_FILE, this.specification.getPrivateKeyFilePath());
+		LOGGER.info("SSH - Private key file path: " + this.specification.getPrivateKeyFilePath());
 	}
 
 	private void setUserId(Map<String, String> additionalEnvVar) {
-		additionalEnvVar.put(UserID, this.userId);
+		additionalEnvVar.put(USER_ID_FIELD, this.userId);
 		LOGGER.info("SSH - User ID: " + this.userId);
 	}
 
 	@Override
-	public TaskState getStatus() {
-		return this.status;
+	public TaskState getTaskState() {
+		return this.taskState;
 	}
 
 	@Override
 	public Specification getSpecification() {
-		return this.spec;
+		return this.specification;
 	}
 
 	@Override

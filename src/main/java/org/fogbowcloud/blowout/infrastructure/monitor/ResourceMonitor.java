@@ -13,9 +13,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.constants.AppPropertiesConstants;
-import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
+import org.fogbowcloud.blowout.core.model.resource.ResourceState;
 import org.fogbowcloud.blowout.infrastructure.provider.InfrastructureProvider;
-import org.fogbowcloud.blowout.pool.AbstractResource;
+import org.fogbowcloud.blowout.core.model.resource.AbstractResource;
 import org.fogbowcloud.blowout.pool.BlowoutPool;
 
 public class ResourceMonitor {

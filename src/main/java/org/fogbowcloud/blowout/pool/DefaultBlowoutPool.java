@@ -7,10 +7,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.blowout.core.Scheduler;
-import org.fogbowcloud.blowout.core.model.Task;
+import org.fogbowcloud.blowout.scheduler.Scheduler;
+import org.fogbowcloud.blowout.core.model.task.Task;
 import org.fogbowcloud.blowout.infrastructure.manager.InfrastructureManager;
-import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
+import org.fogbowcloud.blowout.core.model.resource.AbstractResource;
+import org.fogbowcloud.blowout.core.model.resource.ResourceState;
 
 public class DefaultBlowoutPool implements BlowoutPool {
 	

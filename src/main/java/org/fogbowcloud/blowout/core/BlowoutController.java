@@ -7,15 +7,16 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.constants.BlowoutConstants;
 import org.fogbowcloud.blowout.core.exception.BlowoutException;
-import org.fogbowcloud.blowout.core.model.Task;
-import org.fogbowcloud.blowout.core.model.TaskState;
+import org.fogbowcloud.blowout.core.model.task.Task;
+import org.fogbowcloud.blowout.core.model.task.TaskState;
 import org.fogbowcloud.blowout.core.monitor.TaskMonitor;
 import org.fogbowcloud.blowout.core.constants.AppPropertiesConstants;
 import org.fogbowcloud.blowout.infrastructure.manager.InfrastructureManager;
 import org.fogbowcloud.blowout.infrastructure.monitor.ResourceMonitor;
 import org.fogbowcloud.blowout.infrastructure.provider.InfrastructureProvider;
-import org.fogbowcloud.blowout.pool.AbstractResource;
+import org.fogbowcloud.blowout.core.model.resource.AbstractResource;
 import org.fogbowcloud.blowout.pool.BlowoutPool;
+import org.fogbowcloud.blowout.scheduler.Scheduler;
 
 public class BlowoutController {
 
@@ -74,7 +75,7 @@ public class BlowoutController {
 		if (!started) {
 			throw new BlowoutException("Blowout hasn't been started yet");
 		}
-		LOGGER.debug("Tasks of the job " + Thread.currentThread().getName() + " submitted to the Pool.");
+		LOGGER.debug("Tasks of the job id " + Thread.currentThread().getName() + " submitted to the Pool.");
 		blowoutPool.addTasks(tasks);
 	}
 

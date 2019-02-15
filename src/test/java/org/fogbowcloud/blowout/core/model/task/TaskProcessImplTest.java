@@ -1,4 +1,4 @@
-package org.fogbowcloud.blowout.core.model;
+package org.fogbowcloud.blowout.core.model.task;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.doReturn;
@@ -10,7 +10,9 @@ import static org.mockito.Mockito.verify;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.fogbowcloud.blowout.core.model.*;
 import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class TaskProcessImplTest {
@@ -39,7 +41,7 @@ public class TaskProcessImplTest {
 		tp.executeTask(resource);
 
 		verify(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
-		assertEquals(tp.getStatus(), TaskState.FINISHED);
+		Assert.assertEquals(tp.getTaskState(), TaskState.FINISHED);
 	}
 
 	@Test
@@ -59,7 +61,7 @@ public class TaskProcessImplTest {
 
 		tp.executeTask(resource);
 
-		assertEquals(tp.getStatus(), TaskState.FAILED);
+		assertEquals(tp.getTaskState(), TaskState.FAILED);
 
 	}
 
@@ -87,7 +89,7 @@ public class TaskProcessImplTest {
 		verify(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
 		verify(tp).executeCommandString(FAKE_COMMAND2, Command.Type.LOCAL, resource);
 		verify(tp).executeCommandString(FAKE_COMMAND3, Command.Type.LOCAL, resource);
-		assertEquals(tp.getStatus(), TaskState.FINISHED);
+		assertEquals(tp.getTaskState(), TaskState.FINISHED);
 	}
 
 	@Test
@@ -115,7 +117,7 @@ public class TaskProcessImplTest {
 		verify(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
 		verify(tp).executeCommandString(FAKE_COMMAND2, Command.Type.LOCAL, resource);
 		verify(tp, never()).executeCommandString(FAKE_COMMAND3, Command.Type.LOCAL, resource);
-		assertEquals(tp.getStatus(), TaskState.FAILED);
+		assertEquals(tp.getTaskState(), TaskState.FAILED);
 	}
 
 	@Test
@@ -141,7 +143,7 @@ public class TaskProcessImplTest {
 		verify(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
 		verify(tp, never()).executeCommandString(FAKE_COMMAND2, Command.Type.LOCAL, resource);
 		verify(tp, never()).executeCommandString(FAKE_COMMAND3, Command.Type.LOCAL, resource);
-		assertEquals(tp.getStatus(), TaskState.FAILED);
+		assertEquals(tp.getTaskState(), TaskState.FAILED);
 	}
 
 

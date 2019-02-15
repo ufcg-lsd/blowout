@@ -31,8 +31,6 @@ public class FogbowResourceDatastore {
 
 	protected static final String MANAGER_DATASTORE_SQLITE_DRIVER = "org.sqlite.JDBC";
 
-	protected static final String PREFIX_DATASTORE_URL = "jdbc:sqlite:";
-
 	private static final String INSERT_FOGBOW_RESOURCE_SQL = "INSERT INTO " + FOGBOW_RESOURCE_TABLE_NAME
 			+ " VALUES(?,?,?,?)";
 	private static final String UPDATE_FOGBOW_RESOURCE = "UPDATE " + FOGBOW_RESOURCE_TABLE_NAME + " SET " + ORDER_ID
@@ -41,7 +39,7 @@ public class FogbowResourceDatastore {
 	private static final String DELETE_ALL_CONTENT_SQL = "DELETE FROM " + FOGBOW_RESOURCE_TABLE_NAME;
 	private static final String DELETE_BY_RESOURCE_ID_SQL = DELETE_ALL_CONTENT_SQL + " WHERE " + RESOURCE_ID + "=? ";
 
-	private String dataStoreURL;
+	private final String dataStoreURL;
 
 	public FogbowResourceDatastore(Properties properties) {
 		this.dataStoreURL = properties.getProperty(AppPropertiesConstants.DB_DATASTORE_URL);

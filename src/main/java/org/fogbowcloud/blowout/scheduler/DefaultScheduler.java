@@ -1,4 +1,4 @@
-package org.fogbowcloud.blowout.core;
+package org.fogbowcloud.blowout.scheduler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,12 +6,12 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.blowout.core.model.Task;
-import org.fogbowcloud.blowout.core.model.TaskProcess;
-import org.fogbowcloud.blowout.core.model.TaskProcessImpl;
+import org.fogbowcloud.blowout.core.model.task.Task;
+import org.fogbowcloud.blowout.core.model.task.TaskProcess;
+import org.fogbowcloud.blowout.core.model.task.TaskProcessImpl;
 import org.fogbowcloud.blowout.core.monitor.TaskMonitor;
-import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
-import org.fogbowcloud.blowout.pool.AbstractResource;
+import org.fogbowcloud.blowout.core.model.resource.ResourceState;
+import org.fogbowcloud.blowout.core.model.resource.AbstractResource;
 
 public class DefaultScheduler implements Scheduler {
 	private static final Logger LOGGER = Logger.getLogger(DefaultScheduler.class);
@@ -36,11 +36,15 @@ public class DefaultScheduler implements Scheduler {
 				stopTask(runningTask);
 			}
 		}
-		for (AbstractResource inUse : this.runningTasks.keySet()) {
-			if (!resourcesPool.contains(inUse)) {
-				stopTask(this.runningTasks.get(inUse));
+		for (AbstractResource resourceInUse : this.runningTasks.keySet()) {
+			if (!resourcesPool.contains(resourceInUse)) {
+				stopTask(getTaskRunningInResource(resourceInUse));
 			}
 		}
+	}
+
+	private Task getTaskRunningInResource(AbstractResource resource) {
+		return this.runningTasks.get(resource);
 	}
 
 	protected void actOnResource(AbstractResource resource, List<Task> tasks) {

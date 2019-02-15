@@ -1,4 +1,4 @@
-package org.fogbowcloud.blowout.core;
+package org.fogbowcloud.blowout.scheduler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.fogbowcloud.blowout.core.model.Specification;
-import org.fogbowcloud.blowout.core.model.Task;
-import org.fogbowcloud.blowout.core.model.TaskImpl;
+import org.fogbowcloud.blowout.core.model.task.Task;
+import org.fogbowcloud.blowout.core.model.task.TaskImpl;
 import org.fogbowcloud.blowout.core.monitor.TaskMonitor;
 import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
-import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
-import org.fogbowcloud.blowout.pool.AbstractResource;
+import org.fogbowcloud.blowout.core.model.resource.ResourceState;
+import org.fogbowcloud.blowout.core.model.resource.AbstractResource;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;

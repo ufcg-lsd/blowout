@@ -11,17 +11,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.fogbowcloud.blowout.core.DefaultScheduler;
+import org.fogbowcloud.blowout.scheduler.DefaultScheduler;
 import org.fogbowcloud.blowout.core.constants.FogbowConstants;
 import org.fogbowcloud.blowout.core.model.Specification;
-import org.fogbowcloud.blowout.core.model.Task;
-import org.fogbowcloud.blowout.core.model.TaskImpl;
+import org.fogbowcloud.blowout.core.model.task.Task;
+import org.fogbowcloud.blowout.core.model.task.TaskImpl;
 import org.fogbowcloud.blowout.core.monitor.TaskMonitor;
 import org.fogbowcloud.blowout.infrastructure.manager.DefaultInfrastructureManager;
 import org.fogbowcloud.blowout.infrastructure.manager.InfrastructureManager;
+import org.fogbowcloud.blowout.core.model.resource.AbstractResource;
 import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
-import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
+import org.fogbowcloud.blowout.core.model.resource.ResourceState;
 import org.fogbowcloud.blowout.infrastructure.monitor.ResourceMonitor;
 import org.fogbowcloud.blowout.infrastructure.provider.InfrastructureProvider;
 import org.junit.Assert;
@@ -34,56 +36,57 @@ public class TestDefaultBlowoutPool {
 	private DefaultBlowoutPool defaultBlowoutPool;
 	private InfrastructureManager infraManager;
 	private DefaultScheduler defaultScheduler;
-	private Specification spec;
+	private Specification specification;
+	private ResourceMonitor resourceMonitor;
+	private InfrastructureProvider fogbowInfraProvider;
+	private TaskMonitor taskMonitor;
 	
 	@Before
 	public void setUp() {
 		defaultBlowoutPool = spy(new DefaultBlowoutPool());
-		spec = new Specification("fakeimage", "fakeusername", "fakepublickey", "fakekeypath");
-		spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, "fakeRequirements");
+		specification = new Specification("fakeimage", "fakeusername", "fakepublickey", "fakekeypath");
+		specification.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, "fakeRequirements");
+
+		fogbowInfraProvider = mock(InfrastructureProvider.class);
+		resourceMonitor = mock(ResourceMonitor.class);
+
+		taskMonitor = new TaskMonitor(defaultBlowoutPool, 3000);
+
+		infraManager = new DefaultInfrastructureManager(fogbowInfraProvider, resourceMonitor);
+		defaultScheduler = new DefaultScheduler(taskMonitor);
+
+		defaultBlowoutPool.start(infraManager, defaultScheduler);
 	}
 	
 	@Test
 	public void testCallAct() {
 		// set up
-		FogbowResource resourceOne = spy(new FogbowResource("resource-one-id", "order-one-id", spec));
+		FogbowResource resourceOne = spy(new FogbowResource("resource-one-id", "order-one-id", specification, "fake-public-ip-one"));
 		resourceOne.setState(ResourceState.IDLE);
-		doReturn(true).when(resourceOne).match(spec);
+		doReturn(true).when(resourceOne).match(specification);
 		
-		FogbowResource resourceTwo = spy( new FogbowResource("resource-two-id", "order-two-id", spec));
+		FogbowResource resourceTwo = spy( new FogbowResource("resource-two-id", "order-two-id", specification, "fake-public-ip-two"));
 		resourceTwo.setState(ResourceState.IDLE);
-		doReturn(true).when(resourceTwo).match(spec);
+		doReturn(true).when(resourceTwo).match(specification);
+
+		defaultBlowoutPool.addResource(resourceOne);
+		defaultBlowoutPool.addResource(resourceTwo);
 		
-		Map<String, AbstractResource> resourcePool = new ConcurrentHashMap<String, AbstractResource>();
-		resourcePool.put(resourceTwo.getId(), resourceTwo);
-		resourcePool.put(resourceOne.getId(), resourceOne);
+		TaskImpl taskOne = new TaskImpl("task-one-id", specification, FAKE_UUID);
+		TaskImpl taskTwo = new TaskImpl("task-two-id", specification, FAKE_UUID);
 		
-		TaskImpl taskOne = new TaskImpl("task-one-id", spec, FAKE_UUID);
-		TaskImpl taskTwo = new TaskImpl("task-two-id", spec, FAKE_UUID);
-		
-		List<Task> taskList = new ArrayList<Task>();
-		taskList.add(taskOne);
-		taskList.add(taskTwo);
-		
-		defaultBlowoutPool.setResourcePool(resourcePool);
-		defaultBlowoutPool.setTaskPool(taskList);
-		
-		InfrastructureProvider fogbowInfraProvider = mock(InfrastructureProvider.class);
-		ResourceMonitor resourceMonitor = mock(ResourceMonitor.class);
-		
-		TaskMonitor taskMon = new TaskMonitor(defaultBlowoutPool, 3000);
-		
-		infraManager = new DefaultInfrastructureManager(fogbowInfraProvider, resourceMonitor);
-		defaultScheduler = new DefaultScheduler(taskMon);
-		
-		defaultBlowoutPool.start(infraManager, defaultScheduler);
+		defaultBlowoutPool.addTask(taskOne);
+		defaultBlowoutPool.addTask(taskTwo);
 		
 		// exercise
 		defaultBlowoutPool.callAct();
-		
+
+		ResourceState resourceStateOne = defaultBlowoutPool.getResourceById(resourceOne.getId()).getState();
+		ResourceState resourceStateTwo = defaultBlowoutPool.getResourceById(resourceTwo.getId()).getState();
+
 		// expect
-		Assert.assertEquals(ResourceState.BUSY, defaultBlowoutPool.getResourceById(resourceOne.getId()).getState());
-		Assert.assertEquals(ResourceState.BUSY, defaultBlowoutPool.getResourceById(resourceTwo.getId()).getState());
+		Assert.assertEquals(ResourceState.BUSY, resourceStateOne);
+		Assert.assertEquals(ResourceState.BUSY, resourceStateTwo);
 	}
 	
 	@Test
@@ -98,19 +101,9 @@ public class TestDefaultBlowoutPool {
 				defaultBlowoutPool.setResourcePool(resourcePool);
 				defaultBlowoutPool.setTaskPool(taskList);
 				
-				InfrastructureProvider fogbowInfraProvider = mock(InfrastructureProvider.class);
-				ResourceMonitor resourceMonitor = mock(ResourceMonitor.class);
-				
-				TaskMonitor taskMon = new TaskMonitor(defaultBlowoutPool, 3000);
-				
-				infraManager = spy( new DefaultInfrastructureManager(fogbowInfraProvider, resourceMonitor));
-				defaultScheduler = spy( new DefaultScheduler(taskMon));
-				
-				defaultBlowoutPool.start(infraManager, defaultScheduler);
-				
 				// exercise
 				defaultBlowoutPool.callAct();
-				TaskImpl task = new TaskImpl("task-two-id", spec, FAKE_UUID);
+				TaskImpl task = new TaskImpl("task-two-id", specification, FAKE_UUID);
 
 				
 				defaultBlowoutPool.addTask(task);
@@ -122,8 +115,8 @@ public class TestDefaultBlowoutPool {
 	@Test
 	public void testAddTaskWithFreeResourceJobs(){
 		// set up
-		FogbowResource resourceOne = spy(new FogbowResource("resource-one-id", "order-one-id", spec));
-		doReturn(true).when(resourceOne).match(spec);
+		FogbowResource resourceOne = spy(new FogbowResource("resource-one-id", "order-one-id", specification));
+		doReturn(true).when(resourceOne).match(specification);
 		resourceOne.setState(ResourceState.IDLE);
 		
 		Map<String, AbstractResource> resourcePool = new ConcurrentHashMap<String, AbstractResource>();
@@ -135,23 +128,13 @@ public class TestDefaultBlowoutPool {
 		defaultBlowoutPool.setResourcePool(resourcePool);
 		defaultBlowoutPool.setTaskPool(taskList);
 		
-		InfrastructureProvider fogbowInfraProvider = mock(InfrastructureProvider.class);
-		ResourceMonitor resourceMonitor = mock(ResourceMonitor.class);
-		
-		TaskMonitor taskMon = new TaskMonitor(defaultBlowoutPool, 3000);
-		
-		infraManager = spy( new DefaultInfrastructureManager(fogbowInfraProvider, resourceMonitor));
-		defaultScheduler = spy( new DefaultScheduler(taskMon));
-		
-		defaultBlowoutPool.start(infraManager, defaultScheduler);
-		
 		// exercise
 		defaultBlowoutPool.callAct();
-		TaskImpl task = new TaskImpl("task-two-id", spec, FAKE_UUID);
+		TaskImpl task = new TaskImpl("task-two-id", specification, FAKE_UUID);
 
 		defaultBlowoutPool.addTask(task);
 		
-//		TaskImpl task2 = new TaskImpl("task-two-id2", spec, FAKE_UUID);
+//		TaskImpl task2 = new TaskImpl("task-two-id2", specification, FAKE_UUID);
 //
 //		defaultBlowoutPool.addTask(task2);
 		
@@ -163,9 +146,9 @@ public class TestDefaultBlowoutPool {
 	@Test
 	public void testAddTaskWithRunningTask(){
 		// set up
-		FogbowResource resourceOne = spy(new FogbowResource("resource-one-id", "order-one-id", spec));
+		FogbowResource resourceOne = spy(new FogbowResource("resource-one-id", "order-one-id", specification));
 		resourceOne.setState(ResourceState.BUSY);
-		doReturn(true).when(resourceOne).match(spec);
+		doReturn(true).when(resourceOne).match(specification);
 		
 		Map<String, AbstractResource> resourcePool = new ConcurrentHashMap<String, AbstractResource>();
 		
@@ -173,27 +156,17 @@ public class TestDefaultBlowoutPool {
 		
 		List<Task> taskList = new ArrayList<Task>();
 		
-		TaskImpl task = new TaskImpl("task-two-id2", spec, FAKE_UUID);
+		TaskImpl task = new TaskImpl("task-two-id2", specification, FAKE_UUID);
 		taskList.add(task);
 		defaultBlowoutPool.setResourcePool(resourcePool);
 		defaultBlowoutPool.setTaskPool(taskList);
 		
-		InfrastructureProvider fogbowInfraProvider = mock(InfrastructureProvider.class);
-		ResourceMonitor resourceMonitor = mock(ResourceMonitor.class);
-		
-		TaskMonitor taskMon = new TaskMonitor(defaultBlowoutPool, 3000);
-		
-		infraManager = spy( new DefaultInfrastructureManager(fogbowInfraProvider, resourceMonitor));
-		defaultScheduler = spy( new DefaultScheduler(taskMon));
-		
-		defaultBlowoutPool.start(infraManager, defaultScheduler);
-		
 		// exercise
-		TaskImpl task2 = new TaskImpl("task-two-id", spec, FAKE_UUID);
+		TaskImpl task2 = new TaskImpl("task-two-id", specification, FAKE_UUID);
 
 		defaultBlowoutPool.addTask(task2);
 		
-//		TaskImpl task2 = new TaskImpl("task-two-id2", spec, FAKE_UUID);
+//		TaskImpl task2 = new TaskImpl("task-two-id2", specification, FAKE_UUID);
 //
 //		defaultBlowoutPool.addTask(task2);
 		verify(defaultBlowoutPool).callAct();
@@ -210,20 +183,10 @@ public class TestDefaultBlowoutPool {
 				
 				
 				List<Task> taskList = new ArrayList<Task>();
-				TaskImpl task = new TaskImpl("task-two-id", spec, FAKE_UUID);
+				TaskImpl task = new TaskImpl("task-two-id", specification, FAKE_UUID);
 				taskList.add(task);
 				defaultBlowoutPool.setResourcePool(resourcePool);
 				defaultBlowoutPool.setTaskPool(taskList);
-				
-				InfrastructureProvider fogbowInfraProvider = mock(InfrastructureProvider.class);
-				ResourceMonitor resourceMonitor = mock(ResourceMonitor.class);
-				
-				TaskMonitor taskMon = new TaskMonitor(defaultBlowoutPool, 3000);
-				
-				infraManager = spy( new DefaultInfrastructureManager(fogbowInfraProvider, resourceMonitor));
-				defaultScheduler = spy( new DefaultScheduler(taskMon));
-				
-				defaultBlowoutPool.start(infraManager, defaultScheduler);
 				
 				// exercise
 				defaultBlowoutPool.callAct();
@@ -239,7 +202,7 @@ public class TestDefaultBlowoutPool {
 	@Test
 	public void testUpdateResource() {
 		// set up
-		FogbowResource resource = spy(new FogbowResource("resource-id", "order-id", spec));
+		FogbowResource resource = spy(new FogbowResource("resource-id", "order-id", specification));
 		resource.setState(ResourceState.BUSY);
 		
 		Map<String, AbstractResource> resourcePool = new ConcurrentHashMap<String, AbstractResource>();
