@@ -1,12 +1,10 @@
-package org.fogbowcloud.blowout.pool;
+package org.fogbowcloud.blowout.infrastructure.model;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.fogbowcloud.blowout.core.model.Specification;
-import org.fogbowcloud.blowout.core.constants.AppPropertiesConstants;
-import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
 
 public abstract class AbstractResource {
 

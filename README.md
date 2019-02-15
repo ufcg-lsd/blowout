@@ -3,11 +3,11 @@
 ## What is Blowout?
 Blowout is a tool for receiving Bag-of-tasks (BoT) submissions, monitoring requests and interacting with a Infrastructure Provider to execute the received tasks in federated cloud resources. Blowout abstracts away a complex distributed infrastructure and allows the user to focus on the application requirements.
 
-An example of Infrastructure Provider and Task Submitter for Blowout are, respectively, [Fogbow Middleware](http://www.fogbowcloud.org/) and [Arrebol](http://arrebol.lsd.ufcg.edu.br/).
+An example of Infrastructure Provider and Task Submitter for Blowout are, respectively, [Fogbow Middleware](http://www.fogbowcloud.org/) and [Iguassu](http://arrebol.lsd.ufcg.edu.br/).
 
 The main Blowout features are:
 - **Receive and Request**: receive tasks submissions and request resources from the federated cloud for these tasks.
-- **Associate and Execute**: associate to a particular task a resource that match with the task requeriments and request the execution of this task in the resource.
+- **Associate and Execute**: associate to a particular task a resource that match with the task requirements and request the execution of this task in the resource.
 - **Monitor**: monitor the task execution in the associated resource.
 
 See the following topics to understand the Blowout **architecture**, how to **deploy and configure it**, and finally, how to use it to **execute** tasks.
@@ -17,7 +17,7 @@ Blowout works similarly to a scheduler of tasks to computational resources dispe
 
 Blowout has six main components:
 
-- **BlowoutPool**: manages a pool of tasks and resources. It is through the Blowoutpool that the components have access to the received tasks and resources that were raised by the Infrastructure Provider.
+- **BlowoutPool**: manages a blowoutPool of tasks and resources. It is through the BlowoutPool that the components have access to the received tasks and resources that were raised by the Infrastructure Provider.
 
 - **Scheduler**: associates and disassociates a task, that is ready to be executed, to an available resource. After associating or disassociating a resource to a task, the Scheduler delegates to Task Monitor the assignment of creating or terminating the task execution process in the resource.
 
@@ -25,7 +25,7 @@ Blowout has six main components:
 
 - **Infrastructure Provider**: interacts with the physical resource provider, being responsible for executing the resource requests and making them available in the BlowoutPool.
 
-- **Resource Monitor**: monitors the status of resources that have already been allocated and are pending, managing the availability of these resources in the pool.
+- **Resource Monitor**: monitors the taskState of resources that have already been allocated and are pending, managing the availability of these resources in the blowoutPool.
 
 - **Task Monitor**: creates and closes a process for a task that is ready to be executed, in addition, monitors the execution of tasks that are in running state.
 
@@ -38,7 +38,7 @@ Then, decompress it:
 	
 	unzip master.zip
 
-To get the lastest stable version of Blowout source code, download it from our repository:
+To get the latest stable version of Blowout source code, download it from our repository:
 
     wget https://github.com/fogbow/blowout/archive/master.zip
 
@@ -115,7 +115,7 @@ It's possible to remove a submitted task:
 Two Tasks are equal when they have the same ID and Specifications.
 
 ### Monitoring Tasks
-You can know the status of a Task that has been submitted to Blowout.
+You can know the taskState of a Task that has been submitted to Blowout.
 
 	blowout.addTask(task);
 
@@ -132,7 +132,7 @@ Running | The Task is running on the associated resource
 Finished | The Task was finished with success
 Completed | The Task was finished with success and was taken from the running tasks list
 Not Created | The Task does not exist in Blowout
-Timedout | The Task took timeout
+Timed out | The Task took timeout
 
 
 ## Customizing Blowout Components

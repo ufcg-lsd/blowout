@@ -39,7 +39,7 @@ public class TaskProcessImplTest {
 		tp.executeTask(resource);
 
 		verify(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
-		assertEquals(tp.getStatus(), TaskState.FINISHED);
+		assertEquals(tp.getTaskState(), TaskState.FINISHED);
 	}
 
 	@Test
@@ -59,7 +59,7 @@ public class TaskProcessImplTest {
 
 		tp.executeTask(resource);
 
-		assertEquals(tp.getStatus(), TaskState.FAILED);
+		assertEquals(tp.getTaskState(), TaskState.FAILED);
 
 	}
 
@@ -87,7 +87,7 @@ public class TaskProcessImplTest {
 		verify(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
 		verify(tp).executeCommandString(FAKE_COMMAND2, Command.Type.LOCAL, resource);
 		verify(tp).executeCommandString(FAKE_COMMAND3, Command.Type.LOCAL, resource);
-		assertEquals(tp.getStatus(), TaskState.FINISHED);
+		assertEquals(tp.getTaskState(), TaskState.FINISHED);
 	}
 
 	@Test
@@ -115,7 +115,7 @@ public class TaskProcessImplTest {
 		verify(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
 		verify(tp).executeCommandString(FAKE_COMMAND2, Command.Type.LOCAL, resource);
 		verify(tp, never()).executeCommandString(FAKE_COMMAND3, Command.Type.LOCAL, resource);
-		assertEquals(tp.getStatus(), TaskState.FAILED);
+		assertEquals(tp.getTaskState(), TaskState.FAILED);
 	}
 
 	@Test
@@ -141,7 +141,7 @@ public class TaskProcessImplTest {
 		verify(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
 		verify(tp, never()).executeCommandString(FAKE_COMMAND2, Command.Type.LOCAL, resource);
 		verify(tp, never()).executeCommandString(FAKE_COMMAND3, Command.Type.LOCAL, resource);
-		assertEquals(tp.getStatus(), TaskState.FAILED);
+		assertEquals(tp.getTaskState(), TaskState.FAILED);
 	}
 
 

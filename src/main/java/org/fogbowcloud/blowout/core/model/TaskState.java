@@ -20,13 +20,13 @@ public enum TaskState {
 		return this.desc;
 	}
 	
-	public static TaskState getTaskStateFromDesc(String desc) throws Exception{
+	public static TaskState getTaskStateFromDesc(String desc) {
 		for (TaskState ts : values()) {
 			if(ts.getDesc().equals(desc)){
 				return ts;
 			}
 		}
-		throw new Exception("Invalid task state");
+		return null;
 	}
 	
 }

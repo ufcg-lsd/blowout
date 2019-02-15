@@ -2,7 +2,7 @@ package org.fogbowcloud.blowout.core.model;
 
 import java.util.List;
 
-import org.fogbowcloud.blowout.pool.AbstractResource;
+import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
 
 public interface TaskProcess {
 
@@ -14,11 +14,11 @@ public interface TaskProcess {
 
 	TaskExecutionResult executeTask(AbstractResource resource);
 
-	TaskState getStatus();
+	TaskState getTaskState();
 	
 	Specification getSpecification();
 	
 	AbstractResource getResource();
 	
-	void setStatus(TaskState taskState);
+	void setTaskState(TaskState taskState);
 }

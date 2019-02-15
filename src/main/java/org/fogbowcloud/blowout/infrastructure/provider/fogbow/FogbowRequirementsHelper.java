@@ -6,7 +6,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.constants.FogbowConstants;
 import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
-import org.fogbowcloud.blowout.pool.AbstractResource;
+import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
 
 import condor.classad.AttrRef;
 import condor.classad.ClassAdParser;
@@ -46,72 +46,72 @@ public class FogbowRequirementsHelper {
 		}
 	}
 
-	public static boolean matches(FogbowResource resource, String requirementsStr) {
+	public static boolean matches(FogbowResource resource, String requirements) {
 		
-		LOGGER.debug("Matching Fogbow Requirements [" + requirementsStr + "] with Resource [id: "
+		LOGGER.debug("Matching Fogbow Requirements [" + requirements + "] with Resource [id: "
 				+ resource.getId() + "]");
 		
-		List<String> listAttrSearched = new ArrayList<String>();
-		List<String> listAttrProvided = new ArrayList<String>();
+		List<String> providedAttributes = new ArrayList<>();
+		List<String> foundedAttributes = new ArrayList<>();
 		
 		try {
-			if (requirementsStr == null  || requirementsStr.trim().isEmpty()) {
+			if (requirements == null  || requirements.trim().isEmpty()) {
 				return true;
 			}
 			
-			ClassAdParser classAdParser = new ClassAdParser(requirementsStr);		
+			ClassAdParser classAdParser = new ClassAdParser(requirements);
 			Op expr = (Op) classAdParser.parse();
 			
-			listAttrProvided.add(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_Glue2vCPU);
-			listAttrProvided.add(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_Glue2RAM);
-			listAttrProvided.add(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_Glue2disk);
-			listAttrProvided.add(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_1Glue2CloudComputeManagerID);
+			foundedAttributes.add(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_Glue2vCPU);
+			foundedAttributes.add(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_Glue2RAM);
+			foundedAttributes.add(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_Glue2disk);
+			foundedAttributes.add(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_1Glue2CloudComputeManagerID);
 			
 			Env env = new Env();
-			String value = null;
-			for (String attr : listAttrProvided) {
+			String attributeValue = null;
+			for (String attribute : foundedAttributes) {
 				
-				List<ValueAndOperator> findValuesInRequiremets = findValuesInRequiremets(expr, attr);
+				List<ValueAndOperator> findValuesInRequirements = findValuesInRequirements(expr, attribute);
 				
-				if (findValuesInRequiremets.size() > 0) {
+				if (findValuesInRequirements.size() > 0) {
 
 					// TODO: Check if you need to refact this
-					if (attr.equals(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_Glue2vCPU)) {
-						listAttrSearched.add(attr);
-						value = resource.getMetadataValue(AbstractResource.METADATA_VCPU);
+					if (attribute.equals(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_Glue2vCPU)) {
+						providedAttributes.add(attribute);
+						attributeValue = resource.getMetadataValue(AbstractResource.METADATA_VCPU);
 					} 
-					else if (attr.equals(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_Glue2RAM)) {
-						listAttrSearched.add(attr);
-						value = resource.getMetadataValue(AbstractResource.METADATA_MEM_SIZE);
+					else if (attribute.equals(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_Glue2RAM)) {
+						providedAttributes.add(attribute);
+						attributeValue = resource.getMetadataValue(AbstractResource.METADATA_MEM_SIZE);
 					} 
-					else if (attr.equals(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_Glue2disk)) {
-						value = resource.getMetadataValue(AbstractResource.METADATA_DISK_SIZE);
-						if (value != null && !value.equals(ZERO) ) {
-							listAttrSearched.add(attr);							
+					else if (attribute.equals(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_Glue2disk)) {
+						attributeValue = resource.getMetadataValue(AbstractResource.METADATA_DISK_SIZE);
+						if (attributeValue != null && !attributeValue.equals(ZERO) ) {
+							providedAttributes.add(attribute);
 						}
 					} 
-					else if (attr.equals(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_1Glue2CloudComputeManagerID)) {
-						listAttrSearched.add(attr);
-						value = resource.getMetadataValue(AbstractResource.METADATA_LOCATION);
+					else if (attribute.equals(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_1Glue2CloudComputeManagerID)) {
+						providedAttributes.add(attribute);
+						attributeValue = resource.getMetadataValue(AbstractResource.METADATA_LOCATION);
 					}
 					
-					env.push((RecordExpr) new ClassAdParser("[" + attr + " = " + value + "]").parse());
-					LOGGER.debug("Matching Requirement [" + attr + " = " + value + "]");
+					env.push((RecordExpr) new ClassAdParser("[" + attribute + " = " + attributeValue + "]").parse());
+					LOGGER.debug("Matching Requirement [" + attribute + " = " + attributeValue + "]");
 				}
 			}					
 			
-			if (listAttrSearched.isEmpty()) {
+			if (providedAttributes.isEmpty()) {
 				return true;
 			}
-			expr = extractVariablesExpression(expr, listAttrSearched);
+			expr = extractVariablesExpression(expr, providedAttributes);
 			
 			return expr.eval(env).isTrue();
 		} catch (Exception e) {
-			LOGGER.error("Matching Fogbow Requirements ["+requirementsStr+"] with Resource [id: "+resource.getId()+"] FAILED", e);
+			LOGGER.error("Matching Fogbow Requirements ["+requirements+"] with Resource [id: "+resource.getId()+"] FAILED", e);
 			return false;
 		}finally {
-			listAttrSearched.clear();
-			listAttrProvided.clear();
+			providedAttributes.clear();
+			foundedAttributes.clear();
 		}
 	}
 	
@@ -149,7 +149,7 @@ public class FogbowRequirementsHelper {
 		return new Op(expr.op, left, right);
 	}
 
-	private static List<ValueAndOperator> findValuesInRequiremets(Op expr, String attName) {
+	private static List<ValueAndOperator> findValuesInRequirements(Op expr, String attName) {
 		List<ValueAndOperator> valuesAndOperator = new ArrayList<ValueAndOperator>();
 		if (expr.arg1 instanceof AttrRef) {
 			AttrRef attr = (AttrRef) expr.arg1;
@@ -159,14 +159,14 @@ public class FogbowRequirementsHelper {
 			return valuesAndOperator;
 		}
 		if (expr.arg1 instanceof Op) {
-			List<ValueAndOperator> findValuesInRequiremets = findValuesInRequiremets(
+			List<ValueAndOperator> findValuesInRequirements = findValuesInRequirements(
 					(Op) expr.arg1, attName);
-			if (findValuesInRequiremets != null) {
-				valuesAndOperator.addAll(findValuesInRequiremets);
+			if (findValuesInRequirements != null) {
+				valuesAndOperator.addAll(findValuesInRequirements);
 			}
 		}
 		if (expr.arg2 instanceof Op) {
-			List<ValueAndOperator> findValuesInRequiremets = findValuesInRequiremets(
+			List<ValueAndOperator> findValuesInRequiremets = findValuesInRequirements(
 					(Op) expr.arg2, attName);
 			if (findValuesInRequiremets != null) {
 				valuesAndOperator.addAll(findValuesInRequiremets);

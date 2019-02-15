@@ -21,11 +21,16 @@ public class Command implements Serializable{
 
 	private final String command;
 	private final Type type;
-	private State state = State.UNSTARTED;
+	private State state;
 
-	public Command(String command, Type type) {
+	public Command(String command, Type type, State state) {
 		this.command = command;
 		this.type = type;
+		this.state = state;
+	}
+
+	public Command(String command, Type type) {
+		this(command, type, State.UNSTARTED);
 	}
 
 	public Type getType() {
@@ -45,7 +50,7 @@ public class Command implements Serializable{
 	}
 
 	public Command clone() {
-		return new Command(this.command, this.type);
+		return new Command(this.command, this.type, this.state);
 	}
 	
 	public JSONObject toJSON() {

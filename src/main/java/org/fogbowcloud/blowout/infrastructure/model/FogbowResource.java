@@ -7,7 +7,6 @@ import org.fogbowcloud.blowout.core.constants.AppMessagesConstants;
 import org.fogbowcloud.blowout.core.constants.FogbowConstants;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.infrastructure.provider.fogbow.FogbowRequirementsHelper;
-import org.fogbowcloud.blowout.pool.AbstractResource;
 
 public class FogbowResource extends AbstractResource {
 

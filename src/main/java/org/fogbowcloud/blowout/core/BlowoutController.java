@@ -14,8 +14,9 @@ import org.fogbowcloud.blowout.core.constants.AppPropertiesConstants;
 import org.fogbowcloud.blowout.infrastructure.manager.InfrastructureManager;
 import org.fogbowcloud.blowout.infrastructure.monitor.ResourceMonitor;
 import org.fogbowcloud.blowout.infrastructure.provider.InfrastructureProvider;
-import org.fogbowcloud.blowout.pool.AbstractResource;
+import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
 import org.fogbowcloud.blowout.pool.BlowoutPool;
+import org.fogbowcloud.blowout.scheduler.Scheduler;
 
 public class BlowoutController {
 
@@ -74,7 +75,7 @@ public class BlowoutController {
 		if (!started) {
 			throw new BlowoutException("Blowout hasn't been started yet");
 		}
-		LOGGER.debug("Tasks of the job " + Thread.currentThread().getName() + " submitted to the Pool.");
+		LOGGER.debug("Tasks of the job id " + Thread.currentThread().getName() + " submitted to the Pool.");
 		blowoutPool.addTasks(tasks);
 	}
 

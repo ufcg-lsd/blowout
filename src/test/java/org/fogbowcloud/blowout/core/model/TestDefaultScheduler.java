@@ -7,12 +7,12 @@ import static org.mockito.Mockito.spy;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.fogbowcloud.blowout.core.DefaultScheduler;
-import org.fogbowcloud.blowout.core.Scheduler;
+import org.fogbowcloud.blowout.scheduler.DefaultScheduler;
+import org.fogbowcloud.blowout.scheduler.Scheduler;
 import org.fogbowcloud.blowout.core.monitor.TaskMonitor;
 import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceState;
-import org.fogbowcloud.blowout.pool.AbstractResource;
+import org.fogbowcloud.blowout.infrastructure.model.AbstractResource;
 import org.fogbowcloud.blowout.pool.ResourceStateHelper;
 import org.junit.Before;
 import org.junit.Test;
