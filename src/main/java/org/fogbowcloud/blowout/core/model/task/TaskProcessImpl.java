@@ -21,23 +21,23 @@ public class TaskProcessImpl implements TaskProcess {
 	private static final String ENV_HOST = "HOST";
 	private static final String ENV_SSH_USER = "SSH_USER";
 	private static final String ENV_PRIVATE_KEY_FILE = "PRIVATE_KEY_FILE";
-	private static final String USER_ID_FIELD = "UUID";
+	private static final String ENV_UUID = "UUID";
 
 	private final String taskId;
 	private TaskState taskState;
 	private final List<Command> commandList;
 	private final Specification specification;
 	private String processId;
-	private String userId;
+	private String uuid;
 	private AbstractResource resource;
 
-	public TaskProcessImpl(String taskId, List<Command> commandList, Specification specification, String userId) {
+	public TaskProcessImpl(String taskId, List<Command> commandList, Specification specification, String uuid) {
 		this.processId = AppUtil.generateIdentifier();
 		this.taskId = taskId;
 		this.taskState = TaskState.READY;
 		this.specification = specification;
 		this.commandList = commandList;
-		this.userId = userId;
+		this.uuid = uuid;
 	}
 
 	public String getProcessId() {
@@ -163,7 +163,7 @@ public class TaskProcessImpl implements TaskProcess {
 		setPublicIp(resource, additionalEnvVar);
 		setUser(resource, additionalEnvVar);
 		setPrivateKeyFilePath(additionalEnvVar);
-		setUserId(additionalEnvVar);
+		setUuid(additionalEnvVar);
 
 		return additionalEnvVar;
 	}
@@ -199,9 +199,9 @@ public class TaskProcessImpl implements TaskProcess {
 		LOGGER.info("SSH - Private key file path: " + this.specification.getPrivateKeyFilePath());
 	}
 
-	private void setUserId(Map<String, String> additionalEnvVar) {
-		additionalEnvVar.put(USER_ID_FIELD, this.userId);
-		LOGGER.info("SSH - User ID: " + this.userId);
+	private void setUuid(Map<String, String> additionalEnvVar) {
+		additionalEnvVar.put(ENV_UUID, this.uuid);
+		LOGGER.info("SSH - UUID: " + this.uuid);
 	}
 
 	@Override
