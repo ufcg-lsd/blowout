@@ -62,12 +62,12 @@ public class TaskProcessImpl implements TaskProcess {
 
 		LOGGER.debug("Task : " + taskId + " is running. ");
 		for (Command command : this.getCommands()) {
-			LOGGER.trace("Command " + command.getCommand());
-			LOGGER.trace("Command Type " + command.getType());
+			LOGGER.debug("Command " + command.getCommand());
+			LOGGER.debug("Command Type " + command.getType());
 			String commandString = getExecutableCommandString(command);
 
 			taskExecutionResult = executeCommandString(commandString, command.getType(), resource);
-			LOGGER.trace("Command result: " + taskExecutionResult.getExitValue());
+			LOGGER.debug("Command result: " + taskExecutionResult.getExitValue());
 			if (taskExecutionResult.getExitValue() != TaskExecutionResult.OK) {
 				if(taskExecutionResult.getExitValue() == TaskExecutionResult.TIMEOUT) {
 					this.setTaskState(TaskState.TIMEDOUT);
