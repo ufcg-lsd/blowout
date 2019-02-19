@@ -22,7 +22,7 @@ public abstract class AbstractResource {
 	public static final String METADATA_IMAGE = "metadataImage";
 	public static final String METADATA_PUBLIC_KEY = "metadataPublicKey";
 
-	public static final String METADATA_VCPU = "metadaVCPU";
+	public static final String METADATA_VCPU = "metadataVCPU";
 	public static final String METADATA_MEM_SIZE = "metadataMenSize";
 	public static final String METADATA_DISK_SIZE = "metadataDiskSize";	
 	public static final String METADATA_LOCATION = "metadataLocation";

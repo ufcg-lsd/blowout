@@ -98,7 +98,7 @@ public class BlowoutController {
 	}
 
 	public BlowoutPool createBlowoutInstance() throws Exception {
-		String providerClassName = this.properties.getProperty(AppPropertiesConstants.IMPLEMENTATION_BLOWOUT_POOL,
+		String providerClassName = this.properties.getProperty(AppPropertiesConstants.POOL_PLUGIN,
 				BlowoutConstants.DEFAULT_IMPLEMENTATION_BLOWOUT_POOL);
 		Class<?> forName = Class.forName(providerClassName);
 		Object clazz = forName.getConstructor().newInstance();
@@ -109,7 +109,7 @@ public class BlowoutController {
 	}
 
 	public InfrastructureProvider createInfraProviderInstance(boolean removePreviousResources) throws Exception {
-		String providerClassName = this.properties.getProperty(AppPropertiesConstants.IMPLEMENTATION_INFRA_PROVIDER,
+		String providerClassName = this.properties.getProperty(AppPropertiesConstants.INFRA_PROVIDER_PLUGIN,
 				BlowoutConstants.DEFAULT_IMPLEMENTATION_INFRA_PROVIDER);
 		Class<?> forName = Class.forName(providerClassName);
 		Object clazz = forName.getConstructor(Properties.class, Boolean.TYPE).newInstance(properties, removePreviousResources);
@@ -120,7 +120,7 @@ public class BlowoutController {
 	}
 
 	public InfrastructureManager createInfraManagerInstance() throws Exception {
-		String providerClassName = this.properties.getProperty(AppPropertiesConstants.IMPLEMENTATION_INFRA_MANAGER,
+		String providerClassName = this.properties.getProperty(AppPropertiesConstants.INFRA_MANAGER_PLUGIN,
 				BlowoutConstants.DEFAULT_IMPLEMENTATION_INFRA_MANAGER);
 		Class<?> forName = Class.forName(providerClassName);
 		Object clazz = forName.getConstructor(InfrastructureProvider.class, ResourceMonitor.class).newInstance(infraProvider, resourceMonitor);
@@ -131,7 +131,7 @@ public class BlowoutController {
 	}
 
 	protected Scheduler createSchedulerInstance(TaskMonitor taskMonitor) throws Exception {
-		String providerClassName = this.properties.getProperty(AppPropertiesConstants.IMPLEMENTATION_SCHEDULER,
+		String providerClassName = this.properties.getProperty(AppPropertiesConstants.SCHEDULER_PLUGIN,
 				BlowoutConstants.DEFAULT_IMPLEMENTATION_SCHEDULER);
 		Class<?> forName = Class.forName(providerClassName);
 		Object clazz = forName.getConstructor(TaskMonitor.class).newInstance(taskMonitor);
@@ -255,10 +255,10 @@ public class BlowoutController {
 	}
 
 	private static void populateWithPropertiesKeys(List<String> propertiesKeys) {
-		propertiesKeys.add(AppPropertiesConstants.IMPLEMENTATION_INFRA_PROVIDER);
+		propertiesKeys.add(AppPropertiesConstants.INFRA_PROVIDER_PLUGIN);
 		propertiesKeys.add(AppPropertiesConstants.INFRA_RESOURCE_IDLE_LIFETIME);
 		propertiesKeys.add(AppPropertiesConstants.INFRA_RESOURCE_CONNECTION_TIMEOUT);
-		propertiesKeys.add(AppPropertiesConstants.INFRA_IS_STATIC);
-		propertiesKeys.add(AppPropertiesConstants.INFRA_AUTH_TOKEN_UPDATE_PLUGIN);
+		propertiesKeys.add(AppPropertiesConstants.INFRA_IS_ELASTIC);
+		propertiesKeys.add(AppPropertiesConstants.TOKEN_UPDATE_PLUGIN);
 	}
 }

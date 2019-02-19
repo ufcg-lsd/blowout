@@ -25,10 +25,10 @@ public class RASTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
 
     private static final Logger LOGGER = Logger.getLogger(RASTokenUpdatePlugin.class);
 
-    private static final String FOGBOW_USERNAME = INFRA_AUTH_TOKEN_PREFIX + INFRA_AUTH_TOKEN_USERNAME;
-    private static final String FOGBOW_PASSWORD = INFRA_AUTH_TOKEN_PREFIX + INFRA_AUTH_TOKEN_PASSWORD;
-    private static final String FOGBOW_PROJECT_NAME = INFRA_AUTH_TOKEN_PREFIX + INFRA_AUTH_TOKEN_PROJECT_NAME;
-    private static final String FOGBOW_DOMAIN = INFRA_AUTH_TOKEN_PREFIX + INFRA_AUTH_TOKEN_DOMAIN;
+    private static final String FOGBOW_USERNAME = RAS_TOKEN_PREFIX + RAS_TOKEN_USERNAME;
+    private static final String FOGBOW_PASSWORD = RAS_TOKEN_PREFIX + RAS_TOKEN_PASSWORD;
+    private static final String FOGBOW_PROJECT_NAME = RAS_TOKEN_PREFIX + RAS_TOKEN_PROJECT_NAME;
+    private static final String FOGBOW_DOMAIN = RAS_TOKEN_PREFIX + RAS_TOKEN_DOMAIN;
 
     private final String rasBaseUrl;
     private final String userName;
@@ -42,7 +42,7 @@ public class RASTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
         this.password = super.properties.getProperty(FOGBOW_PASSWORD);
         this.projectName = super.properties.getProperty(FOGBOW_PROJECT_NAME);
         this.domain = super.properties.getProperty(FOGBOW_DOMAIN);
-        this.rasBaseUrl =  super.properties.getProperty(INFRA_RAS_BASE_URL);
+        this.rasBaseUrl =  super.properties.getProperty(RAS_BASE_URL);
     }
 
     @Override
@@ -57,7 +57,7 @@ public class RASTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
 
     @Override
     public void validateProperties() throws BlowoutException {
-        validateProperty(super.properties, INFRA_AUTH_TOKEN_UPDATE_PLUGIN);
+        validateProperty(super.properties, TOKEN_UPDATE_PLUGIN);
         validateProperty(super.properties, FOGBOW_USERNAME);
         validateProperty(super.properties, FOGBOW_PASSWORD);
         validateProperty(super.properties, FOGBOW_PROJECT_NAME);
@@ -82,10 +82,10 @@ public class RASTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
     private StringEntity makeBodyJson() throws JSONException, UnsupportedEncodingException {
         JSONObject json = new JSONObject();
 
-        makeBodyField(json, INFRA_AUTH_TOKEN_USERNAME, this.userName);
-        makeBodyField(json, INFRA_AUTH_TOKEN_PASSWORD, this.password);
-        makeBodyField(json, INFRA_AUTH_TOKEN_DOMAIN, this.domain);
-        makeBodyField(json, INFRA_AUTH_TOKEN_PROJECT_NAME, this.projectName);
+        makeBodyField(json, RAS_TOKEN_USERNAME, this.userName);
+        makeBodyField(json, RAS_TOKEN_PASSWORD, this.password);
+        makeBodyField(json, RAS_TOKEN_DOMAIN, this.domain);
+        makeBodyField(json, RAS_TOKEN_PROJECT_NAME, this.projectName);
 
         return new StringEntity(json.toString());
     }

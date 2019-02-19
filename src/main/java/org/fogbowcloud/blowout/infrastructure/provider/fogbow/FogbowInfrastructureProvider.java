@@ -302,7 +302,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 	private static AbstractTokenUpdatePlugin createTokenUpdatePlugin(Properties properties) throws Exception {
 
-		String providerClassName = properties.getProperty(AppPropertiesConstants.INFRA_AUTH_TOKEN_UPDATE_PLUGIN);
+		String providerClassName = properties.getProperty(AppPropertiesConstants.TOKEN_UPDATE_PLUGIN);
 
 		Object clazz = Class.forName(providerClassName).getConstructor(Properties.class).newInstance(properties);
 		if (!(clazz instanceof AbstractTokenUpdatePlugin)) {

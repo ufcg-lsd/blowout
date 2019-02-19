@@ -36,7 +36,7 @@ public class RASRequestsHelper {
         this.http = new HttpWrapper();
         this.properties = properties;
         this.token = tokenUpdatePlugin.generateToken();
-        this.RAS_BASE_URL = this.properties.getProperty(AppPropertiesConstants.INFRA_RAS_BASE_URL);
+        this.RAS_BASE_URL = this.properties.getProperty(AppPropertiesConstants.RAS_BASE_URL);
     }
 
     public String createCompute(Specification specification) throws RequestResourceException {
@@ -63,12 +63,12 @@ public class RASRequestsHelper {
     public String createPublicIp(String computeOrderId) throws InterruptedException {
         sleep(6000);
         String publicIpId = null;
-        final String provider = this.properties.getProperty(AppPropertiesConstants.INFRA_AUTH_TOKEN_PROJECT_NAME);
+        final String provider = this.properties.getProperty(AppPropertiesConstants.RAS_TOKEN_PROJECT_NAME);
         final String requestUrl = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_PUBLIC_IP;
 
         Map<String, String> bodyRequestAttrs = new HashMap<>();
         if (computeOrderId != null && !computeOrderId.isEmpty()) {
-            bodyRequestAttrs.put(FogbowConstants.JSON_KEY_FOGBOW_COMPUTE_ID, computeOrderId);
+            bodyRequestAttrs.put(FogbowConstants.JSON_KEY_RAS_COMPUTE_ID, computeOrderId);
             bodyRequestAttrs.put(FogbowConstants.JSON_KEY_FOGBOW_PROVIDER, provider);
         }
         try {
@@ -144,12 +144,12 @@ public class RASRequestsHelper {
         JSONObject json = new JSONObject();
         final String iguassuComputesName = "Iguassu";
 
-        makeBodyField(json, FogbowConstants.JSON_KEY_FOGBOW_REQUIREMENTS_PUBLIC_KEY, specification.getPublicKey());
-        makeBodyField(json, FogbowConstants.JSON_KEY_FOGBOW_REQUIREMENTS_MEMORY, specification.getMemory());
-        makeBodyField(json, FogbowConstants.JSON_KEY_FOGBOW_REQUIREMENTS_DISK, specification.getDisk());
-        makeBodyField(json, FogbowConstants.JSON_KEY_FOGBOW_REQUIREMENTS_IMAGE_ID, specification.getImageId());
-        makeBodyField(json, FogbowConstants.JSON_KEY_FOGBOW_REQUIREMENTS_VCPU, specification.getvCPU());
-        makeBodyField(json, FogbowConstants.JSON_KEY_FOGBOW_REQUIREMENTS_COMPUTE_NAME, iguassuComputesName);
+        makeBodyField(json, FogbowConstants.JSON_KEY_RAS_PUBLIC_KEY, specification.getPublicKey());
+        makeBodyField(json, FogbowConstants.JSON_KEY_RAS_MEMORY, specification.getMemory());
+        makeBodyField(json, FogbowConstants.JSON_KEY_RAS_DISK, specification.getDisk());
+        makeBodyField(json, FogbowConstants.JSON_KEY_RAS_IMAGE_ID, specification.getImageId());
+        makeBodyField(json, FogbowConstants.JSON_KEY_RAS_VCPU, specification.getvCPU());
+        makeBodyField(json, FogbowConstants.JSON_KEY_RAS_COMPUTE_NAME, iguassuComputesName);
 
         return new StringEntity(json.toString());
     }

@@ -166,10 +166,10 @@ public class FogbowRequirementsHelper {
 			}
 		}
 		if (expr.arg2 instanceof Op) {
-			List<ValueAndOperator> findValuesInRequiremets = findValuesInRequirements(
+			List<ValueAndOperator> findValuesInRequirements = findValuesInRequirements(
 					(Op) expr.arg2, attName);
-			if (findValuesInRequiremets != null) {
-				valuesAndOperator.addAll(findValuesInRequiremets);
+			if (findValuesInRequirements != null) {
+				valuesAndOperator.addAll(findValuesInRequirements);
 			}
 		}
 		return valuesAndOperator;

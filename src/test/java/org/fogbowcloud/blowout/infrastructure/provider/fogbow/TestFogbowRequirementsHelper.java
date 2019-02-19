@@ -336,12 +336,12 @@ public class TestFogbowRequirementsHelper {
 
 		properties = new Properties();
 
-		properties.setProperty(AppPropertiesConstants.INFRA_IS_STATIC, "false");
-		properties.setProperty(AppPropertiesConstants.IMPLEMENTATION_INFRA_PROVIDER,
+		properties.setProperty(AppPropertiesConstants.INFRA_IS_ELASTIC, "false");
+		properties.setProperty(AppPropertiesConstants.INFRA_PROVIDER_PLUGIN,
 				"org.fogbowcloud.scheduler.infrastructure.fogbow.FogbowInfrastructureProvider");
 		properties.setProperty(AppPropertiesConstants.INFRA_RESOURCE_CONNECTION_TIMEOUT, "10000");
 		properties.setProperty(AppPropertiesConstants.INFRA_RESOURCE_IDLE_LIFETIME, "300000");
-		properties.setProperty(AppPropertiesConstants.INFRA_RAS_BASE_URL, "100_02_01_01:8098");
+		properties.setProperty(AppPropertiesConstants.RAS_BASE_URL, "100_02_01_01:8098");
 
 	}
 
