@@ -32,7 +32,7 @@ public class TestResourceMonitor {
 		infraProvider = Mockito.mock(InfrastructureProvider.class);
 		resourcePool = Mockito.mock(BlowoutPool.class);
 		Properties properties = new Properties();
-		properties.setProperty(AppPropertiesConstants.INFRA_MONITOR_PERIOD, "1000");
+		properties.setProperty(AppPropertiesConstants.RESOURCE_MONITOR_SLEEP_PERIOD, "1000");
 		properties.setProperty(AppPropertiesConstants.INFRA_RESOURCE_IDLE_LIFETIME, "120000");
 		properties.setProperty(AppPropertiesConstants.INFRA_RESOURCE_CONNECTION_RETRY, "3");
 		

@@ -13,7 +13,7 @@ public class AppPropertiesConstants {
 	public static final String INFRA_RESOURCE_IDLE_LIFETIME = "infra_resource_idle_lifetime";
 	public static final String INFRA_RESOURCE_REUSE_TIMES = "max_resource_reuse";
 	public static final String INFRA_RESOURCE_CONNECTION_RETRY = "max_resource_connection_retry";
-	public static final String INFRA_MONITOR_PERIOD = "infra_monitor_period";
+	public static final String RESOURCE_MONITOR_SLEEP_PERIOD = "resource_monitor_sleep_period";
 
 	public static final String RAS_TOKEN_PREFIX = "ras_token_";
 	public static final String RAS_TOKEN_USERNAME = "username";

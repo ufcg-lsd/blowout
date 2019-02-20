@@ -29,7 +29,7 @@ public class ResourceMonitor {
 
 	private Thread monitoringServiceRunner;
 	private MonitoringService monitoringService;
-	private long infraMonitoringPeriod;
+	private long sleepPeriod;
 	private Long idleLifeTime;
 	private int maxConnectionTries;
 	private int maxReuse;
@@ -45,8 +45,8 @@ public class ResourceMonitor {
 		final String defaultMaxConnectTries = "1";
 		final String defaultMaxReuse = "1";
 
-		this.infraMonitoringPeriod = Long.parseLong(properties.getProperty(
-				AppPropertiesConstants.INFRA_MONITOR_PERIOD, defaultInfraMonitorPeriod));
+		this.sleepPeriod = Long.parseLong(properties.getProperty(
+				AppPropertiesConstants.RESOURCE_MONITOR_SLEEP_PERIOD, defaultInfraMonitorPeriod));
 		this.idleLifeTime = Long.parseLong(properties.getProperty(
 				AppPropertiesConstants.INFRA_RESOURCE_IDLE_LIFETIME, defaultIdleLifeTime));
 		this.maxConnectionTries = Integer.parseInt(properties.getProperty(
@@ -89,7 +89,7 @@ public class ResourceMonitor {
 			while (isActive) {
 				try {
 					LOGGER.info("Resource monitor is waiting.");
-					Thread.sleep(infraMonitoringPeriod);
+					Thread.sleep(sleepPeriod);
 					monitorProcess();
 				} catch (InterruptedException e) {
 					LOGGER.error("Error while executing MonitoringService.");
