@@ -69,7 +69,7 @@ public class RASTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
 
         String requestUrl = this.rasBaseUrl + "/" + FogbowConstants.RAS_ENDPOINT_TOKEN;
         StringEntity body = makeBodyJson();
-
+        String bodyContent = body.getContent().toString();
         body.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, HttpWrapper.HTTP_CONTENT_JSON));
 
         String accessToken = httpWrapper.doRequest("post", requestUrl, new LinkedList<>(), body);

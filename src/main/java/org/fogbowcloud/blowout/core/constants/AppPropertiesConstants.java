@@ -14,14 +14,12 @@ public class AppPropertiesConstants {
 	public static final String INFRA_RESOURCE_REUSE_TIMES = "max_resource_reuse";
 	public static final String INFRA_RESOURCE_CONNECTION_RETRY = "max_resource_connection_retry";
 	public static final String INFRA_MONITOR_PERIOD = "infra_monitor_period";
-	public static final String DEFAULT_COMPUTE_FLAVOR_SPEC = "default_compute_flavor_spec";
 
 	public static final String RAS_TOKEN_PREFIX = "ras_token_";
 	public static final String RAS_TOKEN_USERNAME = "username";
 	public static final String RAS_TOKEN_PASSWORD = "password";
-	public static final String RAS_TOKEN_PROJECT_NAME = "project_name";
+	public static final String RAS_TOKEN_PROJECT_NAME = "projectname";
 	public static final String RAS_TOKEN_DOMAIN = "domain";
-
 	public static final String RAS_BASE_URL = "ras_base_url";
 
 	public static final String TOKEN_UPDATE_TIME = "ras_token_update_time";

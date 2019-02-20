@@ -93,7 +93,7 @@ public class TestFogbowInfrastructureProvider {
 				"publicKeyMock", "privateKeyMock", FAKE_DATA_FILE, "userDataType");
 
 		try {
-			StringEntity bodyJson = fogbowInfrastructureProvider.makeBodyJson(specs);
+			StringEntity bodyJson = fogbowInfrastructureProvider.makeJsonBody(specs);
 			String bodyJsonString = EntityUtils.toString(bodyJson);
 
 			assertTrue(bodyJsonString.contains(FogbowConstants.JSON_KEY_RAS_PUBLIC_KEY));

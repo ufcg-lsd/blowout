@@ -273,7 +273,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		this.frDatastore = frDatastore;
 	}
 
-	protected StringEntity makeBodyJson(Specification spec) throws UnsupportedEncodingException {
+	protected StringEntity makeJsonBody(Specification spec) throws UnsupportedEncodingException {
         return requestsHelper.makeJsonBody(spec);
 	}
 
