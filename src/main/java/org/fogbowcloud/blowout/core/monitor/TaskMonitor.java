@@ -178,25 +178,20 @@ public class TaskMonitor implements Runnable {
 		TaskProcess processToHalt = getRunningTasks().get(task);
 		LOGGER.debug("Removing task " + task.getId());
 		removeRunningTask(task);
-		LOGGER.info("Removed TaskProcess of ExecutorService.");
-		this.taskExecutor.remove(() -> {
-			processToHalt.executeTask(processToHalt.getResource());
-		});
-
 
 		if (processToHalt != null) {
-			LOGGER.debug("TaskProcess of Task " + task.getId() + " is not null");
-
+			LOGGER.debug("TaskProcess of Task " + task.getId() + " was found.");
+			LOGGER.info("Removing TaskProcess of ExecutorService.");
+			this.taskExecutor.remove(() -> {
+				processToHalt.executeTask(processToHalt.getResource());
+			});
 			if (processToHalt.getResource() != null) {
 				blowoutPool.updateResource(processToHalt.getResource(), ResourceState.IDLE);
 				LOGGER.debug("Resource " + processToHalt.getResource().getId() + " was stopped.");
 			}
 		} else {
-			LOGGER.debug("Process To Halt is Null");
+			LOGGER.debug("Process To Halt not found.");
 		}
-
-
-
 	}
 
 	public BlowoutPool getBlowoutPool() {

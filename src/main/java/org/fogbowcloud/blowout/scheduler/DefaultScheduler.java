@@ -28,8 +28,8 @@ public class DefaultScheduler implements Scheduler {
 	public void act(List<Task> tasksPool, List<AbstractResource> resourcesPool) {
 		LOGGER.debug("Calling act from the Thread " + Thread.currentThread().getId() +
 				" of entity: " + Thread.currentThread().getName());
+		LOGGER.debug("Task Pool in Scheduler Act: " + toStringTasks(tasksPool));
 		removeUselessTasks(tasksPool);
-		LOGGER.debug("SCHEDULER ACT: " + toDebugTasksPool(tasksPool));
 		for (AbstractResource resource : resourcesPool) {
 			actOnResource(resource, tasksPool);
 		}
@@ -48,9 +48,9 @@ public class DefaultScheduler implements Scheduler {
 		}
 	}
 
-	private String toDebugTasksPool(List<Task> taskpool){
-		String output = "Taskpool -> ";
-		for(Task task : taskpool){
+	private String toStringTasks(List<Task> Tasks){
+		String output = "";
+		for(Task task : Tasks){
 			output += " Id: " + task.getId();
 		}
 		return output;
