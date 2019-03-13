@@ -118,6 +118,20 @@ public class DefaultBlowoutPool implements BlowoutPool {
 		callAct();
 	}
 
+	@Override
+	public void removeTasks(List<Task> tasks){
+		LOGGER.info("Removing list of tasks");
+		for(Task taskToRemove : tasks){
+			for(Task task : taskPool){
+				if(task.getId().equals(taskToRemove.getId())){
+					taskPool.remove(task);
+				}
+			}
+		}
+		scheduler.stopTasks(tasks);
+		callAct();
+	}
+
 	protected InfrastructureManager getInfraManager() {
 		return infraManager;
 	}

@@ -83,6 +83,10 @@ public class BlowoutController {
 		blowoutPool.removeTask(task);
 	}
 
+	public void cleanTasks(List<Task> tasks){
+		blowoutPool.removeTasks(tasks);
+	}
+
 	public TaskState getTaskState(String taskId) {
 		Task task = null;
 		for (Task t : blowoutPool.getAllTasks()) {

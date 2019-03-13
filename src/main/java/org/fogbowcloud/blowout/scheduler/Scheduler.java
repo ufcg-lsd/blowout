@@ -13,5 +13,7 @@ public interface Scheduler {
 
 	void stopTask(Task task);
 
+	void stopTasks(List<Task> tasks);
+
 	List<Task> getRunningTasks();
 }

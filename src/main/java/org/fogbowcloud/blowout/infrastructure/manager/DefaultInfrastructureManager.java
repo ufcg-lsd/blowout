@@ -89,12 +89,12 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
     private void incrementDecrementDemand(
             Map<Specification, Integer> specsDemand, Specification spec,
             boolean increment) {
-        Integer zero = new Integer(0);
+        Integer zero = 0;
         Integer demand = specsDemand.get(spec);
         if (demand == null) {
             demand = zero;
         }
-        demand = new Integer(demand.intValue() + (increment ? 1 : -1));
+        demand = demand + (increment ? 1 : -1);
         specsDemand.put(spec, zero.compareTo(demand) > 0 ? zero : demand);
     }
 
