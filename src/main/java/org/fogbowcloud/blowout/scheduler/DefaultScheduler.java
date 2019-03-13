@@ -28,13 +28,10 @@ public class DefaultScheduler implements Scheduler {
 	public void act(List<Task> tasksPool, List<AbstractResource> resourcesPool) {
 		LOGGER.debug("Calling act from the Thread " + Thread.currentThread().getId() +
 				" of entity: " + Thread.currentThread().getName());
+		removeUselessTasks(tasksPool);
+		LOGGER.debug("SCHEDULER ACT: " + toDebugTasksPool(tasksPool));
 		for (AbstractResource resource : resourcesPool) {
 			actOnResource(resource, tasksPool);
-		}
-		for (Task runningTask : this.runningTasks.values()) {
-			if (!tasksPool.contains(runningTask)) {
-				stopTask(runningTask);
-			}
 		}
 		for (AbstractResource resourceInUse : this.runningTasks.keySet()) {
 			if (!resourcesPool.contains(resourceInUse)) {
@@ -42,6 +39,23 @@ public class DefaultScheduler implements Scheduler {
 			}
 		}
 	}
+
+	private void removeUselessTasks(List<Task> tasksPool){
+		for (Task runningTask : this.runningTasks.values()) {
+			if (!tasksPool.contains(runningTask)) {
+				stopTask(runningTask);
+			}
+		}
+	}
+
+	private String toDebugTasksPool(List<Task> taskpool){
+		String output = "Taskpool -> ";
+		for(Task task : taskpool){
+			output += " Id: " + task.getId();
+		}
+		return output;
+	}
+
 
 	private Task getTaskRunningInResource(AbstractResource resource) {
 		return this.runningTasks.get(resource);
@@ -51,7 +65,10 @@ public class DefaultScheduler implements Scheduler {
 		if (resource.getState().equals(ResourceState.IDLE)) {
 			Task task = chooseTaskForRunning(resource, tasks);
 			if (task != null) {
+				LOGGER.info("Found task " + task.getId() + "for resource " + resource.getId());
 				runTask(task, resource);
+			} else {
+				LOGGER.info("Not found task for resource " + resource.getId());
 			}
 		}
 		
@@ -70,6 +87,24 @@ public class DefaultScheduler implements Scheduler {
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public void stopTasks(List<Task> tasks){
+		LOGGER.info("Stopping list of Tasks");
+		this.taskMonitor.stopTasks(tasks);
+		this.removeTasksOfRunningTasks(tasks);
+	}
+
+	private void removeTasksOfRunningTasks(List<Task> tasksToRemove){
+		for(Task taskToRemove : tasksToRemove){
+			for (AbstractResource resource : this.runningTasks.keySet()) {
+				Task task = runningTasks.get(resource);
+				if (task.getId().equals(taskToRemove.getId())) {
+					this.runningTasks.remove(resource);
+				}
+			}
+		}
 	}
 
 	@Override

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.model.task.Task;
@@ -21,34 +22,34 @@ public class TaskMonitor implements Runnable {
 	private static final Logger LOGGER = Logger.getLogger(TaskMonitor.class);
 
 	private Map<Task, TaskProcess> runningTasks;
-	private ExecutorService taskExecutor;
+	private ThreadPoolExecutor taskExecutor;
 	private Thread monitoringServiceRunner;
 	private BlowoutPool blowoutPool;
 	private long timeout;
 	private boolean isActive;
-	
+
 	public TaskMonitor(BlowoutPool blowoutPool, long timeout) {
 		this.blowoutPool = blowoutPool;
 		this.timeout = timeout;
 		this.runningTasks = new HashMap<>();
-		this.taskExecutor = Executors.newCachedThreadPool();
+		this.taskExecutor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
         this.isActive = false;
 	}
-	
+
 	public void start() {
 	    LOGGER.info("Starting Task Monitor");
 		isActive = true;
 		monitoringServiceRunner = new Thread(this, "task-monitor");
 		monitoringServiceRunner.start();
 	}
-	
+
 	public void stop() {
 	    LOGGER.info("Stopping Task Monitor");
 		isActive = false;
 		this.taskExecutor.shutdown();
 		monitoringServiceRunner.interrupt();
 	}
-	
+
 	@Override
 	public void run() {
 	    LOGGER.info("Running Task Monitor");
@@ -61,9 +62,10 @@ public class TaskMonitor implements Runnable {
 			}
 		}
 	}
-	
+
 	public void processMonitor() {
 	    LOGGER.debug("Task Monitor process");
+	    LOGGER.debug(listTaskProcess());
 		for (TaskProcess taskProcess : getRunningProcesses()) {
 		    TaskState taskProcessState = taskProcess.getTaskState();
             AbstractResource taskProcessResource = taskProcess.getResource();
@@ -86,24 +88,32 @@ public class TaskMonitor implements Runnable {
 		}
 	}
 
+	private String listTaskProcess(){
+		String output = "List Task Process -> ";
+		for(TaskProcess tp : this.getRunningProcesses()){
+			output += " Id Process: " + tp.getProcessId();
+		}
+		return output;
+	}
+
     private void removeRunningTask(Task task) {
         this.runningTasks.remove(task);
     }
-	
+
 	public Map<Task, TaskProcess> getRunningTasks(){
 		return this.runningTasks;
 	}
-	
+
 	public void setRunningTasks(Map<Task, TaskProcess> runningTasks){
 		this.runningTasks = runningTasks;
 	}
-	
+
 	public List<TaskProcess> getRunningProcesses(){
 		List<TaskProcess> processes = new ArrayList<TaskProcess>();
 		processes.addAll(this.runningTasks.values());
 		return processes;
 	}
-	
+
 	public void runTask(Task task, final AbstractResource resource) {
         if (!runningTaskContains(task)) {
 
@@ -128,9 +138,9 @@ public class TaskMonitor implements Runnable {
     private void putTaskToRunningTasks(Task task, TaskProcess taskProcess) {
         this.runningTasks.put(task, taskProcess);
     }
-	
+
 	public TaskState getTaskState(Task task){
-		
+
 		TaskProcess taskProcess = runningTasks.get(task);
 		if(taskProcess == null){
 			if(task.isFinished()){
@@ -140,7 +150,7 @@ public class TaskMonitor implements Runnable {
 		}
 		return taskProcess.getTaskState();
 	}
-	
+
 	public ExecutorService getExecutorService() {
 		return this.taskExecutor;
 	}
@@ -153,21 +163,42 @@ public class TaskMonitor implements Runnable {
 		}
 		return null;
 	}
-	
+
 	protected TaskProcess createProcess(Task task) {
 		return new TaskProcessImpl(task.getId(), task.getAllCommands(), task.getSpecification(), task.getUUID());
 	}
 
+	public void stopTasks(List<Task> tasks){
+	    for(Task task : tasks){
+	        this.stopTask(task);
+        }
+    }
+
 	public void stopTask(Task task) {
 		TaskProcess processToHalt = getRunningTasks().get(task);
+		LOGGER.debug("Removing task " + task.getId());
+		removeRunningTask(task);
+		LOGGER.info("Removed TaskProcess of ExecutorService.");
+		this.taskExecutor.remove(() -> {
+			processToHalt.executeTask(processToHalt.getResource());
+		});
+
+
 		if (processToHalt != null) {
+			LOGGER.debug("TaskProcess of Task " + task.getId() + " is not null");
+
 			if (processToHalt.getResource() != null) {
 				blowoutPool.updateResource(processToHalt.getResource(), ResourceState.IDLE);
 				LOGGER.debug("Resource " + processToHalt.getResource().getId() + " was stopped.");
 			}
+		} else {
+			LOGGER.debug("Process To Halt is Null");
 		}
+
+
+
 	}
-	
+
 	public BlowoutPool getBlowoutPool() {
 		return this.blowoutPool;
 	}

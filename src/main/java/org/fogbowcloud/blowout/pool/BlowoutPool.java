@@ -34,4 +34,5 @@ public interface BlowoutPool {
 	
 	void removeTask(Task task);
 
+    void removeTasks(List<Task> tasks);
 }
