@@ -1,5 +1,7 @@
 package org.fogbowcloud.blowout.scheduler;
 
+import static org.fogbowcloud.blowout.constants.TestConstants.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,31 +15,47 @@ import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
 import org.fogbowcloud.blowout.core.model.resource.ResourceState;
 import org.fogbowcloud.blowout.core.model.resource.AbstractResource;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 public class DefaultSchedulerTest {
+	private Specification specA;
+	private Specification specB;
+	private Task taskA;
+	private Task taskB;
+	private Task taskC;
+	private Task taskD;
 
-	private static final String FAKE_UUID = "1234";
+	@Before
+	public void setUp() {
+		this.specA = new Specification(FAKE_CLOUD_NAME, FAKE_IMAGE_ID,
+				FAKE_FOGBOW_USER_NAME, FAKE_PUBLIC_KEY, FAKE_PRIVATE_KEY_FILE_PATH);
+		this.specB = new Specification(FAKE_CLOUD_NAME+POSTFIX_B,FAKE_IMAGE_ID+POSTFIX_B,
+				FAKE_FOGBOW_USER_NAME+POSTFIX_B, FAKE_PUBLIC_KEY+POSTFIX_B, FAKE_PRIVATE_KEY_FILE_PATH+POSTFIX_B);
+		this.taskA = new TaskImpl(FAKE_UUID, specA, FAKE_UUID);
+		this.taskB = new TaskImpl(FAKE_UUID+POSTFIX_B, specA, FAKE_UUID+POSTFIX_B);
+		this.taskC = new TaskImpl(FAKE_UUID+POSTFIX_C, specA, FAKE_UUID+POSTFIX_C);
+		this.taskD = new TaskImpl(FAKE_UUID+POSTFIX_D, specA, FAKE_UUID+POSTFIX_D);
+	}
 
 	@Test
 	public void testChooseTaskForRunningNotRunningAndSameSpecification() {
 		TaskMonitor taskMon = Mockito.mock(TaskMonitor.class);
 		DefaultScheduler defaultScheduler = new DefaultScheduler(taskMon);
 		
-		List<Task> tasks = new ArrayList<Task>();
-		Specification specA = new Specification("imageA", "usernameA", "publicKeyA", "privateKeyFilePathA");
-		Specification specB = new Specification("imageB", "usernameB", "publicKeyB", "privateKeyFilePathB");
-		TaskImpl taskExcepcted = new TaskImpl("taskThree", specB, FAKE_UUID);
-		tasks.add(new TaskImpl("taskOne", specA, FAKE_UUID));
-		tasks.add(new TaskImpl("taskTwo", specA, FAKE_UUID));
-		tasks.add(taskExcepcted);
-		tasks.add(new TaskImpl("taskFour", specA, FAKE_UUID));
+		List<Task> tasks = new ArrayList<>();
+
+		TaskImpl taskExpected = (TaskImpl) this.taskC;
+		tasks.add(this.taskA);
+		tasks.add(this.taskB);
+		tasks.add(taskExpected);
+		tasks.add(this.taskD);
 		
-		AbstractResource resourceWithSpecB = new FogbowResource("id", "orderId", specB);
+		AbstractResource resourceWithSpecB = new FogbowResource(FAKE_RESOURCE_ID, FAKE_ORDER_ID, specB);
 		
-		Task choosenTaskForRunning = defaultScheduler.chooseTaskForRunning(resourceWithSpecB, tasks);
-		Assert.assertEquals(taskExcepcted, choosenTaskForRunning);
+		Task chooseTaskForRunning = defaultScheduler.chooseTaskForRunning(resourceWithSpecB, tasks);
+		Assert.assertEquals(taskExpected, chooseTaskForRunning);
 	}
 	
 	@Test
@@ -45,9 +63,9 @@ public class DefaultSchedulerTest {
 		TaskMonitor taskMon = Mockito.mock(TaskMonitor.class);
 		DefaultScheduler defaultScheduler = new DefaultScheduler(taskMon);
 		
-		List<Task> tasks = new ArrayList<Task>();
-		Specification specA = new Specification("imageA", "usernameA", "publicKeyA", "privateKeyFilePathA");
-		Specification specB = new Specification("imageB", "usernameB", "publicKeyB", "privateKeyFilePathB");
+		List<Task> tasks = new ArrayList<>();
+		Specification specA = this.specA;
+		Specification specB = this.specB;
 		TaskImpl taskExpected = new TaskImpl("taskFour", specB, FAKE_UUID);
 		TaskImpl taskTwoRunning = new TaskImpl("taskTwo", specB, FAKE_UUID);
 		TaskImpl taskThreeRunning = new TaskImpl("taskThree", specB, FAKE_UUID);
@@ -79,7 +97,8 @@ public class DefaultSchedulerTest {
 		DefaultScheduler defaultScheduler = new DefaultScheduler(taskMon);
 		
 		List<Task> tasks = new ArrayList<Task>();
-		Specification specA = new Specification("imageA", "usernameA", "publicKeyA", "privateKeyFilePathA");
+		Specification specA = new Specification(FAKE_CLOUD_NAME, FAKE_IMAGE_ID,FAKE_FOGBOW_USER_NAME,
+				FAKE_PUBLIC_KEY, FAKE_PRIVATE_KEY_FILE_PATH);
 		Specification specB = new Specification("imageB", "usernameB", "publicKeyB", "privateKeyFilePathB");
 		TaskImpl taskToRunning = new TaskImpl("taskFour", specB, FAKE_UUID);
 		TaskImpl taskTwoRunning = new TaskImpl("taskTwo", specB, FAKE_UUID);

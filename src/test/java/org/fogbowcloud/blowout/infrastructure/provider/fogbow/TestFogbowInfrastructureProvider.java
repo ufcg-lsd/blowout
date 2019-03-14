@@ -1,11 +1,13 @@
 package org.fogbowcloud.blowout.infrastructure.provider.fogbow;
 
+
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.fogbowcloud.blowout.constants.TestConstants.*;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
@@ -32,14 +34,6 @@ import org.mockito.Mockito;
 
 
 public class TestFogbowInfrastructureProvider {
-
-	private static final String FAKE_DATA_FILE = "src/test/java/org/fogbowcloud/blowout/infrastructure/provider/fogbow/userDataMock";
-	private final String FILE_RESPONSE_NO_INSTANCE_ID = "src/test/resources/requestInfoWithoutInstanceId";
-	private final String FILE_RESPONSE_INSTANCE_ID = "src/test/resources/requestInfoWithInstanceId";
-	private final String FILE_RESPONSE_NO_SSH = "src/test/resources/instanceInfoWithoutSshInfo";
-	private final String FILE_RESPONSE_SSH = "src/test/resources/instanceInfoWithSshInfo";
-	private final String FILE_RESPONSE_REQUEST_INSTANCE = "src/test/resources/requestId";
-
 	@Rule
 	public final ExpectedException exception = ExpectedException.none();
 
@@ -89,7 +83,7 @@ public class TestFogbowInfrastructureProvider {
 	@Test
 	public void testMakeBodyJasonToComputeRequest() throws Exception {
 		FogbowInfrastructureProvider fogbowInfrastructureProvider = new FogbowInfrastructureProvider(properties, exec, tokenUpdatePluginMock);
-		Specification specs = new Specification("imageMock", "UserName",
+		Specification specs = new Specification(FAKE_CLOUD_NAME,"imageMock", "UserName",
 				"publicKeyMock", "privateKeyMock", FAKE_DATA_FILE, "userDataType");
 
 		try {
@@ -114,7 +108,7 @@ public class TestFogbowInfrastructureProvider {
 		try {
 			String requestIdMock = "request01";
 			
-			Specification specs = new Specification("imageMock", "UserName",
+			Specification specs = new Specification(FAKE_CLOUD_NAME,"imageMock", "UserName",
 					"publicKeyMock", "privateKeyMock", FAKE_DATA_FILE, "userDataType");
 
 			createDefaultRequestResponse(requestIdMock);
@@ -170,7 +164,7 @@ public class TestFogbowInfrastructureProvider {
 		String state = "fake-state";
 		String provider = "fake-provider";
 
-		Specification specs = new Specification("imageMock", "UserName",
+		Specification specs = new Specification(FAKE_CLOUD_NAME, "imageMock", "UserName",
 				"publicKeyMock", "privateKeyMock", FAKE_DATA_FILE, "userDataType");
 
 		//Create Mock behavior for httpWrapperMock
@@ -259,7 +253,7 @@ public class TestFogbowInfrastructureProvider {
 //		Creating response for request for Instance Attributes
 		createDefaulInstanceAttributesResponse(returnedOrderId, vCPUMock, ramSizeMock, diskMock, hostNameMock);
 
-		Specification specs = new Specification("imageMock", "UserName",
+		Specification specs = new Specification(FAKE_CLOUD_NAME,"imageMock", "UserName",
 				"publicKeyMock", "privateKeyMock", FAKE_DATA_FILE, "userDataType");
 
 		fogbowInfrastructureProvider.setHttpWrapper(httpWrapperMock);
@@ -297,7 +291,7 @@ public class TestFogbowInfrastructureProvider {
 //		Creating response for request for Instance Attributes
 		createDefaulInstanceAttributesResponseNoShh(returnedOrderId, vCPUMock, ramSizeMock, diskMock);
 
-		Specification specs = new Specification("imageMock", "UserName",
+		Specification specs = new Specification(FAKE_CLOUD_NAME,"imageMock", "UserName",
 				"publicKeyMock", "privateKeyMock", FAKE_DATA_FILE, "userDataType");
 
 		fogbowInfrastructureProvider.setHttpWrapper(httpWrapperMock);
