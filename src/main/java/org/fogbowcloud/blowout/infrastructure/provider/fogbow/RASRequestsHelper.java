@@ -63,7 +63,7 @@ public class RASRequestsHelper {
     public String createPublicIp(String computeOrderId) throws InterruptedException {
         sleep(6000);
         String publicIpId = null;
-        final String provider = this.properties.getProperty(AppPropertiesConstants.RAS_TOKEN_PROJECT_NAME);
+        final String provider = this.properties.getProperty(AppPropertiesConstants.AS_TOKEN_PROJECT_NAME);
         final String requestUrl = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_PUBLIC_IP;
 
         Map<String, String> bodyRequestAttrs = new HashMap<>();

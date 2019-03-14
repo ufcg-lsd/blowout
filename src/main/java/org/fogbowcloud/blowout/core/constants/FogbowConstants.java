@@ -3,11 +3,16 @@ package org.fogbowcloud.blowout.core.constants;
 public class FogbowConstants {
 
     /*
+     * Authentication Service endpoints.
+     */
+    public static final String AS_ENDPOINT_TOKEN = "tokens";
+
+    /*
      * Resource Allocation Service endpoints.
      */
-    public static final String RAS_ENDPOINT_TOKEN = "tokens";
     public static final String RAS_ENDPOINT_COMPUTE = "computes";
     public static final String RAS_ENDPOINT_PUBLIC_IP = "publicIps";
+    public static final String RAS_ENDPOINT_PUBLIC_KEY = "publicKey";
 
     /*
      * Resource Allocation Service fields.
