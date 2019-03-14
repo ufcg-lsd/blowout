@@ -29,7 +29,7 @@ public class FogbowResource extends AbstractResource {
 
 	public boolean match(Specification spec) {
 		String fogbowRequirement = spec.getRequirementValue(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS);
-		String image = spec.getImageId();
+		String image = spec.getImageName();
 		String publicKey = spec.getPublicKey();
 		if (fogbowRequirement != null && image != null) {
 

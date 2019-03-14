@@ -13,6 +13,7 @@ public class FogbowConstants {
     public static final String RAS_ENDPOINT_COMPUTE = "computes";
     public static final String RAS_ENDPOINT_PUBLIC_IP = "publicIps";
     public static final String RAS_ENDPOINT_PUBLIC_KEY = "publicKey";
+    public static final String RAS_ENDPOINT_IMAGES = "images";
 
     /*
      * Resource Allocation Service fields.

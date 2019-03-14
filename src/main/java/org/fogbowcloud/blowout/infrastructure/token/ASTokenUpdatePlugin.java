@@ -81,7 +81,7 @@ public class ASTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
         body.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, HttpWrapper.HTTP_CONTENT_JSON));
 
         String accessTokenJson = httpWrapper.doRequest("post", requestUrl, new LinkedList<>(), body);
-        String accessToken = AppUtil.getValueOfJsonStr("token", accessTokenJson);
+        String accessToken = AppUtil.getValueFromJsonStr("token", accessTokenJson);
         String userId = AppUtil.generateIdentifier();
         User user = new User(userId, this.userName, this.password);
 
@@ -94,7 +94,7 @@ public class ASTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
         HttpResponse response = HttpClients.createMinimal().execute(request);
         HttpEntity entity = response.getEntity();
         String responseString = EntityUtils.toString(entity, "UTF-8");
-        String publicKey  = AppUtil.getValueOfJsonStr("publicKey", responseString);
+        String publicKey  = AppUtil.getValueFromJsonStr("publicKey", responseString);
         return publicKey;
     }
 

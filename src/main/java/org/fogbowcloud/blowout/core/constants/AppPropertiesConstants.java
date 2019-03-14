@@ -26,6 +26,7 @@ public class AppPropertiesConstants {
 	public static final String AS_BASE_URL = "as_base_url";
 
 	public static final String RAS_BASE_URL = "ras_base_url";
+	public static final String RAS_MEMBER_ID = "ras_member_id";
 
 	public static final String TOKEN_UPDATE_TIME = "ras_token_update_time";
 	public static final String TOKEN_UPDATE_TIME_UNIT = "ras_token_update_time_unit";

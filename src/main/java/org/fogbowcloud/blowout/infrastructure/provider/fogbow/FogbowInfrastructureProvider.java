@@ -211,7 +211,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
         String requestType = specification.getRequirementValue(FogbowConstants.METADATA_REQUEST_TYPE);
 
         fogbowResource.putMetadata(AbstractResource.METADATA_REQUEST_TYPE, requestType);
-        fogbowResource.putMetadata(AbstractResource.METADATA_IMAGE, specification.getImageId());
+        fogbowResource.putMetadata(AbstractResource.METADATA_IMAGE, specification.getImageName());
         fogbowResource.putMetadata(AbstractResource.METADATA_PUBLIC_KEY, specification.getPublicKey());
     }
 
@@ -239,7 +239,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 	}
 
 	private void validateSpecification(Specification specification) throws RequestResourceException {
-		if (specification.getImageId() == null || specification.getImageId().isEmpty()) {
+		if (specification.getImageName() == null || specification.getImageName().isEmpty()) {
 			throw new RequestResourceException();
 		}
 		if (specification.getPublicKey() == null || specification.getPublicKey().isEmpty()) {

@@ -53,7 +53,7 @@ public class RASRequestsHelper {
         try {
             String computerOrderIdJson = this.doRequest(HttpWrapper.HTTP_METHOD_POST, this.RAS_BASE_URL + "/" +
                     FogbowConstants.RAS_ENDPOINT_COMPUTE, new LinkedList<>(), requestBody);
-            computeOrderId = AppUtil.getValueOfJsonStr("id", computerOrderIdJson);
+            computeOrderId = AppUtil.getValueFromJsonStr("id", computerOrderIdJson);
             LOGGER.info("Compute ID was requested successfully.");
         } catch (Exception e){
             LOGGER.error("Error while requesting resource on Fogbow", e);
@@ -79,7 +79,7 @@ public class RASRequestsHelper {
             final StringEntity bodyRequest = makeRequestBodyJson(bodyRequestAttrs);
             String publicIpIdJson = this.doRequest(HttpWrapper.HTTP_METHOD_POST, requestUrl,
                     new LinkedList<>(), bodyRequest);
-            publicIpId = AppUtil.getValueOfJsonStr("id", publicIpIdJson);
+            publicIpId = AppUtil.getValueFromJsonStr("id", publicIpIdJson);
             LOGGER.info("Public IP ID was requested successfully.");
         } catch (Exception e) {
             LOGGER.error("Error while getting Public IP for compute order of id " + computeOrderId, e);
@@ -131,6 +131,47 @@ public class RASRequestsHelper {
         }
     }
 
+    private String getImageId(String imageName){
+        String imageId = null;
+        List<String> images = this.getImagesByName(imageName);
+        if(images.isEmpty()){
+            //TODO mudar exceção.
+            throw new RuntimeException();
+        }
+        return images.get(0);
+    }
+
+    private List<String> getImagesByName(String name){
+        List<String> images = new ArrayList<>();
+        Map<String, Object> imageMap = getAllImages();
+        for(String imageId : imageMap.keySet()){
+            String imageName = imageMap.get(imageId).toString();
+            if(imageName.equals(name)){
+                images.add(imageName);
+            }
+        }
+        return images;
+    }
+
+
+    private Map<String, Object> getAllImages(){
+        String cloudName = "cloud4";
+        String memberId = this.properties.getProperty(AppPropertiesConstants.RAS_MEMBER_ID);
+        Map<String, Object> allImagesJson = new HashMap<>();
+        final String requestUrl = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_IMAGES + "/"
+                + memberId + "/" + cloudName;
+        final String errorMessage = "Error while getting info about images of member with id" + cloudName;
+
+        try {
+            String response = this.doRequest(HttpWrapper.HTTP_METHOD_GET, requestUrl, new LinkedList<>());
+            allImagesJson = parseAttributes(response);
+        } catch (Exception e) {
+            LOGGER.error(errorMessage, e);
+        }
+        return allImagesJson;
+    }
+
+
     public void setHttpWrapper(HttpWrapper httpWrapper) {
         this.http = httpWrapper;
     }
@@ -148,10 +189,13 @@ public class RASRequestsHelper {
     public StringEntity makeJsonBody(Specification specification) throws UnsupportedEncodingException {
         JSONObject json = new JSONObject();
         final String iguassuComputesName = "Iguassu";
+        String imageId = getImageId(specification.getImageName());
 
-        makeBodyField(json, FogbowConstants.JSON_KEY_RAS_CLOUD_NAME, specification.getCloudName());
+        if(specification.getCloudName() != null){
+            makeBodyField(json, FogbowConstants.JSON_KEY_RAS_CLOUD_NAME, specification.getCloudName());
+        }
         makeBodyField(json, FogbowConstants.JSON_KEY_RAS_DISK, specification.getDisk());
-        makeBodyField(json, FogbowConstants.JSON_KEY_RAS_IMAGE_ID, specification.getImageId());
+        makeBodyField(json, FogbowConstants.JSON_KEY_RAS_IMAGE_ID, imageId);
         makeBodyField(json, FogbowConstants.JSON_KEY_RAS_MEMORY, specification.getMemory());
         makeBodyField(json, FogbowConstants.JSON_KEY_RAS_COMPUTE_NAME, iguassuComputesName);
         makeBodyField(json, FogbowConstants.JSON_KEY_RAS_PUBLIC_KEY, specification.getPublicKey());

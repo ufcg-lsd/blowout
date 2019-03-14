@@ -34,7 +34,7 @@ public class AppUtil {
         return newMap;
     }
 
-    public static String getValueOfJsonStr(String key, String jsonStr) {
+    public static String getValueFromJsonStr(String key, String jsonStr) {
         JSONObject json = new JSONObject(jsonStr);
         String value = json.getString(key);
         return value;
