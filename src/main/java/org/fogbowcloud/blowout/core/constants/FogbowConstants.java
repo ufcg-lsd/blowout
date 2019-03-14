@@ -17,10 +17,11 @@ public class FogbowConstants {
     /*
      * Resource Allocation Service fields.
      */
+    public static final String JSON_KEY_RAS_CLOUD_NAME = "cloudName";
     public static final String JSON_KEY_RAS_DISK = "disk";
     public static final String JSON_KEY_RAS_IMAGE_ID = "imageId";
-    public static final String JSON_KEY_RAS_COMPUTE_NAME = "name";
     public static final String JSON_KEY_RAS_MEMORY = "memory";
+    public static final String JSON_KEY_RAS_COMPUTE_NAME = "name";
     public static final String JSON_KEY_RAS_PUBLIC_KEY = "publicKey";
     public static final String JSON_KEY_RAS_COMPUTE_ID = "computeId";
     public static final String JSON_KEY_RAS_VCPU = "vCPU";

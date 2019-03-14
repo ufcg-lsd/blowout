@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.constants.AppPropertiesConstants;
 import org.fogbowcloud.blowout.core.constants.FogbowConstants;
 import org.fogbowcloud.blowout.core.model.Specification;
+import org.fogbowcloud.blowout.core.util.AppUtil;
 import org.fogbowcloud.blowout.infrastructure.exception.RequestResourceException;
 import org.fogbowcloud.blowout.infrastructure.http.HttpWrapper;
 import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
@@ -50,8 +51,9 @@ public class RASRequestsHelper {
         requestBody.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, HttpWrapper.HTTP_CONTENT_JSON));
         String computeOrderId;
         try {
-            computeOrderId = this.doRequest(HttpWrapper.HTTP_METHOD_POST, this.RAS_BASE_URL + "/" +
+            String computerOrderIdJson = this.doRequest(HttpWrapper.HTTP_METHOD_POST, this.RAS_BASE_URL + "/" +
                     FogbowConstants.RAS_ENDPOINT_COMPUTE, new LinkedList<>(), requestBody);
+            computeOrderId = AppUtil.getValueOfJsonStr("id", computerOrderIdJson);
             LOGGER.info("Compute ID was requested successfully.");
         } catch (Exception e){
             LOGGER.error("Error while requesting resource on Fogbow", e);
@@ -63,18 +65,21 @@ public class RASRequestsHelper {
     public String createPublicIp(String computeOrderId) throws InterruptedException {
         sleep(6000);
         String publicIpId = null;
+        final String cloudName = this.properties.getProperty(AppPropertiesConstants.DEFAULT_CLOUD_NAME);
         final String provider = this.properties.getProperty(AppPropertiesConstants.AS_TOKEN_PROJECT_NAME);
         final String requestUrl = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_PUBLIC_IP;
 
         Map<String, String> bodyRequestAttrs = new HashMap<>();
         if (computeOrderId != null && !computeOrderId.isEmpty()) {
+            bodyRequestAttrs.put(FogbowConstants.JSON_KEY_RAS_CLOUD_NAME, cloudName);
             bodyRequestAttrs.put(FogbowConstants.JSON_KEY_RAS_COMPUTE_ID, computeOrderId);
             bodyRequestAttrs.put(FogbowConstants.JSON_KEY_FOGBOW_PROVIDER, provider);
         }
         try {
             final StringEntity bodyRequest = makeRequestBodyJson(bodyRequestAttrs);
-            publicIpId = this.doRequest(HttpWrapper.HTTP_METHOD_POST, requestUrl,
+            String publicIpIdJson = this.doRequest(HttpWrapper.HTTP_METHOD_POST, requestUrl,
                     new LinkedList<>(), bodyRequest);
+            publicIpId = AppUtil.getValueOfJsonStr("id", publicIpIdJson);
             LOGGER.info("Public IP ID was requested successfully.");
         } catch (Exception e) {
             LOGGER.error("Error while getting Public IP for compute order of id " + computeOrderId, e);
@@ -144,12 +149,13 @@ public class RASRequestsHelper {
         JSONObject json = new JSONObject();
         final String iguassuComputesName = "Iguassu";
 
-        makeBodyField(json, FogbowConstants.JSON_KEY_RAS_PUBLIC_KEY, specification.getPublicKey());
-        makeBodyField(json, FogbowConstants.JSON_KEY_RAS_MEMORY, specification.getMemory());
+        makeBodyField(json, FogbowConstants.JSON_KEY_RAS_CLOUD_NAME, specification.getCloudName());
         makeBodyField(json, FogbowConstants.JSON_KEY_RAS_DISK, specification.getDisk());
         makeBodyField(json, FogbowConstants.JSON_KEY_RAS_IMAGE_ID, specification.getImageId());
-        makeBodyField(json, FogbowConstants.JSON_KEY_RAS_VCPU, specification.getvCPU());
+        makeBodyField(json, FogbowConstants.JSON_KEY_RAS_MEMORY, specification.getMemory());
         makeBodyField(json, FogbowConstants.JSON_KEY_RAS_COMPUTE_NAME, iguassuComputesName);
+        makeBodyField(json, FogbowConstants.JSON_KEY_RAS_PUBLIC_KEY, specification.getPublicKey());
+        makeBodyField(json, FogbowConstants.JSON_KEY_RAS_VCPU, specification.getvCPU());
 
         return new StringEntity(json.toString());
     }
