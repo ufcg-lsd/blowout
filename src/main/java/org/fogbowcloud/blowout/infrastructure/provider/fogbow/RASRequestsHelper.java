@@ -54,9 +54,9 @@ public class RASRequestsHelper {
         requestBody.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, HttpWrapper.HTTP_CONTENT_JSON));
         String computeOrderId;
         try {
-            String computerOrderIdJson = this.doRequest(HttpWrapper.HTTP_METHOD_POST, this.RAS_BASE_URL + "/" +
+            String computerOrderIdResponse = this.doRequest(HttpWrapper.HTTP_METHOD_POST, this.RAS_BASE_URL + "/" +
                     FogbowConstants.RAS_ENDPOINT_COMPUTE, new LinkedList<>(), requestBody);
-            computeOrderId = AppUtil.getValueFromJsonStr("id", computerOrderIdJson);
+            computeOrderId = AppUtil.getValueFromJsonStr("id", computerOrderIdResponse);
             LOGGER.info("Compute ID was requested successfully.");
         } catch (Exception e){
             LOGGER.error("Error while requesting resource on Fogbow", e);
@@ -80,9 +80,9 @@ public class RASRequestsHelper {
         }
         try {
             final StringEntity bodyRequest = makeRequestBodyJson(bodyRequestAttrs);
-            String publicIpIdJson = this.doRequest(HttpWrapper.HTTP_METHOD_POST, requestUrl,
+            String publicIpIdResponse = this.doRequest(HttpWrapper.HTTP_METHOD_POST, requestUrl,
                     new LinkedList<>(), bodyRequest);
-            publicIpId = AppUtil.getValueFromJsonStr("id", publicIpIdJson);
+            publicIpId = AppUtil.getValueFromJsonStr("id", publicIpIdResponse);
             LOGGER.info("Public IP ID was requested successfully.");
         } catch (Exception e) {
             LOGGER.error("Error while getting Public IP for compute order of id " + computeOrderId, e);
