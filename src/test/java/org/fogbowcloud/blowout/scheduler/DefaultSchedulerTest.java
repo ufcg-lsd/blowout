@@ -29,9 +29,9 @@ public class DefaultSchedulerTest {
 
 	@Before
 	public void setUp() {
-		this.specA = new Specification(FAKE_CLOUD_NAME, FAKE_IMAGE_ID,
+		this.specA = new Specification(FAKE_CLOUD_NAME, FAKE_IMAGE_FLAVOR_NAME,
 				FAKE_FOGBOW_USER_NAME, FAKE_PUBLIC_KEY, FAKE_PRIVATE_KEY_FILE_PATH);
-		this.specB = new Specification(FAKE_CLOUD_NAME+POSTFIX_B,FAKE_IMAGE_ID+POSTFIX_B,
+		this.specB = new Specification(FAKE_CLOUD_NAME+POSTFIX_B, FAKE_IMAGE_FLAVOR_NAME +POSTFIX_B,
 				FAKE_FOGBOW_USER_NAME+POSTFIX_B, FAKE_PUBLIC_KEY+POSTFIX_B, FAKE_PRIVATE_KEY_FILE_PATH+POSTFIX_B);
 		this.taskA = new TaskImpl(FAKE_UUID, specA, FAKE_UUID);
 		this.taskB = new TaskImpl(FAKE_UUID+POSTFIX_B, specA, FAKE_UUID+POSTFIX_B);
@@ -97,7 +97,7 @@ public class DefaultSchedulerTest {
 		DefaultScheduler defaultScheduler = new DefaultScheduler(taskMon);
 		
 		List<Task> tasks = new ArrayList<Task>();
-		Specification specA = new Specification(FAKE_CLOUD_NAME, FAKE_IMAGE_ID,FAKE_FOGBOW_USER_NAME,
+		Specification specA = new Specification(FAKE_CLOUD_NAME, FAKE_IMAGE_FLAVOR_NAME,FAKE_FOGBOW_USER_NAME,
 				FAKE_PUBLIC_KEY, FAKE_PRIVATE_KEY_FILE_PATH);
 		Specification specB = new Specification("imageB", "usernameB", "publicKeyB", "privateKeyFilePathB");
 		TaskImpl taskToRunning = new TaskImpl("taskFour", specB, FAKE_UUID);

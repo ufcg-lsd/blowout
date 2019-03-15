@@ -84,7 +84,7 @@ public class TestFogbowInfrastructureProvider {
 	public void testMakeBodyJasonToComputeRequest() throws Exception {
 		FogbowInfrastructureProvider fogbowInfrastructureProvider = new FogbowInfrastructureProvider(properties, exec, tokenUpdatePluginMock);
 		Specification specs = new Specification(FAKE_CLOUD_NAME,"imageMock", "UserName",
-				"publicKeyMock", "privateKeyMock", FAKE_DATA_FILE, "userDataType");
+				"publicKeyMock", "privateKeyMock", FILE_PATH_USER_DATA_MOCK, "userDataType");
 
 		try {
 			StringEntity bodyJson = fogbowInfrastructureProvider.makeJsonBody(specs);
@@ -109,7 +109,7 @@ public class TestFogbowInfrastructureProvider {
 			String requestIdMock = "request01";
 			
 			Specification specs = new Specification(FAKE_CLOUD_NAME,"imageMock", "UserName",
-					"publicKeyMock", "privateKeyMock", FAKE_DATA_FILE, "userDataType");
+					"publicKeyMock", "privateKeyMock", FILE_PATH_USER_DATA_MOCK, "userDataType");
 
 			createDefaultRequestResponse(requestIdMock);
 
@@ -165,7 +165,7 @@ public class TestFogbowInfrastructureProvider {
 		String provider = "fake-provider";
 
 		Specification specs = new Specification(FAKE_CLOUD_NAME, "imageMock", "UserName",
-				"publicKeyMock", "privateKeyMock", FAKE_DATA_FILE, "userDataType");
+				"publicKeyMock", "privateKeyMock", FILE_PATH_USER_DATA_MOCK, "userDataType");
 
 		//Create Mock behavior for httpWrapperMock
 		//Creating response for request for resource.
@@ -254,7 +254,7 @@ public class TestFogbowInfrastructureProvider {
 		createDefaulInstanceAttributesResponse(returnedOrderId, vCPUMock, ramSizeMock, diskMock, hostNameMock);
 
 		Specification specs = new Specification(FAKE_CLOUD_NAME,"imageMock", "UserName",
-				"publicKeyMock", "privateKeyMock", FAKE_DATA_FILE, "userDataType");
+				"publicKeyMock", "privateKeyMock", FILE_PATH_USER_DATA_MOCK, "userDataType");
 
 		fogbowInfrastructureProvider.setHttpWrapper(httpWrapperMock);
 		String resourceId = fogbowInfrastructureProvider.requestResource(specs);
@@ -292,7 +292,7 @@ public class TestFogbowInfrastructureProvider {
 		createDefaulInstanceAttributesResponseNoShh(returnedOrderId, vCPUMock, ramSizeMock, diskMock);
 
 		Specification specs = new Specification(FAKE_CLOUD_NAME,"imageMock", "UserName",
-				"publicKeyMock", "privateKeyMock", FAKE_DATA_FILE, "userDataType");
+				"publicKeyMock", "privateKeyMock", FILE_PATH_USER_DATA_MOCK, "userDataType");
 
 		fogbowInfrastructureProvider.setHttpWrapper(httpWrapperMock);
 		fogbowInfrastructureProvider.requestResource(specs);
@@ -380,7 +380,7 @@ public class TestFogbowInfrastructureProvider {
 		params.put(FogbowInfrastructureTestUtils.REQUEST_ID_TAG, requestIdMock);
 		params.put(FogbowInfrastructureTestUtils.INSTANCE_TAG, instanceIdMock);
 		params.put(FogbowInfrastructureTestUtils.PROVIDER_MEMBER_TAG, location);
-		String fogbowResponse = FogbowInfrastructureTestUtils.createHttpWrapperResponseFromFile(FILE_RESPONSE_INSTANCE_ID, params);
+		String fogbowResponse = FogbowInfrastructureTestUtils.createHttpWrapperResponseFromFile(FILE_PATH_RESPONSE_INSTANCE_ID, params);
 
 		doReturn(fogbowResponse).when(httpWrapperMock).doRequest(Mockito.any(String.class), Mockito.eq(urlEndpointRequestInformations),
 				Mockito.any(String.class), Mockito.any(List.class));
@@ -394,7 +394,7 @@ public class TestFogbowInfrastructureProvider {
 
 		Map<String, String> params = new HashMap<String, String>();
 		params.put(FogbowInfrastructureTestUtils.REQUEST_ID_TAG, requestIdMock);
-		String fogbowResponse = FogbowInfrastructureTestUtils.createHttpWrapperResponseFromFile(FILE_RESPONSE_NO_INSTANCE_ID, params);
+		String fogbowResponse = FogbowInfrastructureTestUtils.createHttpWrapperResponseFromFile(FILE_PATH_RESPONSE_NO_INSTANCE_ID, params);
 
 		doReturn(fogbowResponse).when(httpWrapperMock).doRequest(Mockito.any(String.class), Mockito.eq(urlEndpointRequestInformations), 
 				Mockito.any(String.class), Mockito.any(List.class));

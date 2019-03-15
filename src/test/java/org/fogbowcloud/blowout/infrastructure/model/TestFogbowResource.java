@@ -1,9 +1,8 @@
 package org.fogbowcloud.blowout.infrastructure.model;
 
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.spy;
+import static org.fogbowcloud.blowout.constants.TestConstants.*;
 
 import org.fogbowcloud.blowout.core.constants.FogbowConstants;
 import org.fogbowcloud.blowout.core.model.Specification;
@@ -11,155 +10,99 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-
 public class TestFogbowResource {
-	
-	FogbowResource resource;
+	private FogbowResource resource;
+	private Specification spec;
 	
 	@Before
 	public void setUp() throws Exception {
-		Specification spec = new Specification("Image01", "Fogbow", "fogbowKey", "privateFile");
-		resource = spy(new FogbowResource("resource_01","order_01", spec));
+		this.spec = new Specification(FAKE_CLOUD_NAME, FAKE_IMAGE_FLAVOR_NAME,
+				FAKE_FOGBOW_USER_NAME, FAKE_PUBLIC_KEY,FAKE_PRIVATE_KEY_FILE_PATH);
+		this.resource = spy(new FogbowResource(FAKE_RESOURCE_ID,FAKE_ORDER_ID, spec));
 	}    
 
 	@After
 	public void setDown() throws Exception {
-		
-		resource.getAllMetadata().clear();
-		resource = null;
+		this.resource.getAllMetadata().clear();
+		this.resource = null;
 	}
 	
 	@Test
 	public void matchTest() {
-		
-		String image = "image";
-		String userName = "userName";
-		String publicKey = "publicKey";
-		String privateKey = "privateKey";
-		String fogbowRequirement = "Glue2vCPU >= 1 && Glue2RAM >= 1024 ";
-		String userDataFile = "scripts/lvl-user-data.sh";
-		String userDataType = "text/x-shellscript";
-		
-		String coreSize = "1";
-		String menSize = "1024";
-		String diskSize = "20";
-		String location = "edu.ufcg.lsd.cloud_1s";
-		
-		Specification spec = new Specification(image, userName, publicKey, privateKey, userDataFile, userDataType);
-		spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
-		
-		resource.putMetadata(FogbowResource.METADATA_IMAGE, image);
-		resource.putMetadata(FogbowResource.METADATA_PUBLIC_KEY, publicKey);
-		resource.putMetadata(FogbowResource.METADATA_VCPU, coreSize);
-		resource.putMetadata(FogbowResource.METADATA_MEM_SIZE, menSize);
-		resource.putMetadata(FogbowResource.METADATA_DISK_SIZE, diskSize);
-		resource.putMetadata(FogbowResource.METADATA_LOCATION, location);
-		
+		this.spec.setUserDataFile(USER_DATA_FILE);
+		this.spec.setUserDataType(USER_DATA_TYPE);
+
+		this.spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, EXAMPLE_FOGBOW_REQUIREMENT);
+
+		this.resource.putMetadata(FogbowResource.METADATA_IMAGE, FAKE_IMAGE_FLAVOR_ID);
+		this.resource.putMetadata(FogbowResource.METADATA_PUBLIC_KEY, FAKE_PUBLIC_KEY);
+		this.resource.putMetadata(FogbowResource.METADATA_VCPU, EXAMPLE_CORE_SIZE);
+		this.resource.putMetadata(FogbowResource.METADATA_MEM_SIZE, EXAMPLE_MEM_SIZE);
+		this.resource.putMetadata(FogbowResource.METADATA_DISK_SIZE, EXAMPLE_DISK_SIZE);
+		this.resource.putMetadata(FogbowResource.METADATA_LOCATION, EXAMPLE_LOCATION);
+
 		assertTrue(resource.match(spec));
-		
-		spec.getAllRequirements().clear();
-		spec = null;
-		
+		this.spec.getAllRequirements().clear();
 	}
 	
 	@Test
 	public void matchTestRequirementNotMach() {
-		
-		String image = "image";
-		String userName = "userName";
-		String publicKey = "publicKey";
-		String privateKey = "privateKey";
-		String fogbowRequirement = "Glue2vCPU > 1 || Glue2RAM = 1024 ";
-		String userDataFile = "scripts/lvl-user-data.sh";
-		String userDataType = "text/x-shellscript";
-		
-		String coreSize = "1";
-		String menSize = "2048";
-		String diskSize = "20";
-		String location = "edu.ufcg.lsd.cloud_1s";
-		
-		Specification spec = new Specification(image, userName, publicKey, privateKey, userDataFile, userDataType);
-		spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
-		
-		resource.putMetadata(FogbowResource.METADATA_IMAGE, image);
-		resource.putMetadata(FogbowResource.METADATA_PUBLIC_KEY, publicKey);
-		resource.putMetadata(FogbowResource.METADATA_VCPU, coreSize);
-		resource.putMetadata(FogbowResource.METADATA_MEM_SIZE, menSize);
-		resource.putMetadata(FogbowResource.METADATA_DISK_SIZE, diskSize);
-		resource.putMetadata(FogbowResource.METADATA_LOCATION, location);
+		this.spec.setUserDataFile(USER_DATA_FILE);
+		this.spec.setUserDataType(USER_DATA_TYPE);
+
+		this.spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, EXAMPLE_FOGBOW_REQUIREMENT);
+
+		this.resource.putMetadata(FogbowResource.METADATA_IMAGE, FAKE_IMAGE_FLAVOR_ID);
+		this.resource.putMetadata(FogbowResource.METADATA_PUBLIC_KEY, FAKE_PUBLIC_KEY);
+		this.resource.putMetadata(FogbowResource.METADATA_VCPU, EXAMPLE_CORE_SIZE );
+		this.resource.putMetadata(FogbowResource.METADATA_MEM_SIZE, EXAMPLE_MEM_SIZE);
+		this.resource.putMetadata(FogbowResource.METADATA_DISK_SIZE, EXAMPLE_DISK_SIZE);
+		this.resource.putMetadata(FogbowResource.METADATA_LOCATION, EXAMPLE_LOCATION);
 		
 		assertFalse(resource.match(spec));
-		
-		spec.getAllRequirements().clear();
-		spec = null;
+
+		this.spec.getAllRequirements().clear();
+		this.spec = null;
 	}
 	
 	@Test
 	public void matchTestImageNotMatch() {
+		Specification specB = new Specification(FAKE_CLOUD_NAME+POSTFIX_B,
+				FAKE_IMAGE_FLAVOR_NAME+POSTFIX_B, FAKE_FOGBOW_USER_NAME+POSTFIX_B,
+				FAKE_PUBLIC_KEY+POSTFIX_B, FAKE_PRIVATE_KEY_FILE_PATH+POSTFIX_B,
+				USER_DATA_FILE+POSTFIX_B, USER_DATA_TYPE+POSTFIX_B);
+
+		specB.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, EXAMPLE_FOGBOW_REQUIREMENT);
 		
-		String imageA = "imageA";
-		String imageB = "imageB";
-		String userName = "userName";
-		String publicKey = "publicKey";
-		String privateKey = "privateKey";
-		String fogbowRequirement = "Glue2vCPU >= 1 && Glue2RAM >= 1024 ";
-		String userDataFile = "scripts/lvl-user-data.sh";
-		String userDataType = "text/x-shellscript";
+		resource.putMetadata(FogbowResource.METADATA_IMAGE, FAKE_IMAGE_FLAVOR_ID);
+		resource.putMetadata(FogbowResource.METADATA_PUBLIC_KEY, FAKE_PUBLIC_KEY);
+		resource.putMetadata(FogbowResource.METADATA_VCPU, EXAMPLE_CORE_SIZE);
+		resource.putMetadata(FogbowResource.METADATA_MEM_SIZE, EXAMPLE_MEM_SIZE);
+		resource.putMetadata(FogbowResource.METADATA_DISK_SIZE, EXAMPLE_DISK_SIZE);
+		resource.putMetadata(FogbowResource.METADATA_LOCATION, EXAMPLE_LOCATION);
 		
-		String coreSize = "1";
-		String menSize = "1024";
-		String diskSize = "20";
-		String location = "edu.ufcg.lsd.cloud_1s";
-		
-		Specification spec = new Specification(imageB, userName, publicKey, privateKey, userDataFile, userDataType);
-		spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
-		
-		resource.putMetadata(FogbowResource.METADATA_IMAGE, imageA);
-		resource.putMetadata(FogbowResource.METADATA_PUBLIC_KEY, publicKey);
-		resource.putMetadata(FogbowResource.METADATA_VCPU, coreSize);
-		resource.putMetadata(FogbowResource.METADATA_MEM_SIZE, menSize);
-		resource.putMetadata(FogbowResource.METADATA_DISK_SIZE, diskSize);
-		resource.putMetadata(FogbowResource.METADATA_LOCATION, location);
-		
-		assertFalse(resource.match(spec));
+		assertFalse(resource.match(specB));
 	
-		spec.getAllRequirements().clear();
-		spec = null;
+		specB.getAllRequirements().clear();
 	}
 	
 	@Test
 	public void matchTestPublicKeyNotMatch() {
-		
-		String image = "image";
-		String userName = "userName";
-		String publicKeyA = "publicKeyA";
-		String publicKeyB = "publicKeyB";
-		String privateKey = "privateKey";
-		String fogbowRequirement = "Glue2vCPU >= 1 && Glue2RAM >= 1024 ";
-		String userDataFile = "scripts/lvl-user-data.sh";
-		String userDataType = "text/x-shellscript";
+		this.spec.setUserDataType(USER_DATA_TYPE);
+		this.spec.setUserDataFile(USER_DATA_FILE);
 
-		String coreSize = "1";
-		String menSize = "1024";
-		String diskSize = "20";
-		String location = "edu.ufcg.lsd.cloud_1s";
+		spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, EXAMPLE_FOGBOW_REQUIREMENT);
 
-		Specification spec = new Specification(image, userName, publicKeyB, privateKey, userDataFile, userDataType);
-		spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
-
-		resource.putMetadata(FogbowResource.METADATA_IMAGE, image);
-		resource.putMetadata(FogbowResource.METADATA_PUBLIC_KEY, publicKeyA);
-		resource.putMetadata(FogbowResource.METADATA_VCPU, coreSize);
-		resource.putMetadata(FogbowResource.METADATA_MEM_SIZE, menSize);
-		resource.putMetadata(FogbowResource.METADATA_DISK_SIZE, diskSize);
-		resource.putMetadata(FogbowResource.METADATA_LOCATION, location);
+		resource.putMetadata(FogbowResource.METADATA_IMAGE, FAKE_IMAGE_FLAVOR_ID);
+		resource.putMetadata(FogbowResource.METADATA_PUBLIC_KEY, FAKE_PUBLIC_KEY);
+		resource.putMetadata(FogbowResource.METADATA_VCPU, EXAMPLE_CORE_SIZE);
+		resource.putMetadata(FogbowResource.METADATA_MEM_SIZE, EXAMPLE_MEM_SIZE);
+		resource.putMetadata(FogbowResource.METADATA_DISK_SIZE, EXAMPLE_DISK_SIZE);
+		resource.putMetadata(FogbowResource.METADATA_LOCATION, EXAMPLE_LOCATION);
 
 		assertFalse(resource.match(spec));
 
 		spec.getAllRequirements().clear();
 		spec = null;
 	}
-
-	
-
 }

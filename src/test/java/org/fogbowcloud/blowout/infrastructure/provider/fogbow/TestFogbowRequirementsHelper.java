@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.fogbowcloud.blowout.constants.TestConstants.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +21,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 public class TestFogbowRequirementsHelper {
-
 	private Properties properties;
 	private Map<String, String> requirements;
 	private Specification spec;
@@ -29,20 +29,14 @@ public class TestFogbowRequirementsHelper {
 	@Before
 	public void setUp() throws Exception {
 
-		this.generateDefaulProperties();
+		this.generateDefaultProperties();
 
-		String image = "ubunto01";
-		String userName = "userName";
-		String publicKey = "key01";
-		String privateKey = "privKey01";
-		String userData = "scripts/lvl-user-data.sh";
-		String userDataType = "text/x-shellscript";
-
-		requirements = new HashMap<String, String>();
-		spec = new Specification(image, userName, publicKey, privateKey, userData, userDataType);
-		suitableResource = mock(FogbowResource.class);
-		doReturn("resquest_01").when(suitableResource).getId();
-		when(suitableResource.match(Mockito.any(Specification.class))).thenCallRealMethod();
+		this.requirements = new HashMap<>();
+		this.spec = new Specification(FAKE_CLOUD_NAME, FAKE_IMAGE_FLAVOR_NAME, FAKE_FOGBOW_USER_NAME,
+				FAKE_PUBLIC_KEY, FAKE_PRIVATE_KEY_FILE_PATH, USER_DATA_FILE, USER_DATA_TYPE);
+		this.suitableResource = mock(FogbowResource.class);
+		doReturn("request_01").when(this.suitableResource).getId();
+		when(this.suitableResource.match(Mockito.any(Specification.class))).thenCallRealMethod();
 	}
 
 	@After
@@ -66,15 +60,13 @@ public class TestFogbowRequirementsHelper {
 		String fogbowRequirementC = "Glue2vCPU >= 1 && Glue2RAM >= 1024 && Glue2disk >= 20 && Glue2CloudComputeManagerID ==\"servers.your.domain\"";
 		String fogbowRequirementD = "Glue2vCPU >= 1 && Glue2RAM == 1024 || Glue2RAM == 2048 && Glue2disk >= 20 && Glue2CloudComputeManagerID ==\"servers.your.domain\"";
 		String fogbowRequirementE = "";
-		String fogbowRequirementF = null;
 
 		assertTrue(FogbowRequirementsHelper.validateFogbowRequirementsSyntax(fogbowRequirementA));
 		assertTrue(FogbowRequirementsHelper.validateFogbowRequirementsSyntax(fogbowRequirementB));
 		assertTrue(FogbowRequirementsHelper.validateFogbowRequirementsSyntax(fogbowRequirementC));
 		assertTrue(FogbowRequirementsHelper.validateFogbowRequirementsSyntax(fogbowRequirementD));
 		assertTrue(FogbowRequirementsHelper.validateFogbowRequirementsSyntax(fogbowRequirementE));
-		assertTrue(FogbowRequirementsHelper.validateFogbowRequirementsSyntax(fogbowRequirementF));
-
+		assertTrue(FogbowRequirementsHelper.validateFogbowRequirementsSyntax(null));
 	}
 
 	@Test
@@ -86,9 +78,7 @@ public class TestFogbowRequirementsHelper {
 	}
 
 	@Test
-	public void matchesResourceSucessA(){
-		
-		String fogbowRequirements = "Glue2vCPU >= 1 && Glue2RAM >= 1024";
+	public void matchesResourceSuccessA(){
 		
 		String requestId = "FakeRequestID1";
 		String host = "100.10.1.1";
@@ -106,11 +96,11 @@ public class TestFogbowRequirementsHelper {
 
 		suitableResource = TestResourceHelper.generateMockResource(requestId, resourceMetadata, true);
 		
-		assertTrue(FogbowRequirementsHelper.matches(suitableResource, fogbowRequirements));
+		assertTrue(FogbowRequirementsHelper.matches(suitableResource, EXAMPLE_FOGBOW_REQUIREMENT));
 	}
 
 	@Test
-	public void matchesResourceSucessB() {
+	public void matchesResourceSuccessB() {
 
 		String fogbowRequirements = "Glue2vCPU >= 2 && Glue2RAM >= 2048 && Glue2disk >= 20 && Glue2CloudComputeManagerID ==\"servers.your.domain\"";
 
@@ -131,11 +121,10 @@ public class TestFogbowRequirementsHelper {
 		suitableResource = TestResourceHelper.generateMockResource(requestId, resourceMetadata, true);
 
 		assertTrue(FogbowRequirementsHelper.matches(suitableResource, fogbowRequirements));
-
 	}
 
 	@Test
-	public void matchesResourceSucessC(){
+	public void matchesResourceSuccessC(){
 		
 		String fogbowRequirements = " ";
 		
@@ -332,7 +321,7 @@ public class TestFogbowRequirementsHelper {
 
 	}
 
-	private void generateDefaulProperties() {
+	private void generateDefaultProperties() {
 
 		properties = new Properties();
 

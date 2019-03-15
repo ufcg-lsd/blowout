@@ -48,7 +48,7 @@ public class TestDefaultInfrastructureManager {
 	@Test
 	public void testActOneReadyTaskNoResource() throws Exception {
 		Specification spec = new Specification(FAKE_CLOUD_NAME,
-				FAKE_IMAGE_ID, FAKE_FOGBOW_USER_NAME, FAKE_PUBLIC_KEY, FAKE_PRIVATE_KEY_FILE_PATH);
+				FAKE_IMAGE_FLAVOR_NAME, FAKE_FOGBOW_USER_NAME, FAKE_PUBLIC_KEY, FAKE_PRIVATE_KEY_FILE_PATH);
 
 		Task task = new TaskImpl(FAKE_TASK_ID, spec, FAKE_UUID);
 		
@@ -67,19 +67,17 @@ public class TestDefaultInfrastructureManager {
 	
 	@Test
 	public void testActThreeReadyTaskNoResource() throws Exception {
-		final String postFixC = "-c";
-		
 		Specification spec = new Specification(FAKE_CLOUD_NAME,
-				FAKE_IMAGE_ID, FAKE_FOGBOW_USER_NAME, FAKE_PUBLIC_KEY, FAKE_PRIVATE_KEY_FILE_PATH);
+				FAKE_IMAGE_FLAVOR_NAME, FAKE_FOGBOW_USER_NAME, FAKE_PUBLIC_KEY, FAKE_PRIVATE_KEY_FILE_PATH);
 
 		Task taskA = new TaskImpl(FAKE_TASK_ID, spec, FAKE_UUID);
 		Task taskB = new TaskImpl(FAKE_TASK_ID+ POSTFIX_B, spec, FAKE_UUID);
-		Task taskC = new TaskImpl(FAKE_TASK_ID+postFixC, spec, FAKE_UUID);
+		Task taskC = new TaskImpl(FAKE_TASK_ID+POSTFIX_C, spec, FAKE_UUID);
 		
 		final Queue<String> resourcesToReturn = new LinkedList<>();
 		resourcesToReturn.add(FAKE_RESOURCE_ID);
 		resourcesToReturn.add(FAKE_RESOURCE_ID+POSTFIX_B);
-		resourcesToReturn.add(FAKE_RESOURCE_ID+postFixC);
+		resourcesToReturn.add(FAKE_RESOURCE_ID+POSTFIX_C);
 		
 		List<Task> tasks = new ArrayList<>();
 		tasks.add(taskA);
@@ -98,13 +96,13 @@ public class TestDefaultInfrastructureManager {
 		verify(resourceMonitor, times(1))
 				.addPendingResource(FAKE_RESOURCE_ID+POSTFIX_B, spec);
 		verify(resourceMonitor, times(1))
-				.addPendingResource(FAKE_RESOURCE_ID+postFixC, spec);
+				.addPendingResource(FAKE_RESOURCE_ID+POSTFIX_C, spec);
 	}
 	
 	@Test
 	public void testActOneReadyTaskOnePendingResource() throws Exception {
 		Specification spec = new Specification(FAKE_CLOUD_NAME,
-				FAKE_IMAGE_ID, FAKE_FOGBOW_USER_NAME,FAKE_PUBLIC_KEY,FAKE_PRIVATE_KEY_FILE_PATH);
+				FAKE_IMAGE_FLAVOR_NAME, FAKE_FOGBOW_USER_NAME,FAKE_PUBLIC_KEY,FAKE_PRIVATE_KEY_FILE_PATH);
 
 		Task task = new TaskImpl(FAKE_TASK_ID, spec, FAKE_UUID);
 		
@@ -131,7 +129,7 @@ public class TestDefaultInfrastructureManager {
 	@Test
 	public void testActTwoReadyTasksOnePendingResource() throws Exception {
 		Specification spec = new Specification(FAKE_CLOUD_NAME,
-				FAKE_IMAGE_ID,FAKE_FOGBOW_USER_NAME,FAKE_PUBLIC_KEY,FAKE_PRIVATE_KEY_FILE_PATH);
+				FAKE_IMAGE_FLAVOR_NAME,FAKE_FOGBOW_USER_NAME,FAKE_PUBLIC_KEY,FAKE_PRIVATE_KEY_FILE_PATH);
 
 		Task taskA = new TaskImpl(FAKE_TASK_ID, spec, FAKE_UUID);
 		Task taskB = new TaskImpl(FAKE_TASK_ID+POSTFIX_B, spec, FAKE_UUID+POSTFIX_B);
@@ -160,9 +158,9 @@ public class TestDefaultInfrastructureManager {
 	@Test
 	public void testActOnReadyTasksOnePendingResourceDiffSpec() throws Exception {
 		Specification specA = new Specification(FAKE_CLOUD_NAME,
-				FAKE_IMAGE_ID,FAKE_FOGBOW_USER_NAME, FAKE_PUBLIC_KEY, FAKE_PRIVATE_KEY_FILE_PATH);
+				FAKE_IMAGE_FLAVOR_NAME,FAKE_FOGBOW_USER_NAME, FAKE_PUBLIC_KEY, FAKE_PRIVATE_KEY_FILE_PATH);
 		Specification specB = new Specification(FAKE_CLOUD_NAME+POSTFIX_B,
-				FAKE_IMAGE_ID+POSTFIX_B, FAKE_FOGBOW_USER_NAME+POSTFIX_B,
+				FAKE_IMAGE_FLAVOR_NAME +POSTFIX_B, FAKE_FOGBOW_USER_NAME+POSTFIX_B,
 				FAKE_PUBLIC_KEY+POSTFIX_B, FAKE_PRIVATE_KEY_FILE_PATH+POSTFIX_B);
 
 		Task taskA = new TaskImpl(FAKE_TASK_ID, specA, FAKE_UUID);
@@ -205,7 +203,7 @@ public class TestDefaultInfrastructureManager {
 		specA.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
 		
 		AbstractResource idleResource = new FogbowResource(FAKE_RESOURCE_ID, FAKE_ORDER_ID, specA);
-		idleResource.putMetadata(AbstractResource.METADATA_IMAGE, FAKE_IMAGE_ID);
+		idleResource.putMetadata(AbstractResource.METADATA_IMAGE, FAKE_IMAGE_FLAVOR_NAME);
 		idleResource.putMetadata(AbstractResource.ENV_PRIVATE_KEY_FILE, FAKE_PRIVATE_KEY_FILE_PATH);
 		ResourceStateHelper.changeResourceToState(idleResource, ResourceState.IDLE);
 		
@@ -235,10 +233,10 @@ public class TestDefaultInfrastructureManager {
 	@Test
 	public void testActOnReadyTasksOneIdleResourceDiffSpec() throws Exception {
 		
-		Specification specA = new Specification(FAKE_CLOUD_NAME, FAKE_IMAGE_ID,
+		Specification specA = new Specification(FAKE_CLOUD_NAME, FAKE_IMAGE_FLAVOR_NAME,
 				FAKE_FOGBOW_USER_NAME, FAKE_PUBLIC_KEY, FAKE_PRIVATE_KEY_FILE_PATH);
 		Specification specB = new Specification(FAKE_CLOUD_NAME+POSTFIX_B,
-				FAKE_IMAGE_ID+POSTFIX_B, FAKE_FOGBOW_USER_NAME+POSTFIX_B,
+				FAKE_IMAGE_FLAVOR_NAME +POSTFIX_B, FAKE_FOGBOW_USER_NAME+POSTFIX_B,
 				FAKE_PUBLIC_KEY+POSTFIX_B, FAKE_PRIVATE_KEY_FILE_PATH+POSTFIX_B);
 
 		Task taskA = new TaskImpl(FAKE_TASK_ID, specA, FAKE_UUID);

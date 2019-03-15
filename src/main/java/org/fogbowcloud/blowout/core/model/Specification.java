@@ -14,8 +14,9 @@ import org.json.JSONObject;
 public class Specification implements Serializable {
 
 	private static final long serialVersionUID = 5255295548723927267L;
-	private static final String LN = System.lineSeparator();
 
+	// Todo remove these constants to a separated file.
+	private static final String LN = System.lineSeparator();
 	private static final String REQUIREMENTS_MAP_STR = "requirementsMap";
 	private static final String USER_DATA_TYPE_STR = "userDataType";
 	private static final String USER_DATA_FILE_STR = "userDataFile";
@@ -39,7 +40,6 @@ public class Specification implements Serializable {
 	private String userDataType;
 
 	private Map<String, String> requirements;
-
 
 	public Specification(String imageName, String username, String publicKey, String privateKeyFilePath) {
 		this.cloudName = null;
