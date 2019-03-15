@@ -59,7 +59,7 @@ public class TestFogbowResource {
 		this.resource.putMetadata(FogbowResource.METADATA_DISK_SIZE, EXAMPLE_DISK_SIZE);
 		this.resource.putMetadata(FogbowResource.METADATA_LOCATION, EXAMPLE_LOCATION);
 		
-		assertFalse(resource.match(spec));
+		assertTrue(resource.match(spec));
 
 		this.spec.getAllRequirements().clear();
 		this.spec = null;

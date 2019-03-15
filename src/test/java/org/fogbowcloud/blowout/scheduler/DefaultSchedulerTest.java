@@ -22,10 +22,10 @@ import org.mockito.Mockito;
 public class DefaultSchedulerTest {
 	private Specification specA;
 	private Specification specB;
-	private Task taskA;
-	private Task taskB;
-	private Task taskC;
-	private Task taskD;
+	private TaskImpl taskA;
+	private TaskImpl taskB;
+	private TaskImpl taskC;
+	private TaskImpl taskD;
 
 	@Before
 	public void setUp() {
@@ -35,7 +35,7 @@ public class DefaultSchedulerTest {
 				FAKE_FOGBOW_USER_NAME+POSTFIX_B, FAKE_PUBLIC_KEY+POSTFIX_B, FAKE_PRIVATE_KEY_FILE_PATH+POSTFIX_B);
 		this.taskA = new TaskImpl(FAKE_UUID, specA, FAKE_UUID);
 		this.taskB = new TaskImpl(FAKE_UUID+POSTFIX_B, specA, FAKE_UUID+POSTFIX_B);
-		this.taskC = new TaskImpl(FAKE_UUID+POSTFIX_C, specA, FAKE_UUID+POSTFIX_C);
+		this.taskC = new TaskImpl(FAKE_UUID+POSTFIX_C, specB, FAKE_UUID+POSTFIX_C);
 		this.taskD = new TaskImpl(FAKE_UUID+POSTFIX_D, specA, FAKE_UUID+POSTFIX_D);
 	}
 
@@ -46,7 +46,8 @@ public class DefaultSchedulerTest {
 		
 		List<Task> tasks = new ArrayList<>();
 
-		TaskImpl taskExpected = (TaskImpl) this.taskC;
+		TaskImpl taskExpected = this.taskC;
+
 		tasks.add(this.taskA);
 		tasks.add(this.taskB);
 		tasks.add(taskExpected);
