@@ -13,6 +13,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.constants.AppMessagesConstants;
 import org.fogbowcloud.blowout.core.constants.FogbowConstants;
+import org.fogbowcloud.blowout.core.exception.BlowoutException;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.constants.AppPropertiesConstants;
 
@@ -273,7 +274,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		this.frDatastore = frDatastore;
 	}
 
-	protected StringEntity makeJsonBody(Specification spec) throws UnsupportedEncodingException {
+	protected StringEntity makeJsonBody(Specification spec) throws UnsupportedEncodingException, BlowoutException {
         return requestsHelper.makeJsonBody(spec);
 	}
 

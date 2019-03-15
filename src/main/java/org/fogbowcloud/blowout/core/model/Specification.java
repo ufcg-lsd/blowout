@@ -32,6 +32,8 @@ public class Specification implements Serializable {
 	private String username;
 	private String privateKeyFilePath;
 	private String publicKey;
+
+	//TODO Analyze the removal of these attributes
 	private String contextScript;
 	private String userDataFile;
 	private String userDataType;
@@ -136,7 +138,9 @@ public class Specification implements Serializable {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("CloudName: " + this.cloudName);
+		if((this.cloudName != null) && !this.cloudName.isEmpty()){
+			sb.append("CloudName: " + this.cloudName);
+		}
 		sb.append("Image: " + this.imageName);
 		sb.append(" PublicKey: " + this.publicKey);
 		if ((this.contextScript != null) && !this.contextScript.isEmpty()) {

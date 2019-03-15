@@ -7,6 +7,7 @@ import org.apache.http.protocol.HTTP;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.constants.AppPropertiesConstants;
 import org.fogbowcloud.blowout.core.constants.FogbowConstants;
+import org.fogbowcloud.blowout.core.exception.BlowoutException;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.util.AppUtil;
 import org.fogbowcloud.blowout.infrastructure.exception.RequestResourceException;
@@ -46,6 +47,8 @@ public class RASRequestsHelper {
             requestBody = this.makeJsonBody(specification);
         } catch (UnsupportedEncodingException uee) {
             LOGGER.error("Error while requesting resource on Fogbow" + uee.getMessage(), uee);
+        } catch (BlowoutException be){
+            LOGGER.error("Error while requesting resource on Fogbow: " + be.getMessage(), be);
         }
 
         requestBody.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, HttpWrapper.HTTP_CONTENT_JSON));
@@ -131,46 +134,6 @@ public class RASRequestsHelper {
         }
     }
 
-    private String getImageId(String imageName){
-        String imageId = null;
-        List<String> images = this.getImagesByName(imageName);
-        if(images.isEmpty()){
-            //TODO mudar exceção.
-            throw new RuntimeException();
-        }
-        return images.get(0);
-    }
-
-    private List<String> getImagesByName(String name){
-        List<String> images = new ArrayList<>();
-        Map<String, Object> imageMap = getAllImages();
-        for(String imageId : imageMap.keySet()){
-            String imageName = imageMap.get(imageId).toString();
-            if(imageName.equals(name)){
-                images.add(imageName);
-            }
-        }
-        return images;
-    }
-
-
-    private Map<String, Object> getAllImages(){
-        String cloudName = "cloud4";
-        String memberId = this.properties.getProperty(AppPropertiesConstants.RAS_MEMBER_ID);
-        Map<String, Object> allImagesJson = new HashMap<>();
-        final String requestUrl = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_IMAGES + "/"
-                + memberId + "/" + cloudName;
-        final String errorMessage = "Error while getting info about images of member with id" + cloudName;
-
-        try {
-            String response = this.doRequest(HttpWrapper.HTTP_METHOD_GET, requestUrl, new LinkedList<>());
-            allImagesJson = parseAttributes(response);
-        } catch (Exception e) {
-            LOGGER.error(errorMessage, e);
-        }
-        return allImagesJson;
-    }
-
 
     public void setHttpWrapper(HttpWrapper httpWrapper) {
         this.http = httpWrapper;
@@ -186,10 +149,13 @@ public class RASRequestsHelper {
         return this.http.doRequest(method, endpoint, this.token.getAccessId(), headers);
     }
 
-    public StringEntity makeJsonBody(Specification specification) throws UnsupportedEncodingException {
+    public StringEntity makeJsonBody(Specification specification) throws UnsupportedEncodingException, BlowoutException {
         JSONObject json = new JSONObject();
         final String iguassuComputesName = "Iguassu";
-        String imageId = getImageId(specification.getImageName());
+
+        String imageName = specification.getImageName();
+        String imageId = getImageId(imageName);
+        LOGGER.info("Using the image " + imageName + ":" + imageId + "in compute request");
 
         if(specification.getCloudName() != null){
             makeBodyField(json, FogbowConstants.JSON_KEY_RAS_CLOUD_NAME, specification.getCloudName());
@@ -202,6 +168,47 @@ public class RASRequestsHelper {
         makeBodyField(json, FogbowConstants.JSON_KEY_RAS_VCPU, specification.getvCPU());
 
         return new StringEntity(json.toString());
+    }
+
+    private String getImageId(String imageName) throws BlowoutException {
+        String imageId;
+        List<String> images = this.getImagesByName(imageName);
+        if(images.isEmpty()){
+            throw new BlowoutException("No images found with the name " + imageName);
+        }
+        imageId = images.get(0);
+        return imageId;
+    }
+
+    private List<String> getImagesByName(String imageName){
+        List<String> images = new ArrayList<>();
+
+        Map<String, Object> imagesMap = getAllImages();
+        for(String imageId : imagesMap.keySet()){
+            String currentImageName = imagesMap.get(imageId).toString();
+            if(currentImageName.equals(imageName)){
+                images.add(imageId);
+            }
+        }
+        return images;
+    }
+
+
+    private Map<String, Object> getAllImages(){
+        String cloudName = "cloud4";
+        String memberId = this.properties.getProperty(AppPropertiesConstants.RAS_MEMBER_ID);
+        Map<String, Object> imagesMap = new HashMap<>();
+        final String requestUrl = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_IMAGES + "/"
+                + memberId + "/" + cloudName;
+        final String errorMessage = "Error while getting info about images of member with id" + cloudName;
+
+        try {
+            String response = this.doRequest(HttpWrapper.HTTP_METHOD_GET, requestUrl, new LinkedList<>());
+            imagesMap = parseAttributes(response);
+        } catch (Exception e) {
+            LOGGER.error(errorMessage, e);
+        }
+        return imagesMap;
     }
 
     private Map<String, Object> parseAttributes(String response) throws ScriptException {
