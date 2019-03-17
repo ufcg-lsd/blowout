@@ -7,7 +7,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.fogbowcloud.blowout.constants.TestConstants.*;
+import static org.fogbowcloud.blowout.helpers.Constants.*;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
@@ -17,6 +17,7 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import org.fogbowcloud.blowout.core.constants.FogbowConstants;
+import org.fogbowcloud.blowout.helpers.FogbowInfrastructureTestUtils;
 import org.json.JSONException;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
@@ -33,7 +34,7 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
 
 
-public class TestFogbowInfrastructureProvider {
+public class FogbowInfrastructureProviderTest {
 	@Rule
 	public final ExpectedException exception = ExpectedException.none();
 

@@ -20,7 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-public class TestResourceMonitor {
+public class ResourceMonitorTest {
 
 	private ResourceMonitor resourceMonitor;
 	private InfrastructureProvider infraProvider;

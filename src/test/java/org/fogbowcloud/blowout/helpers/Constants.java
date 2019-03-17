@@ -1,6 +1,6 @@
-package org.fogbowcloud.blowout.constants;
+package org.fogbowcloud.blowout.helpers;
 
-public class TestConstants {
+public class Constants {
 
     public static final String FAKE_UUID = "1234";
     public static final String FAKE_CLOUD_NAME = "fake-cloud-name";

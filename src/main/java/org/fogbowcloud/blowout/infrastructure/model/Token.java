@@ -13,8 +13,8 @@ public class Token {
     private String accessId;
     private User user;
 
-    public Token(String acessId, User user) {
-        this.accessId = acessId;
+    public Token(String accessId, User user) {
+        this.accessId = accessId;
         this.user = user;
     }
 
@@ -22,8 +22,8 @@ public class Token {
         return accessId;
     }
 
-    public void setAcessId(String acessId) {
-        this.accessId = acessId;
+    public void setAcessId(String accessId) {
+        this.accessId = accessId;
     }
 
     public User getUser() {

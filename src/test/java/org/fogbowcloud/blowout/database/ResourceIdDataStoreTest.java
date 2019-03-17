@@ -21,8 +21,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TestResourceIdDataStore {
-	private static final Logger LOGGER = Logger.getLogger(TestResourceIdDataStore.class);
+public class ResourceIdDataStoreTest {
+	private static final Logger LOGGER = Logger.getLogger(ResourceIdDataStoreTest.class);
 
 	private final String DATASTORE_PATH = "src/test/resources/persistance/";
 	

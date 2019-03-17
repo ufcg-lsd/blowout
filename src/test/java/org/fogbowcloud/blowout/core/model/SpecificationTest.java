@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class TestSpecification {
+public class SpecificationTest {
 
 	private static final String PRIVATE_KEY_PATH = "privateKeyPath";
 	private static final String CLOUD_NAME = "cloudName";

@@ -28,9 +28,9 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
 
-import static org.fogbowcloud.blowout.constants.TestConstants.*;
+import static org.fogbowcloud.blowout.helpers.Constants.*;
 
-public class TestDefaultInfrastructureManager {
+public class DefaultInfrastructureManagerTest {
 	private ResourceMonitor resourceMonitor;
 	private InfrastructureProvider infraProvider;
 	private InfrastructureManager defaultInfrastructureManager;

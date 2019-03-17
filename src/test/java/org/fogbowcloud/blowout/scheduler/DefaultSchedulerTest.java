@@ -1,6 +1,6 @@
 package org.fogbowcloud.blowout.scheduler;
 
-import static org.fogbowcloud.blowout.constants.TestConstants.*;
+import static org.fogbowcloud.blowout.helpers.Constants.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;

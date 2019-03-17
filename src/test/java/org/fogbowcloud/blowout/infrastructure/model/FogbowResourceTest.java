@@ -2,7 +2,7 @@ package org.fogbowcloud.blowout.infrastructure.model;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.spy;
-import static org.fogbowcloud.blowout.constants.TestConstants.*;
+import static org.fogbowcloud.blowout.helpers.Constants.*;
 
 import org.fogbowcloud.blowout.core.constants.FogbowConstants;
 import org.fogbowcloud.blowout.core.model.Specification;
@@ -10,7 +10,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TestFogbowResource {
+public class FogbowResourceTest {
 	private FogbowResource resource;
 	private Specification spec;
 	

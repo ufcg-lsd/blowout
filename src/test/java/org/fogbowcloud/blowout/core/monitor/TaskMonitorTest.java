@@ -34,7 +34,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 
-public class TestTaskMonitor {
+public class TaskMonitorTest {
 
 	private static final String FAKE_UUID = "1234";
 	private static final String FAKE_ID = "fakeId";

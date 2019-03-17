@@ -15,7 +15,7 @@ import org.fogbowcloud.blowout.core.model.Specification;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TestTaskImpl {
+public class TaskImplTest {
 	
 	private static final String FAKE_UUID = "1234";
 	private static final String FAKE_METADATA_VALUE = "fakemetadatavalue";

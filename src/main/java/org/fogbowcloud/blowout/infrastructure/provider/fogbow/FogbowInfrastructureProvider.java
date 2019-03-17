@@ -12,6 +12,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import org.apache.http.entity.StringEntity;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.constants.AppMessagesConstants;
+import org.fogbowcloud.blowout.core.constants.BlowoutConstants;
 import org.fogbowcloud.blowout.core.constants.FogbowConstants;
 import org.fogbowcloud.blowout.core.exception.BlowoutException;
 import org.fogbowcloud.blowout.core.model.Specification;
@@ -252,9 +253,9 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 		if (!FogbowRequirementsHelper.validateFogbowRequirementsSyntax(fogbowRequirements)) {
 			LOGGER.debug("FogbowRequirements [" + fogbowRequirements
-					+ "] is not in valid format." + AppMessagesConstants.FOGBOW_REQUIREMENTS_EXAMPLE);
+					+ "] is not in valid format." + BlowoutConstants.FOGBOW_REQUIREMENTS_EXAMPLE);
 			throw new RequestResourceException("FogbowRequirements [" + fogbowRequirements
-					+ "] is not in valid format." + AppMessagesConstants.FOGBOW_REQUIREMENTS_EXAMPLE);
+					+ "] is not in valid format." + BlowoutConstants.FOGBOW_REQUIREMENTS_EXAMPLE);
 		}
 	}
 

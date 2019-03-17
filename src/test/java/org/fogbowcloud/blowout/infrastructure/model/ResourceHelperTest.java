@@ -10,7 +10,7 @@ import java.util.Map;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.mockito.Mockito;
 
-public class TestResourceHelper {
+public class ResourceHelperTest {
 
 	public static FogbowResource generateMockResource(String resourceId, Map<String, String> resourceMetadata, boolean connectivity){
 
