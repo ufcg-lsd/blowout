@@ -1,8 +1,12 @@
 package org.fogbowcloud.blowout.core.model;
 
 import static org.junit.Assert.*;
+import static org.fogbowcloud.blowout.helpers.Constants.*;
+
 import org.fogbowcloud.blowout.core.constants.FogbowConstants;
+
 import org.json.JSONObject;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -10,68 +14,56 @@ import java.util.List;
 
 
 public class SpecificationTest {
+	private Specification spec;
 
-	private static final String PRIVATE_KEY_PATH = "privateKeyPath";
-	private static final String CLOUD_NAME = "cloudName";
-	private static final String PUBLIC_KEY = "publicKey";
-	private static final String USERNAME = "username";
-	private static final String IMAGE_ID = "image";
-	private static final String OTHER_VALUE = "otherValue";
-	private static final String SECOND_REQUIREMENT = "secondRequirement";
-	private static final String THIS_VALUE = "thisValue";
-	private static final String FIRST_REQUIREMENT = "firstRequirement";
-
-    public final static String FOGBOW_REQUIREMENT_A = "Glue2vCPU  == 1 && Glue2RAM >= 1024 ";
-    public final static String FOGBOW_REQUIREMENT_B = "Glue2vCPU >= 1 &&  Glue2RAM >= 1024 && Glue2disk <= 20 ";
-    public final static String FOGBOW_REQUIREMENT_C = "Glue2vCPU <= 1 && Glue2RAM >= 1024 && Glue2disk >= 20 && Glue2CloudComputeManagerID ==\"servers.your.domain\"";
-    public final static String FOGBOW_REQUIREMENT_D = "Glue2vCPU >= 1  && Glue2RAM == 1024 || Glue2RAM == 2048 && Glue2disk == 20 && Glue2CloudComputeManagerID ==\"servers.your.domain\"";
-    public final static String FOGBOW_REQUIREMENT_E = "";
-    public final static String FOGBOW_REQUIREMENT_F = null;
+	@Before
+	public void setUp(){
+		 this.spec = new Specification(JSON_KEY_CLOUD_NAME, JSON_KEY_IMAGE_ID,
+				 JSON_KEY_USERNAME, JSON_KEY_PUBLIC_KEY, JSON_KEY_PRIVATE_KEY_PATH);
+	}
 
 	@Test
 	public void testToAndFromJSon() {
-		Specification spec = new Specification(CLOUD_NAME, IMAGE_ID, USERNAME, PUBLIC_KEY, PRIVATE_KEY_PATH);
-		spec.addRequirement(FIRST_REQUIREMENT, THIS_VALUE);
-		spec.addRequirement(SECOND_REQUIREMENT, OTHER_VALUE);
+
+		this.spec.addRequirement(STR_FIRST_REQUIREMENT, STR_THIS_VALUE);
+		this.spec.addRequirement(STR_SECOND_REQUIREMENT, STR_OTHER_VALUE);
 		
-		JSONObject jsonObject = spec.toJSON();
+		JSONObject jsonObject = this.spec.toJSON();
 		
 		Specification recoveredSpec = Specification.fromJSON(jsonObject);
 		JSONObject jsonObject2 = recoveredSpec.toJSON();
 		
 		Specification recoveredSpec2 = Specification.fromJSON(jsonObject2);
 	    assert(recoveredSpec2.equals(recoveredSpec));
-		assertEquals(spec.getRequirementValue(FIRST_REQUIREMENT), recoveredSpec.getRequirementValue(FIRST_REQUIREMENT));
-		assertEquals(spec.getRequirementValue(SECOND_REQUIREMENT), recoveredSpec.getRequirementValue(SECOND_REQUIREMENT));
+		assertEquals(this.spec.getRequirementValue(STR_FIRST_REQUIREMENT),
+				recoveredSpec.getRequirementValue(STR_FIRST_REQUIREMENT));
+		assertEquals(this.spec.getRequirementValue(STR_SECOND_REQUIREMENT),
+				recoveredSpec.getRequirementValue(STR_SECOND_REQUIREMENT));
 	}
 
 	@Test
-	public void testgetVCPU() {
+	public void testGetVCPU() {
 		List<String> fogbowRequirements = new ArrayList<>();
 		fogbowRequirements.add(FOGBOW_REQUIREMENT_A);
 		fogbowRequirements.add(FOGBOW_REQUIREMENT_B);
 		fogbowRequirements.add(FOGBOW_REQUIREMENT_C);
 		fogbowRequirements.add(FOGBOW_REQUIREMENT_D);
 
-		Specification spec;
 		for (String fogbowRequirement: fogbowRequirements) {
-			spec = new Specification(CLOUD_NAME, IMAGE_ID, USERNAME, PUBLIC_KEY, PRIVATE_KEY_PATH);
-			spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
+			this.spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
 
-			assertEquals("1", spec.getvCPU());
+			assertEquals("1", this.spec.getvCPU());
 		}
 
-        spec = new Specification(CLOUD_NAME, IMAGE_ID, USERNAME, PUBLIC_KEY, PRIVATE_KEY_PATH);
-        spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_E);
+		this.spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_E);
         assertEquals("", spec.getvCPU());
 
-        spec = new Specification(CLOUD_NAME, IMAGE_ID, USERNAME, PUBLIC_KEY, PRIVATE_KEY_PATH);
-        spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_F);
-        assertEquals(null, spec.getvCPU());
+		this.spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_F);
+		assertNull(spec.getvCPU());
 	}
 
     @Test
-    public void testgetMemory() {
+    public void testGetMemory() {
         List<String> fogbowRequirements = new ArrayList<>();
         fogbowRequirements.add(FOGBOW_REQUIREMENT_A);
         fogbowRequirements.add(FOGBOW_REQUIREMENT_B);
@@ -80,23 +72,23 @@ public class SpecificationTest {
 
         Specification spec;
         for (String fogbowRequirement: fogbowRequirements) {
-            spec = new Specification(CLOUD_NAME, IMAGE_ID, USERNAME, PUBLIC_KEY, PRIVATE_KEY_PATH);
+            spec = new Specification(JSON_KEY_CLOUD_NAME, JSON_KEY_IMAGE_ID, JSON_KEY_USERNAME, JSON_KEY_PUBLIC_KEY, JSON_KEY_PRIVATE_KEY_PATH);
             spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
 
             assertEquals("1024", spec.getMemory());
         }
 
-        spec = new Specification(CLOUD_NAME, IMAGE_ID, USERNAME, PUBLIC_KEY, PRIVATE_KEY_PATH);
+        spec = new Specification(JSON_KEY_CLOUD_NAME, JSON_KEY_IMAGE_ID, JSON_KEY_USERNAME, JSON_KEY_PUBLIC_KEY, JSON_KEY_PRIVATE_KEY_PATH);
         spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_E);
         assertEquals("", spec.getMemory());
 
-        spec = new Specification(CLOUD_NAME, IMAGE_ID, USERNAME, PUBLIC_KEY, PRIVATE_KEY_PATH);
+        spec = new Specification(JSON_KEY_CLOUD_NAME, JSON_KEY_IMAGE_ID, JSON_KEY_USERNAME, JSON_KEY_PUBLIC_KEY, JSON_KEY_PRIVATE_KEY_PATH);
         spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_F);
-        assertEquals(null, spec.getMemory());
+	    assertNull(spec.getMemory());
     }
 
     @Test
-    public void testgetDisk() {
+    public void testGetDisk() {
         List<String> fogbowRequirements = new ArrayList<>();
         fogbowRequirements.add(FOGBOW_REQUIREMENT_B);
         fogbowRequirements.add(FOGBOW_REQUIREMENT_C);
@@ -104,24 +96,23 @@ public class SpecificationTest {
 
         Specification spec;
         for (String fogbowRequirement: fogbowRequirements) {
-            spec = new Specification(CLOUD_NAME, IMAGE_ID, USERNAME, PUBLIC_KEY, PRIVATE_KEY_PATH);
+            spec = new Specification(JSON_KEY_CLOUD_NAME, JSON_KEY_IMAGE_ID, JSON_KEY_USERNAME, JSON_KEY_PUBLIC_KEY, JSON_KEY_PRIVATE_KEY_PATH);
             spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
 
             assertEquals("20", spec.getDisk());
         }
 
-        spec = new Specification(CLOUD_NAME, IMAGE_ID, USERNAME, PUBLIC_KEY, PRIVATE_KEY_PATH);
+        spec = new Specification(JSON_KEY_CLOUD_NAME, JSON_KEY_IMAGE_ID, JSON_KEY_USERNAME, JSON_KEY_PUBLIC_KEY, JSON_KEY_PRIVATE_KEY_PATH);
         spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_E);
         assertEquals("", spec.getDisk());
 
-        spec = new Specification(CLOUD_NAME, IMAGE_ID, USERNAME, PUBLIC_KEY, PRIVATE_KEY_PATH);
+        spec = new Specification(JSON_KEY_CLOUD_NAME, JSON_KEY_IMAGE_ID, JSON_KEY_USERNAME, JSON_KEY_PUBLIC_KEY, JSON_KEY_PRIVATE_KEY_PATH);
         spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_F);
-        assertEquals(null, spec.getDisk());
+	    assertNull(spec.getDisk());
     }
 
     @Test
     public void testGetFogbowRequirementValueWhenNoParam() {
-        Specification spec = new Specification(CLOUD_NAME, IMAGE_ID, USERNAME, PUBLIC_KEY, PRIVATE_KEY_PATH);
-        assertNull(spec.getvCPU());
+        assertNull(this.spec.getvCPU());
     }
 }

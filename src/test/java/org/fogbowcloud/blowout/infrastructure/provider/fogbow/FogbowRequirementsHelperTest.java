@@ -96,7 +96,7 @@ public class FogbowRequirementsHelperTest {
 
 		suitableResource = ResourceHelperTest.generateMockResource(requestId, resourceMetadata, true);
 		
-		assertTrue(FogbowRequirementsHelper.matches(suitableResource, EXAMPLE_FOGBOW_REQUIREMENT));
+		assertTrue(FogbowRequirementsHelper.matches(suitableResource, FOGBOW_REQUIREMENT_A));
 	}
 
 	@Test

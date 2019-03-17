@@ -6,21 +6,9 @@ import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 
 import static org.junit.Assert.*;
+import static org.fogbowcloud.blowout.helpers.Constants.*;
 
 public class CommandTest {
-
-	private static final String FAKE_COMMAND = "echo fake-echo";
-	private static final Command.Type COMMAND_TYPE_DEFAULT = Command.Type.REMOTE;
-	private static final String COMMAND_JSON = "{" +
-			"\"command\": \"echo fake-echo\", " +
-			"\"state\": \"QUEUED\", " +
-			"\"type\": \"REMOTE\"" +
-			"}";
-	private static final String COMMAND_JSON_RUNNING = "{" +
-			"\"command\": \"echo fake-echo\", " +
-			"\"state\": \"RUNNING\", " +
-			"\"type\": \"REMOTE\"" +
-			"}";
 
 	private Command command;
 
@@ -31,7 +19,7 @@ public class CommandTest {
 
 	@Test
 	public void testClone() {
-		assertTrue(TestsUtils.isJSONValid(COMMAND_JSON));
+		assertTrue(TestsUtils.isJSONValid(JSON_BODY_COMMAND));
 		assertEquals(this.command.getState(), Command.State.QUEUED);
 
 
@@ -47,17 +35,17 @@ public class CommandTest {
 
 	@Test
 	public void testToJSON() {
-		assertTrue(TestsUtils.isJSONValid(COMMAND_JSON));
-		assertTrue(TestsUtils.isJSONValid(COMMAND_JSON_RUNNING));
+		assertTrue(TestsUtils.isJSONValid(JSON_BODY_COMMAND));
+		assertTrue(TestsUtils.isJSONValid(JSON_BODY_COMMAND_RUNNING));
 		JSONObject actualForm = this.command.toJSON();
 
-		JSONAssert.assertEquals(COMMAND_JSON, actualForm, true);
-		JSONAssert.assertEquals(COMMAND_JSON, actualForm, true);
+		JSONAssert.assertEquals(JSON_BODY_COMMAND, actualForm, true);
+		JSONAssert.assertEquals(JSON_BODY_COMMAND, actualForm, true);
 
 		this.command.setState(Command.State.RUNNING);
 		actualForm = this.command.toJSON();
 
-		JSONAssert.assertEquals(COMMAND_JSON_RUNNING, actualForm, true);
+		JSONAssert.assertEquals(JSON_BODY_COMMAND_RUNNING, actualForm, true);
 	}
 
 	@Test

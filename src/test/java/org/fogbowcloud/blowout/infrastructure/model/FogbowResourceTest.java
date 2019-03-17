@@ -32,7 +32,7 @@ public class FogbowResourceTest {
 		this.spec.setUserDataFile(USER_DATA_FILE);
 		this.spec.setUserDataType(USER_DATA_TYPE);
 
-		this.spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, EXAMPLE_FOGBOW_REQUIREMENT);
+		this.spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_A);
 
 		this.resource.putMetadata(FogbowResource.METADATA_IMAGE, FAKE_IMAGE_FLAVOR_ID);
 		this.resource.putMetadata(FogbowResource.METADATA_PUBLIC_KEY, FAKE_PUBLIC_KEY);
@@ -50,7 +50,7 @@ public class FogbowResourceTest {
 		this.spec.setUserDataFile(USER_DATA_FILE);
 		this.spec.setUserDataType(USER_DATA_TYPE);
 
-		this.spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, EXAMPLE_FOGBOW_REQUIREMENT);
+		this.spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_A);
 
 		this.resource.putMetadata(FogbowResource.METADATA_IMAGE, FAKE_IMAGE_FLAVOR_ID);
 		this.resource.putMetadata(FogbowResource.METADATA_PUBLIC_KEY, FAKE_PUBLIC_KEY);
@@ -72,7 +72,7 @@ public class FogbowResourceTest {
 				FAKE_PUBLIC_KEY+POSTFIX_B, FAKE_PRIVATE_KEY_FILE_PATH+POSTFIX_B,
 				USER_DATA_FILE+POSTFIX_B, USER_DATA_TYPE+POSTFIX_B);
 
-		specB.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, EXAMPLE_FOGBOW_REQUIREMENT);
+		specB.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_A);
 		
 		resource.putMetadata(FogbowResource.METADATA_IMAGE, FAKE_IMAGE_FLAVOR_ID);
 		resource.putMetadata(FogbowResource.METADATA_PUBLIC_KEY, FAKE_PUBLIC_KEY);
@@ -91,7 +91,7 @@ public class FogbowResourceTest {
 		this.spec.setUserDataType(USER_DATA_TYPE);
 		this.spec.setUserDataFile(USER_DATA_FILE);
 
-		spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, EXAMPLE_FOGBOW_REQUIREMENT);
+		spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_A);
 
 		resource.putMetadata(FogbowResource.METADATA_IMAGE, FAKE_IMAGE_FLAVOR_ID);
 		resource.putMetadata(FogbowResource.METADATA_PUBLIC_KEY, FAKE_PUBLIC_KEY);

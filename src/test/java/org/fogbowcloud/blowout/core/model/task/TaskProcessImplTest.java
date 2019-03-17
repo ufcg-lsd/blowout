@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.fogbowcloud.blowout.helpers.Constants.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,11 +18,8 @@ import org.junit.Test;
 
 public class TaskProcessImplTest {
 
-	private static final String FAKE_UUID = "1234";
-	private static final String FAKE_TASK_ID = "fakeTaskId";
-	private static final String FAKE_COMMAND = "fakeCommand";
-	private static final String FAKE_COMMAND2 = "fakeCommand2";
-	private static final String FAKE_COMMAND3 = "fakeCommand3";
+	private static final String FAKE_COMMAND_B = FAKE_COMMAND + POSTFIX_B;
+	private static final String FAKE_COMMAND_C = FAKE_COMMAND + POSTFIX_C;
 
 	@Test
 	public void testExecOneCommand() {
@@ -71,8 +69,8 @@ public class TaskProcessImplTest {
 		Specification spec = mock(Specification.class);
 		List<Command> commandList = new ArrayList<Command>();
 		commandList.add(new Command(FAKE_COMMAND, Command.Type.LOCAL));
-		commandList.add(new Command(FAKE_COMMAND2, Command.Type.LOCAL));
-		commandList.add(new Command(FAKE_COMMAND3, Command.Type.LOCAL));
+		commandList.add(new Command(FAKE_COMMAND_B, Command.Type.LOCAL));
+		commandList.add(new Command(FAKE_COMMAND_C, Command.Type.LOCAL));
 		FogbowResource resource = mock(FogbowResource.class);
 
 		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, FAKE_UUID));
@@ -81,14 +79,14 @@ public class TaskProcessImplTest {
 		terSuccess.finish(0);
 		
 		doReturn(terSuccess).when(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
-		doReturn(terSuccess).when(tp).executeCommandString(FAKE_COMMAND2, Command.Type.LOCAL, resource);
-		doReturn(terSuccess).when(tp).executeCommandString(FAKE_COMMAND3, Command.Type.LOCAL, resource);
+		doReturn(terSuccess).when(tp).executeCommandString(FAKE_COMMAND_B, Command.Type.LOCAL, resource);
+		doReturn(terSuccess).when(tp).executeCommandString(FAKE_COMMAND_C, Command.Type.LOCAL, resource);
 
 		tp.executeTask(resource);
 
 		verify(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
-		verify(tp).executeCommandString(FAKE_COMMAND2, Command.Type.LOCAL, resource);
-		verify(tp).executeCommandString(FAKE_COMMAND3, Command.Type.LOCAL, resource);
+		verify(tp).executeCommandString(FAKE_COMMAND_B, Command.Type.LOCAL, resource);
+		verify(tp).executeCommandString(FAKE_COMMAND_C, Command.Type.LOCAL, resource);
 		assertEquals(tp.getTaskState(), TaskState.FINISHED);
 	}
 
@@ -98,8 +96,8 @@ public class TaskProcessImplTest {
 		Specification spec = mock(Specification.class);
 		List<Command> commandList = new ArrayList<Command>();
 		commandList.add(new Command(FAKE_COMMAND, Command.Type.LOCAL));
-		commandList.add(new Command(FAKE_COMMAND2, Command.Type.LOCAL));
-		commandList.add(new Command(FAKE_COMMAND3, Command.Type.LOCAL));
+		commandList.add(new Command(FAKE_COMMAND_B, Command.Type.LOCAL));
+		commandList.add(new Command(FAKE_COMMAND_C, Command.Type.LOCAL));
 		FogbowResource resource = mock(FogbowResource.class);
 
 		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, FAKE_UUID));
@@ -110,13 +108,13 @@ public class TaskProcessImplTest {
 		terFail.finish(1);
 
 		doReturn(terSuccess).when(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
-		doReturn(terFail).when(tp).executeCommandString(FAKE_COMMAND2, Command.Type.LOCAL, resource);
+		doReturn(terFail).when(tp).executeCommandString(FAKE_COMMAND_B, Command.Type.LOCAL, resource);
 
 		tp.executeTask(resource);
 
 		verify(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
-		verify(tp).executeCommandString(FAKE_COMMAND2, Command.Type.LOCAL, resource);
-		verify(tp, never()).executeCommandString(FAKE_COMMAND3, Command.Type.LOCAL, resource);
+		verify(tp).executeCommandString(FAKE_COMMAND_B, Command.Type.LOCAL, resource);
+		verify(tp, never()).executeCommandString(FAKE_COMMAND_C, Command.Type.LOCAL, resource);
 		assertEquals(tp.getTaskState(), TaskState.FAILED);
 	}
 
@@ -130,8 +128,8 @@ public class TaskProcessImplTest {
 		Specification spec = mock(Specification.class);
 		List<Command> commandList = new ArrayList<Command>();
 		commandList.add(new Command(FAKE_COMMAND, Command.Type.LOCAL));
-		commandList.add(new Command(FAKE_COMMAND2, Command.Type.LOCAL));
-		commandList.add(new Command(FAKE_COMMAND3, Command.Type.LOCAL));
+		commandList.add(new Command(FAKE_COMMAND_B, Command.Type.LOCAL));
+		commandList.add(new Command(FAKE_COMMAND_C, Command.Type.LOCAL));
 		FogbowResource resource = mock(FogbowResource.class);
 
 		TaskProcessImpl tp = spy(new TaskProcessImpl(taskId, commandList, spec, FAKE_UUID));
@@ -141,8 +139,8 @@ public class TaskProcessImplTest {
 		tp.executeTask(resource);
 
 		verify(tp).executeCommandString(FAKE_COMMAND, Command.Type.LOCAL, resource);
-		verify(tp, never()).executeCommandString(FAKE_COMMAND2, Command.Type.LOCAL, resource);
-		verify(tp, never()).executeCommandString(FAKE_COMMAND3, Command.Type.LOCAL, resource);
+		verify(tp, never()).executeCommandString(FAKE_COMMAND_B, Command.Type.LOCAL, resource);
+		verify(tp, never()).executeCommandString(FAKE_COMMAND_C, Command.Type.LOCAL, resource);
 		assertEquals(tp.getTaskState(), TaskState.FAILED);
 	}
 

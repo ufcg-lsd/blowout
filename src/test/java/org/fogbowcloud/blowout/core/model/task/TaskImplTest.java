@@ -1,9 +1,10 @@
 package org.fogbowcloud.blowout.core.model.task;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.fogbowcloud.blowout.helpers.Constants.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,30 +17,21 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class TaskImplTest {
-	
-	private static final String FAKE_UUID = "1234";
-	private static final String FAKE_METADATA_VALUE = "fakemetadatavalue";
-	private static final String FAKE_METADATA = "fakemetadata";
-	private static final String TIME_OUT_VALUE_EMPTY = "";
-	private static final String FAKE_TASK_ID = "taskId";
-	private static final String TIME_OUT_VALUE_GIBBERISH = "fbajsmnfsakl";
-	private static final String TIME_OUT_VALUE_SMALL = "1";
-	private static final String TIME_OUT_VALUE_BIG = "50000000000";
-	String taskId;
-	Specification spec;
-	Task task;
-	
+
+	private String taskId;
+	private Specification spec;
+	private Task task;
 	
 	@Before
 	public void setUp(){
-		spec = mock(Specification.class);
-		taskId = FAKE_TASK_ID;
-		task = spy(new TaskImpl(taskId, spec, FAKE_UUID));
+		this.spec = mock(Specification.class);
+		this.taskId = FAKE_TASK_ID;
+		this.task = spy(new TaskImpl(taskId, spec, FAKE_UUID));
 	}
 	
 	@Test
 	public void testCheckTimeOutedNotTimeOuted(){
-		task.startedRunning();
+		this.task.startedRunning();
 		
 		doReturn(TIME_OUT_VALUE_BIG).when(task).getMetadata(TaskImpl.METADATA_TASK_TIMEOUT);
 		assertEquals(false, task.checkTimeOuted());
@@ -50,7 +42,7 @@ public class TaskImplTest {
 		task.startedRunning();
 		Thread.sleep(5);
 		doReturn(TIME_OUT_VALUE_SMALL).when(task).getMetadata(TaskImpl.METADATA_TASK_TIMEOUT);
-		assertEquals(true, task.checkTimeOuted());
+		assertTrue(task.checkTimeOuted());
 	}
 	
 	@Test
@@ -58,7 +50,7 @@ public class TaskImplTest {
 		task.startedRunning();
 		Thread.sleep(5);
 		doReturn(TIME_OUT_VALUE_GIBBERISH).when(task).getMetadata(TaskImpl.METADATA_TASK_TIMEOUT);
-		assertEquals(false, task.checkTimeOuted());
+		assertFalse(task.checkTimeOuted());
 	}
 	
 	@Test
@@ -66,7 +58,7 @@ public class TaskImplTest {
 		task.startedRunning();
 		Thread.sleep(5);
 		doReturn(null).when(task).getMetadata(TaskImpl.METADATA_TASK_TIMEOUT);
-		assertEquals(false, task.checkTimeOuted());
+		assertFalse(task.checkTimeOuted());
 	}
 	
 	@Test
@@ -74,7 +66,7 @@ public class TaskImplTest {
 		task.startedRunning();
 		Thread.sleep(5);
 		doReturn(TIME_OUT_VALUE_EMPTY).when(task).getMetadata(TaskImpl.METADATA_TASK_TIMEOUT);
-		assertEquals(false, task.checkTimeOuted());
+		assertFalse(task.checkTimeOuted());
 	}
 
 	@Test
@@ -83,7 +75,7 @@ public class TaskImplTest {
 		metadata.put(FAKE_METADATA, FAKE_METADATA_VALUE);
 		doReturn(metadata).when(task).getAllMetadata();
 		List<Command> commands = new ArrayList<Command>();
-		Command command = new Command("fakecomands", Command.Type.REMOTE);
+		Command command = new Command(FAKE_COMMAND, Command.Type.REMOTE);
 		commands.add(command);
 		doReturn(commands).when(task).getAllCommands();
 		
