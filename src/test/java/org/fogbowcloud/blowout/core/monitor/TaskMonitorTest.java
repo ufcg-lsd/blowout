@@ -7,6 +7,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.fogbowcloud.blowout.helpers.Constants.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,33 +37,31 @@ import org.junit.Test;
 
 public class TaskMonitorTest {
 
-	private static final String FAKE_UUID = "1234";
-	private static final String FAKE_ID = "fakeId";
-	public TaskMonitor taskMon;
-	public BlowoutPool pool;
-	public Specification spec;
+	private TaskMonitor taskMon;
+	private BlowoutPool pool;
+	private Specification spec;
 	
 	@Before
 	public void setUp(){
-		pool = mock(BlowoutPool.class);
+		this.pool = mock(BlowoutPool.class);
 		this.taskMon = spy(new TaskMonitor(pool, 0));
-		spec = mock(Specification.class);
+		this.spec = mock(Specification.class);
 	}
 	
 	@Test
 	public void testGetTaskStateCorrect() {
 		// set up
-		TaskImpl taskImpl = new TaskImpl("task-id", spec, FAKE_UUID);
+		TaskImpl taskImpl = new TaskImpl(FAKE_TASK_ID, this.spec, FAKE_UUID);
 		taskImpl.setState(TaskState.RUNNING);
 		
 		List<Command> commandListMock = mock(ArrayList.class);
 		
-		TaskProcessImpl taskProcessImpl = new TaskProcessImpl(taskImpl.getId(), commandListMock, spec, FAKE_UUID);
+		TaskProcessImpl taskProcessImpl = new TaskProcessImpl(taskImpl.getId(), commandListMock, this.spec, FAKE_UUID);
 		taskProcessImpl.setTaskState(TaskState.RUNNING);
 		
 		Map<Task, TaskProcess> runningTasks = mock(Map.class);
 		
-		TaskMonitor taskMon = new TaskMonitor(pool, 3000);
+		TaskMonitor taskMon = new TaskMonitor(this.pool, 3000);
 		taskMon.setRunningTasks(runningTasks);
 		
 		doReturn(taskProcessImpl).when(runningTasks).get(taskImpl);
@@ -77,7 +76,7 @@ public class TaskMonitorTest {
 	@Test
 	public void testGetTaskStateCompleted() {
 		// set up
-		TaskImpl taskImpl = new TaskImpl("task-id", spec, FAKE_UUID);
+		TaskImpl taskImpl = new TaskImpl(FAKE_TASK_ID, this.spec, FAKE_UUID);
 		taskImpl.setState(TaskState.FINISHED);
 		taskImpl.finish();
 		
@@ -98,12 +97,12 @@ public class TaskMonitorTest {
 	@Test
 	public void testGetTaskStateReady() {
 		// set up
-		TaskImpl taskImpl = new TaskImpl("task-id", spec, FAKE_UUID);
+		TaskImpl taskImpl = new TaskImpl(FAKE_TASK_ID, this.spec, FAKE_UUID);
 		taskImpl.setState(TaskState.READY);
 		
 		Map<Task, TaskProcess> runningTasks = mock(Map.class);
 		
-		TaskMonitor taskMon = new TaskMonitor(pool, 3000);
+		TaskMonitor taskMon = new TaskMonitor(this.pool, 3000);
 		taskMon.setRunningTasks(runningTasks);
 		
 		doReturn(null).when(runningTasks).get(taskImpl);
@@ -124,26 +123,26 @@ public class TaskMonitorTest {
 		DefaultBlowoutPool blowoutPool = new DefaultBlowoutPool();
 		blowoutPool.start(infraManager, defaultScheduler);
 
-		TaskImpl taskOne = new TaskImpl("task-one-id", spec, FAKE_UUID);
+		TaskImpl taskOne = new TaskImpl(FAKE_TASK_ID, this.spec, FAKE_UUID);
 		
 		List<Task> taskList = new ArrayList<Task>();
 		taskList.add(taskOne);
 		
 		blowoutPool.addTasks(taskList);
 		
-		AbstractResource resourceOne = new FogbowResource("resource-one-id", "order-one-id", spec);
+		AbstractResource resourceOne = new FogbowResource(FAKE_RESOURCE_ID, FAKE_ORDER_ID, this.spec);
 		
 		blowoutPool.addResource(resourceOne);
 		
 		List<Command> commandListMock = mock(ArrayList.class);
 		
-		TaskProcessImpl taskProcessOne = new TaskProcessImpl(taskOne.getId(), commandListMock, spec, FAKE_UUID);
+		TaskProcessImpl taskProcessOne = new TaskProcessImpl(taskOne.getId(), commandListMock, this.spec, FAKE_UUID);
 		
 		taskProcessOne.setResource(resourceOne);
 		
 		taskProcessOne.setTaskState(TaskState.FINISHED);
 		
-		Map<Task, TaskProcess> runningTasks = new HashMap<Task, TaskProcess>();
+		Map<Task, TaskProcess> runningTasks = new HashMap<>();
 		runningTasks.put(taskOne, taskProcessOne);
 		
 		TaskMonitor taskMon = new TaskMonitor(blowoutPool, 3000);
@@ -154,7 +153,7 @@ public class TaskMonitorTest {
 		
 		// expect
 		Assert.assertEquals(ResourceState.IDLE, resourceOne.getState());
-		Assert.assertEquals(true, taskOne.isFinished());
+		Assert.assertTrue(taskOne.isFinished());
 	}
 	
 	@Test
@@ -162,14 +161,14 @@ public class TaskMonitorTest {
 		TaskProcess fakeProcess = mock(TaskProcess.class);
 		doReturn(TaskState.RUNNING).when(fakeProcess).getTaskState();
 		AbstractResource fakeResource = mock(AbstractResource.class);
-		List<TaskProcess> runningPrc = new ArrayList<TaskProcess>();
+		List<TaskProcess> runningPrc = new ArrayList<>();
 		runningPrc.add(fakeProcess);
 		doReturn(runningPrc).when(this.taskMon).getRunningProcesses();
 		
 		
 		this.taskMon.processMonitor();
-		verify(pool, never()).updateResource(fakeResource, ResourceState.FAILED);
-		verify(pool, never()).updateResource(fakeResource, ResourceState.IDLE);
+		verify(this.pool, never()).updateResource(fakeResource, ResourceState.FAILED);
+		verify(this.pool, never()).updateResource(fakeResource, ResourceState.IDLE);
 	}
 	
 	@Test
@@ -178,37 +177,37 @@ public class TaskMonitorTest {
 		TaskProcess fakeProcess = mock(TaskProcess.class);
 		doReturn(TaskState.FAILED).when(fakeProcess).getTaskState();
 		AbstractResource fakeResource = mock(AbstractResource.class);
-		doReturn(FAKE_ID).when(fakeTask).getId();
-		doReturn(FAKE_ID).when(fakeProcess).getTaskId();
-		doReturn(fakeTask).when(this.taskMon).getTaskById(FAKE_ID);
+		doReturn(FAKE_TASK_ID).when(fakeTask).getId();
+		doReturn(FAKE_TASK_ID).when(fakeProcess).getTaskId();
+		doReturn(fakeTask).when(this.taskMon).getTaskById(FAKE_TASK_ID);
 		doReturn(fakeResource).when(fakeProcess).getResource();
-		List<TaskProcess> runningPrc = new ArrayList<TaskProcess>();
+		List<TaskProcess> runningPrc = new ArrayList<>();
 		runningPrc.add(fakeProcess);
 		doReturn(runningPrc).when(this.taskMon).getRunningProcesses();
-		Map<Task, TaskProcess> runningTasks = new HashMap<Task, TaskProcess>();
+		Map<Task, TaskProcess> runningTasks = new HashMap<>();
 		runningTasks.put(fakeTask, fakeProcess);
 		doReturn(runningTasks).when(this.taskMon).getRunningTasks();
 		
 		this.taskMon.processMonitor();
 		
-		verify(pool).updateResource(fakeResource, ResourceState.FAILED);
-		verify(pool, never()).updateResource(fakeResource, ResourceState.IDLE);
+		verify(this.pool).updateResource(fakeResource, ResourceState.FAILED);
+		verify(this.pool, never()).updateResource(fakeResource, ResourceState.IDLE);
 	}
 	
 	@Test
-	public void testProcMonProcFinnished() {
+	public void testProcMonProcFinished() {
 		Task fakeTask = mock(Task.class);
 		TaskProcess fakeProcess = mock(TaskProcess.class);
 		doReturn(TaskState.FINISHED).when(fakeProcess).getTaskState();
 		AbstractResource fakeResource = mock(AbstractResource.class);
-		doReturn(FAKE_ID).when(fakeTask).getId();
-		doReturn(FAKE_ID).when(fakeProcess).getTaskId();
-		doReturn(fakeTask).when(this.taskMon).getTaskById(FAKE_ID);
+		doReturn(FAKE_TASK_ID).when(fakeTask).getId();
+		doReturn(FAKE_TASK_ID).when(fakeProcess).getTaskId();
+		doReturn(fakeTask).when(this.taskMon).getTaskById(FAKE_TASK_ID);
 		doReturn(fakeResource).when(fakeProcess).getResource();
-		List<TaskProcess> runningPrc = new ArrayList<TaskProcess>();
+		List<TaskProcess> runningPrc = new ArrayList<>();
 		runningPrc.add(fakeProcess);
 		doReturn(runningPrc).when(this.taskMon).getRunningProcesses();
-		Map<Task, TaskProcess> runningTasks = new HashMap<Task, TaskProcess>();
+		Map<Task, TaskProcess> runningTasks = new HashMap<>();
 		runningTasks.put(fakeTask, fakeProcess);
 		doReturn(runningTasks).when(this.taskMon).getRunningTasks();
 		
@@ -223,8 +222,8 @@ public class TaskMonitorTest {
 		Task fakeTask = mock(Task.class);
 		TaskProcess fakeProcess = mock(TaskProcess.class);
 		AbstractResource fakeResource = mock(AbstractResource.class);
-		doReturn(FAKE_ID).when(fakeTask).getId();
-		doReturn(FAKE_ID).when(fakeProcess).getTaskId();
+		doReturn(FAKE_TASK_ID).when(fakeTask).getId();
+		doReturn(FAKE_TASK_ID).when(fakeProcess).getTaskId();
 		List<TaskProcess> runningPrc = new ArrayList<TaskProcess>();
 		runningPrc.add(fakeProcess);
 		doReturn(runningPrc).when(this.taskMon).getRunningProcesses();

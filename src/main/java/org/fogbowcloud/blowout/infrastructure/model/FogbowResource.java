@@ -15,28 +15,28 @@ public class FogbowResource extends AbstractResource {
 
 	private final String computeOrderId;
 	private String instanceId;
-	private String publicIpId;
+	private String publicIpOrderId;
 
 	public FogbowResource(String id, String computeOrderId, Specification spec) {
 		super(id, spec);
 		this.computeOrderId = computeOrderId;
 	}
 
-	public FogbowResource(String id, String computeOrderId, Specification spec, String publicIpId) {
+	public FogbowResource(String id, String computeOrderId, Specification spec, String publicIpOrderId) {
 		this(id, computeOrderId, spec);
-		this.publicIpId = publicIpId;
+		this.publicIpOrderId = publicIpOrderId;
 	}
 
 	public boolean match(Specification spec) {
 		String fogbowRequirement = spec.getRequirementValue(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS);
-		String image = spec.getImageName();
+		String imageName = spec.getImageName();
 		String publicKey = spec.getPublicKey();
-		if (fogbowRequirement != null && image != null) {
+		if (fogbowRequirement != null && imageName != null) {
 
 			if (!FogbowRequirementsHelper.matches(this, fogbowRequirement)) {
 				return false;
 			}
-			if (!image.equalsIgnoreCase(this.getMetadataValue(METADATA_IMAGE))) {
+			if (!imageName.equalsIgnoreCase(this.getMetadataValue(METADATA_IMAGE_NAME))) {
 				return false;
 			}
             return publicKey.equalsIgnoreCase(this.getMetadataValue(METADATA_PUBLIC_KEY));
@@ -46,7 +46,7 @@ public class FogbowResource extends AbstractResource {
     }
 
 	protected boolean internalCheckConnectivity() {
-		String host = super.getMetadataValue(METADATA_SSH_PUBLIC_IP);
+		final String host = super.getMetadataValue(METADATA_SSH_PUBLIC_IP);
 
 		LOGGER.debug("Checking resource connectivity [host: " + host + "].");
 
@@ -101,5 +101,5 @@ public class FogbowResource extends AbstractResource {
 		return this.computeOrderId;
 	}
 
-	public String getPublicIpId() { return this.publicIpId; }
+	public String getPublicIpOrderId() { return this.publicIpOrderId; }
 }

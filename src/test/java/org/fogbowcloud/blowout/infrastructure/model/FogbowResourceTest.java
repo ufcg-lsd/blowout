@@ -11,20 +11,20 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class FogbowResourceTest {
-	private FogbowResource resource;
+	private FogbowResource fogbowResource;
 	private Specification spec;
 	
 	@Before
 	public void setUp() throws Exception {
 		this.spec = new Specification(FAKE_CLOUD_NAME, FAKE_IMAGE_FLAVOR_NAME,
 				FAKE_FOGBOW_USER_NAME, FAKE_PUBLIC_KEY,FAKE_PRIVATE_KEY_FILE_PATH);
-		this.resource = spy(new FogbowResource(FAKE_RESOURCE_ID,FAKE_ORDER_ID, spec));
+		this.fogbowResource = spy(new FogbowResource(FAKE_RESOURCE_ID,FAKE_ORDER_ID, spec));
 	}    
 
 	@After
 	public void setDown() throws Exception {
-		this.resource.getAllMetadata().clear();
-		this.resource = null;
+		this.fogbowResource.getAllMetadata().clear();
+		this.fogbowResource = null;
 	}
 	
 	@Test
@@ -34,14 +34,14 @@ public class FogbowResourceTest {
 
 		this.spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_A);
 
-		this.resource.putMetadata(FogbowResource.METADATA_IMAGE, FAKE_IMAGE_FLAVOR_ID);
-		this.resource.putMetadata(FogbowResource.METADATA_PUBLIC_KEY, FAKE_PUBLIC_KEY);
-		this.resource.putMetadata(FogbowResource.METADATA_VCPU, EXAMPLE_CORE_SIZE);
-		this.resource.putMetadata(FogbowResource.METADATA_MEM_SIZE, EXAMPLE_MEM_SIZE);
-		this.resource.putMetadata(FogbowResource.METADATA_DISK_SIZE, EXAMPLE_DISK_SIZE);
-		this.resource.putMetadata(FogbowResource.METADATA_LOCATION, EXAMPLE_LOCATION);
+		this.fogbowResource.putMetadata(FogbowResource.METADATA_IMAGE_NAME, FAKE_IMAGE_FLAVOR_NAME);
+		this.fogbowResource.putMetadata(FogbowResource.METADATA_PUBLIC_KEY, FAKE_PUBLIC_KEY);
+		this.fogbowResource.putMetadata(FogbowResource.METADATA_VCPU, EXAMPLE_CORE_SIZE);
+		this.fogbowResource.putMetadata(FogbowResource.METADATA_MEM_SIZE, EXAMPLE_MEM_SIZE);
+		this.fogbowResource.putMetadata(FogbowResource.METADATA_DISK_SIZE, EXAMPLE_DISK_SIZE);
+		this.fogbowResource.putMetadata(FogbowResource.METADATA_LOCATION, EXAMPLE_LOCATION);
 
-		assertTrue(resource.match(spec));
+		assertTrue(fogbowResource.match(spec));
 		this.spec.getAllRequirements().clear();
 	}
 	
@@ -52,14 +52,15 @@ public class FogbowResourceTest {
 
 		this.spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_A);
 
-		this.resource.putMetadata(FogbowResource.METADATA_IMAGE, FAKE_IMAGE_FLAVOR_ID);
-		this.resource.putMetadata(FogbowResource.METADATA_PUBLIC_KEY, FAKE_PUBLIC_KEY);
-		this.resource.putMetadata(FogbowResource.METADATA_VCPU, EXAMPLE_CORE_SIZE );
-		this.resource.putMetadata(FogbowResource.METADATA_MEM_SIZE, EXAMPLE_MEM_SIZE);
-		this.resource.putMetadata(FogbowResource.METADATA_DISK_SIZE, EXAMPLE_DISK_SIZE);
-		this.resource.putMetadata(FogbowResource.METADATA_LOCATION, EXAMPLE_LOCATION);
+		this.fogbowResource.putMetadata(FogbowResource.METADATA_IMAGE_NAME, FAKE_IMAGE_FLAVOR_NAME);
+		this.fogbowResource.putMetadata(FogbowResource.METADATA_IMAGE_ID, FAKE_IMAGE_FLAVOR_ID);
+		this.fogbowResource.putMetadata(FogbowResource.METADATA_PUBLIC_KEY, FAKE_PUBLIC_KEY);
+		this.fogbowResource.putMetadata(FogbowResource.METADATA_VCPU, EXAMPLE_CORE_SIZE );
+		this.fogbowResource.putMetadata(FogbowResource.METADATA_MEM_SIZE, EXAMPLE_MEM_SIZE);
+		this.fogbowResource.putMetadata(FogbowResource.METADATA_DISK_SIZE, EXAMPLE_DISK_SIZE);
+		this.fogbowResource.putMetadata(FogbowResource.METADATA_LOCATION, EXAMPLE_LOCATION);
 		
-		assertTrue(resource.match(spec));
+		assertTrue(fogbowResource.match(spec));
 
 		this.spec.getAllRequirements().clear();
 		this.spec = null;
@@ -73,15 +74,16 @@ public class FogbowResourceTest {
 				USER_DATA_FILE+POSTFIX_B, USER_DATA_TYPE+POSTFIX_B);
 
 		specB.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_A);
+
+		this.fogbowResource.putMetadata(FogbowResource.METADATA_IMAGE_NAME, FAKE_IMAGE_FLAVOR_NAME);
+		this.fogbowResource.putMetadata(FogbowResource.METADATA_IMAGE_ID, FAKE_IMAGE_FLAVOR_ID);
+		this.fogbowResource.putMetadata(FogbowResource.METADATA_PUBLIC_KEY, FAKE_PUBLIC_KEY);
+		this.fogbowResource.putMetadata(FogbowResource.METADATA_VCPU, EXAMPLE_CORE_SIZE);
+		this.fogbowResource.putMetadata(FogbowResource.METADATA_MEM_SIZE, EXAMPLE_MEM_SIZE);
+		this.fogbowResource.putMetadata(FogbowResource.METADATA_DISK_SIZE, EXAMPLE_DISK_SIZE);
+		this.fogbowResource.putMetadata(FogbowResource.METADATA_LOCATION, EXAMPLE_LOCATION);
 		
-		resource.putMetadata(FogbowResource.METADATA_IMAGE, FAKE_IMAGE_FLAVOR_ID);
-		resource.putMetadata(FogbowResource.METADATA_PUBLIC_KEY, FAKE_PUBLIC_KEY);
-		resource.putMetadata(FogbowResource.METADATA_VCPU, EXAMPLE_CORE_SIZE);
-		resource.putMetadata(FogbowResource.METADATA_MEM_SIZE, EXAMPLE_MEM_SIZE);
-		resource.putMetadata(FogbowResource.METADATA_DISK_SIZE, EXAMPLE_DISK_SIZE);
-		resource.putMetadata(FogbowResource.METADATA_LOCATION, EXAMPLE_LOCATION);
-		
-		assertFalse(resource.match(specB));
+		assertFalse(this.fogbowResource.match(specB));
 	
 		specB.getAllRequirements().clear();
 	}
@@ -91,18 +93,18 @@ public class FogbowResourceTest {
 		this.spec.setUserDataType(USER_DATA_TYPE);
 		this.spec.setUserDataFile(USER_DATA_FILE);
 
-		spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_A);
+		this.spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_A);
 
-		resource.putMetadata(FogbowResource.METADATA_IMAGE, FAKE_IMAGE_FLAVOR_ID);
-		resource.putMetadata(FogbowResource.METADATA_PUBLIC_KEY, FAKE_PUBLIC_KEY);
-		resource.putMetadata(FogbowResource.METADATA_VCPU, EXAMPLE_CORE_SIZE);
-		resource.putMetadata(FogbowResource.METADATA_MEM_SIZE, EXAMPLE_MEM_SIZE);
-		resource.putMetadata(FogbowResource.METADATA_DISK_SIZE, EXAMPLE_DISK_SIZE);
-		resource.putMetadata(FogbowResource.METADATA_LOCATION, EXAMPLE_LOCATION);
+		this.fogbowResource.putMetadata(FogbowResource.METADATA_IMAGE_NAME, FAKE_IMAGE_FLAVOR_ID);
+		this.fogbowResource.putMetadata(FogbowResource.METADATA_PUBLIC_KEY, FAKE_PUBLIC_KEY);
+		this.fogbowResource.putMetadata(FogbowResource.METADATA_VCPU, EXAMPLE_CORE_SIZE);
+		this.fogbowResource.putMetadata(FogbowResource.METADATA_MEM_SIZE, EXAMPLE_MEM_SIZE);
+		this.fogbowResource.putMetadata(FogbowResource.METADATA_DISK_SIZE, EXAMPLE_DISK_SIZE);
+		this.fogbowResource.putMetadata(FogbowResource.METADATA_LOCATION, EXAMPLE_LOCATION);
 
-		assertFalse(resource.match(spec));
+		assertFalse(this.fogbowResource.match(this.spec));
 
-		spec.getAllRequirements().clear();
-		spec = null;
+		this.spec.getAllRequirements().clear();
+		this.spec = null;
 	}
 }

@@ -19,7 +19,8 @@ public abstract class AbstractResource {
 	public static final String METADATA_EXTRA_PORTS_ATT = "metadataExtraPorts";
 	public static final String METADATA_SSH_PUBLIC_IP = "metadataSshPublicIp";
 
-	public static final String METADATA_IMAGE = "metadataImage";
+	public static final String METADATA_IMAGE_NAME = "metadataImageName";
+	public static final String METADATA_IMAGE_ID = "metadataImageId";
 	public static final String METADATA_PUBLIC_KEY = "metadataPublicKey";
 
 	public static final String METADATA_VCPU = "metadataVCPU";

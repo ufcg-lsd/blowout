@@ -142,7 +142,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
             instanceAttributes = this.requestsHelper.getComputeInstance(fogbowResource.getComputeOrderId());
             instanceId = String.valueOf(instanceAttributes.get(FogbowConstants.INSTANCE_ATTRIBUTE_NAME));
 
-            Map<String, Object> sshInfo = getPublicIpInstance(fogbowResource.getPublicIpId());
+            Map<String, Object> sshInfo = getPublicIpInstance(fogbowResource.getPublicIpOrderId());
 
             this.populateInstanceAttributes(instanceAttributes, sshInfo);
 
@@ -213,7 +213,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
         String requestType = specification.getRequirementValue(FogbowConstants.METADATA_REQUEST_TYPE);
 
         fogbowResource.putMetadata(AbstractResource.METADATA_REQUEST_TYPE, requestType);
-        fogbowResource.putMetadata(AbstractResource.METADATA_IMAGE, specification.getImageName());
+        fogbowResource.putMetadata(AbstractResource.METADATA_IMAGE_NAME, specification.getImageName());
         fogbowResource.putMetadata(AbstractResource.METADATA_PUBLIC_KEY, specification.getPublicKey());
     }
 

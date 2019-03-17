@@ -118,7 +118,7 @@ public class RASRequestsHelper {
         final String computeEndpoint = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_COMPUTE +
                 "/" + fogbowResource.getComputeOrderId();
         final String publicIpEndpoint = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_PUBLIC_IP +
-                "/" + fogbowResource.getPublicIpId();
+                "/" + fogbowResource.getPublicIpOrderId();
         try {
             this.doRequest(HttpWrapper.HTTP_METHOD_DELETE, computeEndpoint, new ArrayList<>());
             LOGGER.info("Compute was deleted successfully.");

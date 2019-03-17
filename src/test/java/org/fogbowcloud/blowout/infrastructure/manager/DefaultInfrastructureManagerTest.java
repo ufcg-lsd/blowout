@@ -203,11 +203,11 @@ public class DefaultInfrastructureManagerTest {
 		specA.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
 		
 		AbstractResource idleResource = new FogbowResource(FAKE_RESOURCE_ID, FAKE_ORDER_ID, specA);
-		idleResource.putMetadata(AbstractResource.METADATA_IMAGE, FAKE_IMAGE_FLAVOR_NAME);
+		idleResource.putMetadata(AbstractResource.METADATA_IMAGE_NAME, FAKE_IMAGE_FLAVOR_NAME);
 		idleResource.putMetadata(AbstractResource.ENV_PRIVATE_KEY_FILE, FAKE_PRIVATE_KEY_FILE_PATH);
 		ResourceStateHelper.changeResourceToState(idleResource, ResourceState.IDLE);
 		
-		idleResource.putMetadata(FogbowResource.METADATA_IMAGE, image);
+		idleResource.putMetadata(FogbowResource.METADATA_IMAGE_NAME, image);
 		idleResource.putMetadata(FogbowResource.METADATA_PUBLIC_KEY, publicKey);
 		idleResource.putMetadata(FogbowResource.METADATA_VCPU, coreSize);
 		idleResource.putMetadata(FogbowResource.METADATA_MEM_SIZE, menSize);

@@ -31,8 +31,8 @@ public class ResourceHelperTest {
 		doReturn(resourceMetadata.get(FogbowResource.METADATA_EXTRA_PORTS_ATT)).when(fakeResource)
 		.getMetadataValue(Mockito.eq(FogbowResource.METADATA_EXTRA_PORTS_ATT));
 		// Flavor
-		doReturn(resourceMetadata.get(FogbowResource.METADATA_IMAGE)).when(fakeResource)
-		.getMetadataValue(Mockito.eq(FogbowResource.METADATA_IMAGE));
+		doReturn(resourceMetadata.get(FogbowResource.METADATA_IMAGE_NAME)).when(fakeResource)
+		.getMetadataValue(Mockito.eq(FogbowResource.METADATA_IMAGE_NAME));
 		doReturn(resourceMetadata.get(FogbowResource.METADATA_PUBLIC_KEY)).when(fakeResource)
 		.getMetadataValue(Mockito.eq(FogbowResource.METADATA_PUBLIC_KEY));
 		doReturn(resourceMetadata.get(FogbowResource.METADATA_VCPU)).when(fakeResource)
@@ -58,7 +58,7 @@ public class ResourceHelperTest {
 		resourceMetadata.put(FogbowResource.METADATA_SSH_PORT, port);
 		resourceMetadata.put(FogbowResource.METADATA_SSH_USERNAME_ATT, userName);
 		resourceMetadata.put(FogbowResource.METADATA_EXTRA_PORTS_ATT, extraPorts);
-		resourceMetadata.put(FogbowResource.METADATA_IMAGE, image);
+		resourceMetadata.put(FogbowResource.METADATA_IMAGE_NAME, image);
 		resourceMetadata.put(FogbowResource.METADATA_PUBLIC_KEY, publicKey);
 		resourceMetadata.put(FogbowResource.METADATA_VCPU, cpuSize);
 		resourceMetadata.put(FogbowResource.METADATA_MEM_SIZE, menSize);
