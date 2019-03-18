@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
+import org.fogbowcloud.blowout.core.constants.BlowoutConstants;
 import org.fogbowcloud.blowout.core.constants.FogbowConstants;
 import org.fogbowcloud.blowout.helpers.FogbowInfrastructureTestUtils;
 import org.json.JSONException;
@@ -32,7 +33,6 @@ import org.fogbowcloud.blowout.infrastructure.model.Token;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
-
 
 public class FogbowInfrastructureProviderTest {
 	@Rule
@@ -187,9 +187,9 @@ public class FogbowInfrastructureProviderTest {
 		FogbowResource newResource = fogbowInfrastructureProvider.getFogbowResource(resourceId);
 
  		assertNotNull(newResource.getId());
-		assertEquals(ramSizeMock, newResource.getMetadataValue(FogbowResource.METADATA_MEM_SIZE));
-		assertEquals("1", newResource.getMetadataValue(FogbowResource.METADATA_VCPU));
-		assertEquals(hostMock, newResource.getMetadataValue(FogbowResource.METADATA_SSH_HOST));
+		assertEquals(ramSizeMock, newResource.getMetadataValue(BlowoutConstants.METADATA_MEM_SIZE));
+		assertEquals("1", newResource.getMetadataValue(BlowoutConstants.METADATA_VCPU));
+		assertEquals(hostMock, newResource.getMetadataValue(BlowoutConstants.METADATA_SSH_HOST));
 
 
 
