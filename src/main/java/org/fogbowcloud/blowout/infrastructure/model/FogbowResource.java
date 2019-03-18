@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.constants.AppMessagesConstants;
+import org.fogbowcloud.blowout.core.constants.BlowoutConstants;
 import org.fogbowcloud.blowout.core.constants.FogbowConstants;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.model.resource.AbstractResource;
@@ -36,17 +37,17 @@ public class FogbowResource extends AbstractResource {
 			if (!FogbowRequirementsHelper.matches(this, fogbowRequirement)) {
 				return false;
 			}
-			if (!imageName.equalsIgnoreCase(this.getMetadataValue(METADATA_IMAGE_NAME))) {
+			if (!imageName.equalsIgnoreCase(this.getMetadataValue(BlowoutConstants.METADATA_IMAGE_NAME))) {
 				return false;
 			}
-            return publicKey.equalsIgnoreCase(this.getMetadataValue(METADATA_PUBLIC_KEY));
+            return publicKey.equalsIgnoreCase(this.getMetadataValue(BlowoutConstants.METADATA_PUBLIC_KEY));
 		} else {
 			return false;
 		}
     }
 
 	protected boolean internalCheckConnectivity() {
-		final String publicIp = super.getMetadataValue(METADATA_PUBLIC_IP);
+		final String publicIp = super.getMetadataValue(BlowoutConstants.METADATA_PUBLIC_IP);
 
 		LOGGER.debug("Checking resource connectivity [host: " + publicIp + "].");
 

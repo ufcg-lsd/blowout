@@ -7,25 +7,6 @@ import java.util.Map.Entry;
 import org.fogbowcloud.blowout.core.model.Specification;
 
 public abstract class AbstractResource {
-
-	public static final String ENV_PRIVATE_KEY_FILE = "PRIVATE_KEY_FILE";
-
-	public static final String METADATA_SSH_HOST = "metadataSSHHost";
-	public static final String METADATA_SSH_USERNAME_ATT = "metadataSshUsername";
-	public static final String METADATA_EXTRA_PORTS_ATT = "metadataExtraPorts";
-	public static final String METADATA_PUBLIC_IP = "metadataPublicIp";
-
-	public static final String METADATA_IMAGE_NAME = "metadataImageName";
-	public static final String METADATA_IMAGE_ID = "metadataImageId";
-	public static final String METADATA_PUBLIC_KEY = "metadataPublicKey";
-
-	public static final String METADATA_VCPU = "metadataVCPU";
-	public static final String METADATA_MEM_SIZE = "metadataMenSize";
-	public static final String METADATA_DISK_SIZE = "metadataDiskSize";
-	public static final String METADATA_LOCATION = "metadataLocation";
-
-	public static final String METADATA_REQUEST_TYPE = "metadataRequestType";
-	
 	private final String id;
 	private final Map<String, Object> metadata;
 	private int timesReused = 0;

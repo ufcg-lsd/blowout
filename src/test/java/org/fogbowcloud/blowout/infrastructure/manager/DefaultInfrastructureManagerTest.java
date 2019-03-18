@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
+import org.fogbowcloud.blowout.core.constants.BlowoutConstants;
 import org.fogbowcloud.blowout.core.constants.FogbowConstants;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.model.task.Task;
@@ -203,16 +204,16 @@ public class DefaultInfrastructureManagerTest {
 		specA.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
 		
 		AbstractResource idleResource = new FogbowResource(FAKE_RESOURCE_ID, FAKE_ORDER_ID, specA);
-		idleResource.putMetadata(AbstractResource.METADATA_IMAGE_NAME, FAKE_IMAGE_FLAVOR_NAME);
-		idleResource.putMetadata(AbstractResource.ENV_PRIVATE_KEY_FILE, FAKE_PRIVATE_KEY_FILE_PATH);
+		idleResource.putMetadata(BlowoutConstants.METADATA_IMAGE_NAME, FAKE_IMAGE_FLAVOR_NAME);
+		idleResource.putMetadata(BlowoutConstants.ENV_PRIVATE_KEY_FILE, FAKE_PRIVATE_KEY_FILE_PATH);
 		ResourceStateHelper.changeResourceToState(idleResource, ResourceState.IDLE);
 		
-		idleResource.putMetadata(FogbowResource.METADATA_IMAGE_NAME, image);
-		idleResource.putMetadata(FogbowResource.METADATA_PUBLIC_KEY, publicKey);
-		idleResource.putMetadata(FogbowResource.METADATA_VCPU, coreSize);
-		idleResource.putMetadata(FogbowResource.METADATA_MEM_SIZE, menSize);
-		idleResource.putMetadata(FogbowResource.METADATA_DISK_SIZE, diskSize);
-		idleResource.putMetadata(FogbowResource.METADATA_LOCATION, location);
+		idleResource.putMetadata(BlowoutConstants.METADATA_IMAGE_NAME, image);
+		idleResource.putMetadata(BlowoutConstants.METADATA_PUBLIC_KEY, publicKey);
+		idleResource.putMetadata(BlowoutConstants.METADATA_VCPU, coreSize);
+		idleResource.putMetadata(BlowoutConstants.METADATA_MEM_SIZE, menSize);
+		idleResource.putMetadata(BlowoutConstants.METADATA_DISK_SIZE, diskSize);
+		idleResource.putMetadata(BlowoutConstants.METADATA_LOCATION, location);
 		
 		Task taskA = new TaskImpl(FAKE_TASK_ID, specA, FAKE_UUID);
 		List<Task> tasks = new ArrayList<>();

@@ -7,28 +7,21 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.fogbowcloud.blowout.core.constants.BlowoutConstants;
 import org.fogbowcloud.blowout.core.model.Command;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.util.AppUtil;
 import org.fogbowcloud.blowout.core.model.resource.AbstractResource;
 
-import static java.lang.Thread.sleep;
-
 public class TaskProcessImpl implements TaskProcess {
-
     private static final Logger LOGGER = Logger.getLogger(TaskProcessImpl.class);
 
-    private static final String ENV_HOST = "HOST";
-    private static final String ENV_SSH_USER = "SSH_USER";
-    private static final String ENV_PRIVATE_KEY_FILE = "PRIVATE_KEY_FILE";
-    private static final String ENV_UUID = "UUID";
-
     private final String taskId;
-    private TaskState taskState;
     private final List<Command> commandList;
     private final Specification specification;
-    private String processId;
-    private String uuid;
+    private final String processId;
+    private final String uuid;
+    private TaskState taskState;
     private AbstractResource resource;
 
     public TaskProcessImpl(String taskId, List<Command> commandList, Specification specification, String uuid) {
@@ -129,12 +122,14 @@ public class TaskProcessImpl implements TaskProcess {
             throws IOException {
         ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c",
                 "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i "
-                        + additionalVariables.get(ENV_PRIVATE_KEY_FILE) + " " + additionalVariables.get(ENV_SSH_USER)
-                        + "@" + additionalVariables.get(ENV_HOST)
+                        + additionalVariables.get(BlowoutConstants.ENV_PRIVATE_KEY_FILE) + " " +
+                        additionalVariables.get(BlowoutConstants.ENV_SSH_USER)
+                        + "@" + additionalVariables.get(BlowoutConstants.ENV_HOST)
                         + " " + parseEnvironVariable(commandString, additionalVariables));
         LOGGER.info("Running: ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i "
-                + additionalVariables.get(ENV_PRIVATE_KEY_FILE) + " " + additionalVariables.get(ENV_SSH_USER) + "@"
-                + additionalVariables.get(ENV_HOST) + " " + parseEnvironVariable(commandString, additionalVariables));
+                + additionalVariables.get(BlowoutConstants.ENV_PRIVATE_KEY_FILE) + " "
+                + additionalVariables.get(BlowoutConstants.ENV_SSH_USER) + "@"
+                + additionalVariables.get(BlowoutConstants.ENV_HOST) + " " + parseEnvironVariable(commandString, additionalVariables));
         return builder.start();
     }
 
@@ -171,19 +166,19 @@ public class TaskProcessImpl implements TaskProcess {
     }
 
     private void setPublicIp(AbstractResource resource, Map<String, String> additionalEnvVar) {
-        additionalEnvVar.put(ENV_HOST, resource.getMetadataValue(AbstractResource.METADATA_PUBLIC_IP));
-        LOGGER.info("SSH - Host: " + resource.getMetadataValue(AbstractResource.METADATA_PUBLIC_IP));
+        additionalEnvVar.put(BlowoutConstants.ENV_HOST, resource.getMetadataValue(BlowoutConstants.METADATA_PUBLIC_IP));
+        LOGGER.info("SSH - Host: " + resource.getMetadataValue(BlowoutConstants.METADATA_PUBLIC_IP));
     }
 
     private void setUser(AbstractResource resource, Map<String, String> additionalEnvVar) {
         String specUsername = this.specification.getUsername();
-        String metadataUsername = resource.getMetadataValue(AbstractResource.METADATA_SSH_USERNAME_ATT);
+        String metadataUsername = resource.getMetadataValue(BlowoutConstants.METADATA_SSH_USERNAME_ATT);
 
         if (validateUsername(specUsername)) {
-            additionalEnvVar.put(ENV_SSH_USER, specUsername);
+            additionalEnvVar.put(BlowoutConstants.ENV_SSH_USER, specUsername);
             loggerUser(specUsername);
         } else if (validateUsername(metadataUsername)) {
-            additionalEnvVar.put(ENV_SSH_USER, metadataUsername);
+            additionalEnvVar.put(BlowoutConstants.ENV_SSH_USER, metadataUsername);
             loggerUser(metadataUsername);
         }
     }
@@ -197,12 +192,12 @@ public class TaskProcessImpl implements TaskProcess {
     }
 
     private void setPrivateKeyFilePath(Map<String, String> additionalEnvVar) {
-        additionalEnvVar.put(ENV_PRIVATE_KEY_FILE, this.specification.getPrivateKeyFilePath());
+        additionalEnvVar.put(BlowoutConstants.ENV_PRIVATE_KEY_FILE, this.specification.getPrivateKeyFilePath());
         LOGGER.info("SSH - Private key file path: " + this.specification.getPrivateKeyFilePath());
     }
 
     private void setUuid(Map<String, String> additionalEnvVar) {
-        additionalEnvVar.put(ENV_UUID, this.uuid);
+        additionalEnvVar.put(BlowoutConstants.ENV_UUID, this.uuid);
         LOGGER.info("SSH - UUID: " + this.uuid);
     }
 

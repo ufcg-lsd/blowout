@@ -28,7 +28,6 @@ import org.fogbowcloud.blowout.infrastructure.provider.InfrastructureProvider;
 import org.fogbowcloud.blowout.infrastructure.token.AbstractTokenUpdatePlugin;
 import org.fogbowcloud.blowout.core.model.resource.AbstractResource;
 
-import static java.lang.Thread.sleep;
 import static org.fogbowcloud.blowout.core.util.AppUtil.generateIdentifier;
 import static org.fogbowcloud.blowout.core.util.AppUtil.isStringEmpty;
 
@@ -212,26 +211,26 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
     private void putMetadata(AbstractResource fogbowResource, Specification specification) {
         String requestType = specification.getRequirementValue(FogbowConstants.METADATA_REQUEST_TYPE);
 
-        fogbowResource.putMetadata(AbstractResource.METADATA_REQUEST_TYPE, requestType);
-        fogbowResource.putMetadata(AbstractResource.METADATA_IMAGE_NAME, specification.getImageName());
-        fogbowResource.putMetadata(AbstractResource.METADATA_PUBLIC_KEY, specification.getPublicKey());
+        fogbowResource.putMetadata(BlowoutConstants.METADATA_REQUEST_TYPE, requestType);
+        fogbowResource.putMetadata(BlowoutConstants.METADATA_IMAGE_NAME, specification.getImageName());
+        fogbowResource.putMetadata(BlowoutConstants.METADATA_PUBLIC_KEY, specification.getPublicKey());
     }
 
     private void putMetadata(AbstractResource fogbowResource, Map<String, Object> instanceAttributes) {
 
-        fogbowResource.putMetadata(AbstractResource.METADATA_PUBLIC_IP,
+        fogbowResource.putMetadata(BlowoutConstants.METADATA_PUBLIC_IP,
                 instanceAttributes.get(FogbowConstants.JSON_KEY_FOGBOW_PUBLIC_IP));
 
-        fogbowResource.putMetadata(AbstractResource.METADATA_SSH_USERNAME_ATT,
+        fogbowResource.putMetadata(BlowoutConstants.METADATA_SSH_USERNAME_ATT,
                 FogbowConstants.INSTANCE_ATTRIBUTE_DEFAULT_SHH_USERNAME);
 
-        fogbowResource.putMetadata(AbstractResource.METADATA_VCPU,
+        fogbowResource.putMetadata(BlowoutConstants.METADATA_VCPU,
                 instanceAttributes.get(FogbowConstants.INSTANCE_ATTRIBUTE_VCPU));
 
-        fogbowResource.putMetadata(AbstractResource.METADATA_MEM_SIZE,
+        fogbowResource.putMetadata(BlowoutConstants.METADATA_MEM_SIZE,
                 instanceAttributes.get(FogbowConstants.INSTANCE_ATTRIBUTE_MEMORY_SIZE));
 
-        fogbowResource.putMetadata(AbstractResource.METADATA_DISK_SIZE,
+        fogbowResource.putMetadata(BlowoutConstants.METADATA_DISK_SIZE,
                 instanceAttributes.get(FogbowConstants.INSTANCE_ATTRIBUTE_DISK_SIZE));
     }
 
