@@ -24,8 +24,6 @@ public class ResourceHelperTest {
 		.getMetadataValue(Mockito.eq(FogbowResource.METADATA_REQUEST_TYPE));
 		doReturn(resourceMetadata.get(FogbowResource.METADATA_SSH_HOST)).when(fakeResource)
 		.getMetadataValue(Mockito.eq(FogbowResource.METADATA_SSH_HOST));
-		doReturn(resourceMetadata.get(FogbowResource.METADATA_SSH_PORT)).when(fakeResource)
-		.getMetadataValue(Mockito.eq(FogbowResource.METADATA_SSH_PORT));
 		doReturn(resourceMetadata.get(FogbowResource.METADATA_SSH_USERNAME_ATT)).when(fakeResource)
 		.getMetadataValue(Mockito.eq(FogbowResource.METADATA_SSH_USERNAME_ATT));
 		doReturn(resourceMetadata.get(FogbowResource.METADATA_EXTRA_PORTS_ATT)).when(fakeResource)
@@ -55,7 +53,6 @@ public class ResourceHelperTest {
 
 		Map<String, String> resourceMetadata = new HashMap<String, String>();
 		resourceMetadata.put(FogbowResource.METADATA_SSH_HOST, host);
-		resourceMetadata.put(FogbowResource.METADATA_SSH_PORT, port);
 		resourceMetadata.put(FogbowResource.METADATA_SSH_USERNAME_ATT, userName);
 		resourceMetadata.put(FogbowResource.METADATA_EXTRA_PORTS_ATT, extraPorts);
 		resourceMetadata.put(FogbowResource.METADATA_IMAGE_NAME, image);

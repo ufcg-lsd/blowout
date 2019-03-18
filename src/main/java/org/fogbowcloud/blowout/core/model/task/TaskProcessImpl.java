@@ -9,7 +9,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.model.Command;
 import org.fogbowcloud.blowout.core.model.Specification;
-import org.fogbowcloud.blowout.core.model.resource.ResourceState;
 import org.fogbowcloud.blowout.core.util.AppUtil;
 import org.fogbowcloud.blowout.core.model.resource.AbstractResource;
 
@@ -172,8 +171,8 @@ public class TaskProcessImpl implements TaskProcess {
     }
 
     private void setPublicIp(AbstractResource resource, Map<String, String> additionalEnvVar) {
-        additionalEnvVar.put(ENV_HOST, resource.getMetadataValue(AbstractResource.METADATA_SSH_PUBLIC_IP));
-        LOGGER.info("SSH - Host: " + resource.getMetadataValue(AbstractResource.METADATA_SSH_PUBLIC_IP));
+        additionalEnvVar.put(ENV_HOST, resource.getMetadataValue(AbstractResource.METADATA_PUBLIC_IP));
+        LOGGER.info("SSH - Host: " + resource.getMetadataValue(AbstractResource.METADATA_PUBLIC_IP));
     }
 
     private void setUser(AbstractResource resource, Map<String, String> additionalEnvVar) {

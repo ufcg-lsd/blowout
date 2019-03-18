@@ -47,10 +47,8 @@ public class FogbowInfrastructureProviderTest {
 
 	@Before
 	public void setUp() throws Exception {
-
-		//Initiating properties file.
 		this.generateDefaultProperties();
-		tokenUpdatePluginMock = mock(AbstractTokenUpdatePlugin.class);
+		this.tokenUpdatePluginMock = mock(AbstractTokenUpdatePlugin.class);
 
 		Token token = mock(Token.class);
 		doReturn(token).when(tokenUpdatePluginMock).generateToken();
@@ -181,21 +179,20 @@ public class FogbowInfrastructureProviderTest {
 		fogbowInfrastructureProvider.setHttpWrapper(httpWrapperMock);
 		String resourceId = fogbowInfrastructureProvider.requestResource(specs);
 		
-//		FogbowResource resource = mock(FogbowResource.class);
-//		doReturn(returnedOrderId).when(resource).createCompute();
-//		createDefaultInstanceIdResponse(returnedOrderId, instanceIdMock, memberIdMock, OrderState.FULFILLED);
+		FogbowResource resource = mock(FogbowResource.class);
+		doReturn(returnedOrderId).when(resource).getComputeOrderId();
 
-//		doReturn(true).when(fogbowResourceDsMock).deleteFogbowResourceById(resource);
+		doReturn(true).when(fogbowResourceDsMock).deleteFogbowResourceById(resource);
 
 		FogbowResource newResource = fogbowInfrastructureProvider.getFogbowResource(resourceId);
 
  		assertNotNull(newResource.getId());
 		assertEquals(ramSizeMock, newResource.getMetadataValue(FogbowResource.METADATA_MEM_SIZE));
 		assertEquals("1", newResource.getMetadataValue(FogbowResource.METADATA_VCPU));
-//		assertEquals(hostMock, newResource.getMetadataValue(FogbowResource.METADATA_SSH_HOST));
-//		assertEquals(portMock, newResource.getMetadataValue(FogbowResource.METADATA_SSH_PORT));
+		assertEquals(hostMock, newResource.getMetadataValue(FogbowResource.METADATA_SSH_HOST));
 
-		newResource = null;
+
+
 	}
 
 	@Test

@@ -46,9 +46,9 @@ public class FogbowResource extends AbstractResource {
     }
 
 	protected boolean internalCheckConnectivity() {
-		final String host = super.getMetadataValue(METADATA_SSH_PUBLIC_IP);
+		final String publicIp = super.getMetadataValue(METADATA_PUBLIC_IP);
 
-		LOGGER.debug("Checking resource connectivity [host: " + host + "].");
+		LOGGER.debug("Checking resource connectivity [host: " + publicIp + "].");
 
 		Runtime run;
 		Process p = null;
@@ -57,10 +57,10 @@ public class FogbowResource extends AbstractResource {
 		try {
 			run = Runtime.getRuntime();
 			p = run.exec(new String[] { "/bin/bash", "-c",
-					"echo quit | telnet " + host + " 2>/dev/null | grep Connected" });
+					"echo quit | telnet " + publicIp + " 2>/dev/null | grep Connected" });
 			p.waitFor();
 
-			LOGGER.info("Running command: /bin/bash -c echo quit | telnet " + host + " 2>/dev/null | grep Connected");
+			LOGGER.info("Running command: /bin/bash -c echo quit | telnet " + publicIp + " 2>/dev/null | grep Connected");
 
 			scanner = new Scanner(p.getInputStream());
 			if (scanner.hasNext()) {
@@ -78,7 +78,6 @@ public class FogbowResource extends AbstractResource {
 			LOGGER.error(AppMessagesConstants.RESOURCE_CONNECT_FAILED);
 			return false;
 		} finally {
-			run = null;
 			if (p != null) {
 				p.destroy();
 			}

@@ -219,7 +219,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
     private void putMetadata(AbstractResource fogbowResource, Map<String, Object> instanceAttributes) {
 
-        fogbowResource.putMetadata(AbstractResource.METADATA_SSH_PUBLIC_IP,
+        fogbowResource.putMetadata(AbstractResource.METADATA_PUBLIC_IP,
                 instanceAttributes.get(FogbowConstants.JSON_KEY_FOGBOW_PUBLIC_IP));
 
         fogbowResource.putMetadata(AbstractResource.METADATA_SSH_USERNAME_ATT,

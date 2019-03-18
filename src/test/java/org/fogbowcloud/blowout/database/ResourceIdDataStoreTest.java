@@ -34,9 +34,9 @@ public class ResourceIdDataStoreTest {
 	
 	private final String FAKE_INSTANCE_ID1 = "fakeInstanceId1";
 	
-	Properties properties = null;
-	FogbowResourceDatastore db = null; 
-	Specification spec = new Specification("imageA", "userA", "publicKey", "filePath");
+	private Properties properties = null;
+	private FogbowResourceDatastore db = null;
+	private Specification spec = new Specification("imageA", "userA", "publicKey", "filePath");
 
 	@Before
 	public void initialize() {		
@@ -55,7 +55,7 @@ public class ResourceIdDataStoreTest {
 	}
 	
 	@Test
-	public void testeAddFogbowResource() throws SQLException, InterruptedException {
+	public void testAddFogbowResource() throws SQLException, InterruptedException {
 
 		FogbowResource resource = new FogbowResource(FAKE_RESOURCE_ID1, FAKE_ORDER_ID1, spec);
 		
@@ -71,7 +71,7 @@ public class ResourceIdDataStoreTest {
 	}
 
 	@Test
-	public void testeAddFogbowResources() throws SQLException, InterruptedException {
+	public void testAddFogbowResources() throws SQLException, InterruptedException {
 		
 		FogbowResource resourceA = new FogbowResource(FAKE_RESOURCE_ID1, FAKE_ORDER_ID1, spec);
 		FogbowResource resourceB = new FogbowResource(FAKE_RESOURCE_ID2, FAKE_ORDER_ID2, spec);
