@@ -1,6 +1,5 @@
 package org.fogbowcloud.blowout.infrastructure.provider.fogbow;
 
-
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -128,12 +127,12 @@ public class FogbowInfrastructureProviderTest {
 	public void getResourceTestSuccess() throws Exception{
 
 		//Attributes
-		String requestIdMock = "request01";
+		final String requestIdMock = "request01";
 
 		FogbowResource resource = mock(FogbowResource.class);
 		doReturn(requestIdMock).when(resource).getId();
 
-		//To avoid SSH Connection Erro when tries to test connection to a FAKE host.
+		//To avoid SSH Connection Error when tries to test connection to a FAKE host.
 		doReturn(resource).when(fogbowInfrastructureProvider).getFogbowResource(Mockito.eq(requestIdMock));
 		doReturn(true).when(resource).checkConnectivity(); 
 

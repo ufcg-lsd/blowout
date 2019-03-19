@@ -14,8 +14,8 @@ public class Constants {
     public static final String FAKE_RESOURCE_ID = "fake-resource-id";
     public static final String FAKE_TASK_ID = "fake-task-id";
     public static final String FAKE_ORDER_ID = "fake-order-id";
-    public static final String FAKE_METADATA_VALUE = "fakemetadatavalue";
-    public static final String FAKE_METADATA = "fakemetadata";
+    public static final String FAKE_METADATA_VALUE = "fake-metadata-value";
+    public static final String FAKE_METADATA = "fake-metadata";
     public static final String FAKE_COMMAND = "echo fake-echo";
 
     public static final String JSON_KEY_PRIVATE_KEY_PATH = "privateKeyPath";
@@ -23,6 +23,7 @@ public class Constants {
     public static final String JSON_KEY_PUBLIC_KEY = "publicKey";
     public static final String JSON_KEY_USERNAME = "username";
     public static final String JSON_KEY_IMAGE_ID = "image";
+
     public static final String STR_OTHER_VALUE = "otherValue";
     public static final String STR_SECOND_REQUIREMENT = "secondRequirement";
     public static final String STR_THIS_VALUE = "thisValue";

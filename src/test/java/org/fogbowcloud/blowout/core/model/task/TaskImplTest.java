@@ -34,7 +34,7 @@ public class TaskImplTest {
 		this.task.startedRunning();
 		
 		doReturn(TIME_OUT_VALUE_BIG).when(task).getMetadata(TaskImpl.METADATA_TASK_TIMEOUT);
-		assertEquals(false, task.checkTimeOuted());
+		assertFalse(task.checkTimeOuted());
 	}
 	
 	@Test
@@ -108,5 +108,4 @@ public class TaskImplTest {
 		assert(epilogueCommands.contains(epilogueCommand));
 		assert(epilogueCommands.contains(epilogueCommand2));
 	}
-	
 }

@@ -35,29 +35,26 @@ public class DefaultInfrastructureManagerTest {
 	private ResourceMonitor resourceMonitor;
 	private InfrastructureProvider infraProvider;
 	private InfrastructureManager defaultInfrastructureManager;
+	private Specification spec;
 	
 	@Before
 	public void setUp() throws Exception {
-		infraProvider = Mockito.mock(InfrastructureProvider.class);
-		resourceMonitor = Mockito.mock(ResourceMonitor.class);
-		defaultInfrastructureManager = Mockito.spy(new DefaultInfrastructureManager(infraProvider, resourceMonitor));
+		this.infraProvider = Mockito.mock(InfrastructureProvider.class);
+		this.resourceMonitor = Mockito.mock(ResourceMonitor.class);
+		this.defaultInfrastructureManager = Mockito.spy(new DefaultInfrastructureManager(infraProvider, resourceMonitor));
+		this.spec = new Specification(FAKE_CLOUD_NAME, FAKE_IMAGE_FLAVOR_NAME, FAKE_FOGBOW_USER_NAME,
+				FAKE_PUBLIC_KEY, FAKE_PRIVATE_KEY_FILE_PATH);
 	}
-
-	@After
-	public void setDown() throws Exception {}
 
 	@Test
 	public void testActOneReadyTaskNoResource() throws Exception {
-		Specification spec = new Specification(FAKE_CLOUD_NAME,
-				FAKE_IMAGE_FLAVOR_NAME, FAKE_FOGBOW_USER_NAME, FAKE_PUBLIC_KEY, FAKE_PRIVATE_KEY_FILE_PATH);
-
-		Task task = new TaskImpl(FAKE_TASK_ID, spec, FAKE_UUID);
+		Task task = new TaskImpl(FAKE_TASK_ID, this.spec, FAKE_UUID);
 		
 		List<Task> tasks = new ArrayList<>();
 		tasks.add(task);
 		List<AbstractResource> resources = new ArrayList<>();
 		
-		doReturn(FAKE_RESOURCE_ID).when(infraProvider).requestResource(spec);
+		doReturn(FAKE_RESOURCE_ID).when(this.infraProvider).requestResource(this.spec);
 		doReturn(new ArrayList<AbstractResource>()).when(resourceMonitor).getPendingResources();
 		
 		defaultInfrastructureManager.act(resources, tasks);
@@ -186,34 +183,23 @@ public class DefaultInfrastructureManagerTest {
 	
 	@Test
 	public void testActOnReadyTasksOneIdleResource() throws Exception {
-		final String image = "image";
-		final String userName = "userName";
-		final String publicKey = "publicKey";
-		final String privateKey = "privateKey";
-		final String fogbowRequirement = "Glue2vCPU >= 1 && Glue2RAM >= 1024 ";
-		final String userDataFile = "scripts/lvl-user-data.sh";
-		final String userDataType = "text/x-shellscript";
-		
-		final String coreSize = "1";
-		final String menSize = "1024";
-		final String diskSize = "20";
-		final String location = "edu.ufcg.lsd.cloud_1s";
-
 		Specification specA =
-				new Specification(FAKE_CLOUD_NAME, image, userName, publicKey, privateKey, userDataFile, userDataType);
-		specA.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
+				new Specification(FAKE_CLOUD_NAME, FAKE_IMAGE_FLAVOR_NAME, FAKE_FOGBOW_USER_NAME,
+						FAKE_PUBLIC_KEY, FAKE_PRIVATE_KEY_FILE_PATH, USER_DATA_FILE, USER_DATA_TYPE);
+
+		specA.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_A);
 		
 		AbstractResource idleResource = new FogbowResource(FAKE_RESOURCE_ID, FAKE_ORDER_ID, specA);
 		idleResource.putMetadata(BlowoutConstants.METADATA_IMAGE_NAME, FAKE_IMAGE_FLAVOR_NAME);
 		idleResource.putMetadata(BlowoutConstants.ENV_PRIVATE_KEY_FILE, FAKE_PRIVATE_KEY_FILE_PATH);
 		ResourceStateHelper.changeResourceToState(idleResource, ResourceState.IDLE);
 		
-		idleResource.putMetadata(BlowoutConstants.METADATA_IMAGE_NAME, image);
-		idleResource.putMetadata(BlowoutConstants.METADATA_PUBLIC_KEY, publicKey);
-		idleResource.putMetadata(BlowoutConstants.METADATA_VCPU, coreSize);
-		idleResource.putMetadata(BlowoutConstants.METADATA_MEM_SIZE, menSize);
-		idleResource.putMetadata(BlowoutConstants.METADATA_DISK_SIZE, diskSize);
-		idleResource.putMetadata(BlowoutConstants.METADATA_LOCATION, location);
+		idleResource.putMetadata(BlowoutConstants.METADATA_IMAGE_NAME, FAKE_IMAGE_FLAVOR_NAME);
+		idleResource.putMetadata(BlowoutConstants.METADATA_PUBLIC_KEY, FAKE_PUBLIC_KEY);
+		idleResource.putMetadata(BlowoutConstants.METADATA_VCPU, EXAMPLE_CORE_SIZE);
+		idleResource.putMetadata(BlowoutConstants.METADATA_MEM_SIZE, EXAMPLE_MEM_SIZE);
+		idleResource.putMetadata(BlowoutConstants.METADATA_DISK_SIZE, EXAMPLE_DISK_SIZE);
+		idleResource.putMetadata(BlowoutConstants.METADATA_LOCATION, EXAMPLE_LOCATION);
 		
 		Task taskA = new TaskImpl(FAKE_TASK_ID, specA, FAKE_UUID);
 		List<Task> tasks = new ArrayList<>();
@@ -228,7 +214,6 @@ public class DefaultInfrastructureManagerTest {
 		verify(infraProvider, times(0)).requestResource(specA);
 		verify(resourceMonitor, times(0))
 				.addPendingResource(Mockito.any(String.class), Mockito.any(Specification.class));
-		
 	}
 	
 	@Test

@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.fogbowcloud.blowout.helpers.Constants.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,18 +26,19 @@ public class ResourceMonitorTest {
 	private ResourceMonitor resourceMonitor;
 	private InfrastructureProvider infraProvider;
 	private BlowoutPool resourcePool;
+	private Specification spec;
 	
 	@Before
 	public void setUp() throws Exception {
 		
-		infraProvider = Mockito.mock(InfrastructureProvider.class);
-		resourcePool = Mockito.mock(BlowoutPool.class);
+		this.infraProvider = Mockito.mock(InfrastructureProvider.class);
+		this.resourcePool = Mockito.mock(BlowoutPool.class);
 		Properties properties = new Properties();
 		properties.setProperty(AppPropertiesConstants.RESOURCE_MONITOR_SLEEP_PERIOD, "1000");
 		properties.setProperty(AppPropertiesConstants.INFRA_RESOURCE_IDLE_LIFETIME, "120000");
 		properties.setProperty(AppPropertiesConstants.INFRA_RESOURCE_CONNECTION_RETRY, "3");
-		
-		resourceMonitor = Mockito.spy(new ResourceMonitor(infraProvider, resourcePool, properties));
+		this.spec = Mockito.mock(Specification.class);
+		this.resourceMonitor = Mockito.spy(new ResourceMonitor(this.infraProvider, this.resourcePool, properties));
 	}
 
 	@After
@@ -46,25 +48,17 @@ public class ResourceMonitorTest {
 
 	@Test
 	public void testProcessPendingResource() throws Exception {
-
-		List<AbstractResource> resources = new ArrayList<AbstractResource>();
-		
-		String resourceId = "resourceA";
-		String orderId = "orderA";
-		
-		Specification specA = new Specification("ImageA", "Fogbow", "myKeyA", "path");
-		
-		AbstractResource resource = new FogbowResource(resourceId, orderId, specA);
+		List<AbstractResource> resources = new ArrayList<>();
+		AbstractResource resource = new FogbowResource(FAKE_RESOURCE_ID, FAKE_ORDER_ID, this.spec);
 		
 		doReturn(resources).when(resourcePool).getAllResources();
-		doReturn(resource).when(infraProvider).getResource(resourceId);
+		doReturn(resource).when(infraProvider).getResource(FAKE_RESOURCE_ID);
 		
-		resourceMonitor.addPendingResource(resourceId, specA);
+		resourceMonitor.addPendingResource(FAKE_RESOURCE_ID, this.spec);
 		resourceMonitor.getMonitoringService().monitorProcess();
 		
 		verify(resourcePool, times(1)).addResource(resource);
 		assertTrue(resourceMonitor.getPendingResources().isEmpty());
-
 	}
 	
 	@Test
@@ -93,7 +87,4 @@ public class ResourceMonitorTest {
 		assertEquals(1, resourceMonitor.getPendingResources().size());
 
 	}
-	
-	
-	
 }
