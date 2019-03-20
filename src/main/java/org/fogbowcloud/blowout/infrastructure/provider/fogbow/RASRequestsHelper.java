@@ -69,7 +69,9 @@ public class RASRequestsHelper {
     }
 
     public String createPublicIp(String computeOrderId) throws InterruptedException {
-        sleep(6000);
+        final Integer sleepTimeInMillis = 6000;
+
+        sleep(sleepTimeInMillis);
         String publicIpId = null;
         final String cloudName = this.properties.getProperty(AppPropertiesConstants.DEFAULT_CLOUD_NAME);
         final String provider = this.properties.getProperty(AppPropertiesConstants.AS_TOKEN_PROJECT_NAME);

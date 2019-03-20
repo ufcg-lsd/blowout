@@ -3,11 +3,16 @@ package org.fogbowcloud.blowout.infrastructure.provider.fogbow;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
+import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.helpers.Constants;
 import org.fogbowcloud.blowout.infrastructure.exception.RequestResourceException;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class RASRequestsHelperTest {
 	private RASRequestsHelper rasRequestsHelper;
@@ -25,7 +30,7 @@ public class RASRequestsHelperTest {
 	}
 
 	@Test
-	public void testCreateCompute() throws RequestResourceException {
+	public void testCreateComputeSuccess() throws RequestResourceException {
 		when(this.rasRequestsHelper.createCompute(this.spec))
 				.thenReturn(Constants.FAKE_COMPUTE_ORDER_ID);
 
@@ -44,11 +49,12 @@ public class RASRequestsHelperTest {
 
 		this.rasRequestsHelper.createCompute(this.spec);
 
-		verify(this.rasRequestsHelper, times(1)).createCompute(this.spec);
+		verify(this.rasRequestsHelper, times(Constants.WANTED_NUMBER_OF_INVOCATIONS))
+				.createCompute(this.spec);
 	}
 
 	@Test
-	public void createPublicIp() throws RequestResourceException, InterruptedException {
+	public void testCreatePublicIpSuccess() throws RequestResourceException, InterruptedException {
 		when(this.rasRequestsHelper.createCompute(this.spec))
 				.thenReturn(Constants.FAKE_COMPUTE_ORDER_ID);
 
@@ -66,18 +72,32 @@ public class RASRequestsHelperTest {
 	}
 
 	@Test
-	public void getPublicIpInstance() {
+	public void testGetPublicIpInstanceSuccess() throws RequestResourceException, InterruptedException {
+		when(this.rasRequestsHelper.createCompute(this.spec))
+				.thenReturn(Constants.FAKE_COMPUTE_ORDER_ID);
+
+		final String fakeComputeOrderId = this.rasRequestsHelper.createCompute(this.spec);
+
+		when(this.rasRequestsHelper.createPublicIp(fakeComputeOrderId))
+				.thenReturn(Constants.FAKE_PUBLIC_IP_ORDER_ID);
+
+		final String fakePublicIpOrderId = this.rasRequestsHelper.createPublicIp(fakeComputeOrderId);
+
+		when(this.rasRequestsHelper.getPublicIpInstance(fakePublicIpOrderId))
+				.thenReturn(new HashMap<>());
+
+		Map<String, Object> publicIpInstance = this.rasRequestsHelper.getPublicIpInstance(fakePublicIpOrderId);
 	}
 
 	@Test
-	public void getComputeInstance() {
+	public void testGetComputeInstanceSuccess() {
 	}
 
 	@Test
-	public void deleteFogbowResource() {
+	public void testDeleteFogbowResourceSuccess() {
 	}
 
 	@Test
-	public void makeJsonBody() {
+	public void testMakeJsonBodySuccess() {
 	}
 }
