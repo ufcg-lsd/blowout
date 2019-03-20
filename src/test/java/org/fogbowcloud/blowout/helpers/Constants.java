@@ -17,6 +17,8 @@ public class Constants {
     public static final String FAKE_METADATA_VALUE = "fake-metadata-value";
     public static final String FAKE_METADATA = "fake-metadata";
     public static final String FAKE_COMMAND = "echo fake-echo";
+    public static final String FAKE_COMPUTE_ORDER_ID = "fake-compute-order-id";
+    public static final String FAKE_PUBLIC_IP_ORDER_ID = "fake-public-ip-order-id";
 
     public static final String JSON_KEY_PRIVATE_KEY_PATH = "privateKeyPath";
     public static final String JSON_KEY_CLOUD_NAME = "cloudName";
@@ -28,6 +30,7 @@ public class Constants {
     public static final String STR_SECOND_REQUIREMENT = "secondRequirement";
     public static final String STR_THIS_VALUE = "thisValue";
     public static final String STR_FIRST_REQUIREMENT = "firstRequirement";
+    public static final Integer WANTED_NUMBER_OF_INVOCATIONS = 1;
 
     public static final Command.Type COMMAND_TYPE_DEFAULT = Command.Type.REMOTE;
 
@@ -72,4 +75,5 @@ public class Constants {
             "\"state\": \"RUNNING\", " +
             "\"type\": \"REMOTE\"" +
             "}";
+
 }

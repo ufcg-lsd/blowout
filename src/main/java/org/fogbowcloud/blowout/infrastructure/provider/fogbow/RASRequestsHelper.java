@@ -51,7 +51,10 @@ public class RASRequestsHelper {
             LOGGER.error("Error while requesting resource on Fogbow: " + be.getMessage(), be);
         }
 
-        requestBody.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, HttpWrapper.HTTP_CONTENT_JSON));
+        if (requestBody != null) {
+            requestBody.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, HttpWrapper.HTTP_CONTENT_JSON));
+        }
+
         String computeOrderId;
         try {
             String computerOrderIdResponse = this.doRequest(HttpWrapper.HTTP_METHOD_POST, this.RAS_BASE_URL + "/" +
