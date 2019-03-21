@@ -2,6 +2,7 @@ package org.fogbowcloud.blowout.infrastructure.token;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
@@ -14,6 +15,7 @@ import org.fogbowcloud.blowout.core.constants.FogbowConstants;
 import org.fogbowcloud.blowout.core.exception.BlowoutException;
 
 import static org.fogbowcloud.blowout.core.constants.AppPropertiesConstants.*;
+import static org.fogbowcloud.blowout.core.util.AppUtil.getValueFromJsonStr;
 import static org.fogbowcloud.blowout.core.util.AppUtil.makeBodyField;
 
 import org.fogbowcloud.blowout.core.util.AppUtil;
@@ -75,27 +77,26 @@ public class ASTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
     private Token createToken() throws Exception {
         HttpWrapper httpWrapper = new HttpWrapper();
 
-        String requestUrl = this.asBaseUrl + "/" + FogbowConstants.AS_ENDPOINT_TOKEN;
-        String publicKeyRAS = getPublicKeyRAS();
-        StringEntity body = makeBodyJson(publicKeyRAS);
+        final String requestUrl = this.asBaseUrl + "/" + FogbowConstants.AS_ENDPOINT_TOKEN;
+        final String publicKeyRAS = getPublicKeyRAS();
+        final StringEntity body = makeBodyJson(publicKeyRAS);
         body.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, HttpWrapper.HTTP_CONTENT_JSON));
 
-        String accessTokenJson = httpWrapper.doRequest("post", requestUrl, new LinkedList<>(), body);
-        String accessToken = AppUtil.getValueFromJsonStr("token", accessTokenJson);
-        String userId = AppUtil.generateIdentifier();
+        final String accessTokenJson = httpWrapper.doRequest(HttpWrapper.HTTP_METHOD_POST, requestUrl, new LinkedList<>(), body);
+        final String accessToken = getValueFromJsonStr("token", accessTokenJson);
+        final String userId = AppUtil.generateIdentifier();
         User user = new User(userId, this.userName, this.password);
 
         return new Token(accessToken, user);
     }
 
-    private String getPublicKeyRAS() throws Exception{
-        final String requestUrl = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_PUBLIC_KEY;
+    private String getPublicKeyRAS() throws Exception {
+        final String requestUrl = this.asBaseUrl + "/" + FogbowConstants.RAS_ENDPOINT_PUBLIC_KEY;
         HttpUriRequest request = new HttpGet(requestUrl);
         HttpResponse response = HttpClients.createMinimal().execute(request);
         HttpEntity entity = response.getEntity();
         String responseString = EntityUtils.toString(entity, "UTF-8");
-        String publicKey  = AppUtil.getValueFromJsonStr("publicKey", responseString);
-        return publicKey;
+        return getValueFromJsonStr(FogbowConstants.JSON_KEY_RAS_PUBLIC_KEY, responseString);
     }
 
 

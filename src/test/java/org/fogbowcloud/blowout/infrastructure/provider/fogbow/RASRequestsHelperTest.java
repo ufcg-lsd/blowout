@@ -9,6 +9,7 @@ import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.helpers.Constants;
 import org.fogbowcloud.blowout.helpers.HoverflyRules;
 import org.fogbowcloud.blowout.infrastructure.exception.RequestResourceException;
+import org.fogbowcloud.blowout.infrastructure.token.ASTokenUpdatePlugin;
 import org.fogbowcloud.blowout.infrastructure.token.AbstractTokenUpdatePlugin;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -22,34 +23,32 @@ import java.util.Properties;
 
 public class RASRequestsHelperTest {
 	private RASRequestsHelper rasRequestsHelper;
-	private AbstractTokenUpdatePlugin abstractTokenUpdatePlugin;
 	private Specification spec;
-	private Properties properties;
 
 	@ClassRule
 	public static HoverflyRule hoverflyRule = HoverflyRule.inSimulationMode(HoverflyRules.simulationSource);
 
 	@Before
 	public void setUp() throws IOException {
-		this.abstractTokenUpdatePlugin = mock(AbstractTokenUpdatePlugin.class);
-		this.properties = new Properties();
-		this.properties.load(new FileInputStream(Constants.TEST_CONFIG_FILE_PATH));
-		this.rasRequestsHelper = new RASRequestsHelper(this.properties, this.abstractTokenUpdatePlugin,
-				this.properties.getProperty(Constants.FAKE_RAS_BASE_URL));
+		Properties properties = new Properties();
+		properties.load(new FileInputStream(Constants.FILE_PATH_TESTS_CONFIG));
+		AbstractTokenUpdatePlugin abstractTokenUpdatePlugin = new ASTokenUpdatePlugin(properties);
+
+		this.rasRequestsHelper = new RASRequestsHelper(properties, abstractTokenUpdatePlugin);
 		this.spec = mock(Specification.class);
 	}
 
 	@Test
 	public void testCreateComputeSuccess() throws RequestResourceException {
 		when(this.rasRequestsHelper.createCompute(this.spec))
-				.thenReturn(Constants.FAKE_COMPUTE_ORDER_ID);
+				.thenReturn(Constants.FakeData.COMPUTE_ORDER_ID);
 
 		final String fakeComputeOrderId = this.rasRequestsHelper.createCompute(this.spec);
 
 		verify(this.rasRequestsHelper, times(Constants.WANTED_NUMBER_OF_INVOCATIONS))
 				.createCompute(this.spec);
 
-		assertEquals(Constants.FAKE_COMPUTE_ORDER_ID, fakeComputeOrderId);
+		assertEquals(Constants.FakeData.COMPUTE_ORDER_ID, fakeComputeOrderId);
 	}
 
 	@Test(expected = RequestResourceException.class)
@@ -66,31 +65,30 @@ public class RASRequestsHelperTest {
 	@Test
 	public void testCreatePublicIpSuccess() throws RequestResourceException, InterruptedException {
 		when(this.rasRequestsHelper.createCompute(this.spec))
-				.thenReturn(Constants.FAKE_COMPUTE_ORDER_ID);
+				.thenReturn(Constants.FakeData.COMPUTE_ORDER_ID);
 
 		final String fakeComputeOrderId = this.rasRequestsHelper.createCompute(this.spec);
 
 		when(this.rasRequestsHelper.createPublicIp(fakeComputeOrderId))
-				.thenReturn(Constants.FAKE_PUBLIC_IP_ORDER_ID);
+				.thenReturn(Constants.FakeData.PUBLIC_IP_ORDER_ID);
 
 		final String fakePublicIpOrderId = this.rasRequestsHelper.createPublicIp(fakeComputeOrderId);
 
 		verify(this.rasRequestsHelper, times(Constants.WANTED_NUMBER_OF_INVOCATIONS))
 				.createPublicIp(fakeComputeOrderId);
 
-		assertEquals(Constants.FAKE_PUBLIC_IP_ORDER_ID, fakePublicIpOrderId);
+		assertEquals(Constants.FakeData.PUBLIC_IP_ORDER_ID, fakePublicIpOrderId);
 	}
 
 	@Test
 	public void testGetPublicIpInstanceSuccess() throws RequestResourceException, InterruptedException {
 
 		when(this.rasRequestsHelper.createCompute(this.spec))
-				.thenReturn(Constants.FAKE_COMPUTE_ORDER_ID);
-
+				.thenReturn(Constants.FakeData.COMPUTE_ORDER_ID);
 		final String fakeComputeOrderId = this.rasRequestsHelper.createCompute(this.spec);
 
 		when(this.rasRequestsHelper.createPublicIp(fakeComputeOrderId))
-				.thenReturn(Constants.FAKE_PUBLIC_IP_ORDER_ID);
+				.thenReturn(Constants.FakeData.PUBLIC_IP_ORDER_ID);
 
 		final String fakePublicIpOrderId = this.rasRequestsHelper.createPublicIp(fakeComputeOrderId);
 
@@ -113,6 +111,7 @@ public class RASRequestsHelperTest {
 
 	@Test
 	public void testGetComputeInstanceSuccess() {
+		// Todo
 		// setUp
 		// exercise
 		// verify
@@ -121,6 +120,7 @@ public class RASRequestsHelperTest {
 
 	@Test
 	public void testDeleteFogbowResourceSuccess() {
+		// Todo
 		// setUp
 		// exercise
 		// verify
@@ -129,6 +129,7 @@ public class RASRequestsHelperTest {
 
 	@Test
 	public void testMakeJsonBodySuccess() {
+		// Todo
 		// setUp
 		// exercise
 		// verify

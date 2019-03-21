@@ -12,6 +12,7 @@ import java.util.Properties;
 
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.constants.AppPropertiesConstants;
+import org.fogbowcloud.blowout.helpers.Constants;
 import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
 import org.fogbowcloud.blowout.infrastructure.provider.InfrastructureProvider;
 import org.fogbowcloud.blowout.core.model.resource.AbstractResource;
@@ -49,12 +50,12 @@ public class ResourceMonitorTest {
 	@Test
 	public void testProcessPendingResource() throws Exception {
 		List<AbstractResource> resources = new ArrayList<>();
-		AbstractResource resource = new FogbowResource(FAKE_RESOURCE_ID, FAKE_ORDER_ID, this.spec);
+		AbstractResource resource = new FogbowResource(Constants.FakeData.RESOURCE_ID, Constants.FakeData.ORDER_ID, this.spec);
 		
 		doReturn(resources).when(resourcePool).getAllResources();
-		doReturn(resource).when(infraProvider).getResource(FAKE_RESOURCE_ID);
+		doReturn(resource).when(infraProvider).getResource(Constants.FakeData.RESOURCE_ID);
 		
-		resourceMonitor.addPendingResource(FAKE_RESOURCE_ID, this.spec);
+		resourceMonitor.addPendingResource(Constants.FakeData.RESOURCE_ID, this.spec);
 		resourceMonitor.getMonitoringService().monitorProcess();
 		
 		verify(resourcePool, times(1)).addResource(resource);

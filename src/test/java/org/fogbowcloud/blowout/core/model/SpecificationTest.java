@@ -5,6 +5,7 @@ import static org.fogbowcloud.blowout.helpers.Constants.*;
 
 import org.fogbowcloud.blowout.core.constants.FogbowConstants;
 
+import org.fogbowcloud.blowout.helpers.Constants;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,8 +19,8 @@ public class SpecificationTest {
 
 	@Before
 	public void setUp(){
-		 this.spec = new Specification(JSON_KEY_CLOUD_NAME, JSON_KEY_IMAGE_ID,
-				 JSON_KEY_USERNAME, JSON_KEY_PUBLIC_KEY, JSON_KEY_PRIVATE_KEY_PATH);
+		 this.spec = new Specification(Constants.JSON.Key.CLOUD_NAME, Constants.JSON.Key.IMAGE_ID,
+                 Constants.JSON.Key.USERNAME, Constants.JSON.Key.PUBLIC_KEY, Constants.JSON.Key.PRIVATE_KEY_PATH);
 	}
 
 	@Test
@@ -72,17 +73,20 @@ public class SpecificationTest {
 
         Specification spec;
         for (String fogbowRequirement: fogbowRequirements) {
-            spec = new Specification(JSON_KEY_CLOUD_NAME, JSON_KEY_IMAGE_ID, JSON_KEY_USERNAME, JSON_KEY_PUBLIC_KEY, JSON_KEY_PRIVATE_KEY_PATH);
+            spec = new Specification(Constants.JSON.Key.CLOUD_NAME, Constants.JSON.Key.IMAGE_ID,
+                    Constants.JSON.Key.USERNAME, Constants.JSON.Key.PUBLIC_KEY, Constants.JSON.Key.PRIVATE_KEY_PATH);
             spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
 
             assertEquals("1024", spec.getMemory());
         }
 
-        spec = new Specification(JSON_KEY_CLOUD_NAME, JSON_KEY_IMAGE_ID, JSON_KEY_USERNAME, JSON_KEY_PUBLIC_KEY, JSON_KEY_PRIVATE_KEY_PATH);
+        spec = new Specification(Constants.JSON.Key.CLOUD_NAME, Constants.JSON.Key.IMAGE_ID,
+                Constants.JSON.Key.USERNAME, Constants.JSON.Key.PUBLIC_KEY, Constants.JSON.Key.PRIVATE_KEY_PATH);
         spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_E);
         assertEquals("", spec.getMemory());
 
-        spec = new Specification(JSON_KEY_CLOUD_NAME, JSON_KEY_IMAGE_ID, JSON_KEY_USERNAME, JSON_KEY_PUBLIC_KEY, JSON_KEY_PRIVATE_KEY_PATH);
+        spec = new Specification(Constants.JSON.Key.CLOUD_NAME, Constants.JSON.Key.IMAGE_ID,
+                Constants.JSON.Key.USERNAME, Constants.JSON.Key.PUBLIC_KEY, Constants.JSON.Key.PRIVATE_KEY_PATH);
         spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_F);
 	    assertNull(spec.getMemory());
     }
@@ -96,17 +100,20 @@ public class SpecificationTest {
 
         Specification spec;
         for (String fogbowRequirement: fogbowRequirements) {
-            spec = new Specification(JSON_KEY_CLOUD_NAME, JSON_KEY_IMAGE_ID, JSON_KEY_USERNAME, JSON_KEY_PUBLIC_KEY, JSON_KEY_PRIVATE_KEY_PATH);
+            spec = new Specification(Constants.JSON.Key.CLOUD_NAME, Constants.JSON.Key.IMAGE_ID,
+                    Constants.JSON.Key.USERNAME, Constants.JSON.Key.PUBLIC_KEY, Constants.JSON.Key.PRIVATE_KEY_PATH);
             spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
 
             assertEquals("20", spec.getDisk());
         }
 
-        spec = new Specification(JSON_KEY_CLOUD_NAME, JSON_KEY_IMAGE_ID, JSON_KEY_USERNAME, JSON_KEY_PUBLIC_KEY, JSON_KEY_PRIVATE_KEY_PATH);
+        spec = new Specification(Constants.JSON.Key.CLOUD_NAME, Constants.JSON.Key.IMAGE_ID, Constants.JSON.Key.USERNAME,
+                Constants.JSON.Key.PUBLIC_KEY, Constants.JSON.Key.PRIVATE_KEY_PATH);
         spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_E);
         assertEquals("", spec.getDisk());
 
-        spec = new Specification(JSON_KEY_CLOUD_NAME, JSON_KEY_IMAGE_ID, JSON_KEY_USERNAME, JSON_KEY_PUBLIC_KEY, JSON_KEY_PRIVATE_KEY_PATH);
+        spec = new Specification(Constants.JSON.Key.CLOUD_NAME, Constants.JSON.Key.IMAGE_ID, Constants.JSON.Key.USERNAME,
+                Constants.JSON.Key.PUBLIC_KEY, Constants.JSON.Key.PRIVATE_KEY_PATH);
         spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_F);
 	    assertNull(spec.getDisk());
     }

@@ -41,11 +41,6 @@ public class RASRequestsHelper {
         this.RAS_BASE_URL = this.properties.getProperty(AppPropertiesConstants.RAS_BASE_URL);
     }
 
-    public RASRequestsHelper(Properties properties, AbstractTokenUpdatePlugin tokenUpdatePlugin, String rasBaseUrl) {
-        this(properties, tokenUpdatePlugin);
-        RAS_BASE_URL = rasBaseUrl;
-    }
-
     public String createCompute(Specification specification) throws RequestResourceException {
         StringEntity requestBody = null;
         try {
@@ -162,7 +157,13 @@ public class RASRequestsHelper {
 
     public StringEntity makeJsonBody(Specification specification) throws UnsupportedEncodingException, BlowoutException {
         JSONObject json = new JSONObject();
-        final String iguassuComputesName = "Iguassu";
+        String userName = specification.getUsername();
+
+        if (userName.trim().isEmpty()) {
+            userName = "Iguassu";
+        }
+
+        final String iguassuComputeName = "Compute started by: " + userName;
 
         String imageName = specification.getImageName();
         String imageId = getImageId(imageName);
@@ -174,7 +175,7 @@ public class RASRequestsHelper {
         makeBodyField(json, FogbowConstants.JSON_KEY_RAS_DISK, specification.getDisk());
         makeBodyField(json, FogbowConstants.JSON_KEY_RAS_IMAGE_ID, imageId);
         makeBodyField(json, FogbowConstants.JSON_KEY_RAS_MEMORY, specification.getMemory());
-        makeBodyField(json, FogbowConstants.JSON_KEY_RAS_COMPUTE_NAME, iguassuComputesName);
+        makeBodyField(json, FogbowConstants.JSON_KEY_RAS_COMPUTE_NAME, iguassuComputeName);
         makeBodyField(json, FogbowConstants.JSON_KEY_RAS_PUBLIC_KEY, specification.getPublicKey());
         makeBodyField(json, FogbowConstants.JSON_KEY_RAS_VCPU, specification.getvCPU());
 

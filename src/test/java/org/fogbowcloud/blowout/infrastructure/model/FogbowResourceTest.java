@@ -7,6 +7,7 @@ import static org.fogbowcloud.blowout.helpers.Constants.*;
 import org.fogbowcloud.blowout.core.constants.BlowoutConstants;
 import org.fogbowcloud.blowout.core.constants.FogbowConstants;
 import org.fogbowcloud.blowout.core.model.Specification;
+import org.fogbowcloud.blowout.helpers.Constants;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,9 +18,9 @@ public class FogbowResourceTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		this.spec = new Specification(FAKE_CLOUD_NAME, FAKE_COMPUTE_IMAGE_FLAVOR_NAME,
-				FAKE_FOGBOW_USER_NAME, FAKE_PUBLIC_KEY,FAKE_PRIVATE_KEY_FILE_PATH);
-		this.fogbowResource = spy(new FogbowResource(FAKE_RESOURCE_ID,FAKE_ORDER_ID, spec));
+		this.spec = new Specification(Constants.FakeData.CLOUD_NAME, Constants.FakeData.COMPUTE_IMAGE_FLAVOR_NAME,
+				Constants.FakeData.FOGBOW_USER_NAME, Constants.FakeData.PUBLIC_KEY,Constants.FakeData.PRIVATE_KEY_FILE_PATH);
+		this.fogbowResource = spy(new FogbowResource(Constants.FakeData.RESOURCE_ID,Constants.FakeData.ORDER_ID, spec));
 	}    
 
 	@After
@@ -30,17 +31,17 @@ public class FogbowResourceTest {
 	
 	@Test
 	public void matchTest() {
-		this.spec.setUserDataFile(USER_DATA_FILE);
-		this.spec.setUserDataType(USER_DATA_TYPE);
+		this.spec.setUserDataFile(Constants.FakeData.USER_DATA_FILE);
+		this.spec.setUserDataType(Constants.FakeData.USER_DATA_TYPE);
 
 		this.spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_A);
 
-		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_IMAGE_NAME, FAKE_COMPUTE_IMAGE_FLAVOR_NAME);
-		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_PUBLIC_KEY, FAKE_PUBLIC_KEY);
-		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_VCPU, EXAMPLE_CORE_SIZE);
-		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_MEM_SIZE, EXAMPLE_MEM_SIZE);
-		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_DISK_SIZE, EXAMPLE_DISK_SIZE);
-		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_LOCATION, EXAMPLE_LOCATION);
+		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_IMAGE_NAME, Constants.FakeData.COMPUTE_IMAGE_FLAVOR_NAME);
+		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_PUBLIC_KEY, Constants.FakeData.PUBLIC_KEY);
+		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_VCPU, Constants.FakeData.CORE_SIZE);
+		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_MEM_SIZE, Constants.FakeData.MEM_SIZE);
+		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_DISK_SIZE, Constants.FakeData.DISK_SIZE);
+		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_LOCATION, Constants.FakeData.LOCATION);
 
 		assertTrue(fogbowResource.match(spec));
 		this.spec.getAllRequirements().clear();
@@ -48,18 +49,18 @@ public class FogbowResourceTest {
 	
 	@Test
 	public void matchTestRequirementNotMach() {
-		this.spec.setUserDataFile(USER_DATA_FILE);
-		this.spec.setUserDataType(USER_DATA_TYPE);
+		this.spec.setUserDataFile(Constants.FakeData.USER_DATA_FILE);
+		this.spec.setUserDataType(Constants.FakeData.USER_DATA_TYPE);
 
 		this.spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_A);
 
-		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_IMAGE_NAME, FAKE_COMPUTE_IMAGE_FLAVOR_NAME);
-		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_IMAGE_ID, FAKE_COMPUTE_IMAGE_FLAVOR_ID);
-		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_PUBLIC_KEY, FAKE_PUBLIC_KEY);
-		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_VCPU, EXAMPLE_CORE_SIZE );
-		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_MEM_SIZE, EXAMPLE_MEM_SIZE);
-		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_DISK_SIZE, EXAMPLE_DISK_SIZE);
-		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_LOCATION, EXAMPLE_LOCATION);
+		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_IMAGE_NAME, Constants.FakeData.COMPUTE_IMAGE_FLAVOR_NAME);
+		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_IMAGE_ID, Constants.FakeData.COMPUTE_IMAGE_ID);
+		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_PUBLIC_KEY, Constants.FakeData.PUBLIC_KEY);
+		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_VCPU, Constants.FakeData.CORE_SIZE );
+		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_MEM_SIZE, Constants.FakeData.MEM_SIZE);
+		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_DISK_SIZE, Constants.FakeData.DISK_SIZE);
+		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_LOCATION, Constants.FakeData.LOCATION);
 		
 		assertTrue(fogbowResource.match(spec));
 
@@ -69,20 +70,20 @@ public class FogbowResourceTest {
 	
 	@Test
 	public void matchTestImageNotMatch() {
-		Specification specB = new Specification(FAKE_CLOUD_NAME+POSTFIX_B,
-				FAKE_COMPUTE_IMAGE_FLAVOR_NAME +POSTFIX_B, FAKE_FOGBOW_USER_NAME+POSTFIX_B,
-				FAKE_PUBLIC_KEY+POSTFIX_B, FAKE_PRIVATE_KEY_FILE_PATH+POSTFIX_B,
-				USER_DATA_FILE+POSTFIX_B, USER_DATA_TYPE+POSTFIX_B);
+		Specification specB = new Specification(Constants.FakeData.CLOUD_NAME+POSTFIX_B,
+				Constants.FakeData.COMPUTE_IMAGE_FLAVOR_NAME +POSTFIX_B, Constants.FakeData.FOGBOW_USER_NAME+POSTFIX_B,
+				Constants.FakeData.PUBLIC_KEY+POSTFIX_B, Constants.FakeData.PRIVATE_KEY_FILE_PATH+POSTFIX_B,
+				Constants.FakeData.USER_DATA_FILE+POSTFIX_B, Constants.FakeData.USER_DATA_TYPE+POSTFIX_B);
 
 		specB.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_A);
 
-		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_IMAGE_NAME, FAKE_COMPUTE_IMAGE_FLAVOR_NAME);
-		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_IMAGE_ID, FAKE_COMPUTE_IMAGE_FLAVOR_ID);
-		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_PUBLIC_KEY, FAKE_PUBLIC_KEY);
-		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_VCPU, EXAMPLE_CORE_SIZE);
-		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_MEM_SIZE, EXAMPLE_MEM_SIZE);
-		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_DISK_SIZE, EXAMPLE_DISK_SIZE);
-		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_LOCATION, EXAMPLE_LOCATION);
+		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_IMAGE_NAME, Constants.FakeData.COMPUTE_IMAGE_FLAVOR_NAME);
+		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_IMAGE_ID, Constants.FakeData.COMPUTE_IMAGE_ID);
+		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_PUBLIC_KEY, Constants.FakeData.PUBLIC_KEY);
+		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_VCPU, Constants.FakeData.CORE_SIZE);
+		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_MEM_SIZE, Constants.FakeData.MEM_SIZE);
+		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_DISK_SIZE, Constants.FakeData.DISK_SIZE);
+		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_LOCATION, Constants.FakeData.LOCATION);
 		
 		assertFalse(this.fogbowResource.match(specB));
 	
@@ -91,17 +92,17 @@ public class FogbowResourceTest {
 	
 	@Test
 	public void matchTestPublicKeyNotMatch() {
-		this.spec.setUserDataType(USER_DATA_TYPE);
-		this.spec.setUserDataFile(USER_DATA_FILE);
+		this.spec.setUserDataType(Constants.FakeData.USER_DATA_TYPE);
+		this.spec.setUserDataFile(Constants.FakeData.USER_DATA_FILE);
 
 		this.spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_A);
 
-		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_IMAGE_NAME, FAKE_COMPUTE_IMAGE_FLAVOR_ID);
-		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_PUBLIC_KEY, FAKE_PUBLIC_KEY);
-		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_VCPU, EXAMPLE_CORE_SIZE);
-		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_MEM_SIZE, EXAMPLE_MEM_SIZE);
-		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_DISK_SIZE, EXAMPLE_DISK_SIZE);
-		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_LOCATION, EXAMPLE_LOCATION);
+		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_IMAGE_NAME,Constants.FakeData.COMPUTE_IMAGE_ID);
+		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_PUBLIC_KEY, Constants.FakeData.PUBLIC_KEY);
+		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_VCPU, Constants.FakeData.CORE_SIZE);
+		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_MEM_SIZE, Constants.FakeData.MEM_SIZE);
+		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_DISK_SIZE, Constants.FakeData.DISK_SIZE);
+		this.fogbowResource.putMetadata(BlowoutConstants.METADATA_LOCATION, Constants.FakeData.LOCATION);
 
 		assertFalse(this.fogbowResource.match(this.spec));
 
