@@ -5,6 +5,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.apache.log4j.Logger;
+import org.fogbowcloud.blowout.core.constants.AppMessagesConstants;
 import org.fogbowcloud.blowout.core.constants.AppPropertiesConstants;
 import org.fogbowcloud.blowout.core.constants.FogbowConstants;
 import org.fogbowcloud.blowout.core.exception.BlowoutException;
@@ -28,9 +29,8 @@ import static org.fogbowcloud.blowout.core.util.AppUtil.*;
 
 public class RASRequestsHelper {
     private final Logger LOGGER = Logger.getLogger(RASRequestsHelper.class);
-    private final String RAS_BASE_URL;
     private final Properties properties;
-
+    private String RAS_BASE_URL;
     private HttpWrapper http;
     private Token token;
 
@@ -39,6 +39,11 @@ public class RASRequestsHelper {
         this.properties = properties;
         this.token = tokenUpdatePlugin.generateToken();
         this.RAS_BASE_URL = this.properties.getProperty(AppPropertiesConstants.RAS_BASE_URL);
+    }
+
+    public RASRequestsHelper(Properties properties, AbstractTokenUpdatePlugin tokenUpdatePlugin, String rasBaseUrl) {
+        this(properties, tokenUpdatePlugin);
+        RAS_BASE_URL = rasBaseUrl;
     }
 
     public String createCompute(Specification specification) throws RequestResourceException {
@@ -95,28 +100,29 @@ public class RASRequestsHelper {
         return publicIpId;
     }
 
-    public Map<String, Object> getPublicIpInstance(String publicIpId) {
+    public Map<String, Object> getPublicIpInstance(String publicIpOrderId) {
         String response;
-        Map<String, Object> sshInfo = new HashMap<>();
-        final String requestUrl = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_PUBLIC_IP + "/" + publicIpId;
-        final String errorMessage = "Error while getting info about public instance of order with id " + publicIpId;
+        Map<String, Object> publicIpInstance = new HashMap<>();
+        final String requestUrl = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_PUBLIC_IP + "/" + publicIpOrderId;
+        final String errorMessage = AppMessagesConstants.ERROR_WHILE_GET_PUBLIC_IP_INSTANCE + publicIpOrderId;
 
         try {
             response = this.doRequest(HttpWrapper.HTTP_METHOD_GET, requestUrl, new LinkedList<>());
-            sshInfo = parseAttributes(response);
-            LOGGER.debug("Getting SSH information.");
-            LOGGER.debug(sshInfo);
+            publicIpInstance = parseJSONStringToMap(response);
+            LOGGER.debug("Getting Public Ip instance.");
+
+            LOGGER.debug(publicIpInstance);
         } catch (Exception e) {
             LOGGER.error(errorMessage, e);
         }
-        return sshInfo;
+        return publicIpInstance;
     }
 
     public Map<String, Object> getComputeInstance(String computeOrderId) throws Exception {
         final String requestUrl = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_COMPUTE + "/" + computeOrderId;
         final String instanceInformation = this.doRequest(HttpWrapper.HTTP_METHOD_GET, requestUrl, new ArrayList<>());
 
-        return parseAttributes(instanceInformation);
+        return parseJSONStringToMap(instanceInformation);
     }
 
     public void deleteFogbowResource(FogbowResource fogbowResource) throws Exception {
@@ -200,23 +206,23 @@ public class RASRequestsHelper {
 
 
     private Map<String, Object> getAllImages(){
-        String cloudName = "cloud4";
-        String memberId = this.properties.getProperty(AppPropertiesConstants.RAS_MEMBER_ID);
+        final String cloudName = "cloud4";
+        final String memberId = this.properties.getProperty(AppPropertiesConstants.RAS_MEMBER_ID);
         Map<String, Object> imagesMap = new HashMap<>();
         final String requestUrl = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_IMAGES + "/"
                 + memberId + "/" + cloudName;
-        final String errorMessage = "Error while getting info about images of member with id" + cloudName;
+        final String errorMessage = "Error while getting info about images of member with id :" + memberId;
 
         try {
-            String response = this.doRequest(HttpWrapper.HTTP_METHOD_GET, requestUrl, new LinkedList<>());
-            imagesMap = parseAttributes(response);
+            final String response = this.doRequest(HttpWrapper.HTTP_METHOD_GET, requestUrl, new LinkedList<>());
+            imagesMap = parseJSONStringToMap(response);
         } catch (Exception e) {
             LOGGER.error(errorMessage, e);
         }
         return imagesMap;
     }
 
-    private Map<String, Object> parseAttributes(String response) throws ScriptException {
+    private Map<String, Object> parseJSONStringToMap(String response) throws ScriptException {
         ScriptEngine engine;
         ScriptEngineManager sem = new ScriptEngineManager();
         engine = sem.getEngineByName("javascript");
@@ -224,7 +230,7 @@ public class RASRequestsHelper {
         final String script = "Java.asJSONCompatible(" + response + ")";
         Object result = engine.eval(script);
 
-        Map<String, Object> contents = (Map<String, Object>) result;
+        final Map<String, Object> contents = (Map<String, Object>) result;
 
         return new HashMap<>(contents);
     }

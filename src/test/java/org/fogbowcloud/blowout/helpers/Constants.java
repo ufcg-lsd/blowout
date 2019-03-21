@@ -6,8 +6,8 @@ public class Constants {
 
     public static final String FAKE_UUID = "1234";
     public static final String FAKE_CLOUD_NAME = "fake-cloud-name";
-    public static final String FAKE_IMAGE_FLAVOR_NAME = "fake-image-flavor-name";
-    public static final String FAKE_IMAGE_FLAVOR_ID = "fake-image-flavor-id";
+    public static final String FAKE_COMPUTE_IMAGE_FLAVOR_NAME = "fake-compute-flavor-name";
+    public static final String FAKE_COMPUTE_IMAGE_FLAVOR_ID = "fake-image-flavor-id";
     public static final String FAKE_FOGBOW_USER_NAME = "fake-fogbow-user-name";
     public static final String FAKE_PUBLIC_KEY = "fake-public-key";
     public static final String FAKE_PRIVATE_KEY_FILE_PATH = "fake-private-key-file-path";
@@ -19,7 +19,10 @@ public class Constants {
     public static final String FAKE_COMMAND = "echo fake-echo";
     public static final String FAKE_COMPUTE_ORDER_ID = "fake-compute-order-id";
     public static final String FAKE_PUBLIC_IP_ORDER_ID = "fake-public-ip-order-id";
+    public static final String FAKE_RAS_BASE_URL = "fake-ras-base-url";
+    public static final String FAKE_RAS_MEMBER_ID = "fake-ras-member-id";
 
+    public static final String JSON_CONTENT_TYPE = "application/json";
     public static final String JSON_KEY_PRIVATE_KEY_PATH = "privateKeyPath";
     public static final String JSON_KEY_CLOUD_NAME = "cloudName";
     public static final String JSON_KEY_PUBLIC_KEY = "publicKey";
@@ -76,4 +79,10 @@ public class Constants {
             "\"type\": \"REMOTE\"" +
             "}";
 
+    public static final String JSON_BODY_RAS_PUBLIC_IP_INSTANCE_RESPONSE = "{\r\n  \"cloudName\": \"string\",\r\n " +
+            " \"computeId\": \"string\",\r\n  \"computeName\": \"string\",\r\n  \"id\": \"string\",\r\n  \"ip\": " +
+            "\"string\",\r\n  \"provider\": \"string\",\r\n  \"state\": \"DISPATCHED\"\r\n}";
+
+
+    public static final String TEST_CONFIG_FILE_PATH = "src/test/resources/blowout-test.conf";
 }

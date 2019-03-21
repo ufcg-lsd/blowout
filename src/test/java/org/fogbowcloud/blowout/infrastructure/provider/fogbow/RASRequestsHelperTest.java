@@ -1,31 +1,41 @@
 package org.fogbowcloud.blowout.infrastructure.provider.fogbow;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.*;
 
-import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
+import io.specto.hoverfly.junit.rule.HoverflyRule;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.helpers.Constants;
+import org.fogbowcloud.blowout.helpers.HoverflyRules;
 import org.fogbowcloud.blowout.infrastructure.exception.RequestResourceException;
+import org.fogbowcloud.blowout.infrastructure.token.AbstractTokenUpdatePlugin;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Test;
-import org.mockito.Mockito;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 public class RASRequestsHelperTest {
 	private RASRequestsHelper rasRequestsHelper;
+	private AbstractTokenUpdatePlugin abstractTokenUpdatePlugin;
 	private Specification spec;
+	private Properties properties;
 
-	// setUp
-	// exercise
-	// verify
-	// setDown
+	@ClassRule
+	public static HoverflyRule hoverflyRule = HoverflyRule.inSimulationMode(HoverflyRules.simulationSource);
 
 	@Before
-	public void setUp() {
-		this.rasRequestsHelper = mock(RASRequestsHelper.class);
+	public void setUp() throws IOException {
+		this.abstractTokenUpdatePlugin = mock(AbstractTokenUpdatePlugin.class);
+		this.properties = new Properties();
+		this.properties.load(new FileInputStream(Constants.TEST_CONFIG_FILE_PATH));
+		this.rasRequestsHelper = new RASRequestsHelper(this.properties, this.abstractTokenUpdatePlugin,
+				this.properties.getProperty(Constants.FAKE_RAS_BASE_URL));
 		this.spec = mock(Specification.class);
 	}
 
@@ -73,6 +83,7 @@ public class RASRequestsHelperTest {
 
 	@Test
 	public void testGetPublicIpInstanceSuccess() throws RequestResourceException, InterruptedException {
+
 		when(this.rasRequestsHelper.createCompute(this.spec))
 				.thenReturn(Constants.FAKE_COMPUTE_ORDER_ID);
 
@@ -87,17 +98,40 @@ public class RASRequestsHelperTest {
 				.thenReturn(new HashMap<>());
 
 		Map<String, Object> publicIpInstance = this.rasRequestsHelper.getPublicIpInstance(fakePublicIpOrderId);
+
+		verify(this.rasRequestsHelper, times(Constants.WANTED_NUMBER_OF_INVOCATIONS))
+				.getPublicIpInstance(fakePublicIpOrderId);
+
+		assertNotNull(publicIpInstance);
+		System.out.println(publicIpInstance.toString());
+
+		final int publicIpInstancePropQuantityExpected = 7;
+		final int publicIpInstancePropQuantity = publicIpInstance.keySet().size();
+
+		assertEquals(publicIpInstancePropQuantityExpected, publicIpInstancePropQuantity);
 	}
 
 	@Test
 	public void testGetComputeInstanceSuccess() {
+		// setUp
+		// exercise
+		// verify
+		// setDown
 	}
 
 	@Test
 	public void testDeleteFogbowResourceSuccess() {
+		// setUp
+		// exercise
+		// verify
+		// setDown
 	}
 
 	@Test
 	public void testMakeJsonBodySuccess() {
+		// setUp
+		// exercise
+		// verify
+		// setDown
 	}
 }

@@ -32,7 +32,7 @@ public class FogbowRequirementsHelperTest {
 		this.generateDefaultProperties();
 
 		this.requirements = new HashMap<>();
-		this.spec = new Specification(FAKE_CLOUD_NAME, FAKE_IMAGE_FLAVOR_NAME, FAKE_FOGBOW_USER_NAME,
+		this.spec = new Specification(FAKE_CLOUD_NAME, FAKE_COMPUTE_IMAGE_FLAVOR_NAME, FAKE_FOGBOW_USER_NAME,
 				FAKE_PUBLIC_KEY, FAKE_PRIVATE_KEY_FILE_PATH, USER_DATA_FILE, USER_DATA_TYPE);
 		this.suitableResource = mock(FogbowResource.class);
 		doReturn("request_01").when(this.suitableResource).getId();
