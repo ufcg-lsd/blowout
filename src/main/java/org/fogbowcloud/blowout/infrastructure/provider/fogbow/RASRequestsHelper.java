@@ -159,7 +159,7 @@ public class RASRequestsHelper {
         JSONObject json = new JSONObject();
         String userName = specification.getUsername();
 
-        if (userName.trim().isEmpty()) {
+        if (userName == null || userName.trim().isEmpty()) {
             userName = "Iguassu";
         }
 

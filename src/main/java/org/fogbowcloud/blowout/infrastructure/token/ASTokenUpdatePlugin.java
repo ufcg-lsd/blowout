@@ -11,6 +11,7 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
+import org.fogbowcloud.blowout.core.constants.AppPropertiesConstants;
 import org.fogbowcloud.blowout.core.constants.FogbowConstants;
 import org.fogbowcloud.blowout.core.exception.BlowoutException;
 
@@ -91,7 +92,7 @@ public class ASTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
     }
 
     private String getPublicKeyRAS() throws Exception {
-        final String requestUrl = this.asBaseUrl + "/" + FogbowConstants.RAS_ENDPOINT_PUBLIC_KEY;
+        final String requestUrl = this.properties.getProperty(RAS_BASE_URL) + "/" + FogbowConstants.RAS_ENDPOINT_PUBLIC_KEY;
         HttpUriRequest request = new HttpGet(requestUrl);
         HttpResponse response = HttpClients.createMinimal().execute(request);
         HttpEntity entity = response.getEntity();
