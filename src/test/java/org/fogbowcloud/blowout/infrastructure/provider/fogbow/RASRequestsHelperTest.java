@@ -9,7 +9,7 @@ import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.helpers.Constants;
 import org.fogbowcloud.blowout.helpers.HoverflyRules;
 import org.fogbowcloud.blowout.infrastructure.exception.RequestResourceException;
-import org.fogbowcloud.blowout.infrastructure.token.ASTokenUpdatePlugin;
+import org.fogbowcloud.blowout.infrastructure.token.KeystoneTokenUpdatePlugin;
 import org.fogbowcloud.blowout.infrastructure.token.AbstractTokenUpdatePlugin;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -32,7 +32,7 @@ public class RASRequestsHelperTest {
 	public void setUp() throws IOException {
 		Properties properties = new Properties();
 		properties.load(new FileInputStream(Constants.FILE_PATH_TESTS_CONFIG));
-		AbstractTokenUpdatePlugin abstractTokenUpdatePlugin = new ASTokenUpdatePlugin(properties);
+		AbstractTokenUpdatePlugin abstractTokenUpdatePlugin = new KeystoneTokenUpdatePlugin(properties);
 
 		this.rasRequestsHelper = new RASRequestsHelper(properties, abstractTokenUpdatePlugin);
 		this.spec = mock(Specification.class);

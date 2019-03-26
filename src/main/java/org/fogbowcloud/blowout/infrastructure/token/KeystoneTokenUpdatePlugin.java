@@ -2,7 +2,6 @@ package org.fogbowcloud.blowout.infrastructure.token;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
@@ -11,7 +10,6 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
-import org.fogbowcloud.blowout.core.constants.AppPropertiesConstants;
 import org.fogbowcloud.blowout.core.constants.FogbowConstants;
 import org.fogbowcloud.blowout.core.exception.BlowoutException;
 
@@ -32,9 +30,9 @@ import java.io.UnsupportedEncodingException;
 import java.util.LinkedList;
 import java.util.Properties;
 
-public class ASTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
+public class KeystoneTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
 
-    private static final Logger LOGGER = Logger.getLogger(ASTokenUpdatePlugin.class);
+    private static final Logger LOGGER = Logger.getLogger(KeystoneTokenUpdatePlugin.class);
 
     private static final String FOGBOW_USERNAME = AS_TOKEN_PREFIX + AS_TOKEN_USERNAME;
     private static final String FOGBOW_PASSWORD = AS_TOKEN_PREFIX + AS_TOKEN_PASSWORD;
@@ -47,7 +45,7 @@ public class ASTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
     private final String projectName;
     private final String domain;
 
-    public ASTokenUpdatePlugin(Properties properties) {
+    public KeystoneTokenUpdatePlugin(Properties properties) {
         super(properties);
         this.userName = super.properties.getProperty(FOGBOW_USERNAME);
         this.password = super.properties.getProperty(FOGBOW_PASSWORD);
