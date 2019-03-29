@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
+import org.fogbowcloud.blowout.helpers.Constants;
 import org.fogbowcloud.blowout.scheduler.DefaultScheduler;
 import org.fogbowcloud.blowout.core.model.Command;
 import org.fogbowcloud.blowout.core.model.Specification;
@@ -51,12 +52,12 @@ public class TaskMonitorTest {
 	@Test
 	public void testGetTaskStateCorrect() {
 		// set up
-		TaskImpl taskImpl = new TaskImpl(FAKE_TASK_ID, this.spec, FAKE_UUID);
+		TaskImpl taskImpl = new TaskImpl(Constants.FakeData.TASK_ID, this.spec, Constants.FakeData.UUID);
 		taskImpl.setState(TaskState.RUNNING);
 		
 		List<Command> commandListMock = mock(ArrayList.class);
 		
-		TaskProcessImpl taskProcessImpl = new TaskProcessImpl(taskImpl.getId(), commandListMock, this.spec, FAKE_UUID);
+		TaskProcessImpl taskProcessImpl = new TaskProcessImpl(taskImpl.getId(), commandListMock, this.spec,Constants.FakeData.UUID);
 		taskProcessImpl.setTaskState(TaskState.RUNNING);
 		
 		Map<Task, TaskProcess> runningTasks = mock(Map.class);
@@ -76,7 +77,7 @@ public class TaskMonitorTest {
 	@Test
 	public void testGetTaskStateCompleted() {
 		// set up
-		TaskImpl taskImpl = new TaskImpl(FAKE_TASK_ID, this.spec, FAKE_UUID);
+		TaskImpl taskImpl = new TaskImpl(Constants.FakeData.TASK_ID, this.spec, Constants.FakeData.UUID);
 		taskImpl.setState(TaskState.FINISHED);
 		taskImpl.finish();
 		
@@ -97,7 +98,7 @@ public class TaskMonitorTest {
 	@Test
 	public void testGetTaskStateReady() {
 		// set up
-		TaskImpl taskImpl = new TaskImpl(FAKE_TASK_ID, this.spec, FAKE_UUID);
+		TaskImpl taskImpl = new TaskImpl(Constants.FakeData.TASK_ID, this.spec, Constants.FakeData.UUID);
 		taskImpl.setState(TaskState.READY);
 		
 		Map<Task, TaskProcess> runningTasks = mock(Map.class);
@@ -123,20 +124,22 @@ public class TaskMonitorTest {
 		DefaultBlowoutPool blowoutPool = new DefaultBlowoutPool();
 		blowoutPool.start(infraManager, defaultScheduler);
 
-		TaskImpl taskOne = new TaskImpl(FAKE_TASK_ID, this.spec, FAKE_UUID);
+		TaskImpl taskOne = new TaskImpl(Constants.FakeData.TASK_ID, this.spec, Constants.FakeData.UUID);
 		
 		List<Task> taskList = new ArrayList<Task>();
 		taskList.add(taskOne);
 		
 		blowoutPool.addTasks(taskList);
 		
-		AbstractResource resourceOne = new FogbowResource(FAKE_RESOURCE_ID, FAKE_ORDER_ID, this.spec);
+		AbstractResource resourceOne = new FogbowResource(Constants.FakeData.RESOURCE_ID,
+				Constants.FakeData.ORDER_ID, this.spec);
 		
 		blowoutPool.addResource(resourceOne);
 		
 		List<Command> commandListMock = mock(ArrayList.class);
 		
-		TaskProcessImpl taskProcessOne = new TaskProcessImpl(taskOne.getId(), commandListMock, this.spec, FAKE_UUID);
+		TaskProcessImpl taskProcessOne = new TaskProcessImpl(taskOne.getId(), commandListMock, this.spec,
+				Constants.FakeData.UUID);
 		
 		taskProcessOne.setResource(resourceOne);
 		
@@ -177,9 +180,9 @@ public class TaskMonitorTest {
 		TaskProcess fakeProcess = mock(TaskProcess.class);
 		doReturn(TaskState.FAILED).when(fakeProcess).getTaskState();
 		AbstractResource fakeResource = mock(AbstractResource.class);
-		doReturn(FAKE_TASK_ID).when(fakeTask).getId();
-		doReturn(FAKE_TASK_ID).when(fakeProcess).getTaskId();
-		doReturn(fakeTask).when(this.taskMon).getTaskById(FAKE_TASK_ID);
+		doReturn(Constants.FakeData.TASK_ID).when(fakeTask).getId();
+		doReturn(Constants.FakeData.TASK_ID).when(fakeProcess).getTaskId();
+		doReturn(fakeTask).when(this.taskMon).getTaskById(Constants.FakeData.TASK_ID);
 		doReturn(fakeResource).when(fakeProcess).getResource();
 		List<TaskProcess> runningPrc = new ArrayList<>();
 		runningPrc.add(fakeProcess);
@@ -200,9 +203,9 @@ public class TaskMonitorTest {
 		TaskProcess fakeProcess = mock(TaskProcess.class);
 		doReturn(TaskState.FINISHED).when(fakeProcess).getTaskState();
 		AbstractResource fakeResource = mock(AbstractResource.class);
-		doReturn(FAKE_TASK_ID).when(fakeTask).getId();
-		doReturn(FAKE_TASK_ID).when(fakeProcess).getTaskId();
-		doReturn(fakeTask).when(this.taskMon).getTaskById(FAKE_TASK_ID);
+		doReturn(Constants.FakeData.TASK_ID).when(fakeTask).getId();
+		doReturn(Constants.FakeData.TASK_ID).when(fakeProcess).getTaskId();
+		doReturn(fakeTask).when(this.taskMon).getTaskById(Constants.FakeData.TASK_ID);
 		doReturn(fakeResource).when(fakeProcess).getResource();
 		List<TaskProcess> runningPrc = new ArrayList<>();
 		runningPrc.add(fakeProcess);
@@ -222,8 +225,8 @@ public class TaskMonitorTest {
 		Task fakeTask = mock(Task.class);
 		TaskProcess fakeProcess = mock(TaskProcess.class);
 		AbstractResource fakeResource = mock(AbstractResource.class);
-		doReturn(FAKE_TASK_ID).when(fakeTask).getId();
-		doReturn(FAKE_TASK_ID).when(fakeProcess).getTaskId();
+		doReturn(Constants.FakeData.TASK_ID).when(fakeTask).getId();
+		doReturn(Constants.FakeData.TASK_ID).when(fakeProcess).getTaskId();
 		List<TaskProcess> runningPrc = new ArrayList<TaskProcess>();
 		runningPrc.add(fakeProcess);
 		doReturn(runningPrc).when(this.taskMon).getRunningProcesses();

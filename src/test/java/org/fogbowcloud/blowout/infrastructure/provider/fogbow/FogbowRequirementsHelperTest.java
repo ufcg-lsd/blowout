@@ -5,7 +5,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.fogbowcloud.blowout.helpers.Constants.*;
+import static org.fogbowcloud.blowout.helpers.Constants.FakeData.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +13,7 @@ import java.util.Properties;
 
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.constants.AppPropertiesConstants;
+import org.fogbowcloud.blowout.helpers.Constants;
 import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
 import org.fogbowcloud.blowout.infrastructure.model.ResourceHelperTest;
 import org.junit.After;
@@ -32,8 +33,8 @@ public class FogbowRequirementsHelperTest {
 		this.generateDefaultProperties();
 
 		this.requirements = new HashMap<>();
-		this.spec = new Specification(FAKE_CLOUD_NAME, FAKE_IMAGE_FLAVOR_NAME, FAKE_FOGBOW_USER_NAME,
-				FAKE_PUBLIC_KEY, FAKE_PRIVATE_KEY_FILE_PATH, USER_DATA_FILE, USER_DATA_TYPE);
+		this.spec = new Specification(CLOUD_NAME, COMPUTE_IMAGE_FLAVOR_NAME, FOGBOW_USER_NAME,
+				PUBLIC_KEY, PRIVATE_KEY_FILE_PATH, USER_DATA_FILE, USER_DATA_TYPE);
 		this.suitableResource = mock(FogbowResource.class);
 		doReturn("request_01").when(this.suitableResource).getId();
 		when(this.suitableResource.match(Mockito.any(Specification.class))).thenCallRealMethod();
@@ -96,7 +97,7 @@ public class FogbowRequirementsHelperTest {
 
 		suitableResource = ResourceHelperTest.generateMockResource(requestId, resourceMetadata, true);
 		
-		assertTrue(FogbowRequirementsHelper.matches(suitableResource, FOGBOW_REQUIREMENT_A));
+		assertTrue(FogbowRequirementsHelper.matches(suitableResource, Constants.FOGBOW_REQUIREMENT_A));
 	}
 
 	@Test

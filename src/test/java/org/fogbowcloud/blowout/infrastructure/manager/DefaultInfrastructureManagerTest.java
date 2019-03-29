@@ -4,6 +4,8 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.fogbowcloud.blowout.helpers.Constants.*;
+import org.fogbowcloud.blowout.helpers.Constants.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,62 +25,54 @@ import org.fogbowcloud.blowout.infrastructure.monitor.ResourceMonitor;
 import org.fogbowcloud.blowout.infrastructure.provider.InfrastructureProvider;
 import org.fogbowcloud.blowout.core.model.resource.AbstractResource;
 import org.fogbowcloud.blowout.pool.ResourceStateHelper;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
 
-import static org.fogbowcloud.blowout.helpers.Constants.*;
-
 public class DefaultInfrastructureManagerTest {
 	private ResourceMonitor resourceMonitor;
 	private InfrastructureProvider infraProvider;
 	private InfrastructureManager defaultInfrastructureManager;
+	private Specification spec;
 	
 	@Before
 	public void setUp() throws Exception {
-		infraProvider = Mockito.mock(InfrastructureProvider.class);
-		resourceMonitor = Mockito.mock(ResourceMonitor.class);
-		defaultInfrastructureManager = Mockito.spy(new DefaultInfrastructureManager(infraProvider, resourceMonitor));
+		this.infraProvider = Mockito.mock(InfrastructureProvider.class);
+		this.resourceMonitor = Mockito.mock(ResourceMonitor.class);
+		this.defaultInfrastructureManager = Mockito.spy(new DefaultInfrastructureManager(infraProvider, resourceMonitor));
+		this.spec = new Specification(FakeData.CLOUD_NAME, FakeData.COMPUTE_IMAGE_FLAVOR_NAME, FakeData.FOGBOW_USER_NAME,
+				FakeData.PUBLIC_KEY, FakeData.PRIVATE_KEY_FILE_PATH);
 	}
-
-	@After
-	public void setDown() throws Exception {}
 
 	@Test
 	public void testActOneReadyTaskNoResource() throws Exception {
-		Specification spec = new Specification(FAKE_CLOUD_NAME,
-				FAKE_IMAGE_FLAVOR_NAME, FAKE_FOGBOW_USER_NAME, FAKE_PUBLIC_KEY, FAKE_PRIVATE_KEY_FILE_PATH);
-
-		Task task = new TaskImpl(FAKE_TASK_ID, spec, FAKE_UUID);
+		Task task = new TaskImpl(FakeData.TASK_ID, this.spec, FakeData.UUID);
 		
 		List<Task> tasks = new ArrayList<>();
 		tasks.add(task);
 		List<AbstractResource> resources = new ArrayList<>();
 		
-		doReturn(FAKE_RESOURCE_ID).when(infraProvider).requestResource(spec);
+		doReturn(FakeData.RESOURCE_ID).when(this.infraProvider).requestResource(this.spec);
 		doReturn(new ArrayList<AbstractResource>()).when(resourceMonitor).getPendingResources();
 		
 		defaultInfrastructureManager.act(resources, tasks);
 		verify(infraProvider, times(1)).requestResource(spec);
-		verify(resourceMonitor, times(1)).addPendingResource(FAKE_RESOURCE_ID, spec);
+		verify(resourceMonitor, times(1)).addPendingResource(FakeData.RESOURCE_ID, spec);
 		
 	}
 	
 	@Test
 	public void testActThreeReadyTaskNoResource() throws Exception {
-		Specification spec = new Specification(FAKE_CLOUD_NAME,
-				FAKE_IMAGE_FLAVOR_NAME, FAKE_FOGBOW_USER_NAME, FAKE_PUBLIC_KEY, FAKE_PRIVATE_KEY_FILE_PATH);
 
-		Task taskA = new TaskImpl(FAKE_TASK_ID, spec, FAKE_UUID);
-		Task taskB = new TaskImpl(FAKE_TASK_ID+ POSTFIX_B, spec, FAKE_UUID);
-		Task taskC = new TaskImpl(FAKE_TASK_ID+POSTFIX_C, spec, FAKE_UUID);
+		Task taskA = new TaskImpl(FakeData.TASK_ID, spec, FakeData.UUID);
+		Task taskB = new TaskImpl(FakeData.TASK_ID+ POSTFIX_B, spec, FakeData.UUID);
+		Task taskC = new TaskImpl(FakeData.TASK_ID+POSTFIX_C, spec, FakeData.UUID);
 		
 		final Queue<String> resourcesToReturn = new LinkedList<>();
-		resourcesToReturn.add(FAKE_RESOURCE_ID);
-		resourcesToReturn.add(FAKE_RESOURCE_ID+POSTFIX_B);
-		resourcesToReturn.add(FAKE_RESOURCE_ID+POSTFIX_C);
+		resourcesToReturn.add(FakeData.RESOURCE_ID);
+		resourcesToReturn.add(FakeData.RESOURCE_ID+POSTFIX_B);
+		resourcesToReturn.add(FakeData.RESOURCE_ID+POSTFIX_C);
 		
 		List<Task> tasks = new ArrayList<>();
 		tasks.add(taskA);
@@ -93,25 +87,22 @@ public class DefaultInfrastructureManagerTest {
 		
 		defaultInfrastructureManager.act(resources, tasks);
 		verify(infraProvider, times(3)).requestResource(spec);
-		verify(resourceMonitor, times(1)).addPendingResource(FAKE_RESOURCE_ID, spec);
+		verify(resourceMonitor, times(1)).addPendingResource(FakeData.RESOURCE_ID, spec);
 		verify(resourceMonitor, times(1))
-				.addPendingResource(FAKE_RESOURCE_ID+POSTFIX_B, spec);
+				.addPendingResource(FakeData.RESOURCE_ID+POSTFIX_B, spec);
 		verify(resourceMonitor, times(1))
-				.addPendingResource(FAKE_RESOURCE_ID+POSTFIX_C, spec);
+				.addPendingResource(FakeData.RESOURCE_ID+POSTFIX_C, spec);
 	}
 	
 	@Test
 	public void testActOneReadyTaskOnePendingResource() throws Exception {
-		Specification spec = new Specification(FAKE_CLOUD_NAME,
-				FAKE_IMAGE_FLAVOR_NAME, FAKE_FOGBOW_USER_NAME,FAKE_PUBLIC_KEY,FAKE_PRIVATE_KEY_FILE_PATH);
-
-		Task task = new TaskImpl(FAKE_TASK_ID, spec, FAKE_UUID);
+		Task task = new TaskImpl(FakeData.TASK_ID, spec, FakeData.UUID);
 		
 		List<Task> tasks = new ArrayList<>();
 		tasks.add(task);
 		List<AbstractResource> resources = new ArrayList<>();
 		List<String> pendingResources = new ArrayList<>();
-		pendingResources.add(FAKE_RESOURCE_ID);
+		pendingResources.add(FakeData.RESOURCE_ID);
 		List<Specification> pendingSpecs = new ArrayList<>();
 		pendingSpecs.add(spec);
 		Map<Specification, Integer> pendingRequests = new HashMap<>();
@@ -129,18 +120,15 @@ public class DefaultInfrastructureManagerTest {
 	
 	@Test
 	public void testActTwoReadyTasksOnePendingResource() throws Exception {
-		Specification spec = new Specification(FAKE_CLOUD_NAME,
-				FAKE_IMAGE_FLAVOR_NAME,FAKE_FOGBOW_USER_NAME,FAKE_PUBLIC_KEY,FAKE_PRIVATE_KEY_FILE_PATH);
-
-		Task taskA = new TaskImpl(FAKE_TASK_ID, spec, FAKE_UUID);
-		Task taskB = new TaskImpl(FAKE_TASK_ID+POSTFIX_B, spec, FAKE_UUID+POSTFIX_B);
+		Task taskA = new TaskImpl(FakeData.TASK_ID, this.spec, FakeData.UUID);
+		Task taskB = new TaskImpl(FakeData.TASK_ID+POSTFIX_B, this.spec, FakeData.UUID+POSTFIX_B);
 		
 		List<Task> tasks = new ArrayList<>();
 		tasks.add(taskA);
 		tasks.add(taskB);
 		List<AbstractResource> resources = new ArrayList<>();
 		List<String> pendingResources = new ArrayList<>();
-		pendingResources.add(FAKE_RESOURCE_ID);
+		pendingResources.add(FakeData.RESOURCE_ID);
 		List<Specification> pendingSpecs = new ArrayList<>();
 		pendingSpecs.add(spec);
 		Map<Specification, Integer> pendingRequests = new HashMap<>();
@@ -158,14 +146,12 @@ public class DefaultInfrastructureManagerTest {
 	
 	@Test
 	public void testActOnReadyTasksOnePendingResourceDiffSpec() throws Exception {
-		Specification specA = new Specification(FAKE_CLOUD_NAME,
-				FAKE_IMAGE_FLAVOR_NAME,FAKE_FOGBOW_USER_NAME, FAKE_PUBLIC_KEY, FAKE_PRIVATE_KEY_FILE_PATH);
-		Specification specB = new Specification(FAKE_CLOUD_NAME+POSTFIX_B,
-				FAKE_IMAGE_FLAVOR_NAME +POSTFIX_B, FAKE_FOGBOW_USER_NAME+POSTFIX_B,
-				FAKE_PUBLIC_KEY+POSTFIX_B, FAKE_PRIVATE_KEY_FILE_PATH+POSTFIX_B);
+		Specification specB = new Specification(FakeData.CLOUD_NAME+POSTFIX_B,
+				FakeData.COMPUTE_IMAGE_FLAVOR_NAME +POSTFIX_B, FakeData.FOGBOW_USER_NAME+POSTFIX_B,
+				FakeData.PUBLIC_KEY+POSTFIX_B, FakeData.PRIVATE_KEY_FILE_PATH+POSTFIX_B);
 
-		Task taskA = new TaskImpl(FAKE_TASK_ID, specA, FAKE_UUID);
-		AbstractResource pendingResource = new FogbowResource(FAKE_RESOURCE_ID, FAKE_ORDER_ID, specB);
+		Task taskA = new TaskImpl(FakeData.TASK_ID, spec, FakeData.UUID);
+		AbstractResource pendingResource = new FogbowResource(FakeData.RESOURCE_ID, FakeData.ORDER_ID, specB);
 		
 		List<Task> tasks = new ArrayList<>();
 		tasks.add(taskA);
@@ -179,43 +165,29 @@ public class DefaultInfrastructureManagerTest {
 		doReturn(pendingRequests).when(resourceMonitor).getPendingRequests();
 		
 		defaultInfrastructureManager.act(resources, tasks);
-		verify(infraProvider, times(1)).requestResource(specA);
+		verify(infraProvider, times(1)).requestResource(spec);
 		verify(resourceMonitor, times(1))
 				.addPendingResource(Mockito.any(String.class), Mockito.any(Specification.class));
 	}
 	
 	@Test
 	public void testActOnReadyTasksOneIdleResource() throws Exception {
-		final String image = "image";
-		final String userName = "userName";
-		final String publicKey = "publicKey";
-		final String privateKey = "privateKey";
-		final String fogbowRequirement = "Glue2vCPU >= 1 && Glue2RAM >= 1024 ";
-		final String userDataFile = "scripts/lvl-user-data.sh";
-		final String userDataType = "text/x-shellscript";
-		
-		final String coreSize = "1";
-		final String menSize = "1024";
-		final String diskSize = "20";
-		final String location = "edu.ufcg.lsd.cloud_1s";
 
-		Specification specA =
-				new Specification(FAKE_CLOUD_NAME, image, userName, publicKey, privateKey, userDataFile, userDataType);
-		specA.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, fogbowRequirement);
+		spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, FOGBOW_REQUIREMENT_A);
 		
-		AbstractResource idleResource = new FogbowResource(FAKE_RESOURCE_ID, FAKE_ORDER_ID, specA);
-		idleResource.putMetadata(BlowoutConstants.METADATA_IMAGE_NAME, FAKE_IMAGE_FLAVOR_NAME);
-		idleResource.putMetadata(BlowoutConstants.ENV_PRIVATE_KEY_FILE, FAKE_PRIVATE_KEY_FILE_PATH);
+		AbstractResource idleResource = new FogbowResource(FakeData.RESOURCE_ID,FakeData.ORDER_ID, spec);
+		idleResource.putMetadata(BlowoutConstants.METADATA_IMAGE_NAME, FakeData.COMPUTE_IMAGE_FLAVOR_NAME);
+		idleResource.putMetadata(BlowoutConstants.ENV_PRIVATE_KEY_FILE, FakeData.PRIVATE_KEY_FILE_PATH);
 		ResourceStateHelper.changeResourceToState(idleResource, ResourceState.IDLE);
 		
-		idleResource.putMetadata(BlowoutConstants.METADATA_IMAGE_NAME, image);
-		idleResource.putMetadata(BlowoutConstants.METADATA_PUBLIC_KEY, publicKey);
-		idleResource.putMetadata(BlowoutConstants.METADATA_VCPU, coreSize);
-		idleResource.putMetadata(BlowoutConstants.METADATA_MEM_SIZE, menSize);
-		idleResource.putMetadata(BlowoutConstants.METADATA_DISK_SIZE, diskSize);
-		idleResource.putMetadata(BlowoutConstants.METADATA_LOCATION, location);
+		idleResource.putMetadata(BlowoutConstants.METADATA_IMAGE_NAME, FakeData.COMPUTE_IMAGE_FLAVOR_NAME);
+		idleResource.putMetadata(BlowoutConstants.METADATA_PUBLIC_KEY, FakeData.PUBLIC_KEY);
+		idleResource.putMetadata(BlowoutConstants.METADATA_VCPU, FakeData.CORE_SIZE);
+		idleResource.putMetadata(BlowoutConstants.METADATA_MEM_SIZE, FakeData.MEM_SIZE);
+		idleResource.putMetadata(BlowoutConstants.METADATA_DISK_SIZE, FakeData.DISK_SIZE);
+		idleResource.putMetadata(BlowoutConstants.METADATA_LOCATION, FakeData.LOCATION);
 		
-		Task taskA = new TaskImpl(FAKE_TASK_ID, specA, FAKE_UUID);
+		Task taskA = new TaskImpl(FakeData.TASK_ID, spec, FakeData.UUID);
 		List<Task> tasks = new ArrayList<>();
 		tasks.add(taskA);
 		List<AbstractResource> resources = new ArrayList<>();
@@ -225,23 +197,20 @@ public class DefaultInfrastructureManagerTest {
 		doReturn(pendingResources).when(resourceMonitor).getPendingResources();
 		
 		defaultInfrastructureManager.act(resources, tasks);
-		verify(infraProvider, times(0)).requestResource(specA);
+		verify(infraProvider, times(0)).requestResource(spec);
 		verify(resourceMonitor, times(0))
 				.addPendingResource(Mockito.any(String.class), Mockito.any(Specification.class));
-		
 	}
 	
 	@Test
 	public void testActOnReadyTasksOneIdleResourceDiffSpec() throws Exception {
-		
-		Specification specA = new Specification(FAKE_CLOUD_NAME, FAKE_IMAGE_FLAVOR_NAME,
-				FAKE_FOGBOW_USER_NAME, FAKE_PUBLIC_KEY, FAKE_PRIVATE_KEY_FILE_PATH);
-		Specification specB = new Specification(FAKE_CLOUD_NAME+POSTFIX_B,
-				FAKE_IMAGE_FLAVOR_NAME +POSTFIX_B, FAKE_FOGBOW_USER_NAME+POSTFIX_B,
-				FAKE_PUBLIC_KEY+POSTFIX_B, FAKE_PRIVATE_KEY_FILE_PATH+POSTFIX_B);
 
-		Task taskA = new TaskImpl(FAKE_TASK_ID, specA, FAKE_UUID);
-		AbstractResource idleResource = new FogbowResource(FAKE_RESOURCE_ID, FAKE_ORDER_ID, specB);
+		Specification specB = new Specification(FakeData.CLOUD_NAME+POSTFIX_B,
+				FakeData.COMPUTE_IMAGE_FLAVOR_NAME +POSTFIX_B, FakeData.FOGBOW_USER_NAME+POSTFIX_B,
+				FakeData.PUBLIC_KEY+POSTFIX_B, FakeData.PRIVATE_KEY_FILE_PATH+POSTFIX_B);
+
+		Task taskA = new TaskImpl(FakeData.TASK_ID, spec, FakeData.UUID);
+		AbstractResource idleResource = new FogbowResource(FakeData.RESOURCE_ID, FakeData.ORDER_ID, specB);
 		ResourceStateHelper.changeResourceToState(idleResource, ResourceState.IDLE);
 		
 		List<Task> tasks = new ArrayList<>();
@@ -253,7 +222,7 @@ public class DefaultInfrastructureManagerTest {
 		doReturn(pendingResources).when(resourceMonitor).getPendingResources();
 		
 		defaultInfrastructureManager.act(resources, tasks);
-		verify(infraProvider, times(1)).requestResource(specA);
+		verify(infraProvider, times(1)).requestResource(spec);
 		verify(resourceMonitor, times(1))
 				.addPendingResource(Mockito.any(String.class), Mockito.any(Specification.class));
 	}

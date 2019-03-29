@@ -1,4 +1,5 @@
 package org.fogbowcloud.blowout.core.model;
+import org.fogbowcloud.blowout.helpers.Constants;
 import org.fogbowcloud.blowout.helpers.TestsUtils;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -14,12 +15,12 @@ public class CommandTest {
 
 	@Before
 	public void setUp() {
-		this.command = new Command(FAKE_COMMAND, COMMAND_TYPE_DEFAULT);
+		this.command = new Command(Constants.FakeData.COMMAND, COMMAND_TYPE_DEFAULT);
 	}
 
 	@Test
 	public void testClone() {
-		assertTrue(TestsUtils.isJSONValid(JSON_BODY_COMMAND));
+		assertTrue(TestsUtils.isJSONValid(Constants.JSON.Body.COMMAND));
 		assertEquals(this.command.getState(), Command.State.QUEUED);
 
 
@@ -35,17 +36,17 @@ public class CommandTest {
 
 	@Test
 	public void testToJSON() {
-		assertTrue(TestsUtils.isJSONValid(JSON_BODY_COMMAND));
-		assertTrue(TestsUtils.isJSONValid(JSON_BODY_COMMAND_RUNNING));
+		assertTrue(TestsUtils.isJSONValid(Constants.JSON.Body.COMMAND));
+		assertTrue(TestsUtils.isJSONValid(Constants.JSON.Body.COMMAND_RUNNING));
 		JSONObject actualForm = this.command.toJSON();
 
-		JSONAssert.assertEquals(JSON_BODY_COMMAND, actualForm, true);
-		JSONAssert.assertEquals(JSON_BODY_COMMAND, actualForm, true);
+		JSONAssert.assertEquals(Constants.JSON.Body.COMMAND, actualForm, true);
+		JSONAssert.assertEquals(Constants.JSON.Body.COMMAND, actualForm, true);
 
 		this.command.setState(Command.State.RUNNING);
 		actualForm = this.command.toJSON();
 
-		JSONAssert.assertEquals(JSON_BODY_COMMAND_RUNNING, actualForm, true);
+		JSONAssert.assertEquals(Constants.JSON.Body.COMMAND_RUNNING, actualForm, true);
 	}
 
 	@Test

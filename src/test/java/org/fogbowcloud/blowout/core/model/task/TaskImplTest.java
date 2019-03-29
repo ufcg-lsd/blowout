@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.fogbowcloud.blowout.core.model.Command;
 import org.fogbowcloud.blowout.core.model.Specification;
+import org.fogbowcloud.blowout.helpers.Constants;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -25,8 +26,8 @@ public class TaskImplTest {
 	@Before
 	public void setUp(){
 		this.spec = mock(Specification.class);
-		this.taskId = FAKE_TASK_ID;
-		this.task = spy(new TaskImpl(taskId, spec, FAKE_UUID));
+		this.taskId = Constants.FakeData.TASK_ID;
+		this.task = spy(new TaskImpl(taskId, spec, Constants.FakeData.UUID));
 	}
 	
 	@Test
@@ -34,7 +35,7 @@ public class TaskImplTest {
 		this.task.startedRunning();
 		
 		doReturn(TIME_OUT_VALUE_BIG).when(task).getMetadata(TaskImpl.METADATA_TASK_TIMEOUT);
-		assertEquals(false, task.checkTimeOuted());
+		assertFalse(task.checkTimeOuted());
 	}
 	
 	@Test
@@ -72,10 +73,10 @@ public class TaskImplTest {
 	@Test
 	public void testClone(){
 		Map<String, String> metadata = new HashMap<String, String>();
-		metadata.put(FAKE_METADATA, FAKE_METADATA_VALUE);
+		metadata.put(Constants.FakeData.METADATA, Constants.FakeData.METADATA_VALUE);
 		doReturn(metadata).when(task).getAllMetadata();
 		List<Command> commands = new ArrayList<Command>();
-		Command command = new Command(FAKE_COMMAND, Command.Type.REMOTE);
+		Command command = new Command(Constants.FakeData.COMMAND, Command.Type.REMOTE);
 		commands.add(command);
 		doReturn(commands).when(task).getAllCommands();
 		
@@ -108,5 +109,4 @@ public class TaskImplTest {
 		assert(epilogueCommands.contains(epilogueCommand));
 		assert(epilogueCommands.contains(epilogueCommand2));
 	}
-	
 }
