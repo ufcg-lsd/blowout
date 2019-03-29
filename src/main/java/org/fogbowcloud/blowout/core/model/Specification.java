@@ -14,8 +14,9 @@ import org.json.JSONObject;
 public class Specification implements Serializable {
 
 	private static final long serialVersionUID = 5255295548723927267L;
-	private static final String LN = System.lineSeparator();
 
+	// Todo remove these constants to a separated file.
+	private static final String LN = System.lineSeparator();
 	private static final String REQUIREMENTS_MAP_STR = "requirementsMap";
 	private static final String USER_DATA_TYPE_STR = "userDataType";
 	private static final String USER_DATA_FILE_STR = "userDataFile";
@@ -24,36 +25,50 @@ public class Specification implements Serializable {
 	private static final String PUBLIC_KEY_STR = "publicKey";
 	private static final String USERNAME_STR = "username";
 	private static final String IMAGE_STR = "image";
+	private static final String CLOUD_NAME_STR = "cloudName";
 	private static final Logger LOGGER = Logger.getLogger(Specification.class);
 
-	private String imageId;
+	private String cloudName;
+	private String imageName;
 	private String username;
 	private String privateKeyFilePath;
 	private String publicKey;
+
+	//TODO Analyze the removal of these attributes
 	private String contextScript;
 	private String userDataFile;
 	private String userDataType;
 
 	private Map<String, String> requirements;
 
-	public Specification(String imageId, String username, String publicKey, String privateKeyFilePath) {
-		this.imageId = imageId;
+	public Specification(String imageName, String username, String publicKey, String privateKeyFilePath) {
+		this.cloudName = null;
+		this.imageName = imageName;
 		this.username = username;
 		this.publicKey = publicKey;
 		this.privateKeyFilePath = privateKeyFilePath;
 		this.requirements = new HashMap<>();
 	}
 
-	public Specification(String imageId, String username, String publicKey, String privateKeyFilePath,
+	public Specification(String cloudName, String imageName, String username, String publicKey, String privateKeyFilePath) {
+		this.cloudName = cloudName;
+		this.imageName = imageName;
+		this.username = username;
+		this.publicKey = publicKey;
+		this.privateKeyFilePath = privateKeyFilePath;
+		this.requirements = new HashMap<>();
+	}
+
+	public Specification(String cloudName, String imageName, String username, String publicKey, String privateKeyFilePath,
 						 String userDataFile, String userDataType) {
-		this(imageId, username, publicKey, privateKeyFilePath);
+		this(cloudName, imageName, username, publicKey, privateKeyFilePath);
 		this.userDataFile = userDataFile;
 		this.userDataType = userDataType;
 	}
 
-	public Specification(String imageId, String username, String publicKey, String privateKeyFilePath,
+	public Specification(String cloudName, String imageName, String username, String publicKey, String privateKeyFilePath,
 						 String userDataFile, String userDataType, String vCPU, String memory, String disk) {
-		this(imageId, username, publicKey, privateKeyFilePath, userDataFile, userDataType);
+		this(cloudName, imageName, username, publicKey, privateKeyFilePath, userDataFile, userDataType);
 	}
 
 	public void addRequirement(String key, String value) {
@@ -74,8 +89,10 @@ public class Specification implements Serializable {
 		return this.requirements;
 	}
 
-	public String getImageId() {
-		return this.imageId;
+	public String getCloudName() {return this.cloudName; }
+
+	public String getImageName() {
+		return this.imageName;
 	}
 
 	public String getUsername() {
@@ -121,7 +138,10 @@ public class Specification implements Serializable {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("Image: " + this.imageId);
+		if((this.cloudName != null) && !this.cloudName.isEmpty()){
+			sb.append("CloudName: " + this.cloudName);
+		}
+		sb.append("Image: " + this.imageName);
 		sb.append(" PublicKey: " + this.publicKey);
 		if ((this.contextScript != null) && !this.contextScript.isEmpty()) {
 			sb.append(LN + "ContextScript: " + contextScript);
@@ -143,7 +163,7 @@ public class Specification implements Serializable {
 	}
 
 	public Specification clone() {
-		Specification cloneSpec = new Specification(this.imageId, this.username, this.publicKey, this.privateKeyFilePath,
+		Specification cloneSpec = new Specification(this.cloudName, this.imageName, this.username, this.publicKey, this.privateKeyFilePath,
 				this.userDataFile, this.userDataType);
 		cloneSpec.putAllRequirements(this.getAllRequirements());
 		return cloneSpec;
@@ -152,7 +172,8 @@ public class Specification implements Serializable {
 	public JSONObject toJSON() {
 		try {
 			JSONObject specification = new JSONObject();
-			specification.put(IMAGE_STR, this.getImageId());
+			specification.put(CLOUD_NAME_STR, this.getCloudName());
+			specification.put(IMAGE_STR, this.getImageName());
 			specification.put(USERNAME_STR, this.getUsername());
 			specification.put(PUBLIC_KEY_STR, this.getPublicKey());
 			specification.put(PRIVATE_KEY_FILE_PATH_STR, this.getPrivateKeyFilePath());
@@ -168,7 +189,7 @@ public class Specification implements Serializable {
 	}
 
 	public static Specification fromJSON(JSONObject specJSON) {
-		Specification specification = new Specification(specJSON.optString(IMAGE_STR), specJSON.optString(USERNAME_STR),
+		Specification specification = new Specification(specJSON.optString(CLOUD_NAME_STR), specJSON.optString(IMAGE_STR), specJSON.optString(USERNAME_STR),
 				specJSON.optString(PUBLIC_KEY_STR), specJSON.optString(PRIVATE_KEY_FILE_PATH_STR),
 				specJSON.optString(USER_DATA_FILE_STR), specJSON.optString(USER_DATA_TYPE_STR));
 		HashMap<String, String> reqMap = (HashMap<String, String>) toMap(specJSON.optString(REQUIREMENTS_MAP_STR));
@@ -235,8 +256,9 @@ public class Specification implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((cloudName == null) ? 0 : cloudName.hashCode());
 		result = prime * result + ((contextScript == null) ? 0 : contextScript.hashCode());
-		result = prime * result + ((imageId == null) ? 0 : imageId.hashCode());
+		result = prime * result + ((imageName == null) ? 0 : imageName.hashCode());
 		result = prime * result + ((privateKeyFilePath == null) ? 0 : privateKeyFilePath.hashCode());
 		result = prime * result + ((publicKey == null) ? 0 : publicKey.hashCode());
 		result = prime * result + ((userDataFile == null) ? 0 : userDataFile.hashCode());
@@ -255,15 +277,20 @@ public class Specification implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		Specification other = (Specification) obj;
+		if (cloudName == null) {
+			if (other.cloudName != null)
+				return false;
+		} else if (!cloudName.equals(other.cloudName))
+			return false;
 		if (contextScript == null) {
 			if (other.contextScript != null)
 				return false;
 		} else if (!contextScript.equals(other.contextScript))
 			return false;
-		if (imageId == null) {
-			if (other.imageId != null)
+		if (imageName == null) {
+			if (other.imageName != null)
 				return false;
-		} else if (!imageId.equals(other.imageId))
+		} else if (!imageName.equals(other.imageName))
 			return false;
 		if (privateKeyFilePath == null) {
 			if (other.privateKeyFilePath != null)

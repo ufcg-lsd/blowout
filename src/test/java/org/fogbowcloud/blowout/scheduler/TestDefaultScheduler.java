@@ -1,4 +1,4 @@
-package org.fogbowcloud.blowout.core.model;
+package org.fogbowcloud.blowout.scheduler;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -7,6 +7,7 @@ import static org.mockito.Mockito.spy;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.model.task.Task;
 import org.fogbowcloud.blowout.core.model.task.TaskImpl;
 import org.fogbowcloud.blowout.scheduler.DefaultScheduler;

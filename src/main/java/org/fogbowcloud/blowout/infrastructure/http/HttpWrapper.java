@@ -21,7 +21,7 @@ public class HttpWrapper {
 	private static final int CLIENT_SIDE_CODE_ERRO_INIT = 400;
 
 	public static final String HTTP_CONTENT_JSON = "application/json";
-	public static final String FEDERATION_TOKEN_VALUE_HEADER_KEY = "federationTokenValue";
+	public static final String FOGBOW_USER_TOKEN_KEY = "Fogbow-User-Token";
 
 	public static final String HTTP_METHOD_POST = HttpPost.METHOD_NAME;
 	public static final String HTTP_METHOD_GET = HttpGet.METHOD_NAME;
@@ -53,7 +53,7 @@ public class HttpWrapper {
         }
 
         if (authToken != null) {
-            request.addHeader(FEDERATION_TOKEN_VALUE_HEADER_KEY, authToken);
+            request.addHeader(FOGBOW_USER_TOKEN_KEY, authToken);
         }
         for (Header header : additionalHeaders) {
             request.addHeader(header);

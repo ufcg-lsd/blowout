@@ -12,7 +12,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import org.apache.http.entity.StringEntity;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.constants.AppMessagesConstants;
+import org.fogbowcloud.blowout.core.constants.BlowoutConstants;
 import org.fogbowcloud.blowout.core.constants.FogbowConstants;
+import org.fogbowcloud.blowout.core.exception.BlowoutException;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.constants.AppPropertiesConstants;
 
@@ -26,7 +28,6 @@ import org.fogbowcloud.blowout.infrastructure.provider.InfrastructureProvider;
 import org.fogbowcloud.blowout.infrastructure.token.AbstractTokenUpdatePlugin;
 import org.fogbowcloud.blowout.core.model.resource.AbstractResource;
 
-import static java.lang.Thread.sleep;
 import static org.fogbowcloud.blowout.core.util.AppUtil.generateIdentifier;
 import static org.fogbowcloud.blowout.core.util.AppUtil.isStringEmpty;
 
@@ -140,7 +141,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
             instanceAttributes = this.requestsHelper.getComputeInstance(fogbowResource.getComputeOrderId());
             instanceId = String.valueOf(instanceAttributes.get(FogbowConstants.INSTANCE_ATTRIBUTE_NAME));
 
-            Map<String, Object> sshInfo = getPublicIpInstance(fogbowResource.getPublicIpId());
+            Map<String, Object> sshInfo = getPublicIpInstance(fogbowResource.getPublicIpOrderId());
 
             this.populateInstanceAttributes(instanceAttributes, sshInfo);
 
@@ -210,26 +211,26 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
     private void putMetadata(AbstractResource fogbowResource, Specification specification) {
         String requestType = specification.getRequirementValue(FogbowConstants.METADATA_REQUEST_TYPE);
 
-        fogbowResource.putMetadata(AbstractResource.METADATA_REQUEST_TYPE, requestType);
-        fogbowResource.putMetadata(AbstractResource.METADATA_IMAGE, specification.getImageId());
-        fogbowResource.putMetadata(AbstractResource.METADATA_PUBLIC_KEY, specification.getPublicKey());
+        fogbowResource.putMetadata(BlowoutConstants.METADATA_REQUEST_TYPE, requestType);
+        fogbowResource.putMetadata(BlowoutConstants.METADATA_IMAGE_NAME, specification.getImageName());
+        fogbowResource.putMetadata(BlowoutConstants.METADATA_PUBLIC_KEY, specification.getPublicKey());
     }
 
     private void putMetadata(AbstractResource fogbowResource, Map<String, Object> instanceAttributes) {
 
-        fogbowResource.putMetadata(AbstractResource.METADATA_SSH_PUBLIC_IP,
+        fogbowResource.putMetadata(BlowoutConstants.METADATA_PUBLIC_IP,
                 instanceAttributes.get(FogbowConstants.JSON_KEY_FOGBOW_PUBLIC_IP));
 
-        fogbowResource.putMetadata(AbstractResource.METADATA_SSH_USERNAME_ATT,
+        fogbowResource.putMetadata(BlowoutConstants.METADATA_SSH_USERNAME_ATT,
                 FogbowConstants.INSTANCE_ATTRIBUTE_DEFAULT_SHH_USERNAME);
 
-        fogbowResource.putMetadata(AbstractResource.METADATA_VCPU,
+        fogbowResource.putMetadata(BlowoutConstants.METADATA_VCPU,
                 instanceAttributes.get(FogbowConstants.INSTANCE_ATTRIBUTE_VCPU));
 
-        fogbowResource.putMetadata(AbstractResource.METADATA_MEM_SIZE,
+        fogbowResource.putMetadata(BlowoutConstants.METADATA_MEM_SIZE,
                 instanceAttributes.get(FogbowConstants.INSTANCE_ATTRIBUTE_MEMORY_SIZE));
 
-        fogbowResource.putMetadata(AbstractResource.METADATA_DISK_SIZE,
+        fogbowResource.putMetadata(BlowoutConstants.METADATA_DISK_SIZE,
                 instanceAttributes.get(FogbowConstants.INSTANCE_ATTRIBUTE_DISK_SIZE));
     }
 
@@ -239,7 +240,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 	}
 
 	private void validateSpecification(Specification specification) throws RequestResourceException {
-		if (specification.getImageId() == null || specification.getImageId().isEmpty()) {
+		if (specification.getImageName() == null || specification.getImageName().isEmpty()) {
 			throw new RequestResourceException();
 		}
 		if (specification.getPublicKey() == null || specification.getPublicKey().isEmpty()) {
@@ -251,9 +252,9 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
 		if (!FogbowRequirementsHelper.validateFogbowRequirementsSyntax(fogbowRequirements)) {
 			LOGGER.debug("FogbowRequirements [" + fogbowRequirements
-					+ "] is not in valid format." + AppMessagesConstants.FOGBOW_REQUIREMENTS_EXAMPLE);
+					+ "] is not in valid format." + BlowoutConstants.FOGBOW_REQUIREMENTS_EXAMPLE);
 			throw new RequestResourceException("FogbowRequirements [" + fogbowRequirements
-					+ "] is not in valid format." + AppMessagesConstants.FOGBOW_REQUIREMENTS_EXAMPLE);
+					+ "] is not in valid format." + BlowoutConstants.FOGBOW_REQUIREMENTS_EXAMPLE);
 		}
 	}
 
@@ -273,7 +274,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		this.frDatastore = frDatastore;
 	}
 
-	protected StringEntity makeJsonBody(Specification spec) throws UnsupportedEncodingException {
+	protected StringEntity makeJsonBody(Specification spec) throws UnsupportedEncodingException, BlowoutException {
         return requestsHelper.makeJsonBody(spec);
 	}
 

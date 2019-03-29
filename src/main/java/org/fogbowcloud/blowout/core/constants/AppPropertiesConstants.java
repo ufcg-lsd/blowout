@@ -14,13 +14,19 @@ public class AppPropertiesConstants {
 	public static final String INFRA_RESOURCE_REUSE_TIMES = "max_resource_reuse";
 	public static final String INFRA_RESOURCE_CONNECTION_RETRY = "max_resource_connection_retry";
 	public static final String RESOURCE_MONITOR_SLEEP_PERIOD = "resource_monitor_sleep_period";
+	public static final String DEFAULT_CLOUD_NAME = "default-cloud-name";
 
-	public static final String RAS_TOKEN_PREFIX = "ras_token_";
-	public static final String RAS_TOKEN_USERNAME = "username";
-	public static final String RAS_TOKEN_PASSWORD = "password";
-	public static final String RAS_TOKEN_PROJECT_NAME = "projectname";
-	public static final String RAS_TOKEN_DOMAIN = "domain";
+	public static final String AS_TOKEN_PREFIX = "as_token_";
+	public static final String AS_TOKEN_USERNAME = "username";
+	public static final String AS_TOKEN_PASSWORD = "password";
+	public static final String AS_TOKEN_PROJECT_NAME = "projectname";
+	public static final String AS_TOKEN_DOMAIN = "domain";
+	public static final String AS_TOKEN_PUBLIC_KEY = "publicKey";
+	public static final String AS_TOKEN_CREDENTIALS = "credentials";
+	public static final String AS_BASE_URL = "as_base_url";
+
 	public static final String RAS_BASE_URL = "ras_base_url";
+	public static final String RAS_MEMBER_ID = "ras_member_id";
 
 	public static final String TOKEN_UPDATE_TIME = "ras_token_update_time";
 	public static final String TOKEN_UPDATE_TIME_UNIT = "ras_token_update_time_unit";

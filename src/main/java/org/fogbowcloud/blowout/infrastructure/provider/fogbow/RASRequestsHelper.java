@@ -5,9 +5,12 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.apache.log4j.Logger;
+import org.fogbowcloud.blowout.core.constants.AppMessagesConstants;
 import org.fogbowcloud.blowout.core.constants.AppPropertiesConstants;
 import org.fogbowcloud.blowout.core.constants.FogbowConstants;
+import org.fogbowcloud.blowout.core.exception.BlowoutException;
 import org.fogbowcloud.blowout.core.model.Specification;
+import org.fogbowcloud.blowout.core.util.AppUtil;
 import org.fogbowcloud.blowout.infrastructure.exception.RequestResourceException;
 import org.fogbowcloud.blowout.infrastructure.http.HttpWrapper;
 import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
@@ -26,9 +29,8 @@ import static org.fogbowcloud.blowout.core.util.AppUtil.*;
 
 public class RASRequestsHelper {
     private final Logger LOGGER = Logger.getLogger(RASRequestsHelper.class);
-    private final String RAS_BASE_URL;
     private final Properties properties;
-
+    private String RAS_BASE_URL;
     private HttpWrapper http;
     private Token token;
 
@@ -45,13 +47,19 @@ public class RASRequestsHelper {
             requestBody = this.makeJsonBody(specification);
         } catch (UnsupportedEncodingException uee) {
             LOGGER.error("Error while requesting resource on Fogbow" + uee.getMessage(), uee);
+        } catch (BlowoutException be){
+            LOGGER.error("Error while requesting resource on Fogbow: " + be.getMessage(), be);
         }
 
-        requestBody.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, HttpWrapper.HTTP_CONTENT_JSON));
+        if (requestBody != null) {
+            requestBody.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, HttpWrapper.HTTP_CONTENT_JSON));
+        }
+
         String computeOrderId;
         try {
-            computeOrderId = this.doRequest(HttpWrapper.HTTP_METHOD_POST, this.RAS_BASE_URL + "/" +
+            String computerOrderIdResponse = this.doRequest(HttpWrapper.HTTP_METHOD_POST, this.RAS_BASE_URL + "/" +
                     FogbowConstants.RAS_ENDPOINT_COMPUTE, new LinkedList<>(), requestBody);
+            computeOrderId = AppUtil.getValueFromJsonStr("id", computerOrderIdResponse);
             LOGGER.info("Compute ID was requested successfully.");
         } catch (Exception e){
             LOGGER.error("Error while requesting resource on Fogbow", e);
@@ -61,20 +69,25 @@ public class RASRequestsHelper {
     }
 
     public String createPublicIp(String computeOrderId) throws InterruptedException {
-        sleep(6000);
+        final Integer sleepTimeInMillis = 6000;
+
+        sleep(sleepTimeInMillis);
         String publicIpId = null;
-        final String provider = this.properties.getProperty(AppPropertiesConstants.RAS_TOKEN_PROJECT_NAME);
+        final String cloudName = this.properties.getProperty(AppPropertiesConstants.DEFAULT_CLOUD_NAME);
+        final String provider = this.properties.getProperty(AppPropertiesConstants.AS_TOKEN_PROJECT_NAME);
         final String requestUrl = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_PUBLIC_IP;
 
         Map<String, String> bodyRequestAttrs = new HashMap<>();
         if (computeOrderId != null && !computeOrderId.isEmpty()) {
+            bodyRequestAttrs.put(FogbowConstants.JSON_KEY_RAS_CLOUD_NAME, cloudName);
             bodyRequestAttrs.put(FogbowConstants.JSON_KEY_RAS_COMPUTE_ID, computeOrderId);
             bodyRequestAttrs.put(FogbowConstants.JSON_KEY_FOGBOW_PROVIDER, provider);
         }
         try {
             final StringEntity bodyRequest = makeRequestBodyJson(bodyRequestAttrs);
-            publicIpId = this.doRequest(HttpWrapper.HTTP_METHOD_POST, requestUrl,
+            String publicIpIdResponse = this.doRequest(HttpWrapper.HTTP_METHOD_POST, requestUrl,
                     new LinkedList<>(), bodyRequest);
+            publicIpId = AppUtil.getValueFromJsonStr("id", publicIpIdResponse);
             LOGGER.info("Public IP ID was requested successfully.");
         } catch (Exception e) {
             LOGGER.error("Error while getting Public IP for compute order of id " + computeOrderId, e);
@@ -82,35 +95,36 @@ public class RASRequestsHelper {
         return publicIpId;
     }
 
-    public Map<String, Object> getPublicIpInstance(String publicIpId) {
+    public Map<String, Object> getPublicIpInstance(String publicIpOrderId) {
         String response;
-        Map<String, Object> sshInfo = new HashMap<>();
-        final String requestUrl = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_PUBLIC_IP + "/" + publicIpId;
-        final String errorMessage = "Error while getting info about public instance of order with id " + publicIpId;
+        Map<String, Object> publicIpInstance = new HashMap<>();
+        final String requestUrl = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_PUBLIC_IP + "/" + publicIpOrderId;
+        final String errorMessage = AppMessagesConstants.ERROR_WHILE_GET_PUBLIC_IP_INSTANCE + publicIpOrderId;
 
         try {
             response = this.doRequest(HttpWrapper.HTTP_METHOD_GET, requestUrl, new LinkedList<>());
-            sshInfo = parseAttributes(response);
-            LOGGER.debug("Getting SSH information.");
-            LOGGER.debug(sshInfo);
+            publicIpInstance = parseJSONStringToMap(response);
+            LOGGER.debug("Getting Public Ip instance.");
+
+            LOGGER.debug(publicIpInstance);
         } catch (Exception e) {
             LOGGER.error(errorMessage, e);
         }
-        return sshInfo;
+        return publicIpInstance;
     }
 
     public Map<String, Object> getComputeInstance(String computeOrderId) throws Exception {
         final String requestUrl = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_COMPUTE + "/" + computeOrderId;
         final String instanceInformation = this.doRequest(HttpWrapper.HTTP_METHOD_GET, requestUrl, new ArrayList<>());
 
-        return parseAttributes(instanceInformation);
+        return parseJSONStringToMap(instanceInformation);
     }
 
     public void deleteFogbowResource(FogbowResource fogbowResource) throws Exception {
         final String computeEndpoint = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_COMPUTE +
                 "/" + fogbowResource.getComputeOrderId();
         final String publicIpEndpoint = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_PUBLIC_IP +
-                "/" + fogbowResource.getPublicIpId();
+                "/" + fogbowResource.getPublicIpOrderId();
         try {
             this.doRequest(HttpWrapper.HTTP_METHOD_DELETE, computeEndpoint, new ArrayList<>());
             LOGGER.info("Compute was deleted successfully.");
@@ -126,6 +140,7 @@ public class RASRequestsHelper {
         }
     }
 
+
     public void setHttpWrapper(HttpWrapper httpWrapper) {
         this.http = httpWrapper;
     }
@@ -140,21 +155,75 @@ public class RASRequestsHelper {
         return this.http.doRequest(method, endpoint, this.token.getAccessId(), headers);
     }
 
-    public StringEntity makeJsonBody(Specification specification) throws UnsupportedEncodingException {
+    public StringEntity makeJsonBody(Specification specification) throws UnsupportedEncodingException, BlowoutException {
         JSONObject json = new JSONObject();
-        final String iguassuComputesName = "Iguassu";
+        String userName = specification.getUsername();
 
-        makeBodyField(json, FogbowConstants.JSON_KEY_RAS_PUBLIC_KEY, specification.getPublicKey());
-        makeBodyField(json, FogbowConstants.JSON_KEY_RAS_MEMORY, specification.getMemory());
+        if (userName == null || userName.trim().isEmpty()) {
+            userName = "Iguassu";
+        }
+
+        final String iguassuComputeName = "Compute started by: " + userName;
+
+        String imageName = specification.getImageName();
+        String imageId = getImageId(imageName);
+        LOGGER.info("Using the image " + imageName + ":" + imageId + "in compute request");
+
+        if(specification.getCloudName() != null){
+            makeBodyField(json, FogbowConstants.JSON_KEY_RAS_CLOUD_NAME, specification.getCloudName());
+        }
         makeBodyField(json, FogbowConstants.JSON_KEY_RAS_DISK, specification.getDisk());
-        makeBodyField(json, FogbowConstants.JSON_KEY_RAS_IMAGE_ID, specification.getImageId());
+        makeBodyField(json, FogbowConstants.JSON_KEY_RAS_IMAGE_ID, imageId);
+        makeBodyField(json, FogbowConstants.JSON_KEY_RAS_MEMORY, specification.getMemory());
+        makeBodyField(json, FogbowConstants.JSON_KEY_RAS_COMPUTE_NAME, iguassuComputeName);
+        makeBodyField(json, FogbowConstants.JSON_KEY_RAS_PUBLIC_KEY, specification.getPublicKey());
         makeBodyField(json, FogbowConstants.JSON_KEY_RAS_VCPU, specification.getvCPU());
-        makeBodyField(json, FogbowConstants.JSON_KEY_RAS_COMPUTE_NAME, iguassuComputesName);
 
         return new StringEntity(json.toString());
     }
 
-    private Map<String, Object> parseAttributes(String response) throws ScriptException {
+    private String getImageId(String imageName) throws BlowoutException {
+        String imageId;
+        List<String> images = this.getImagesByName(imageName);
+        if(images.isEmpty()){
+            throw new BlowoutException("No images found with the name " + imageName);
+        }
+        imageId = images.get(0);
+        return imageId;
+    }
+
+    private List<String> getImagesByName(String imageName){
+        List<String> images = new ArrayList<>();
+
+        Map<String, Object> imagesMap = getAllImages();
+        for(String imageId : imagesMap.keySet()){
+            String currentImageName = imagesMap.get(imageId).toString();
+            if(currentImageName.equals(imageName)){
+                images.add(imageId);
+            }
+        }
+        return images;
+    }
+
+
+    private Map<String, Object> getAllImages(){
+        final String cloudName = "cloud4";
+        final String memberId = this.properties.getProperty(AppPropertiesConstants.RAS_MEMBER_ID);
+        Map<String, Object> imagesMap = new HashMap<>();
+        final String requestUrl = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_IMAGES + "/"
+                + memberId + "/" + cloudName;
+        final String errorMessage = "Error while getting info about images of member with id :" + memberId;
+
+        try {
+            final String response = this.doRequest(HttpWrapper.HTTP_METHOD_GET, requestUrl, new LinkedList<>());
+            imagesMap = parseJSONStringToMap(response);
+        } catch (Exception e) {
+            LOGGER.error(errorMessage, e);
+        }
+        return imagesMap;
+    }
+
+    private Map<String, Object> parseJSONStringToMap(String response) throws ScriptException {
         ScriptEngine engine;
         ScriptEngineManager sem = new ScriptEngineManager();
         engine = sem.getEngineByName("javascript");
@@ -162,7 +231,7 @@ public class RASRequestsHelper {
         final String script = "Java.asJSONCompatible(" + response + ")";
         Object result = engine.eval(script);
 
-        Map<String, Object> contents = (Map<String, Object>) result;
+        final Map<String, Object> contents = (Map<String, Object>) result;
 
         return new HashMap<>(contents);
     }

@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.fogbowcloud.blowout.helpers.Constants.FakeData.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,15 +13,15 @@ import java.util.Properties;
 
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.constants.AppPropertiesConstants;
+import org.fogbowcloud.blowout.helpers.Constants;
 import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
-import org.fogbowcloud.blowout.infrastructure.model.TestResourceHelper;
+import org.fogbowcloud.blowout.infrastructure.model.ResourceHelperTest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-public class TestFogbowRequirementsHelper {
-
+public class FogbowRequirementsHelperTest {
 	private Properties properties;
 	private Map<String, String> requirements;
 	private Specification spec;
@@ -29,20 +30,14 @@ public class TestFogbowRequirementsHelper {
 	@Before
 	public void setUp() throws Exception {
 
-		this.generateDefaulProperties();
+		this.generateDefaultProperties();
 
-		String image = "ubunto01";
-		String userName = "userName";
-		String publicKey = "key01";
-		String privateKey = "privKey01";
-		String userData = "scripts/lvl-user-data.sh";
-		String userDataType = "text/x-shellscript";
-
-		requirements = new HashMap<String, String>();
-		spec = new Specification(image, userName, publicKey, privateKey, userData, userDataType);
-		suitableResource = mock(FogbowResource.class);
-		doReturn("resquest_01").when(suitableResource).getId();
-		when(suitableResource.match(Mockito.any(Specification.class))).thenCallRealMethod();
+		this.requirements = new HashMap<>();
+		this.spec = new Specification(CLOUD_NAME, COMPUTE_IMAGE_FLAVOR_NAME, FOGBOW_USER_NAME,
+				PUBLIC_KEY, PRIVATE_KEY_FILE_PATH, USER_DATA_FILE, USER_DATA_TYPE);
+		this.suitableResource = mock(FogbowResource.class);
+		doReturn("request_01").when(this.suitableResource).getId();
+		when(this.suitableResource.match(Mockito.any(Specification.class))).thenCallRealMethod();
 	}
 
 	@After
@@ -66,15 +61,13 @@ public class TestFogbowRequirementsHelper {
 		String fogbowRequirementC = "Glue2vCPU >= 1 && Glue2RAM >= 1024 && Glue2disk >= 20 && Glue2CloudComputeManagerID ==\"servers.your.domain\"";
 		String fogbowRequirementD = "Glue2vCPU >= 1 && Glue2RAM == 1024 || Glue2RAM == 2048 && Glue2disk >= 20 && Glue2CloudComputeManagerID ==\"servers.your.domain\"";
 		String fogbowRequirementE = "";
-		String fogbowRequirementF = null;
 
 		assertTrue(FogbowRequirementsHelper.validateFogbowRequirementsSyntax(fogbowRequirementA));
 		assertTrue(FogbowRequirementsHelper.validateFogbowRequirementsSyntax(fogbowRequirementB));
 		assertTrue(FogbowRequirementsHelper.validateFogbowRequirementsSyntax(fogbowRequirementC));
 		assertTrue(FogbowRequirementsHelper.validateFogbowRequirementsSyntax(fogbowRequirementD));
 		assertTrue(FogbowRequirementsHelper.validateFogbowRequirementsSyntax(fogbowRequirementE));
-		assertTrue(FogbowRequirementsHelper.validateFogbowRequirementsSyntax(fogbowRequirementF));
-
+		assertTrue(FogbowRequirementsHelper.validateFogbowRequirementsSyntax(null));
 	}
 
 	@Test
@@ -86,9 +79,7 @@ public class TestFogbowRequirementsHelper {
 	}
 
 	@Test
-	public void matchesResourceSucessA(){
-		
-		String fogbowRequirements = "Glue2vCPU >= 1 && Glue2RAM >= 1024";
+	public void matchesResourceSuccessA(){
 		
 		String requestId = "FakeRequestID1";
 		String host = "100.10.1.1";
@@ -100,17 +91,17 @@ public class TestFogbowRequirementsHelper {
 		String diskSize = "30";
 		String location = "servers.your.domain";
 		
-		Map<String, String> resourceMetadata = TestResourceHelper.generateResourceMetadata(host, port, userName,
-				extraPorts, spec.getImageId(), spec.getPublicKey(), cpuSize, menSize, diskSize,
+		Map<String, String> resourceMetadata = ResourceHelperTest.generateResourceMetadata(host, port, userName,
+				extraPorts, spec.getImageName(), spec.getPublicKey(), cpuSize, menSize, diskSize,
 				location);
 
-		suitableResource = TestResourceHelper.generateMockResource(requestId, resourceMetadata, true);
+		suitableResource = ResourceHelperTest.generateMockResource(requestId, resourceMetadata, true);
 		
-		assertTrue(FogbowRequirementsHelper.matches(suitableResource, fogbowRequirements));
+		assertTrue(FogbowRequirementsHelper.matches(suitableResource, Constants.FOGBOW_REQUIREMENT_A));
 	}
 
 	@Test
-	public void matchesResourceSucessB() {
+	public void matchesResourceSuccessB() {
 
 		String fogbowRequirements = "Glue2vCPU >= 2 && Glue2RAM >= 2048 && Glue2disk >= 20 && Glue2CloudComputeManagerID ==\"servers.your.domain\"";
 
@@ -124,18 +115,17 @@ public class TestFogbowRequirementsHelper {
 		String diskSize = "30";
 		String location = "\"servers.your.domain\"";
 
-		Map<String, String> resourceMetadata = TestResourceHelper.generateResourceMetadata(host, port, userName,
-				extraPorts, spec.getImageId(), spec.getPublicKey(), cpuSize, menSize, diskSize,
+		Map<String, String> resourceMetadata = ResourceHelperTest.generateResourceMetadata(host, port, userName,
+				extraPorts, spec.getImageName(), spec.getPublicKey(), cpuSize, menSize, diskSize,
 				location);
 
-		suitableResource = TestResourceHelper.generateMockResource(requestId, resourceMetadata, true);
+		suitableResource = ResourceHelperTest.generateMockResource(requestId, resourceMetadata, true);
 
 		assertTrue(FogbowRequirementsHelper.matches(suitableResource, fogbowRequirements));
-
 	}
 
 	@Test
-	public void matchesResourceSucessC(){
+	public void matchesResourceSuccessC(){
 		
 		String fogbowRequirements = " ";
 		
@@ -149,11 +139,11 @@ public class TestFogbowRequirementsHelper {
 		String diskSize = "30";
 		String location = "servers.your.domain";
 		
-		Map<String, String> resourceMetadata = TestResourceHelper.generateResourceMetadata(host, port, userName,
-				extraPorts, spec.getImageId(), spec.getPublicKey(), cpuSize, menSize, diskSize,
+		Map<String, String> resourceMetadata = ResourceHelperTest.generateResourceMetadata(host, port, userName,
+				extraPorts, spec.getImageName(), spec.getPublicKey(), cpuSize, menSize, diskSize,
 				location);
 
-		suitableResource = TestResourceHelper.generateMockResource(requestId, resourceMetadata, true);
+		suitableResource = ResourceHelperTest.generateMockResource(requestId, resourceMetadata, true);
 		
 		assertTrue(FogbowRequirementsHelper.matches(suitableResource, fogbowRequirements));
 		
@@ -174,10 +164,10 @@ public class TestFogbowRequirementsHelper {
 		String diskSize = "";
 		String location = "";
 
-		Map<String, String> resourceMetadata = TestResourceHelper.generateResourceMetadata(host, port, userName,
-				extraPorts, spec.getImageId(), spec.getPublicKey(), cpuSize, menSize, diskSize,
+		Map<String, String> resourceMetadata = ResourceHelperTest.generateResourceMetadata(host, port, userName,
+				extraPorts, spec.getImageName(), spec.getPublicKey(), cpuSize, menSize, diskSize,
 				location);
-		suitableResource = TestResourceHelper.generateMockResource(requestId, resourceMetadata, true);
+		suitableResource = ResourceHelperTest.generateMockResource(requestId, resourceMetadata, true);
 
 		assertTrue(FogbowRequirementsHelper.matches(suitableResource, fogbowRequirementsB));
 	}
@@ -197,10 +187,10 @@ public class TestFogbowRequirementsHelper {
 		String diskSize = "";
 		String location = "";
 		
-		Map<String, String> resourceMetadata = TestResourceHelper.generateResourceMetadata(host, port, userName,
-				extraPorts, spec.getImageId(), spec.getPublicKey(), cpuSize, menSize, diskSize,
+		Map<String, String> resourceMetadata = ResourceHelperTest.generateResourceMetadata(host, port, userName,
+				extraPorts, spec.getImageName(), spec.getPublicKey(), cpuSize, menSize, diskSize,
 				location);
-		suitableResource = TestResourceHelper.generateMockResource(requestId, resourceMetadata, true);
+		suitableResource = ResourceHelperTest.generateMockResource(requestId, resourceMetadata, true);
 
 		assertFalse(FogbowRequirementsHelper.matches(suitableResource, fogbowRequirementsB));
 
@@ -223,10 +213,10 @@ public class TestFogbowRequirementsHelper {
 		String diskSize = "";
 		String location = "";
 		
-		Map<String, String> resourceMetadata = TestResourceHelper.generateResourceMetadata(host, port, userName,
-				extraPorts, spec.getImageId(), spec.getPublicKey(), cpuSize, menSize, diskSize,
+		Map<String, String> resourceMetadata = ResourceHelperTest.generateResourceMetadata(host, port, userName,
+				extraPorts, spec.getImageName(), spec.getPublicKey(), cpuSize, menSize, diskSize,
 				location);
-		suitableResource = TestResourceHelper.generateMockResource(requestId, resourceMetadata, true);
+		suitableResource = ResourceHelperTest.generateMockResource(requestId, resourceMetadata, true);
 
 		assertFalse(FogbowRequirementsHelper.matches(suitableResource, fogbowRequirementsB));
 
@@ -248,10 +238,10 @@ public class TestFogbowRequirementsHelper {
 		String diskSize = "";
 		String location = "";
 		
-		Map<String, String> resourceMetadata = TestResourceHelper.generateResourceMetadata(host, port, userName,
-				extraPorts, spec.getImageId(), spec.getPublicKey(), cpuSize, menSize, diskSize,
+		Map<String, String> resourceMetadata = ResourceHelperTest.generateResourceMetadata(host, port, userName,
+				extraPorts, spec.getImageName(), spec.getPublicKey(), cpuSize, menSize, diskSize,
 				location);
-		suitableResource = TestResourceHelper.generateMockResource(requestId, resourceMetadata, true);
+		suitableResource = ResourceHelperTest.generateMockResource(requestId, resourceMetadata, true);
 
 		assertFalse(FogbowRequirementsHelper.matches(suitableResource, fogbowRequirementsB));
 
@@ -273,10 +263,10 @@ public class TestFogbowRequirementsHelper {
 		String diskSize = "";
 		String location = "";
 		
-		Map<String, String> resourceMetadata = TestResourceHelper.generateResourceMetadata(host, port, userName,
-				extraPorts, spec.getImageId(), spec.getPublicKey(), cpuSize, menSize, diskSize,
+		Map<String, String> resourceMetadata = ResourceHelperTest.generateResourceMetadata(host, port, userName,
+				extraPorts, spec.getImageName(), spec.getPublicKey(), cpuSize, menSize, diskSize,
 				location);
-		suitableResource = TestResourceHelper.generateMockResource(requestId, resourceMetadata, true);
+		suitableResource = ResourceHelperTest.generateMockResource(requestId, resourceMetadata, true);
 
 		assertFalse(FogbowRequirementsHelper.matches(suitableResource, fogbowRequirementsB));
 
@@ -297,11 +287,11 @@ public class TestFogbowRequirementsHelper {
 		String diskSize = "39";
 		String location = "servers.your.domain";
 
-		Map<String, String> resourceMetadata = TestResourceHelper.generateResourceMetadata(host, port, userName,
-				extraPorts, spec.getImageId(), spec.getPublicKey(), cpuSize, menSize, diskSize,
+		Map<String, String> resourceMetadata = ResourceHelperTest.generateResourceMetadata(host, port, userName,
+				extraPorts, spec.getImageName(), spec.getPublicKey(), cpuSize, menSize, diskSize,
 				location);
 
-		suitableResource = TestResourceHelper.generateMockResource(requestId, resourceMetadata, true);
+		suitableResource = ResourceHelperTest.generateMockResource(requestId, resourceMetadata, true);
 
 		assertFalse(FogbowRequirementsHelper.matches(suitableResource, fogbowRequirements));
 
@@ -322,17 +312,17 @@ public class TestFogbowRequirementsHelper {
 		String diskSize = "40";
 		String location = "servers.your.domainA";
 
-		Map<String, String> resourceMetadata = TestResourceHelper.generateResourceMetadata(host, port, userName,
-				extraPorts,spec.getImageId(), spec.getPublicKey(), cpuSize, menSize, diskSize,
+		Map<String, String> resourceMetadata = ResourceHelperTest.generateResourceMetadata(host, port, userName,
+				extraPorts,spec.getImageName(), spec.getPublicKey(), cpuSize, menSize, diskSize,
 				location);
 
-		suitableResource = TestResourceHelper.generateMockResource(requestId, resourceMetadata, true);
+		suitableResource = ResourceHelperTest.generateMockResource(requestId, resourceMetadata, true);
 
 		assertFalse(FogbowRequirementsHelper.matches(suitableResource, fogbowRequirements));
 
 	}
 
-	private void generateDefaulProperties() {
+	private void generateDefaultProperties() {
 
 		properties = new Properties();
 

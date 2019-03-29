@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.constants.AppMessagesConstants;
+import org.fogbowcloud.blowout.core.constants.BlowoutConstants;
 import org.fogbowcloud.blowout.core.constants.FogbowConstants;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.model.resource.AbstractResource;
@@ -15,40 +16,40 @@ public class FogbowResource extends AbstractResource {
 
 	private final String computeOrderId;
 	private String instanceId;
-	private String publicIpId;
+	private String publicIpOrderId;
 
 	public FogbowResource(String id, String computeOrderId, Specification spec) {
 		super(id, spec);
 		this.computeOrderId = computeOrderId;
 	}
 
-	public FogbowResource(String id, String computeOrderId, Specification spec, String publicIpId) {
+	public FogbowResource(String id, String computeOrderId, Specification spec, String publicIpOrderId) {
 		this(id, computeOrderId, spec);
-		this.publicIpId = publicIpId;
+		this.publicIpOrderId = publicIpOrderId;
 	}
 
 	public boolean match(Specification spec) {
 		String fogbowRequirement = spec.getRequirementValue(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS);
-		String image = spec.getImageId();
+		String imageName = spec.getImageName();
 		String publicKey = spec.getPublicKey();
-		if (fogbowRequirement != null && image != null) {
+		if (fogbowRequirement != null && imageName != null) {
 
 			if (!FogbowRequirementsHelper.matches(this, fogbowRequirement)) {
 				return false;
 			}
-			if (!image.equalsIgnoreCase(this.getMetadataValue(METADATA_IMAGE))) {
+			if (!imageName.equalsIgnoreCase(this.getMetadataValue(BlowoutConstants.METADATA_IMAGE_NAME))) {
 				return false;
 			}
-            return publicKey.equalsIgnoreCase(this.getMetadataValue(METADATA_PUBLIC_KEY));
+            return publicKey.equalsIgnoreCase(this.getMetadataValue(BlowoutConstants.METADATA_PUBLIC_KEY));
 		} else {
 			return false;
 		}
     }
 
 	protected boolean internalCheckConnectivity() {
-		String host = super.getMetadataValue(METADATA_SSH_PUBLIC_IP);
+		final String publicIp = super.getMetadataValue(BlowoutConstants.METADATA_PUBLIC_IP);
 
-		LOGGER.debug("Checking resource connectivity [host: " + host + "].");
+		LOGGER.debug("Checking resource connectivity [host: " + publicIp + "].");
 
 		Runtime run;
 		Process p = null;
@@ -57,10 +58,10 @@ public class FogbowResource extends AbstractResource {
 		try {
 			run = Runtime.getRuntime();
 			p = run.exec(new String[] { "/bin/bash", "-c",
-					"echo quit | telnet " + host + " 2>/dev/null | grep Connected" });
+					"echo quit | telnet " + publicIp + " 2>/dev/null | grep Connected" });
 			p.waitFor();
 
-			LOGGER.info("Running command: /bin/bash -c echo quit | telnet " + host + " 2>/dev/null | grep Connected");
+			LOGGER.info("Running command: /bin/bash -c echo quit | telnet " + publicIp + " 2>/dev/null | grep Connected");
 
 			scanner = new Scanner(p.getInputStream());
 			if (scanner.hasNext()) {
@@ -78,7 +79,6 @@ public class FogbowResource extends AbstractResource {
 			LOGGER.error(AppMessagesConstants.RESOURCE_CONNECT_FAILED);
 			return false;
 		} finally {
-			run = null;
 			if (p != null) {
 				p.destroy();
 			}
@@ -101,5 +101,5 @@ public class FogbowResource extends AbstractResource {
 		return this.computeOrderId;
 	}
 
-	public String getPublicIpId() { return this.publicIpId; }
+	public String getPublicIpOrderId() { return this.publicIpOrderId; }
 }

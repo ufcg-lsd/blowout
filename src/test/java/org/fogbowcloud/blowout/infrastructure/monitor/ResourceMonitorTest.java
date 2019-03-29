@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.fogbowcloud.blowout.helpers.Constants.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.Properties;
 
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.constants.AppPropertiesConstants;
+import org.fogbowcloud.blowout.helpers.Constants;
 import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
 import org.fogbowcloud.blowout.infrastructure.provider.InfrastructureProvider;
 import org.fogbowcloud.blowout.core.model.resource.AbstractResource;
@@ -20,23 +22,24 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-public class TestResourceMonitor {
+public class ResourceMonitorTest {
 
 	private ResourceMonitor resourceMonitor;
 	private InfrastructureProvider infraProvider;
 	private BlowoutPool resourcePool;
+	private Specification spec;
 	
 	@Before
 	public void setUp() throws Exception {
 		
-		infraProvider = Mockito.mock(InfrastructureProvider.class);
-		resourcePool = Mockito.mock(BlowoutPool.class);
+		this.infraProvider = Mockito.mock(InfrastructureProvider.class);
+		this.resourcePool = Mockito.mock(BlowoutPool.class);
 		Properties properties = new Properties();
 		properties.setProperty(AppPropertiesConstants.RESOURCE_MONITOR_SLEEP_PERIOD, "1000");
 		properties.setProperty(AppPropertiesConstants.INFRA_RESOURCE_IDLE_LIFETIME, "120000");
 		properties.setProperty(AppPropertiesConstants.INFRA_RESOURCE_CONNECTION_RETRY, "3");
-		
-		resourceMonitor = Mockito.spy(new ResourceMonitor(infraProvider, resourcePool, properties));
+		this.spec = Mockito.mock(Specification.class);
+		this.resourceMonitor = Mockito.spy(new ResourceMonitor(this.infraProvider, this.resourcePool, properties));
 	}
 
 	@After
@@ -46,25 +49,17 @@ public class TestResourceMonitor {
 
 	@Test
 	public void testProcessPendingResource() throws Exception {
-
-		List<AbstractResource> resources = new ArrayList<AbstractResource>();
-		
-		String resourceId = "resourceA";
-		String orderId = "orderA";
-		
-		Specification specA = new Specification("ImageA", "Fogbow", "myKeyA", "path");
-		
-		AbstractResource resource = new FogbowResource(resourceId, orderId, specA);
+		List<AbstractResource> resources = new ArrayList<>();
+		AbstractResource resource = new FogbowResource(Constants.FakeData.RESOURCE_ID, Constants.FakeData.ORDER_ID, this.spec);
 		
 		doReturn(resources).when(resourcePool).getAllResources();
-		doReturn(resource).when(infraProvider).getResource(resourceId);
+		doReturn(resource).when(infraProvider).getResource(Constants.FakeData.RESOURCE_ID);
 		
-		resourceMonitor.addPendingResource(resourceId, specA);
+		resourceMonitor.addPendingResource(Constants.FakeData.RESOURCE_ID, this.spec);
 		resourceMonitor.getMonitoringService().monitorProcess();
 		
 		verify(resourcePool, times(1)).addResource(resource);
 		assertTrue(resourceMonitor.getPendingResources().isEmpty());
-
 	}
 	
 	@Test
@@ -93,7 +88,4 @@ public class TestResourceMonitor {
 		assertEquals(1, resourceMonitor.getPendingResources().size());
 
 	}
-	
-	
-	
 }

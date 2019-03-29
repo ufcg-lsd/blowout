@@ -30,7 +30,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TestDefaultBlowoutPool {
+public class DefaultBlowoutPoolTest {
 	
 	private static final String FAKE_UUID = "1234";
 	private DefaultBlowoutPool defaultBlowoutPool;

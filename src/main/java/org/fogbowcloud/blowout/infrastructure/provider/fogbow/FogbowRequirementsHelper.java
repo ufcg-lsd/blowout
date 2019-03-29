@@ -4,10 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.fogbowcloud.blowout.core.constants.BlowoutConstants;
 import org.fogbowcloud.blowout.core.constants.FogbowConstants;
 import org.fogbowcloud.blowout.infrastructure.model.FogbowResource;
-import org.fogbowcloud.blowout.core.model.resource.AbstractResource;
-
 import condor.classad.AttrRef;
 import condor.classad.ClassAdParser;
 import condor.classad.Env;
@@ -78,21 +77,21 @@ public class FogbowRequirementsHelper {
 					// TODO: Check if you need to refact this
 					if (attribute.equals(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_Glue2vCPU)) {
 						providedAttributes.add(attribute);
-						attributeValue = resource.getMetadataValue(AbstractResource.METADATA_VCPU);
+						attributeValue = resource.getMetadataValue(BlowoutConstants.METADATA_VCPU);
 					} 
 					else if (attribute.equals(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_Glue2RAM)) {
 						providedAttributes.add(attribute);
-						attributeValue = resource.getMetadataValue(AbstractResource.METADATA_MEM_SIZE);
+						attributeValue = resource.getMetadataValue(BlowoutConstants.METADATA_MEM_SIZE);
 					} 
 					else if (attribute.equals(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_Glue2disk)) {
-						attributeValue = resource.getMetadataValue(AbstractResource.METADATA_DISK_SIZE);
+						attributeValue = resource.getMetadataValue(BlowoutConstants.METADATA_DISK_SIZE);
 						if (attributeValue != null && !attributeValue.equals(ZERO) ) {
 							providedAttributes.add(attribute);
 						}
 					} 
 					else if (attribute.equals(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_1Glue2CloudComputeManagerID)) {
 						providedAttributes.add(attribute);
-						attributeValue = resource.getMetadataValue(AbstractResource.METADATA_LOCATION);
+						attributeValue = resource.getMetadataValue(BlowoutConstants.METADATA_LOCATION);
 					}
 					
 					env.push((RecordExpr) new ClassAdParser("[" + attribute + " = " + attributeValue + "]").parse());
