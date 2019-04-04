@@ -1,10 +1,7 @@
 package org.fogbowcloud.blowout.helpers;
 
-import io.specto.hoverfly.junit.core.SimulationSource;
 import org.fogbowcloud.blowout.core.constants.FogbowConstants;
 
-import static io.specto.hoverfly.junit.dsl.HoverflyDsl.service;
-import static io.specto.hoverfly.junit.dsl.ResponseCreators.success;
 import static org.fogbowcloud.blowout.helpers.Constants.JSON.Header.Key.FOGBOW_USER_TOKEN;
 
 public class HoverflyRules {
@@ -26,6 +23,7 @@ public class HoverflyRules {
 
     private static final String getRasPublicKey = "/" + FogbowConstants.JSON_KEY_RAS_PUBLIC_KEY;
 
+    /*
     public static SimulationSource simulationSource = SimulationSource.
             dsl(
                     service(Constants.FakeData.RAS_BASE_URL)
@@ -64,4 +62,5 @@ public class HoverflyRules {
                             .body(Constants.JSON.Body.AUTHENTICATE)
                             .willReturn(success().body(Constants.JSON.Body.AUTHENTICATE_RESPONSE))
             );
+     */
 }

@@ -1,10 +1,11 @@
 package org.fogbowcloud.blowout.helpers;
 
+import org.fogbowcloud.blowout.core.constants.FogbowConstants;
 import org.fogbowcloud.blowout.core.model.Command;
 
 public class Constants {
     public class FakeData {
-        public static final String CLOUD_NAME = "fake-cloud-name";
+        public static final String CLOUD_NAME = "cloud4";
         public static final String COMPUTE_IMAGE_FLAVOR_NAME = "fake-compute-flavor-name";
         public static final String COMPUTE_IMAGE_ID = "fake-compute-image-id";
         public static final String FOGBOW_USER_NAME = "fake-fogbow-user-name";
@@ -23,8 +24,8 @@ public class Constants {
 
         public static final String FOGBOW_USER_TOKEN = "fake-fogbow-user-token";
         public static final String RAS_PUBLIC_KEY = "fake-ras-public-key";
-        public static final String RAS_BASE_URL = "fake-ras.fogbow.cloud";
-        public static final String AS_BASE_URL = "fake-as.fogbow.cloud";
+        public static final String RAS_BASE_URL = "http://fake-ras-base-url.edu.br";
+        public static final String AS_BASE_URL = "http://fake-as-base-url.edu.br";
 
         public static final String RAS_MEMBER_ID = "fake-ras-member-id";
         public static final String USER_DATA_FILE = "scripts/lvl-user-data.sh";
@@ -35,6 +36,7 @@ public class Constants {
         public static final String LOCATION = "edu.ufcg.lsd.cloud_1s";
         public static final String COMMAND = "echo fake-echo";
         public static final String UUID = "1234";
+        public static final String FAKE_ACCESS_ID = "fake-access-id";
     }
 
     public class JSON {
@@ -71,12 +73,12 @@ public class Constants {
 
             public static final String COMPUTE = "{" +
                     "\"cloudName\": \"fake-cloud-name\"," +
-                    " \"disk\": 0, " +
+                    " \"disk\": 0," +
                     "\"imageId\": \"fake-compute-image-id\"," +
                     "\"memory\": 0," +
                     "\"name\": \"fake-compute-name\"," +
-                    "\"provider\": \"fake-provider\", " +
-                    "\"publicKey\": \"fake-public-key\", " +
+                    "\"provider\": \"fake-provider\"," +
+                    "\"publicKey\": \"fake-public-key\"," +
                     "\"vCPU\": 0" +
                     "}";
 
@@ -120,7 +122,33 @@ public class Constants {
                         "}," +
                     "\"publicKey\": \"fake-ras-public-key\""
                     ;
+            public static final String SPECIFICATION = "{" +
+                    "\"imageId\":\"fake-compute-image-id\"," +
+                    "\"cloudName\":\"cloud4\"," +
+                    "\"name\":\"Compute started by: fake-fogbow-user-name\"," +
+                    "\"publicKey\":\"fake-public-key\"" +
+                    "}";
         }
+    }
+
+    public class ENDPOINT {
+
+        public static final String getPublicIpInstanceEndpoint =  FakeData.RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_PUBLIC_IP +
+                "/" + Constants.FakeData.PUBLIC_IP_ORDER_ID;
+
+        public static final String createPublicIPEndpoint = FakeData.RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_PUBLIC_IP;
+
+        public static final String getAllImagesEndpoint = FakeData.RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_IMAGES + "/"
+                + Constants.FakeData.RAS_MEMBER_ID + "/" + Constants.FakeData.CLOUD_NAME;
+
+        public static final String createComputeEndpoint = FakeData.RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_COMPUTE;
+
+        public static final String getComputeInstanceEndpoint = FakeData.RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_COMPUTE + "/" +
+                Constants.FakeData.COMPUTE_ORDER_ID;
+
+        public static final String getAsToken = "/" + FogbowConstants.AS_ENDPOINT_TOKEN;
+
+        public static final String getRasPublicKey = "/" + FogbowConstants.JSON_KEY_RAS_PUBLIC_KEY;
     }
 
     public static final String STR_OTHER_VALUE = "otherValue";
