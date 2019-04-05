@@ -1,24 +1,27 @@
 package org.fogbowcloud.blowout.infrastructure.provider.fogbow;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
 import static org.fogbowcloud.blowout.helpers.Constants.*;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
+import java.io.FileInputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.fogbowcloud.blowout.core.constants.BlowoutConstants;
 import org.fogbowcloud.blowout.core.constants.FogbowConstants;
+import org.fogbowcloud.blowout.core.model.resource.AbstractResource;
 import org.fogbowcloud.blowout.helpers.Constants;
 import org.fogbowcloud.blowout.helpers.FogbowInfrastructureTestUtils;
+import org.fogbowcloud.blowout.infrastructure.token.KeystoneTokenUpdatePlugin;
 import org.json.JSONException;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
@@ -38,31 +41,40 @@ public class FogbowInfrastructureProviderTest {
 	@Rule
 	public final ExpectedException exception = ExpectedException.none();
 
-	private FogbowInfrastructureProvider fogbowInfrastructureProvider; 
+	private FogbowInfrastructureProvider fogbowInfrastructureProvider;
 	private HttpWrapper httpWrapperMock;
-	private Properties properties;
+	private static Properties properties;
 	private ScheduledCurrentThreadExecutorService exec;
-	private AbstractTokenUpdatePlugin tokenUpdatePluginMock;
+	private static AbstractTokenUpdatePlugin tokenUpdatePluginMock;
 	private FogbowResourceDatastore fogbowResourceDsMock;
+	private static Specification spec;
+
+	@BeforeClass
+	public static void init() throws Exception {
+		properties = new Properties();
+		properties.load(new FileInputStream(Constants.FILE_PATH_TESTS_CONFIG));
+
+		Token token = Mockito.mock(Token.class);
+		when(token.getAccessId()).thenReturn(Constants.FakeData.FAKE_ACCESS_ID);
+
+		tokenUpdatePluginMock =  mock(KeystoneTokenUpdatePlugin.class);
+		when(tokenUpdatePluginMock.generateToken()).thenReturn(token);
+		when(tokenUpdatePluginMock.getUpdateTime()).thenReturn(6);
+		when(tokenUpdatePluginMock.getUpdateTimeUnits()).thenReturn(TimeUnit.HOURS);
+
+		spec = new Specification(Constants.FakeData.CLOUD_NAME, Constants.FakeData.COMPUTE_IMAGE_FLAVOR_NAME,
+				Constants.FakeData.FOGBOW_USER_NAME, Constants.FakeData.PUBLIC_KEY, Constants.FakeData.PRIVATE_KEY_FILE_PATH);
+
+	}
 
 	@Before
-	public void setUp() throws Exception {
-		this.generateDefaultProperties();
-		this.tokenUpdatePluginMock = mock(AbstractTokenUpdatePlugin.class);
-
-		Token token = mock(Token.class);
-		doReturn(token).when(tokenUpdatePluginMock).generateToken();
-		doReturn(6).when(tokenUpdatePluginMock).getUpdateTime();
-		doReturn(TimeUnit.HOURS).when(tokenUpdatePluginMock).getUpdateTimeUnits();
-		
+	public void setUp() {
 		httpWrapperMock = mock(HttpWrapper.class);
 		fogbowResourceDsMock = mock(FogbowResourceDatastore.class);
-
 		exec = new ScheduledCurrentThreadExecutorService();
 		fogbowInfrastructureProvider = spy(new FogbowInfrastructureProvider(properties, exec, tokenUpdatePluginMock));
 		fogbowInfrastructureProvider.setFrDatastore(fogbowResourceDsMock);
-		//doNothing().when(fogbowInfrastructureProvider).handleTokenUpdate(exec, "server", "password");
-	}    
+	}
 
 	@After
 	public void setDown() throws Exception {
@@ -73,14 +85,12 @@ public class FogbowInfrastructureProviderTest {
 
 	@Test
 	public void testHandleTokenUpdate(){
-		Token token = mock(Token.class);
-		doReturn(token).when(tokenUpdatePluginMock).generateToken();
 		fogbowInfrastructureProvider.handleTokenUpdate(exec);
-		verify(fogbowInfrastructureProvider).setToken(token);
+		verify(fogbowInfrastructureProvider).handleTokenUpdate(exec);
 	}
 
 	@Test
-	public void testMakeBodyJasonToComputeRequest() throws Exception {
+	public void testMakeBodyJsonToComputeRequest() throws Exception {
 		FogbowInfrastructureProvider fogbowInfrastructureProvider = new FogbowInfrastructureProvider(properties, exec, tokenUpdatePluginMock);
 		Specification specs = new Specification(Constants.FakeData.CLOUD_NAME,"imageMock", "UserName",
 				"publicKeyMock", "privateKeyMock", FILE_PATH_USER_DATA_MOCK, "userDataType");
@@ -105,19 +115,41 @@ public class FogbowInfrastructureProviderTest {
 	@Test
 	public void requestResourceGetRequestIdTestSuccess(){
 		try {
+
+			when(httpWrapperMock.doRequest(eq(HttpGet.METHOD_NAME), eq(Constants.ENDPOINT.getAllImagesEndpoint), eq(Constants.FakeData.FAKE_ACCESS_ID), any(List.class)))
+					.thenReturn(Constants.JSON.Body.IMAGES_RESPONSE);
+
+			when(httpWrapperMock.doRequest(eq(HttpPost.METHOD_NAME), eq(Constants.ENDPOINT.createComputeEndpoint), eq(Constants.FakeData.FAKE_ACCESS_ID), any(List.class), any(StringEntity.class)))
+					.thenReturn(Constants.JSON.Body.COMPUTE_ORDER_ID);
+
+			when(httpWrapperMock.doRequest(eq(HttpPost.METHOD_NAME), eq(Constants.ENDPOINT.createPublicIPEndpoint), eq(Constants.FakeData.FAKE_ACCESS_ID), any(List.class), any(StringEntity.class)))
+					.thenReturn(Constants.JSON.Body.PUBLIC_IP_ORDER_ID);
+
+			when(httpWrapperMock.doRequest(eq(HttpGet.METHOD_NAME), eq(Constants.ENDPOINT.getComputeInstanceEndpoint), eq(Constants.FakeData.FAKE_ACCESS_ID), anyList()))
+					.thenReturn(Constants.JSON.Body.COMPUTE);
+
+			when(httpWrapperMock.doRequest(eq(HttpGet.METHOD_NAME), eq(Constants.ENDPOINT.getPublicIpInstanceEndpoint), eq(Constants.FakeData.FAKE_ACCESS_ID), any(List.class)))
+					.thenReturn(Constants.JSON.Body.PUBLIC_IP_INSTANCE_RESPONSE);
+
+			fogbowInfrastructureProvider.setHttpWrapper(httpWrapperMock);
+
+			String resourceId = fogbowInfrastructureProvider.requestResource(spec);
+			assertNotNull(resourceId);
+
+			AbstractResource abstractResource = fogbowInfrastructureProvider.getResource(resourceId);
+			assertEquals(resourceId, abstractResource.getId());
+			assertEquals(Constants.FakeData.PUBLIC_IP_ORDER_ID, ((FogbowResource) abstractResource).getPublicIpOrderId());
+
+			/*
 			String requestIdMock = "request01";
-			
-			Specification specs = new Specification(Constants.FakeData.CLOUD_NAME,"imageMock", "UserName",
-					"publicKeyMock", "privateKeyMock", FILE_PATH_USER_DATA_MOCK, "userDataType");
 
 			createDefaultRequestResponse(requestIdMock);
 
-			fogbowInfrastructureProvider.setHttpWrapper(httpWrapperMock);
 			doReturn(true).when(fogbowResourceDsMock).addFogbowResource(Mockito.any(FogbowResource.class));
 
-			String resourceId = fogbowInfrastructureProvider.requestResource(specs);
+			String resourceId = fogbowInfrastructureProvider.requestResource(spec);
 			assertNotNull(resourceId);
-
+			*/
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail();
@@ -126,71 +158,46 @@ public class FogbowInfrastructureProviderTest {
 
 	@Test
 	public void getResourceTestSuccess() throws Exception{
-
-		//Attributes
-		final String requestIdMock = "request01";
-
-		FogbowResource resource = mock(FogbowResource.class);
-		doReturn(requestIdMock).when(resource).getId();
-
-		//To avoid SSH Connection Error when tries to test connection to a FAKE host.
-		doReturn(resource).when(fogbowInfrastructureProvider).getFogbowResource(Mockito.eq(requestIdMock));
-		doReturn(true).when(resource).checkConnectivity(); 
-
+		when(httpWrapperMock.doRequest(eq(HttpGet.METHOD_NAME), eq(Constants.ENDPOINT.getComputeInstanceEndpoint), eq(Constants.FakeData.FAKE_ACCESS_ID), anyList()))
+				.thenReturn(Constants.JSON.Body.COMPUTE);
+		when(httpWrapperMock.doRequest(eq(HttpGet.METHOD_NAME), eq(Constants.ENDPOINT.getPublicIpInstanceEndpoint), eq(Constants.FakeData.FAKE_ACCESS_ID), any(List.class)))
+				.thenReturn(Constants.JSON.Body.PUBLIC_IP_INSTANCE_RESPONSE);
 		fogbowInfrastructureProvider.setHttpWrapper(httpWrapperMock);
 
-		FogbowResource newResource = (FogbowResource) fogbowInfrastructureProvider.getResource(requestIdMock);
+		FogbowResource fogbowResource = new FogbowResource(Constants.FakeData.RESOURCE_ID,
+				Constants.FakeData.COMPUTE_ORDER_ID, spec, Constants.FakeData.PUBLIC_IP_ORDER_ID);
+		Map<String, FogbowResource> resourcesMap = new ConcurrentHashMap<>();
+		resourcesMap.put(Constants.FakeData.RESOURCE_ID, fogbowResource);
+		fogbowInfrastructureProvider.setResourcesMap(resourcesMap);
 
-		assertNotNull(newResource);
-		assertEquals(requestIdMock, newResource.getId());
+		AbstractResource abstractResource = fogbowInfrastructureProvider.getResource(Constants.FakeData.RESOURCE_ID);
+
+		assertEquals(Constants.FakeData.RESOURCE_ID, abstractResource.getId());
+		assertEquals(Constants.FakeData.PUBLIC_IP_FAKE, abstractResource.getMetadataValue(BlowoutConstants.METADATA_PUBLIC_IP));
 
 	}
 
 	@Test
 	public void getFogbowResourceTestSuccess() throws Exception{
 
-		//Attributes
-		String returnedOrderId = "order01";
-		String instanceIdMock = "instance01";
-		String ramSizeMock = "1024";
-		String diskMock = "2";
-		String vCPUMock = "1";
-		String hostMock = "10.0.1.10";
-		String portMock = "8989";
-		String hostNameMock = "fake-hostname";
-		String publicOrderId = "publicOrderId01";
-		String ip = "fake-ip";
-		String state = "fake-state";
-		String provider = "fake-provider";
-
-		Specification specs = new Specification(Constants.FakeData.CLOUD_NAME, "imageMock", "UserName",
-				"publicKeyMock", "privateKeyMock", FILE_PATH_USER_DATA_MOCK, "userDataType");
-
-		//Create Mock behavior for httpWrapperMock
-		//Creating response for request for resource.
-		createDefaultRequestResponse(returnedOrderId);
-		//Creating response for request for Instance ID
-//		createDefaultInstanceIdResponse(returnedOrderId, vCPUMock, ramSizeMock, diskMock, OrderState.FULFILLED, hostNameMock);
-		//Creating response for request for Instance Attributes
-		createDefaultInstanceAttributesResponse(returnedOrderId, vCPUMock, ramSizeMock, diskMock, hostNameMock);
-		createDefaultPublicIpResponsePostRequest(publicOrderId);
-		createDefaultPublicIpResponseGetRequest(publicOrderId, ip, state, provider);
-
+		when(httpWrapperMock.doRequest(eq(HttpGet.METHOD_NAME), eq(Constants.ENDPOINT.getComputeInstanceEndpoint), eq(Constants.FakeData.FAKE_ACCESS_ID), anyList()))
+				.thenReturn(Constants.JSON.Body.COMPUTE);
+		when(httpWrapperMock.doRequest(eq(HttpGet.METHOD_NAME), eq(Constants.ENDPOINT.getPublicIpInstanceEndpoint), eq(Constants.FakeData.FAKE_ACCESS_ID), any(List.class)))
+				.thenReturn(Constants.JSON.Body.PUBLIC_IP_INSTANCE_RESPONSE);
 		fogbowInfrastructureProvider.setHttpWrapper(httpWrapperMock);
-		String resourceId = fogbowInfrastructureProvider.requestResource(specs);
-		
-		FogbowResource resource = mock(FogbowResource.class);
-		doReturn(returnedOrderId).when(resource).getComputeOrderId();
 
-		doReturn(true).when(fogbowResourceDsMock).deleteFogbowResourceById(resource);
+		FogbowResource fogbowResource = new FogbowResource(Constants.FakeData.RESOURCE_ID,
+				Constants.FakeData.COMPUTE_ORDER_ID, spec, Constants.FakeData.PUBLIC_IP_ORDER_ID);
+		Map<String, FogbowResource> resourcesMap = new ConcurrentHashMap<>();
+		resourcesMap.put(Constants.FakeData.RESOURCE_ID, fogbowResource);
+		fogbowInfrastructureProvider.setResourcesMap(resourcesMap);
 
-		FogbowResource newResource = fogbowInfrastructureProvider.getFogbowResource(resourceId);
+		FogbowResource fogbowResourceReturn = fogbowInfrastructureProvider.getFogbowResource(Constants.FakeData.RESOURCE_ID);
 
- 		assertNotNull(newResource.getId());
-		assertEquals(ramSizeMock, newResource.getMetadataValue(BlowoutConstants.METADATA_MEM_SIZE));
-		assertEquals("1", newResource.getMetadataValue(BlowoutConstants.METADATA_VCPU));
-		assertEquals(hostMock, newResource.getMetadataValue(BlowoutConstants.METADATA_SSH_HOST));
-
+		assertEquals(Constants.FakeData.RESOURCE_ID, fogbowResourceReturn.getId());
+		assertEquals(Constants.FakeData.PUBLIC_IP_ORDER_ID, fogbowResourceReturn.getPublicIpOrderId());
+		assertEquals(Constants.FakeData.COMPUTE_ORDER_ID, fogbowResourceReturn.getComputeOrderId());
+		assertEquals(Constants.FakeData.PUBLIC_IP_FAKE, fogbowResourceReturn.getMetadataValue(BlowoutConstants.METADATA_PUBLIC_IP));
 
 
 	}

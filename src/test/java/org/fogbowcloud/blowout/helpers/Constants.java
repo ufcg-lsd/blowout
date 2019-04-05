@@ -20,6 +20,7 @@ public class Constants {
 
         public static final String COMPUTE_ORDER_ID = "fake-compute-order-id";
         public static final String PUBLIC_IP_ORDER_ID = "fake-public-ip-order-id";
+        public static final String PUBLIC_IP_FAKE = "fake-ip";
         public static final String RAS_BASE_URL_PROP = "fake-ras-base-url";
 
         public static final String FOGBOW_USER_TOKEN = "fake-fogbow-user-token";
@@ -99,7 +100,7 @@ public class Constants {
                     "\"computeId\": \"string\"," +
                     "\"computeName\": \"string\"," +
                     "\"id\": \"string\"," +
-                    "\"ip\": \"string\"," +
+                    "\"ip\": \"fake-ip\"," +
                     "\"provider\": \"string\"," +
                     "\"state\": \"DISPATCHED\"" +
                     "}";
