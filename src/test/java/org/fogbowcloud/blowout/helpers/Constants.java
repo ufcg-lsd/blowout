@@ -74,13 +74,26 @@ public class Constants {
 
             public static final String COMPUTE = "{" +
                     "\"cloudName\": \"fake-cloud-name\"," +
-                    " \"disk\": 0," +
+                    " \"disk\": 4," +
                     "\"imageId\": \"fake-compute-image-id\"," +
-                    "\"memory\": 0," +
+                    "\"memory\": 1024," +
                     "\"name\": \"fake-compute-name\"," +
                     "\"provider\": \"fake-provider\"," +
                     "\"publicKey\": \"fake-public-key\"," +
-                    "\"vCPU\": 0" +
+                    "\"state\": \"READY\"," +
+                    "\"vCPU\": 1" +
+                    "}";
+
+            public static final String COMPUTE_NOT_READY = "{" +
+                    "\"cloudName\": \"fake-cloud-name\"," +
+                    " \"disk\": 4," +
+                    "\"imageId\": \"fake-compute-image-id\"," +
+                    "\"memory\": 1024," +
+                    "\"name\": \"fake-compute-name\"," +
+                    "\"provider\": \"fake-provider\"," +
+                    "\"publicKey\": \"fake-public-key\"," +
+                    "\"state\": \"CREATING\"," +
+                    "\"vCPU\": 1" +
                     "}";
 
             public static final String COMMAND = "{" +
