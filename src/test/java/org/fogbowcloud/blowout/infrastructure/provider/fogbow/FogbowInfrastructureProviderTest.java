@@ -189,7 +189,7 @@ public class FogbowInfrastructureProviderTest {
 	}
 
 	@Test
-	public void getFogbowResourceFailRequests(){
+	public void getFogbowResourceFailRequestTest(){
 		FogbowResource fogbowResource = new FogbowResource(Constants.FakeData.RESOURCE_ID,
 				Constants.FakeData.COMPUTE_ORDER_ID, spec, Constants.FakeData.PUBLIC_IP_ORDER_ID);
 		Map<String, FogbowResource> resourceMap = new ConcurrentHashMap<>();
@@ -202,44 +202,6 @@ public class FogbowInfrastructureProviderTest {
 			e.printStackTrace();
 			fail();
 		}
-
-	}
-
-	@Test
-	public void getResourceTestNoInstanceId() throws Exception{
-
-
-		/*
-		//Attributes
-		String returnedOrderId = "order03";
-		String instanceIdMock = "instance03";
-		String ramSizeMock = "1024";
-		String diskMock = "2";
-		String vCPUMock = "1";
-		String memberIdMock = "member01";
-
-//		Create Mock behavior for httpWrapperMock
-//		Creating response for request for resource.
-		createDefaultRequestResponse(returnedOrderId);
-//		Creating response for request for Instance ID
-//		createDefaultInstanceIdResponse(returnedOrderId, instanceIdMock, memberIdMock, OrderState.FAILED);
-
-		createDefaultInstanceAttributesResponseNoShh(returnedOrderId, vCPUMock, ramSizeMock, diskMock);
-
-		fogbowInfrastructureProvider.setHttpWrapper(httpWrapperMock);
-
-		FogbowResource resource = mock(FogbowResource.class);
-		doReturn(returnedOrderId).when(resource).getId();
-
-		Map<String, FogbowResource> resourceMap = new HashMap<String, FogbowResource>();
-		resourceMap.put(resource.getId(), resource);
-		
-		fogbowInfrastructureProvider.setResourcesMap(resourceMap);
-		
-		FogbowResource newResource = fogbowInfrastructureProvider.getFogbowResource(returnedOrderId);
-
-		assertNull(newResource);
-		*/
 
 	}
 
