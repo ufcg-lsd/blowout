@@ -1,7 +1,6 @@
 package org.fogbowcloud.blowout.infrastructure;
 
 import org.fogbowcloud.blowout.helpers.Constants;
-import org.fogbowcloud.blowout.helpers.HoverflyRules;
 import org.fogbowcloud.blowout.infrastructure.model.Token;
 import org.fogbowcloud.blowout.infrastructure.token.KeystoneTokenUpdatePlugin;
 import org.fogbowcloud.blowout.infrastructure.token.AbstractTokenUpdatePlugin;

@@ -146,7 +146,8 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
             this.populateInstanceAttributes(instanceAttributes, sshInfo);
 
-            if (instanceState != null && !instanceState.isEmpty() && instanceState.equals("READY")) {
+            if (instanceState != null && !instanceState.isEmpty() && instanceState.equals("READY")
+                && sshInfo.get(FogbowConstants.INSTANCE_ATTRIBUTE_STATE) == "READY") {
                 LOGGER.debug("Instance ID returned: " + instanceId);
 
                 fogbowResource.setInstanceId(instanceId);

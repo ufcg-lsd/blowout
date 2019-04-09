@@ -74,7 +74,7 @@ public class RASRequestsHelper {
         sleep(sleepTimeInMillis);
         String publicIpId = null;
         final String cloudName = this.properties.getProperty(AppPropertiesConstants.DEFAULT_CLOUD_NAME);
-        final String provider = this.properties.getProperty(AppPropertiesConstants.AS_TOKEN_PREFIX + AppPropertiesConstants.AS_TOKEN_PROJECT_NAME);
+        final String provider = this.properties.getProperty(AppPropertiesConstants.RAS_MEMBER_ID);
         final String requestUrl = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_PUBLIC_IP;
 
         Map<String, String> bodyRequestAttrs = new HashMap<>();
