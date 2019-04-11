@@ -37,15 +37,22 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 
     private void requestResources(Map<Specification, Integer> specsDemand) throws RequestResourceException {
 
+        LOGGER.debug("amount of specs: " + specsDemand.size());
+
         for (Entry<Specification, Integer> entry : specsDemand.entrySet()) {
 
             Specification spec = entry.getKey();
 
             Integer requested = this.resourceMonitor.getPendingRequests().get(
                     spec);
+
+            LOGGER.debug("amount requested: " + requested);
+
             if (requested == null)
                 requested = 0;
             int requiredResources = entry.getValue() - requested;
+
+            LOGGER.debug("amount required: " + requested);
 
             for (int count = 0; count < requiredResources; count++) {
 
@@ -58,6 +65,7 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
     private Map<Specification, Integer> generateDemandBySpec(List<Task> tasks, List<AbstractResource> resources) {
         Map<Specification, Integer> specsDemand = new HashMap<>();
 
+        //FIXME: it seems to me we need to filter IDLE only
         List<AbstractResource> currentResources = filterResourcesByState(resources,
                 ResourceState.IDLE,
                 ResourceState.BUSY,
@@ -66,7 +74,10 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
 
         for (Task task : tasks) {
 
+            //FIXME it seems we should run bellow code for
             if (!task.isFinished()) {
+
+                LOGGER.debug("task <" + task.getId() + " is on state <" + task.getState() + ">");
 
                 boolean resourceResolved = false;
 
@@ -74,10 +85,16 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
                     if (resource.match(task.getSpecification())) {
                         resourceResolved = true;
                         currentResources.remove(resource);
+
+                        LOGGER.debug("task <" + task.getId() + " was matched with resource <" + resource.getId() + ">");
+
                         break;
                     }
                 }
                 if (!resourceResolved) {
+
+                    LOGGER.debug("task <" + task.getId() + " was unable to match");
+
                     incrementDecrementDemand(specsDemand,
                             task.getSpecification(), true);
                 }
@@ -102,8 +119,8 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
             List<AbstractResource> resources, ResourceState... resourceStates) {
 
         List<AbstractResource> filteredResources = new ArrayList<AbstractResource>();
-        for (AbstractResource resource : resources) {
-            for (ResourceState state : resourceStates) {
+        for(ResourceState state: resourceStates){
+            for(AbstractResource resource : resources){
                 if (state.equals(resource.getState())) {
                     filteredResources.add(resource);
                 }

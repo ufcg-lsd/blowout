@@ -126,18 +126,19 @@ public class RASRequestsHelper {
         final String publicIpEndpoint = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_PUBLIC_IP +
                 "/" + fogbowResource.getPublicIpOrderId();
         try {
+            this.doRequest(HttpWrapper.HTTP_METHOD_DELETE, publicIpEndpoint, new ArrayList<>());
+            LOGGER.info("Public IP was deleted successfully.");
+        } catch (Exception e){
+            LOGGER.error("Error while trying to delete the Public IP.");
+        }
+
+        try {
             this.doRequest(HttpWrapper.HTTP_METHOD_DELETE, computeEndpoint, new ArrayList<>());
             LOGGER.info("Compute was deleted successfully.");
         } catch (Exception e) {
             LOGGER.error("Error while trying to delete the Compute order.");
         }
 
-        try {
-            this.doRequest(HttpWrapper.HTTP_METHOD_DELETE, publicIpEndpoint, new ArrayList<>());
-            LOGGER.info("Public IP was deleted successfully.");
-        } catch (Exception e){
-            LOGGER.error("Error while trying to delete the Public IP.");
-        }
     }
 
 
