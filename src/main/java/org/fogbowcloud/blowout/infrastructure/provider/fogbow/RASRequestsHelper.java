@@ -164,7 +164,7 @@ public class RASRequestsHelper {
             userName = "Iguassu";
         }
 
-        final String iguassuComputeName = "Compute started by: " + userName;
+        final String iguassuComputeName = userName;
 
         String imageName = specification.getImageName();
         String imageId = getImageId(imageName);
