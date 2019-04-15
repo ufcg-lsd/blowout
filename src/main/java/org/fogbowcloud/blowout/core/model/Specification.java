@@ -141,7 +141,7 @@ public class Specification implements Serializable {
 		if((this.cloudName != null) && !this.cloudName.isEmpty()){
 			sb.append("CloudName: " + this.cloudName);
 		}
-		sb.append("Image: " + this.imageName);
+		sb.append(" Image: " + this.imageName);
 		sb.append(" PublicKey: " + this.publicKey);
 		if ((this.contextScript != null) && !this.contextScript.isEmpty()) {
 			sb.append(LN + "ContextScript: " + contextScript);

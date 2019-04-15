@@ -140,12 +140,14 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 
             instanceAttributes = this.requestsHelper.getComputeInstance(fogbowResource.getComputeOrderId());
             instanceId = String.valueOf(instanceAttributes.get(FogbowConstants.INSTANCE_ATTRIBUTE_NAME));
+			String instanceState = String.valueOf(instanceAttributes.get(FogbowConstants.INSTANCE_ATTRIBUTE_STATE));
 
             Map<String, Object> sshInfo = getPublicIpInstance(fogbowResource.getPublicIpOrderId());
 
             this.populateInstanceAttributes(instanceAttributes, sshInfo);
 
-            if (instanceId != null && !instanceId.isEmpty()) {
+            if (instanceState != null && !instanceState.isEmpty() && instanceState.equals("READY")
+                && sshInfo.get(FogbowConstants.INSTANCE_ATTRIBUTE_STATE) == "READY") {
                 LOGGER.debug("Instance ID returned: " + instanceId);
 
                 fogbowResource.setInstanceId(instanceId);
@@ -158,8 +160,8 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
                 } else {
                     LOGGER.debug("Instance attributes not yet ready for instance: [" + instanceId + "]");
                 }
+                return fogbowResource;
             }
-            return fogbowResource;
 
         } catch (Exception e) {
             LOGGER.error("Error while getting resource from Order id: [" + fogbowResource.getComputeOrderId() + "]", e);

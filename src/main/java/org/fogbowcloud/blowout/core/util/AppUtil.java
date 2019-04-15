@@ -2,6 +2,9 @@ package org.fogbowcloud.blowout.core.util;
 
 import org.json.JSONObject;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -32,6 +35,19 @@ public class AppUtil {
             newMap.put(key, value);
         }
         return newMap;
+    }
+
+    public static Map<String, Object> parseJSONStringToMap(String response) throws ScriptException {
+        ScriptEngine engine;
+        ScriptEngineManager sem = new ScriptEngineManager();
+        engine = sem.getEngineByName("javascript");
+
+        final String script = "Java.asJSONCompatible(" + response + ")";
+        Object result = engine.eval(script);
+
+        final Map<String, Object> contents = (Map<String, Object>) result;
+
+        return new HashMap<>(contents);
     }
 
     public static String getValueFromJsonStr(String key, String jsonStr) {

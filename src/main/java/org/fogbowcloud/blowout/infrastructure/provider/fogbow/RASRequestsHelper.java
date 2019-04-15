@@ -74,7 +74,7 @@ public class RASRequestsHelper {
         sleep(sleepTimeInMillis);
         String publicIpId = null;
         final String cloudName = this.properties.getProperty(AppPropertiesConstants.DEFAULT_CLOUD_NAME);
-        final String provider = this.properties.getProperty(AppPropertiesConstants.AS_TOKEN_PROJECT_NAME);
+        final String provider = this.properties.getProperty(AppPropertiesConstants.RAS_MEMBER_ID);
         final String requestUrl = RAS_BASE_URL + "/" + FogbowConstants.RAS_ENDPOINT_PUBLIC_IP;
 
         Map<String, String> bodyRequestAttrs = new HashMap<>();
@@ -168,11 +168,9 @@ public class RASRequestsHelper {
 
         String imageName = specification.getImageName();
         String imageId = getImageId(imageName);
-        LOGGER.info("Using the image " + imageName + ":" + imageId + "in compute request");
+        LOGGER.info("Using the image " + imageName + ":" + imageId + " in compute request");
 
-        if(specification.getCloudName() != null){
-            makeBodyField(json, FogbowConstants.JSON_KEY_RAS_CLOUD_NAME, specification.getCloudName());
-        }
+        makeBodyField(json, FogbowConstants.JSON_KEY_RAS_CLOUD_NAME, specification.getCloudName());
         makeBodyField(json, FogbowConstants.JSON_KEY_RAS_DISK, specification.getDisk());
         makeBodyField(json, FogbowConstants.JSON_KEY_RAS_IMAGE_ID, imageId);
         makeBodyField(json, FogbowConstants.JSON_KEY_RAS_MEMORY, specification.getMemory());
@@ -222,19 +220,6 @@ public class RASRequestsHelper {
             LOGGER.error(errorMessage, e);
         }
         return imagesMap;
-    }
-
-    private Map<String, Object> parseJSONStringToMap(String response) throws ScriptException {
-        ScriptEngine engine;
-        ScriptEngineManager sem = new ScriptEngineManager();
-        engine = sem.getEngineByName("javascript");
-
-        final String script = "Java.asJSONCompatible(" + response + ")";
-        Object result = engine.eval(script);
-
-        final Map<String, Object> contents = (Map<String, Object>) result;
-
-        return new HashMap<>(contents);
     }
 
     private StringEntity makeRequestBodyJson(Map<String, String> bodyRequestAttrs) throws UnsupportedEncodingException {
