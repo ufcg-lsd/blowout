@@ -17,6 +17,8 @@ import org.fogbowcloud.blowout.core.model.resource.ResourceState;
 import org.fogbowcloud.blowout.core.model.resource.AbstractResource;
 import org.fogbowcloud.blowout.pool.BlowoutPool;
 
+import static java.lang.Thread.sleep;
+
 public class TaskMonitor implements Runnable {
 
 	private static final Logger LOGGER = Logger.getLogger(TaskMonitor.class);
@@ -126,7 +128,15 @@ public class TaskMonitor implements Runnable {
             blowoutPool.updateResource(resource, ResourceState.BUSY);
 
             getExecutorService().submit(() -> {
-                taskProcess.executeTask(resource);
+				final long sleepTimeInMillis = 5000;
+
+				try {
+					Thread.sleep(sleepTimeInMillis);
+					LOGGER.info("Thread " + Thread.currentThread().getName() + " was sleeping.");
+				} catch (InterruptedException e) {
+					LOGGER.info("Thread " + Thread.currentThread().getName() + " was interrupted.");
+				}
+				taskProcess.executeTask(resource);
             });
         }
 	}

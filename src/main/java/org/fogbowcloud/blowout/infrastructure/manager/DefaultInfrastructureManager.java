@@ -59,6 +59,7 @@ public class DefaultInfrastructureManager implements InfrastructureManager {
                 String resourceId = infraProvider.requestResource(spec);
                 resourceMonitor.addPendingResource(resourceId, spec);
             }
+
         }
     }
 
