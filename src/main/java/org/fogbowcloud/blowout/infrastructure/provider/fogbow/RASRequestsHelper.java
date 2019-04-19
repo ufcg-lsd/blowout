@@ -69,7 +69,7 @@ public class RASRequestsHelper {
     }
 
     public String createPublicIp(String computeOrderId) throws InterruptedException {
-        final Integer sleepTimeInMillis = 6000;
+        final long sleepTimeInMillis = 5000;
 
         sleep(sleepTimeInMillis);
         String publicIpId = null;

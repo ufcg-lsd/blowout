@@ -67,7 +67,7 @@ public class FogbowInfrastructureProvider implements InfrastructureProvider {
 		LOGGER.info("Requesting resource on Fogbow with specifications: " + specification.toString());
 		this.validateSpecification(specification);
 
-		String computeOrderId = this.requestsHelper.createCompute(specification);
+		final String computeOrderId = this.requestsHelper.createCompute(specification);
 		String publicIpId = null;
 
 		try {
